@@ -10,7 +10,7 @@
 </script>
 
 <ResizablePaneGroup direction="horizontal" class="grow basis-0" autoSaveId={layoutId}>
-    <ResizablePane>
+    <ResizablePane defaultSize={20}>
         <TreePane bind:entries />
     </ResizablePane>
     <ResizableHandle />
