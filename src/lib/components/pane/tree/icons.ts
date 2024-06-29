@@ -11,18 +11,18 @@ export const pickIcon = (label: string): { icon: Icon; classes: string[] } => {
             case "class":
                 return { icon: Coffee, classes: ["text-red-500"] };
             case "json":
-                return { icon: Braces, classes: ["text-green-500"] }
+                return { icon: Braces, classes: ["text-green-500"] };
             case "jpg":
             case "jpeg":
             case "png":
             case "gif":
-                return { icon: Image, classes: ["text-blue-500"] }
+                return { icon: Image, classes: ["text-blue-500"] };
             case "html":
             case "xml":
             case "xhtml":
             case "mhtml":
             case "htm":
-                return { icon: Code, classes: ["text-green-600"] }
+                return { icon: Code, classes: ["text-green-600"] };
             case "txt":
                 return { icon: Text, classes: [] };
         }

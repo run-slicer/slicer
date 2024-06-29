@@ -45,7 +45,7 @@
                     ".cm-scroller": {
                         // make scrollbar thinner
                         "scrollbar-width": "thin",
-                    }
+                    },
                 }}
             />
         {/await}
