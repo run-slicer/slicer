@@ -2,14 +2,12 @@ import type { Data } from "$lib/workspace";
 
 const ROW_BYTES = 16;
 
-const pad = (str: string, length: number) => str.padStart(length, "0");
-
 export const formatHex = async (data: Data): Promise<string> => {
     const buffer = new Uint8Array(await data.arrayBuffer());
 
     let result = "";
     for (let row = 0; row < buffer.length; row += ROW_BYTES) {
-        result += pad(row.toString(16), 8) + "  "; // address
+        result += row.toString(16).padStart(8, "0") + "  "; // address
 
         // hexadecimal representation
         for (let col = 0; col < ROW_BYTES; col++) {

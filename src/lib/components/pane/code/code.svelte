@@ -56,6 +56,22 @@
                             // make scrollbar thinner
                             "scrollbar-width": "thin",
                         },
+                        ".cm-panels": {
+                            // fix color on panel container
+                            "background-color": "hsl(var(--background))"
+                        },
+                        ".cm-search": {
+                            // fix alignment on search panel
+                            "display": "flex",
+                            "align-items": "center",
+                        },
+                        ".cm-button": {
+                            // fix color on search button
+                            "background-color": "hsl(var(--secondary))",
+                            "border-color": "hsl(var(--secondary))",
+                            "border-radius": "0.25rem", // rounded
+                            "background-image": "unset",
+                        },
                     }}
                 />
             {/await}
