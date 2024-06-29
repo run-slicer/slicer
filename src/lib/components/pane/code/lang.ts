@@ -40,8 +40,5 @@ export const fromExtension = (ext: string): Language => {
 };
 
 export const fromEntry = (entry: Entry): Language => {
-    const name = entry.data.name;
-
-    const dotIndex = name.lastIndexOf(".");
-    return dotIndex !== -1 ? fromExtension(name.substring(dotIndex + 1)) : "plaintext";
+    return entry.data.extension ? fromExtension(entry.data.extension) : "plaintext";
 };

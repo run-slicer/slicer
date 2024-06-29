@@ -8,11 +8,34 @@ export interface BlobLike {
     text: () => Promise<string>;
 }
 
+export interface Named {
+    name: string;
+    shortName: string;
+    extension?: string;
+}
+
+const parseName = (name: string): Named => {
+    let shortName = name;
+
+    const slashIndex = name.lastIndexOf("/");
+    if (slashIndex !== -1) {
+        shortName = name.substring(slashIndex + 1);
+    }
+
+    let extension: string | undefined;
+
+    const dotIndex = shortName.lastIndexOf(".");
+    if (dotIndex !== -1) {
+        extension = shortName.substring(dotIndex + 1);
+    }
+
+    return { name, shortName, extension };
+};
+
 export type DataType = "file" | "zip";
 
-export interface Data extends BlobLike {
+export interface Data extends BlobLike, Named {
     type: DataType;
-    name: string;
 }
 
 export interface FileData extends Data {
@@ -23,11 +46,11 @@ export interface FileData extends Data {
 export const fileData = (file: File): FileData => {
     return {
         type: "file",
-        name: file.name,
         file: file,
         stream: async () => file.stream(),
         arrayBuffer: () => file.arrayBuffer(),
         text: () => file.text(),
+        ...parseName(file.name),
     };
 };
 
@@ -45,12 +68,12 @@ export const zipData = async (file: File): Promise<ZipData[]> => {
         .map(([n, v]) => {
             return {
                 type: "zip",
-                name: n,
                 parent: info,
                 entry: v,
                 stream: async () => (await v.blob()).stream(),
                 arrayBuffer: () => v.arrayBuffer(),
                 text: () => v.text(),
+                ...parseName(n),
             };
         });
 };
@@ -88,7 +111,7 @@ export const current = writable<Entry | null>(null);
 export const classes = derived(entries, ($entries) => {
     return new Map(
         Array.from($entries.values())
-            .filter((e) => e.data.name.endsWith(".class"))
+            .filter((e) => e.data.extension === "class")
             .map((e) => {
                 const name = e.data.name;
 

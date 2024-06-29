@@ -13,7 +13,7 @@
 </script>
 
 <div class="flex h-full w-full flex-col scrollbar-thin">
-    <PaneHeader name="Code" icon={Code} />
+    <PaneHeader name={entry ? entry.data.shortName : "Code"} icon={Code} />
     <div class="relative basis-full overflow-hidden">
         {#if entry}
             {#await Promise.all([import("svelte-codemirror-editor"), load(language), read(entry)])}
