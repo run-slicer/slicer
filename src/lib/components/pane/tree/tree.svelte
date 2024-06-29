@@ -38,7 +38,7 @@
 
 <div class="flex h-full w-full flex-col">
     <PaneHeader name="Project" icon={Folders} />
-    <div class="flex h-full w-full overflow-scroll text-nowrap p-2 scrollbar-thin">
+    <div class="flex h-full w-full overflow-auto text-nowrap p-2 scrollbar-thin">
         {#if root.nodes && root.nodes.length > 0}
             <div class="block">
                 {#each root.nodes as node (node.label)}
