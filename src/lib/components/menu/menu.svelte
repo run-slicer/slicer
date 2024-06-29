@@ -1,7 +1,7 @@
 <script lang="ts">
     import { userPrefersMode } from "mode-watcher";
     import { Separator } from "$lib/components/ui/separator";
-    import { loadClass, loadJar } from "$lib/action/load";
+    import { load } from "$lib/action/load";
     import { current as currentDecompiler, all as decompilers, swap as swapDecompiler } from "$lib/decompiler";
     import {
         Menubar,
@@ -19,6 +19,34 @@
     } from "$lib/components/ui/menubar";
 
     $: decompiler = $currentDecompiler.id;
+
+    const listenShortcut = (shortcut: string, callback: (e: KeyboardEvent) => void) => {
+        const checks: ((e: KeyboardEvent) => boolean)[] = [];
+        for (const key of shortcut.toLowerCase().split("+")) {
+            switch (key) {
+                case "ctrl":
+                    checks.push((e) => e.ctrlKey);
+                    break;
+                case "alt":
+                    checks.push((e) => e.altKey);
+                    break;
+                case "shift":
+                    checks.push((e) => e.shiftKey);
+                    break;
+                default:
+                    checks.push((e) => e.key.toLowerCase() === key);
+            }
+        }
+
+        window.addEventListener("keydown", async (e) => {
+            if (checks.every((check) => check(e))) {
+                e.preventDefault();
+                callback(e);
+            }
+        });
+    };
+
+    listenShortcut("Ctrl+O", load);
 </script>
 
 <Menubar class="rounded-none border-b border-none px-2 lg:px-4">
@@ -45,13 +73,9 @@
     <MenubarMenu>
         <MenubarTrigger class="relative">File</MenubarTrigger>
         <MenubarContent>
-            <MenubarSub>
-                <MenubarSubTrigger>Open</MenubarSubTrigger>
-                <MenubarSubContent class="w-[230px]">
-                    <MenubarItem on:click={loadClass}>Class</MenubarItem>
-                    <MenubarItem on:click={loadJar}>JAR</MenubarItem>
-                </MenubarSubContent>
-            </MenubarSub>
+            <MenubarItem on:click={load}>
+                Open <MenubarShortcut>Ctrl+O</MenubarShortcut>
+            </MenubarItem>
         </MenubarContent>
     </MenubarMenu>
     <MenubarMenu>

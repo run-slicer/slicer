@@ -121,15 +121,11 @@ export const load = async (d: Data): Promise<LoadResult> => {
     return { entry: entry, created: true };
 };
 
-export const loadFile = async (f: File): Promise<LoadResult> => load(fileData(f));
-
-export const loadZip = async (f: File): Promise<LoadResult[]> => Promise.all((await zipData(f)).map(load));
-
-export const loadFileOrZip = async (f: File): Promise<LoadResult[]> => {
+export const loadFile = async (f: File): Promise<LoadResult[]> => {
     const view = new DataView(await f.slice(0, 4).arrayBuffer());
     if (view.getInt32(0, true) === 0x04034b50) {
-        return loadZip(f); // detected zip header
+        return Promise.all((await zipData(f)).map(load)); // detected zip header
     }
 
-    return [await loadFile(f)];
+    return [await load(fileData(f))];
 };
