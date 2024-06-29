@@ -1,4 +1,4 @@
-import { Braces, Coffee, File, Text, Image, Code } from "lucide-svelte";
+import { Braces, Coffee, File, Text, Image, Code, TextQuote } from "lucide-svelte";
 import type { ComponentType, SvelteComponent } from "svelte";
 
 export type Icon = ComponentType<SvelteComponent<{ size?: number | string; class?: string }>>;
@@ -23,6 +23,9 @@ export const pickIcon = (label: string): { icon: Icon; classes: string[] } => {
             case "mhtml":
             case "htm":
                 return { icon: Code, classes: ["text-green-600"] };
+            case "yaml":
+            case "yml":
+                return { icon: TextQuote, classes: ["text-green-500"] };
             case "txt":
                 return { icon: Text, classes: [] };
         }

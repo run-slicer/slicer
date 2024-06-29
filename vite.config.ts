@@ -17,6 +17,7 @@ export default defineConfig({
             "@codemirror/lang-java",
             "@codemirror/lang-xml",
             "@codemirror/lang-json",
+            "@codemirror/lang-yaml",
             "@uiw/codemirror-theme-github",
         ],
     },
