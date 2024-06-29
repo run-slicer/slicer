@@ -88,7 +88,7 @@
         <MenubarTrigger class="relative">View</MenubarTrigger>
         <MenubarContent>
             <MenubarSub>
-                <MenubarSubTrigger>Editor</MenubarSubTrigger>
+                <MenubarSubTrigger>Mode</MenubarSubTrigger>
                 <MenubarSubContent class="w-[230px]">
                     <MenubarRadioGroup bind:value={viewType}>
                         <MenubarRadioItem value="text">Textual</MenubarRadioItem>
