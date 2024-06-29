@@ -1,0 +1,35 @@
+import type { Data } from "$lib/workspace";
+
+const ROW_BYTES = 16;
+
+const pad = (str: string, length: number) => str.padStart(length, "0");
+
+export const formatHex = async (data: Data): Promise<string> => {
+    const buffer = new Uint8Array(await data.arrayBuffer());
+
+    let result = "";
+    for (let row = 0; row < buffer.length; row += ROW_BYTES) {
+        result += pad(row.toString(16), 8) + "  "; // address
+
+        // hexadecimal representation
+        for (let col = 0; col < ROW_BYTES; col++) {
+            if (row + col < buffer.length) {
+                result += buffer[row + col].toString(16).padStart(2, "0") + " ";
+            } else {
+                result += "   "; // pad missing values
+            }
+        }
+        result += " ";
+
+        // ASCII representation
+        for (let col = 0; col < ROW_BYTES; col++) {
+            if (row + col < buffer.length) {
+                const byte = buffer[row + col];
+                result += byte >= 32 && byte <= 126 ? String.fromCharCode(byte) : ".";
+            }
+        }
+        result += "\n";
+    }
+
+    return result;
+};

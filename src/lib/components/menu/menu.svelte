@@ -1,6 +1,7 @@
 <script lang="ts">
     import { userPrefersMode } from "mode-watcher";
     import { Separator } from "$lib/components/ui/separator";
+    import type { EditorConfig } from "$lib/components/pane";
     import { load } from "$lib/action/load";
     import { current as currentDecompiler, all as decompilers, swap as swapDecompiler } from "$lib/decompiler";
     import {
@@ -17,6 +18,11 @@
         MenubarRadioGroup,
         MenubarRadioItem,
     } from "$lib/components/ui/menubar";
+
+    export let config: EditorConfig;
+
+    let viewType = config.view;
+    $: config = { ...config, view: viewType };
 
     $: decompiler = $currentDecompiler.id;
 
@@ -81,6 +87,16 @@
     <MenubarMenu>
         <MenubarTrigger class="relative">View</MenubarTrigger>
         <MenubarContent>
+            <MenubarSub>
+                <MenubarSubTrigger>Editor</MenubarSubTrigger>
+                <MenubarSubContent class="w-[230px]">
+                    <MenubarRadioGroup bind:value={viewType}>
+                        <MenubarRadioItem value="text">Textual</MenubarRadioItem>
+                        <MenubarRadioItem value="hex">Hexadecimal</MenubarRadioItem>
+                    </MenubarRadioGroup>
+                </MenubarSubContent>
+            </MenubarSub>
+            <MenubarSeparator />
             <MenubarSub>
                 <MenubarSubTrigger>Decompiler</MenubarSubTrigger>
                 <MenubarSubContent class="w-[230px]">
