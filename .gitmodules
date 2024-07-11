@@ -1,6 +1,0 @@
-[submodule "src/lib/decompiler/cfr"]
-	path = src/lib/decompiler/cfr
-	url = https://github.com/run-slicer/cfr.git
-[submodule "src/lib/decompiler/vf"]
-	path = src/lib/decompiler/vf
-	url = https://github.com/run-slicer/vf.git
