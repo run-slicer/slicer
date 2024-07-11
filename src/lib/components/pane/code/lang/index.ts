@@ -1,7 +1,7 @@
 import type { LanguageSupport } from "@codemirror/language";
 import type { Entry } from "$lib/workspace";
 
-export type Language = "java" | "xml" | "json" | "yaml" | "plaintext";
+export type Language = "java" | "xml" | "json" | "yaml" | "properties" | "hex" | "plaintext";
 
 export const load = async (lang: Language): Promise<LanguageSupport | null> => {
     switch (lang) {
@@ -13,6 +13,10 @@ export const load = async (lang: Language): Promise<LanguageSupport | null> => {
             return (await import("@codemirror/lang-json")).json();
         case "yaml":
             return (await import("@codemirror/lang-yaml")).yaml();
+        case "properties":
+            return (await import("./properties")).properties();
+        case "hex":
+            return (await import("./hex")).hex();
     }
 
     return null;
@@ -34,6 +38,8 @@ export const fromExtension = (ext: string): Language => {
         case "yaml":
         case "yml":
             return "yaml";
+        case "properties":
+            return "properties";
     }
 
     return "plaintext";

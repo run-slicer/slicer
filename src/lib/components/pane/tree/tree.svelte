@@ -40,7 +40,7 @@
     <PaneHeader name="Project" icon={Folders} />
     <div class="flex h-full w-full overflow-auto text-nowrap p-2 scrollbar-thin">
         {#if root.nodes && root.nodes.length > 0}
-            <div class="block">
+            <div class="flex flex-col w-full">
                 {#each root.nodes as node (node.label)}
                     <TreeNode data={node} />
                 {/each}
@@ -49,7 +49,7 @@
             <div class="flex grow items-center justify-center">
                 <Button variant="outline" size="sm" on:click={load}>
                     <Plus class="mr-2 h-4 w-4" />
-                    Add
+                    Open
                 </Button>
             </div>
         {/if}

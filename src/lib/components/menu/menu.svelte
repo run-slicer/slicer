@@ -3,7 +3,10 @@
     import { Separator } from "$lib/components/ui/separator";
     import type { EditorConfig } from "$lib/components/pane";
     import { load } from "$lib/action/load";
+    import { add } from "$lib/action/add";
     import { current as currentDecompiler, all as decompilers, swap as swapDecompiler } from "$lib/decompiler";
+    import { Modifier } from "$lib/shortcut";
+    import Shortcut from "./shortcut.svelte";
     import {
         Menubar,
         MenubarMenu,
@@ -14,7 +17,6 @@
         MenubarSubTrigger,
         MenubarSubContent,
         MenubarItem,
-        MenubarShortcut,
         MenubarRadioGroup,
         MenubarRadioItem,
     } from "$lib/components/ui/menubar";
@@ -25,34 +27,6 @@
     $: config = { ...config, view: viewType };
 
     $: decompiler = $currentDecompiler.id;
-
-    const listenShortcut = (shortcut: string, callback: (e: KeyboardEvent) => void) => {
-        const checks: ((e: KeyboardEvent) => boolean)[] = [];
-        for (const key of shortcut.toLowerCase().split("+")) {
-            switch (key) {
-                case "ctrl":
-                    checks.push((e) => e.ctrlKey);
-                    break;
-                case "alt":
-                    checks.push((e) => e.altKey);
-                    break;
-                case "shift":
-                    checks.push((e) => e.shiftKey);
-                    break;
-                default:
-                    checks.push((e) => e.key.toLowerCase() === key);
-            }
-        }
-
-        window.addEventListener("keydown", async (e) => {
-            if (checks.every((check) => check(e))) {
-                e.preventDefault();
-                callback(e);
-            }
-        });
-    };
-
-    listenShortcut("Ctrl+O", load);
 </script>
 
 <Menubar class="rounded-none border-b border-none px-2 lg:px-4">
@@ -72,7 +46,7 @@
                 </MenubarSubContent>
             </MenubarSub>
             <MenubarItem disabled>
-                Preferences <MenubarShortcut>Ctrl+Alt+S</MenubarShortcut>
+                Preferences <Shortcut key="s" modifier={Modifier.Ctrl | Modifier.Alt} />
             </MenubarItem>
         </MenubarContent>
     </MenubarMenu>
@@ -80,7 +54,10 @@
         <MenubarTrigger class="relative">File</MenubarTrigger>
         <MenubarContent>
             <MenubarItem on:click={load}>
-                Open <MenubarShortcut>Ctrl+O</MenubarShortcut>
+                Open <Shortcut key="o" modifier={Modifier.Ctrl} />
+            </MenubarItem>
+            <MenubarItem on:click={add}>
+                Add <Shortcut key="o" modifier={Modifier.Ctrl | Modifier.Shift} />
             </MenubarItem>
         </MenubarContent>
     </MenubarMenu>

@@ -10,7 +10,7 @@
 <script lang="ts">
     import { ChevronDown, ChevronRight, Folder } from "lucide-svelte";
     import { cn } from "$lib/utils";
-    import { pickIcon } from "$lib/components/pane/tree/icons";
+    import { pickIcon } from "./icons";
 
     export let data: Node;
 
@@ -49,7 +49,7 @@
     {:else}
         {@const { icon, classes } = pickIcon(data.label)}
         <button class="highlight my-0.5 flex w-full" on:click={data.action}>
-            <svelte:component this={icon} size="16" class={cn("my-auto mr-1", classes)} />
+            <svelte:component this={icon} size="16" class={cn("my-auto mr-1 min-w-[16px]", classes)} />
             <span class="text-sm">{data.label}</span>
         </button>
     {/if}

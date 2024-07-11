@@ -51,30 +51,31 @@ export const flyAndScale = (
     };
 };
 
-export const readFile = (
-    pattern: string,
-    multiple: boolean,
-    callback: (f: File) => Promise<void>,
-    complete: (num: number) => Promise<void> = async () => {}
-) => {
-    const input = document.createElement("input");
-    input.style.display = "none";
-    input.type = "file";
-    input.accept = pattern;
-    input.multiple = multiple;
+export const partition = <T>(arr: T[], func: (e: T) => boolean): [T[], T[]] => {
+    const pass: T[] = [], fail: T[] = [];
+    for (const elem of arr) {
+        (func(elem) ? pass : fail).push(elem);
+    }
 
-    input.addEventListener("cancel", () => input.remove());
-    input.addEventListener("change", async () => {
-        if (input.files) {
-            for (const file of input.files) {
-                await callback(file);
-            }
-            await complete(input.files.length);
-        }
-        input.remove();
+    return [pass, fail];
+}
+
+export const readFiles = (pattern: string, multiple: boolean): Promise<File[]> => {
+    return new Promise<File[]>((resolve) => {
+        const input = document.createElement("input");
+        input.style.display = "none";
+        input.type = "file";
+        input.accept = pattern;
+        input.multiple = multiple;
+
+        input.addEventListener("cancel", () => input.remove());
+        input.addEventListener("change", async () => {
+            resolve(input.files ? [...input.files] : []);
+            input.remove();
+        });
+
+        input.click();
     });
-
-    input.click();
 };
 
 export interface TimedResult<T> {

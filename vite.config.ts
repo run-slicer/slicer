@@ -14,10 +14,7 @@ export default defineConfig({
         exclude: [
             "svelte-codemirror-editor",
             "codemirror",
-            "@codemirror/lang-java",
-            "@codemirror/lang-xml",
-            "@codemirror/lang-json",
-            "@codemirror/lang-yaml",
+            "@codemirror/language",
             "@uiw/codemirror-theme-github",
         ],
     },

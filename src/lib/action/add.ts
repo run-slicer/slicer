@@ -1,18 +1,17 @@
 import { addToast } from "$lib/components/toaster.svelte";
-import { loadFile } from "$lib/workspace";
+import { fileData, load } from "$lib/workspace";
 import { partition, readFiles, timed } from "$lib/utils";
 
-export const load = async () => {
+export const add = async () => {
     const results = await Promise.all(
-        (await readFiles(".jar,.zip", true))
-            .map((f) => timed("load action", () => loadFile(f)))
+        (await readFiles("", true))
+            .map((f) => timed("add action", () => load(fileData(f))))
     );
 
-    const time = results.reduce((acc, v) => acc + v.time, 0);
-    const [created, skipped] = partition(results.flatMap((r) => r.result), (r) => r.created);
+    const [created, skipped] = partition(results, (r) => r.result.created);
     if (skipped.length > 0) {
         if (skipped.length <= 5) {
-            for (const result of skipped) {
+            for (const { result } of skipped) {
                 addToast({
                     title: "Duplicate entry",
                     description: `Skipped adding ${result.entry.data.name}, as it is already present in the workspace.`,
@@ -27,8 +26,8 @@ export const load = async () => {
     }
     if (created.length > 0) {
         addToast({
-            title: "Loaded",
-            description: `Loaded ${created.length} file(s) in ${time}ms.`,
+            title: "Added",
+            description: `Added ${created.length} file(s).`,
         });
     }
 };
