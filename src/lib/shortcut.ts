@@ -7,13 +7,11 @@ const isMac = /Macintosh|Mac OS|MacIntel|MacPPC|Mac68K/gi.test(navigator.userAge
 export const enum Modifier {
     Ctrl = 1 << 0,
     Shift = 1 << 1,
-    Alt = 1 << 2
+    Alt = 1 << 2,
 }
 
 const listen = (key: string, mod: number, callback: (e: KeyboardEvent) => void) => {
-    const checks: ((e: KeyboardEvent) => boolean)[] = [
-        (e) => e.key.toLowerCase() === key,
-    ];
+    const checks: ((e: KeyboardEvent) => boolean)[] = [(e) => e.key.toLowerCase() === key];
     if ((mod & Modifier.Ctrl) !== 0) {
         checks.push((e) => e.getModifierState(isMac ? "Meta" : "Control"));
     }

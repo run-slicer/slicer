@@ -3,7 +3,6 @@
     import { Button } from "$lib/components/ui/button";
     import type { Entry } from "$lib/workspace";
     import TreeNode, { type Node } from "./node.svelte";
-    import { open } from "$lib/action/open";
     import { load } from "$lib/action/load";
     import { PaneHeader } from "$lib/components/pane";
 
@@ -16,14 +15,14 @@
 
             let next = curr.nodes.find((n) => n.label === part);
             if (!next) {
-                next = { label: part };
+                next = { label: part, parent: curr };
                 curr.nodes.push(next);
             }
 
             curr = next;
         }
 
-        curr.action = () => open(entry); // add action on leaf node
+        curr.entry = entry;
     };
 
     export let entries: Entry[];
@@ -40,7 +39,7 @@
     <PaneHeader name="Project" icon={Folders} />
     <div class="flex h-full w-full overflow-auto text-nowrap p-2 scrollbar-thin">
         {#if root.nodes && root.nodes.length > 0}
-            <div class="flex flex-col w-full">
+            <div class="flex w-full flex-col">
                 {#each root.nodes as node (node.label)}
                     <TreeNode data={node} />
                 {/each}

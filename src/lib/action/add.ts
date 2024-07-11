@@ -4,8 +4,7 @@ import { partition, readFiles, timed } from "$lib/utils";
 
 export const add = async () => {
     const results = await Promise.all(
-        (await readFiles("", true))
-            .map((f) => timed("add action", () => load(fileData(f))))
+        (await readFiles("", true)).map((f) => timed("add action", () => load(fileData(f))))
     );
 
     const [created, skipped] = partition(results, (r) => r.result.created);
@@ -17,7 +16,8 @@ export const add = async () => {
                     description: `Skipped adding ${result.entry.data.name}, as it is already present in the workspace.`,
                 });
             }
-        } else { // don't spam toasts for more than 5 entries
+        } else {
+            // don't spam toasts for more than 5 entries
             addToast({
                 title: "Duplicate entries",
                 description: `Skipped adding ${skipped.length} entries, as they were already present in the workspace.`,

@@ -30,8 +30,7 @@ const parser: StreamParser<State> = {
         }
 
         if (sol) {
-            while (stream.eatSpace()) {
-            }
+            while (stream.eatSpace()) {}
         }
 
         const c = stream.next();
@@ -59,7 +58,7 @@ const parser: StreamParser<State> = {
         nextMultiline: false,
         inMultiline: false,
         afterSection: false,
-    })
+    }),
 };
 
 export const properties = (): LanguageSupport => {

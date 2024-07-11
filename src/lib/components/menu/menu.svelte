@@ -37,7 +37,7 @@
             <MenubarSeparator />
             <MenubarSub>
                 <MenubarSubTrigger>Theme</MenubarSubTrigger>
-                <MenubarSubContent class="w-[230px]">
+                <MenubarSubContent class="w-[12rem]">
                     <MenubarRadioGroup bind:value={$userPrefersMode}>
                         <MenubarRadioItem value="system">System</MenubarRadioItem>
                         <MenubarRadioItem value="dark">Dark</MenubarRadioItem>
@@ -66,7 +66,7 @@
         <MenubarContent>
             <MenubarSub>
                 <MenubarSubTrigger>Mode</MenubarSubTrigger>
-                <MenubarSubContent class="w-[230px]">
+                <MenubarSubContent class="w-[12rem]">
                     <MenubarRadioGroup bind:value={viewType}>
                         <MenubarRadioItem value="text">Textual</MenubarRadioItem>
                         <MenubarRadioItem value="hex">Hexadecimal</MenubarRadioItem>
@@ -76,7 +76,7 @@
             <MenubarSeparator />
             <MenubarSub>
                 <MenubarSubTrigger>Decompiler</MenubarSubTrigger>
-                <MenubarSubContent class="w-[230px]">
+                <MenubarSubContent class="w-[12rem]">
                     <MenubarRadioGroup bind:value={decompiler} onValueChange={(id) => swapDecompiler(id || "")}>
                         {#each decompilers.values() as { id, name }}
                             <MenubarRadioItem value={id}>{name || id}</MenubarRadioItem>

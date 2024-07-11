@@ -152,3 +152,14 @@ export const loadFile = async (f: File): Promise<LoadResult[]> => {
 
     return [await load(fileData(f))];
 };
+
+export const remove = (entry: Entry) => {
+    if (get(current)?.data?.name === entry.data.name) {
+        current.set(null); // opened, close it before removing
+    }
+
+    entries.update((e) => {
+        e.delete(entry.data.name);
+        return e;
+    });
+};

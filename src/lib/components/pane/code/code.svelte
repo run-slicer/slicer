@@ -19,14 +19,14 @@
     $: text = config.view === "text";
     $: hex = config.view === "hex";
 
-    $: language = entry && text ? fromEntry(entry) : (hex ? "hex" : "plaintext");
+    $: language = entry && text ? fromEntry(entry) : hex ? "hex" : "plaintext";
 </script>
 
 <div class="flex h-full w-full flex-col scrollbar-thin">
     <PaneHeader name={entry ? entry.data.shortName : "Code"} icon={hex ? Binary : Code} />
     <div class="relative basis-full overflow-hidden">
         {#if entry}
-            {#await Promise.all([import("svelte-codemirror-editor"), import("./theme"), load(language), read(config, entry)])}
+            {#await Promise.all( [import("svelte-codemirror-editor"), import("./theme"), load(language), read(config, entry)] )}
                 <Loading value={entry.type === "class" && text ? "Decompiling..." : "Reading..."} overlay />
             {:then [editor, { dark, light }, lang, value]}
                 <svelte:component
@@ -59,11 +59,11 @@
                         },
                         ".cm-panels": {
                             // fix color on panel container
-                            "background-color": "hsl(var(--background))"
+                            "background-color": "hsl(var(--background))",
                         },
                         ".cm-search": {
                             // fix alignment on search panel
-                            "display": "flex",
+                            display: "flex",
                             "align-items": "center",
                         },
                         ".cm-button": {
