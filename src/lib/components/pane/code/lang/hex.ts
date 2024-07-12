@@ -9,7 +9,7 @@ const parser: StreamParser<any> = {
             }
             return "def"; // offset
         }
-        if (stream.match(/^ 00 /)) {
+        if (stream.match(/^00 /)) {
             return "comment"; // zero byte
         }
 

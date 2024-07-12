@@ -45,7 +45,11 @@
                         {data.title}
                     </div>
                 {/if}
-                <div {...$description(id)} use:description class="text-sm opacity-90 overflow-hidden text-ellipsis whitespace-nowrap">
+                <div
+                    {...$description(id)}
+                    use:description
+                    class="overflow-hidden text-ellipsis whitespace-nowrap text-sm opacity-90"
+                >
                     {data.description}
                 </div>
             </div>

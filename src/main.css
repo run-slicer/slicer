@@ -74,7 +74,7 @@
     }
     html,
     body {
-        @apply h-full bg-background text-foreground;
+        @apply h-full overflow-hidden bg-background text-foreground;
     }
     #app {
         @apply flex min-h-full flex-col overflow-hidden;

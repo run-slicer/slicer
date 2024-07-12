@@ -1,32 +1,17 @@
 <script lang="ts" context="module">
-    import type { Entry } from "$lib/workspace";
     import { writable } from "svelte/store";
-
-    export interface Node {
-        label: string;
-        entry?: Entry;
-        parent?: Node;
-        nodes?: Node[];
-        expanded?: boolean;
-    }
 
     export let currentMenu = writable({});
 </script>
 
 <script lang="ts">
-    import { ChevronDown, ChevronRight, Folder, Trash2 } from "lucide-svelte";
-    import { open } from "$lib/action/open";
-    import { remove } from "$lib/action/remove";
+    import { ChevronDown, ChevronRight, Folder } from "lucide-svelte";
+    import { createEventDispatcher } from "svelte";
     import { cn } from "$lib/utils";
+    import { ContextMenu, ContextMenuTrigger } from "$lib/components/ui/context-menu";
+    import NodeMenu from "./menu.svelte";
     import { pickIcon } from "./icons";
-    import {
-        ContextMenu,
-        ContextMenuTrigger,
-        ContextMenuContent,
-        ContextMenuItem,
-        ContextMenuLabel,
-        ContextMenuSeparator,
-    } from "$lib/components/ui/context-menu";
+    import type { Node } from "./";
 
     export let data: Node;
     $: {
@@ -48,9 +33,6 @@
         }
     }
 
-    const openEntry = () => open(data.entry!);
-    const deleteEntry = () => remove(data.entry!);
-
     // this is a god-awful way to have only one context menu open at a time,
     // but I do not care anymore - this works
     const menuId = {};
@@ -59,43 +41,46 @@
             $currentMenu = menuId;
         }
     };
+
+    const dispatch = createEventDispatcher();
 </script>
 
 <div {...$$restProps}>
     {#if data.nodes}
-        <button on:click={() => (expanded = !expanded)} class="highlight flex w-full py-[0.2rem]">
-            <svelte:component
-                this={expanded ? ChevronDown : ChevronRight}
-                size={14}
-                class="my-auto mr-1 text-muted-foreground"
-            />
-            <Folder size={16} class="my-auto mr-1 fill-muted" />
-            <span class="text-sm">{data.label}</span>
-        </button>
+        <ContextMenu open={$currentMenu === menuId} onOpenChange={setOpened}>
+            <ContextMenuTrigger>
+                <button on:click={() => (expanded = !expanded)} class="highlight flex w-full py-[0.2rem]">
+                    <svelte:component
+                        this={expanded ? ChevronDown : ChevronRight}
+                        size={14}
+                        class="my-auto mr-1 min-w-[14px] text-muted-foreground"
+                    />
+                    <Folder size={16} class="my-auto mr-1 min-w-[16px] fill-muted" />
+                    <span class="text-sm">{data.label}</span>
+                </button>
+            </ContextMenuTrigger>
+            <NodeMenu {data} on:delete />
+        </ContextMenu>
         {#if expanded}
             {#each data.nodes as node (node.label)}
-                <svelte:self bind:data={node} class={cn("ml-0.5 pl-[16px]", hasNonLeaf || "ml-1 pl-[32px]")} />
+                <svelte:self
+                    bind:data={node}
+                    on:open
+                    on:delete
+                    class={cn("ml-0.5 pl-[16px]", hasNonLeaf || "ml-1 pl-[32px]")}
+                />
             {/each}
         {/if}
     {:else}
         {@const { icon, classes } = pickIcon(data.label)}
         <ContextMenu open={$currentMenu === menuId} onOpenChange={setOpened}>
             <ContextMenuTrigger>
-                <button class="highlight flex w-full py-[0.2rem]" on:click={openEntry}>
+                <button class="highlight flex w-full py-[0.2rem]" on:click={() => dispatch("open", data)}>
                     <svelte:component this={icon} size="16" class={cn("my-auto mr-1 min-w-[16px]", classes)} />
                     <span class="text-sm">{data.label}</span>
                 </button>
             </ContextMenuTrigger>
-            <ContextMenuContent class="min-w-[12rem] max-w-[16rem]">
-                <ContextMenuLabel class="overflow-hidden text-ellipsis text-center">{data.label}</ContextMenuLabel>
-                <ContextMenuSeparator />
-                <ContextMenuItem
-                    class="flex justify-between data-[highlighted]:bg-destructive data-[highlighted]:text-destructive-foreground"
-                    on:click={deleteEntry}
-                >
-                    Delete <Trash2 size="16" class="mr-1" />
-                </ContextMenuItem>
-            </ContextMenuContent>
+            <NodeMenu {data} on:delete />
         </ContextMenu>
     {/if}
 </div>

@@ -10,7 +10,7 @@
     let duration = 0;
     if (overlay) {
         // only show fade animation for longer loads
-        onMount(() => setTimeout(() => (duration = 300), 500));
+        onMount(() => setTimeout(() => (duration = 300), 300));
     }
 </script>
 

@@ -125,8 +125,8 @@ export interface LoadResult {
     created: boolean;
 }
 
-export const load = async (d: Data): Promise<LoadResult> => {
-    const dupeEntry = get(entries).get(d.name);
+const load0 = async (entries: Map<string, Entry>, d: Data): Promise<LoadResult> => {
+    const dupeEntry = entries.get(d.name);
     if (dupeEntry) {
         return { entry: dupeEntry, created: false };
     }
@@ -136,18 +136,41 @@ export const load = async (d: Data): Promise<LoadResult> => {
         data: d,
     };
 
+    return { entry: entry, created: true };
+};
+
+export const load = async (d: Data): Promise<LoadResult> => {
+    const result = await load0(get(entries), d);
+    if (result.created) {
+        entries.update((e) => {
+            e.set(d.name, result.entry);
+            return e;
+        });
+    }
+
+    return result;
+};
+
+export const loadBatch = async (d: Data[]): Promise<LoadResult[]> => {
+    const entries0 = get(entries);
+
+    const results = await Promise.all(d.map((data) => load0(entries0, data)));
     entries.update((e) => {
-        e.set(d.name, entry);
+        for (const { entry, created } of results) {
+            if (created) {
+                e.set(entry.data.name, entry);
+            }
+        }
         return e;
     });
 
-    return { entry: entry, created: true };
+    return results;
 };
 
 export const loadFile = async (f: File): Promise<LoadResult[]> => {
     const view = new DataView(await f.slice(0, 4).arrayBuffer());
     if (view.getInt32(0, true) === 0x04034b50) {
-        return Promise.all((await zipData(f)).map(load)); // detected zip header
+        return loadBatch(await zipData(f)); // detected zip header
     }
 
     return [await load(fileData(f))];
