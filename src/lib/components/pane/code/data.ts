@@ -1,10 +1,10 @@
 import { type ClassEntry, type Entry } from "$lib/workspace";
-import type { EditorConfig } from "$lib/components/pane";
+import type { Config } from "$lib/config";
 import { current } from "$lib/decompiler";
 import { get } from "svelte/store";
 import { formatHex } from "./hex";
 
-export const read = async (config: EditorConfig, entry: Entry | null): Promise<string> => {
+export const read = async (config: Config, entry: Entry | null): Promise<string> => {
     if (!entry) {
         return "";
     }

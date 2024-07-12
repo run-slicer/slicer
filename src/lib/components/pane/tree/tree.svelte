@@ -4,16 +4,18 @@
     import type { Entry } from "$lib/workspace";
     import TreeNode from "./node.svelte";
     import { type Node, openEntry, deleteEntry } from "./";
-    import { load } from "$lib/action/load";
+    import { load } from "$lib/action";
     import { PaneHeader } from "$lib/components/pane";
     import {
-        Dialog,
-        DialogContent,
-        DialogDescription,
-        DialogFooter,
-        DialogHeader,
-        DialogTitle,
-    } from "$lib/components/ui/dialog";
+        AlertDialog,
+        AlertDialogAction,
+        AlertDialogCancel,
+        AlertDialogContent,
+        AlertDialogDescription,
+        AlertDialogFooter,
+        AlertDialogHeader,
+        AlertDialogTitle,
+    } from "$lib/components/ui/alert-dialog";
 
     let root: Node = { label: "<root>", nodes: [] };
     const updateNode = (entry: Entry) => {
@@ -44,8 +46,10 @@
     }
 
     let deleteData: Node | null = null;
-    const handleDelete = () => {
-        deleteEntry(deleteData!);
+    const handleDelete = (accepted: boolean) => {
+        if (accepted) {
+            deleteEntry(deleteData!);
+        }
         deleteData = null;
     };
 </script>
@@ -74,20 +78,25 @@
     </div>
 </div>
 
-<Dialog open={deleteData !== null}>
-    <DialogContent class="sm:max-w-[425px]">
+<AlertDialog open={deleteData !== null}>
+    <AlertDialogContent class="sm:max-w-[425px]">
         {#if deleteData}
-            <DialogHeader>
-                <DialogTitle>Are you sure absolutely sure?</DialogTitle>
-                <DialogDescription>
-                    This will permanently delete <span class="break-all italic">{deleteData.label}</span> from the
-                    workspace.
+            <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                    This will permanently delete
+                    <span class="break-all italic">{deleteData.label}</span> from the workspace.
                     <p class="mt-2 font-semibold">This action cannot be undone.</p>
-                </DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-                <Button type="submit" variant="destructive" on:click={handleDelete}>Delete</Button>
-            </DialogFooter>
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+                <AlertDialogCancel on:click={() => handleDelete(false)}>Cancel</AlertDialogCancel>
+                <AlertDialogAction asChild let:builder>
+                    <Button builders={[builder]} variant="destructive" on:click={() => handleDelete(true)}>
+                        Delete
+                    </Button>
+                </AlertDialogAction>
+            </AlertDialogFooter>
         {/if}
-    </DialogContent>
-</Dialog>
+    </AlertDialogContent>
+</AlertDialog>

@@ -1,21 +1,23 @@
 <script lang="ts">
     import { ResizableHandle, ResizablePane, ResizablePaneGroup } from "$lib/components/ui/resizable";
-    import { TreePane, CodePane, type EditorConfig } from "$lib/components/pane";
-    import type { Entry } from "$lib/workspace";
-
-    export let config: EditorConfig;
-    export let entries: Entry[];
-    export let entry: Entry | null = null;
+    import { TreePane, CodePane, WelcomePane } from "$lib/components/pane";
+    import { current as entry, entries } from "$lib/workspace";
 
     export let layoutId = "content-pane";
+
+    $: entries0 = Array.from($entries.values());
 </script>
 
 <ResizablePaneGroup direction="horizontal" class="grow basis-0" autoSaveId={layoutId}>
     <ResizablePane defaultSize={20}>
-        <TreePane bind:entries />
+        <TreePane bind:entries={entries0} />
     </ResizablePane>
     <ResizableHandle />
     <ResizablePane>
-        <CodePane bind:entry bind:config />
+        {#if $entry}
+            <CodePane bind:entry={$entry} />
+        {:else}
+            <WelcomePane />
+        {/if}
     </ResizablePane>
 </ResizablePaneGroup>

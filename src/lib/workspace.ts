@@ -106,6 +106,12 @@ export const narrow = async (entry: Entry): Promise<Entry> => {
 
 export const entries = writable<Map<string, Entry>>(new Map());
 
+// ask user for confirmation if there are entries in the workspace
+const unloadHandler = (e: BeforeUnloadEvent) => e.preventDefault();
+entries.subscribe((e) => {
+    window.onbeforeunload = e.size > 0 ? unloadHandler : null;
+});
+
 export const current = writable<Entry | null>(null);
 
 export const classes = derived(entries, ($entries) => {
@@ -183,6 +189,14 @@ export const remove = (entry: Entry) => {
 
     entries.update((e) => {
         e.delete(entry.data.name);
+        return e;
+    });
+};
+
+export const clear = () => {
+    current.set(null); // close opened entry
+    entries.update((e) => {
+        e.clear();
         return e;
     });
 };

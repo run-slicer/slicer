@@ -1,7 +1,6 @@
 import { type Entry, remove as removeWs } from "$lib/workspace";
 import { addToast } from "$lib/components/toaster.svelte";
-import { remove } from "$lib/action/remove";
-import { open } from "$lib/action/open";
+import { open, remove } from "$lib/action";
 
 export interface Node {
     label: string;

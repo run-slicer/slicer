@@ -1,10 +1,9 @@
 <script lang="ts">
     import { userPrefersMode } from "mode-watcher";
     import { Separator } from "$lib/components/ui/separator";
-    import type { EditorConfig } from "$lib/components/pane";
-    import { load } from "$lib/action/load";
-    import { add } from "$lib/action/add";
+    import { add, load } from "$lib/action";
     import { current as currentDecompiler, all as decompilers, swap as swapDecompiler } from "$lib/decompiler";
+    import { current as config } from "$lib/config";
     import { Modifier } from "$lib/shortcut";
     import Shortcut from "./shortcut.svelte";
     import {
@@ -20,11 +19,6 @@
         MenubarRadioGroup,
         MenubarRadioItem,
     } from "$lib/components/ui/menubar";
-
-    export let config: EditorConfig;
-
-    let viewType = config.view;
-    $: config = { ...config, view: viewType };
 
     $: decompiler = $currentDecompiler.id;
 </script>
@@ -67,7 +61,7 @@
             <MenubarSub>
                 <MenubarSubTrigger>Mode</MenubarSubTrigger>
                 <MenubarSubContent class="w-[12rem]">
-                    <MenubarRadioGroup bind:value={viewType}>
+                    <MenubarRadioGroup bind:value={$config.view}>
                         <MenubarRadioItem value="text">Textual</MenubarRadioItem>
                         <MenubarRadioItem value="hex">Hexadecimal</MenubarRadioItem>
                     </MenubarRadioGroup>

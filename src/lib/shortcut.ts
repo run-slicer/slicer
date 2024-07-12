@@ -1,5 +1,4 @@
-import { add } from "$lib/action/add";
-import { load } from "$lib/action/load";
+import { add, load } from "$lib/action";
 
 // https://stackoverflow.com/questions/38241480/detect-macos-ios-windows-android-and-linux-os-with-js
 const isMac = /Macintosh|Mac OS|MacIntel|MacPPC|Mac68K/gi.test(navigator.userAgent);

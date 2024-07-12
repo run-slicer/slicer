@@ -34,7 +34,7 @@
             animate:flip={{ duration: 500 }}
             in:fly={{ duration: 150, x: "100%" }}
             out:fly={{ duration: 150, x: "100%" }}
-            class="group pointer-events-auto relative flex w-full items-center justify-between space-x-4 overflow-hidden rounded-md p-6 pr-8 shadow-lg transition-all {data.variant ===
+            class="group pointer-events-auto relative mt-2 flex w-full items-center justify-between space-x-4 overflow-hidden rounded-md p-6 pr-8 shadow-lg transition-all {data.variant ===
             'destructive'
                 ? 'border-destructive bg-destructive text-destructive-foreground'
                 : 'border bg-background text-foreground'}"

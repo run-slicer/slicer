@@ -1,32 +1,32 @@
-<script lang="ts" context="module">
-    export interface EditorConfig {
-        view: "text" | "hex";
-    }
-</script>
-
 <script lang="ts">
     import { mode } from "mode-watcher";
     import { Binary, Code } from "lucide-svelte";
     import type { Entry } from "$lib/workspace";
+    import { current as config } from "$lib/config";
+    import { close } from "$lib/action";
     import Loading from "$lib/components/loading.svelte";
     import { PaneHeader } from "$lib/components/pane";
     import { load, fromEntry } from "./lang";
     import { read } from "./data";
 
-    export let config: EditorConfig;
     export let entry: Entry | null = null;
 
-    $: text = config.view === "text";
-    $: hex = config.view === "hex";
+    $: text = $config.view === "text";
+    $: hex = $config.view === "hex";
 
     $: language = entry && text ? fromEntry(entry) : hex ? "hex" : "plaintext";
 </script>
 
 <div class="flex h-full w-full flex-col scrollbar-thin">
-    <PaneHeader name={entry ? entry.data.shortName : "Code"} icon={hex ? Binary : Code} />
+    <PaneHeader
+        name={entry ? entry.data.shortName : "Code"}
+        icon={hex ? Binary : Code}
+        closeable={entry !== null}
+        on:close={close}
+    />
     <div class="relative basis-full overflow-hidden">
         {#if entry}
-            {#await Promise.all( [import("svelte-codemirror-editor"), import("./theme"), load(language), read(config, entry)] )}
+            {#await Promise.all( [import("svelte-codemirror-editor"), import("./theme"), load(language), read($config, entry)] )}
                 <Loading value={entry.type === "class" && text ? "Decompiling..." : "Reading..."} overlay />
             {:then [editor, { dark, light }, lang, value]}
                 <svelte:component
@@ -76,8 +76,6 @@
                     }}
                 />
             {/await}
-        {:else}
-            <!-- fancy welcome goes here -->
         {/if}
     </div>
 </div>
