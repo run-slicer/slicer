@@ -6,6 +6,7 @@
     export let layoutId = "content-pane";
 
     $: entries0 = Array.from($entries.values());
+    $: document.title = $entry ? `slicer - ${$entry.data.shortName}` : "slicer";
 </script>
 
 <ResizablePaneGroup direction="horizontal" class="grow basis-0" autoSaveId={layoutId}>

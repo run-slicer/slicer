@@ -1,5 +1,6 @@
-import { get, writable } from "svelte/store";
-import { type Entry, type ClassEntry, current as currentWs, narrow } from "$lib/workspace";
+import { derived } from "svelte/store";
+import { current as config } from "$lib/config";
+import { type Entry, type ClassEntry, narrow } from "$lib/workspace";
 import cfr from "./cfr";
 import vf from "./vf";
 
@@ -36,20 +37,6 @@ export const all: Map<string, Decompiler> = new Map([
     [vf.id, vf],
 ]);
 
-export const current = writable<Decompiler>(cfr);
-
-current.subscribe(() => {
-    const entry = get(currentWs);
-    if (entry && entry.type === "class") {
-        currentWs.set(entry); // force update
-    }
+export const current = derived(config, ($config) => {
+    return all.get($config.tools.decompiler.id) || cfr;
 });
-
-export const swap = (id: string) => {
-    const next = all.get(id);
-    if (!next || next.id === get(current).id) {
-        return;
-    }
-
-    current.set(next);
-};

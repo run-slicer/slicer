@@ -1,11 +1,13 @@
 <script lang="ts">
     import { userPrefersMode } from "mode-watcher";
     import { Separator } from "$lib/components/ui/separator";
-    import { add, load } from "$lib/action";
-    import { current as currentDecompiler, all as decompilers, swap as swapDecompiler } from "$lib/decompiler";
+    import { add, load, close } from "$lib/action";
+    import { current as currentDecompiler, all as decompilers } from "$lib/decompiler";
     import { current as config } from "$lib/config";
+    import { current as entry, entries } from "$lib/workspace";
     import { Modifier } from "$lib/shortcut";
     import Shortcut from "./shortcut.svelte";
+    import ClearDialog from "./dialog/clear.svelte";
     import {
         Menubar,
         MenubarMenu,
@@ -21,6 +23,8 @@
     } from "$lib/components/ui/menubar";
 
     $: decompiler = $currentDecompiler.id;
+
+    let clearConfirmOpen = false;
 </script>
 
 <Menubar class="rounded-none border-b border-none px-2 lg:px-4">
@@ -53,6 +57,13 @@
             <MenubarItem on:click={add}>
                 Add <Shortcut key="o" modifier={Modifier.Ctrl | Modifier.Shift} />
             </MenubarItem>
+            <MenubarSeparator />
+            <MenubarItem disabled={$entry === null} on:click={close}>
+                Close <Shortcut key="e" modifier={Modifier.Ctrl} />
+            </MenubarItem>
+            <MenubarItem disabled={$entries.size === 0} on:click={() => (clearConfirmOpen = true)}>
+                Clear workspace
+            </MenubarItem>
         </MenubarContent>
     </MenubarMenu>
     <MenubarMenu>
@@ -71,7 +82,10 @@
             <MenubarSub>
                 <MenubarSubTrigger>Decompiler</MenubarSubTrigger>
                 <MenubarSubContent class="w-[12rem]">
-                    <MenubarRadioGroup bind:value={decompiler} onValueChange={(id) => swapDecompiler(id || "")}>
+                    <MenubarRadioGroup
+                        bind:value={decompiler}
+                        onValueChange={(id) => ($config.tools.decompiler.id = id || "")}
+                    >
                         {#each decompilers.values() as { id, name }}
                             <MenubarRadioItem value={id}>{name || id}</MenubarRadioItem>
                         {/each}
@@ -82,3 +96,5 @@
     </MenubarMenu>
 </Menubar>
 <Separator />
+
+<ClearDialog bind:open={clearConfirmOpen} />

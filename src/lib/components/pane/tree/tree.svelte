@@ -3,19 +3,10 @@
     import { Button } from "$lib/components/ui/button";
     import type { Entry } from "$lib/workspace";
     import TreeNode from "./node.svelte";
-    import { type Node, openEntry, deleteEntry } from "./";
+    import { type Node, openEntry } from "./";
+    import DeleteDialog from "./dialog/delete.svelte";
     import { load } from "$lib/action";
     import { PaneHeader } from "$lib/components/pane";
-    import {
-        AlertDialog,
-        AlertDialogAction,
-        AlertDialogCancel,
-        AlertDialogContent,
-        AlertDialogDescription,
-        AlertDialogFooter,
-        AlertDialogHeader,
-        AlertDialogTitle,
-    } from "$lib/components/ui/alert-dialog";
 
     let root: Node = { label: "<root>", nodes: [] };
     const updateNode = (entry: Entry) => {
@@ -46,12 +37,6 @@
     }
 
     let deleteData: Node | null = null;
-    const handleDelete = (accepted: boolean) => {
-        if (accepted) {
-            deleteEntry(deleteData!);
-        }
-        deleteData = null;
-    };
 </script>
 
 <div class="flex h-full w-full flex-col">
@@ -78,25 +63,4 @@
     </div>
 </div>
 
-<AlertDialog open={deleteData !== null}>
-    <AlertDialogContent class="sm:max-w-[425px]">
-        {#if deleteData}
-            <AlertDialogHeader>
-                <AlertDialogTitle>Are you sure absolutely sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                    This will permanently delete
-                    <span class="break-all italic">{deleteData.label}</span> from the workspace.
-                    <p class="mt-2 font-semibold">This action cannot be undone.</p>
-                </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-                <AlertDialogCancel on:click={() => handleDelete(false)}>Cancel</AlertDialogCancel>
-                <AlertDialogAction asChild let:builder>
-                    <Button builders={[builder]} variant="destructive" on:click={() => handleDelete(true)}>
-                        Delete
-                    </Button>
-                </AlertDialogAction>
-            </AlertDialogFooter>
-        {/if}
-    </AlertDialogContent>
-</AlertDialog>
+<DeleteDialog bind:data={deleteData} />
