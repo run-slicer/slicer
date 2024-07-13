@@ -5,7 +5,7 @@
     import { current as config } from "$lib/config";
     import { close } from "$lib/action";
     import Loading from "$lib/components/loading.svelte";
-    import { PaneHeader } from "$lib/components/pane";
+    import { PaneHeader, PaneHeaderItem } from "$lib/components/pane";
     import { load, fromEntry } from "./lang";
     import { read } from "./data";
 
@@ -18,12 +18,14 @@
 </script>
 
 <div class="flex h-full w-full flex-col scrollbar-thin">
-    <PaneHeader
-        name={entry ? entry.data.shortName : "Code"}
-        icon={hex ? Binary : Code}
-        closeable={entry !== null}
-        on:close={close}
-    />
+    <PaneHeader>
+        <PaneHeaderItem
+            name={entry ? entry.data.shortName : "Code"}
+            icon={hex ? Binary : Code}
+            closeable={entry !== null}
+            on:close={close}
+        />
+    </PaneHeader>
     <div class="relative basis-full overflow-hidden">
         {#if entry}
             {#await Promise.all( [import("svelte-codemirror-editor"), import("./theme"), load(language), read($config, entry)] )}

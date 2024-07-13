@@ -4,10 +4,12 @@
     import { ToggleGroup, ToggleGroupItem } from "$lib/components/ui/toggle-group";
     import { FilePlus2, Folder, Moon, Settings, Sparkles, Sun } from "lucide-svelte";
     import { Button } from "$lib/components/ui/button";
-    import { PaneHeader } from "$lib/components/pane";
+    import { PaneHeader, PaneHeaderItem } from "$lib/components/pane";
 </script>
 
-<PaneHeader name="Welcome" icon={Sparkles} />
+<PaneHeader>
+    <PaneHeaderItem name="Welcome" icon={Sparkles} />
+</PaneHeader>
 <div class="m-24">
     <h1 class="mb-8 text-4xl font-bold">Welcome</h1>
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">

@@ -6,7 +6,7 @@
     import { type Node, openEntry } from "./";
     import DeleteDialog from "./dialog/delete.svelte";
     import { load } from "$lib/action";
-    import { PaneHeader } from "$lib/components/pane";
+    import { PaneHeader, PaneHeaderItem } from "$lib/components/pane";
 
     let root: Node = { label: "<root>", nodes: [] };
     const updateNode = (entry: Entry) => {
@@ -40,7 +40,9 @@
 </script>
 
 <div class="flex h-full w-full flex-col">
-    <PaneHeader name="Project" icon={Folders} />
+    <PaneHeader>
+        <PaneHeaderItem name="Project" icon={Folders} />
+    </PaneHeader>
     <div class="flex h-full w-full overflow-auto text-nowrap p-2 scrollbar-thin">
         {#if root.nodes && root.nodes.length > 0}
             <div class="flex w-full flex-col">

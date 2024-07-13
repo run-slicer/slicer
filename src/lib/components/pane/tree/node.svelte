@@ -10,8 +10,7 @@
     import { cn } from "$lib/utils";
     import { ContextMenu, ContextMenuTrigger } from "$lib/components/ui/context-menu";
     import NodeMenu from "./menu.svelte";
-    import { pickIcon } from "./icons";
-    import type { Node } from "./";
+    import { type Node, pickIcon } from "./";
 
     export let data: Node;
     $: {
