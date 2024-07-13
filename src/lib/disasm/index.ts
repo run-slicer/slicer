@@ -1,13 +1,14 @@
-import { derived } from "svelte/store";
-import { current as config } from "$lib/config";
-import { type Entry, type ClassEntry, narrow } from "$lib/workspace";
+import { derived, get } from "svelte/store";
+import { toolsDisasm, view } from "$lib/state";
+import { type Entry, type ClassEntry, current as currentWs, narrow } from "$lib/workspace";
 import cfr from "./cfr";
 import vf from "./vf";
 
-export interface Decompiler {
+export interface Disassembler {
     id: string;
     name?: string;
-    decompile: (entry: ClassEntry) => Promise<string>;
+    group?: string;
+    run: (entry: ClassEntry) => Promise<string>;
 }
 
 export type EntrySource = (name: string) => Promise<Uint8Array | null>;
@@ -32,11 +33,18 @@ export const createSource = (classes: Map<string, Entry>, name: string, buf: Uin
     };
 };
 
-export const all: Map<string, Decompiler> = new Map([
+export const all: Map<string, Disassembler> = new Map([
     [cfr.id, cfr],
     [vf.id, vf],
 ]);
 
-export const current = derived(config, ($config) => {
-    return all.get($config.tools.decompiler.id) || cfr;
+export const current = derived(toolsDisasm, ($toolsDisasm) => {
+    return all.get($toolsDisasm) || cfr;
+});
+
+current.subscribe(() => {
+    const entry = get(currentWs);
+    if (entry && entry.type === "class" && get(view) === "text") {
+        currentWs.set(entry); // disassembled view, force update
+    }
 });

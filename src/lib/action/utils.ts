@@ -1,13 +1,3 @@
-export const partition = <T>(arr: T[], func: (e: T) => boolean): [T[], T[]] => {
-    const pass: T[] = [],
-        fail: T[] = [];
-    for (const elem of arr) {
-        (func(elem) ? pass : fail).push(elem);
-    }
-
-    return [pass, fail];
-};
-
 export const readFiles = (pattern: string, multiple: boolean): Promise<File[]> => {
     return new Promise<File[]>((resolve) => {
         const input = document.createElement("input");

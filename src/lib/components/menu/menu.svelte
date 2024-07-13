@@ -2,10 +2,11 @@
     import { userPrefersMode } from "mode-watcher";
     import { Separator } from "$lib/components/ui/separator";
     import { add, load, close } from "$lib/action";
-    import { current as currentDecompiler, all as decompilers } from "$lib/decompiler";
-    import { current as config } from "$lib/config";
+    import { current as currentDisasm, all as disasms } from "$lib/disasm";
+    import { view, toolsDisasm } from "$lib/state";
     import { current as entry, entries } from "$lib/workspace";
     import { Modifier } from "$lib/shortcut";
+    import { groupBy } from "$lib/arrays";
     import Shortcut from "./shortcut.svelte";
     import ClearDialog from "./dialog/clear.svelte";
     import {
@@ -21,8 +22,9 @@
         MenubarRadioGroup,
         MenubarRadioItem,
     } from "$lib/components/ui/menubar";
+    import { MenubarLabel } from "$lib/components/ui/menubar/index.js";
 
-    $: decompiler = $currentDecompiler.id;
+    $: disasm = $currentDisasm.id;
 
     let clearConfirmOpen = false;
 </script>
@@ -72,7 +74,7 @@
             <MenubarSub>
                 <MenubarSubTrigger>Mode</MenubarSubTrigger>
                 <MenubarSubContent class="w-[12rem]">
-                    <MenubarRadioGroup bind:value={$config.view}>
+                    <MenubarRadioGroup bind:value={$view}>
                         <MenubarRadioItem value="text">Textual</MenubarRadioItem>
                         <MenubarRadioItem value="hex">Hexadecimal</MenubarRadioItem>
                     </MenubarRadioGroup>
@@ -80,14 +82,17 @@
             </MenubarSub>
             <MenubarSeparator />
             <MenubarSub>
-                <MenubarSubTrigger>Decompiler</MenubarSubTrigger>
+                <MenubarSubTrigger>Disassembler</MenubarSubTrigger>
                 <MenubarSubContent class="w-[12rem]">
                     <MenubarRadioGroup
-                        bind:value={decompiler}
-                        onValueChange={(id) => ($config.tools.decompiler.id = id || "")}
+                        bind:value={disasm}
+                        onValueChange={(id) => ($toolsDisasm = id || "")}
                     >
-                        {#each decompilers.values() as { id, name }}
-                            <MenubarRadioItem value={id}>{name || id}</MenubarRadioItem>
+                        {#each groupBy(Array.from(disasms.values()), (d) => d.group).entries() as [group, members]}
+                            <MenubarLabel>{group || "Other"}</MenubarLabel>
+                            {#each members as { id, name }}
+                                <MenubarRadioItem value={id}>{name || id}</MenubarRadioItem>
+                            {/each}
                         {/each}
                     </MenubarRadioGroup>
                 </MenubarSubContent>

@@ -1,4 +1,4 @@
 pnpm-lock.yaml
 /src/lib/components/ui
-/src/lib/decompiler/cfr
-/src/lib/decompiler/vf
+/src/lib/disasm/cfr
+/src/lib/disasm/vf

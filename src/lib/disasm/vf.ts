@@ -1,12 +1,13 @@
-import { createSource, type Decompiler } from "./";
+import { createSource, type Disassembler } from "./";
 import { type ClassEntry, classes } from "$lib/workspace";
 import { getClassConst, getUtf8Const } from "$lib/reader";
 import { get } from "svelte/store";
 
-const vf: Decompiler = {
+const vf: Disassembler = {
     id: "vf",
     name: "Vineflower",
-    decompile: async (entry: ClassEntry): Promise<string> => {
+    group: "Decompilers",
+    run: async (entry: ClassEntry): Promise<string> => {
         const { node, data } = entry;
         const { decompile } = await import("@run-slicer/vf");
 

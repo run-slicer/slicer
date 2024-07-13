@@ -1,20 +1,20 @@
-import { type ClassEntry, type Entry } from "$lib/workspace";
-import type { Config } from "$lib/config";
-import { current } from "$lib/decompiler";
+import type { ClassEntry, Entry } from "$lib/workspace";
+import type { View } from "$lib/state";
+import { current } from "$lib/disasm";
 import { get } from "svelte/store";
 import { formatHex } from "./hex";
 
-export const read = async (config: Config, entry: Entry | null): Promise<string> => {
+export const read = async (view: View, entry: Entry | null): Promise<string> => {
     if (!entry) {
         return "";
     }
 
-    if (config.view === "hex") {
+    if (view === "hex") {
         return await formatHex(entry.data);
     } else if (entry.type === "class") {
         const decompiler = get(current);
 
-        return await decompiler.decompile(entry as ClassEntry);
+        return await decompiler.run(entry as ClassEntry);
     }
 
     return await entry.data.text();
