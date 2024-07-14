@@ -68,8 +68,12 @@ export const pickIcon = (label: string): { icon: Icon; classes: string[] } => {
             case "tar":
             case "gz":
             case "rar":
+            case "lzma":
                 return { icon: FileArchive, classes: [] };
             case "properties":
+            case "md":
+            case "rst":
+            case "adoc":
                 return { icon: FileText, classes: [] };
             case "txt":
                 return { icon: Text, classes: [] };

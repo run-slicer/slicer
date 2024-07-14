@@ -11,6 +11,15 @@ export default defineConfig({
         },
     },
     optimizeDeps: {
-        exclude: ["svelte-codemirror-editor", "codemirror", "@codemirror/language", "@uiw/codemirror-theme-github"],
+        exclude: [
+            "svelte-codemirror-editor",
+            "codemirror",
+            "@codemirror/lang-java",
+            "@codemirror/lang-json",
+            "@codemirror/lang-xml",
+            "@codemirror/lang-yaml",
+            "@codemirror/language",
+            "@uiw/codemirror-theme-github",
+        ],
     },
 });

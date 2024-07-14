@@ -1,5 +1,5 @@
 import { derived, get } from "svelte/store";
-import { toolsDisasm, view } from "$lib/state";
+import { toolsDisasm, editorView } from "$lib/state";
 import { type Entry, type ClassEntry, current as currentWs, narrow } from "$lib/workspace";
 import cfr from "./cfr";
 import vf from "./vf";
@@ -8,7 +8,7 @@ export interface Disassembler {
     id: string;
     name?: string;
     group?: string;
-    run: (entry: ClassEntry) => Promise<string>;
+    run(entry: ClassEntry): Promise<string>;
 }
 
 export type EntrySource = (name: string) => Promise<Uint8Array | null>;
@@ -44,7 +44,7 @@ export const current = derived(toolsDisasm, ($toolsDisasm) => {
 
 current.subscribe(() => {
     const entry = get(currentWs);
-    if (entry && entry.type === "class" && get(view) === "text") {
+    if (entry && entry.type === "class" && get(editorView) === "text") {
         currentWs.set(entry); // disassembled view, force update
     }
 });

@@ -3,7 +3,7 @@ import cfr from "$lib/disasm/cfr";
 
 const root = "slicer.state";
 
-export type View = "text" | "hex";
+export type View = "auto" | "text" | "hex";
 
-export const view = persisted<View>(`${root}.view`, "text");
+export const editorView = persisted<View>(`${root}.editor.view`, "auto");
 export const toolsDisasm = persisted<string>(`${root}.tools.disasm`, cfr.id);

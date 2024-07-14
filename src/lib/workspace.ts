@@ -3,9 +3,9 @@ import { type Node, read } from "$lib/reader";
 import { unzip, type ZipEntry, type ZipInfo } from "unzipit";
 
 export interface BlobLike {
-    stream: () => Promise<ReadableStream<Uint8Array>>;
-    arrayBuffer: () => Promise<ArrayBuffer>;
-    text: () => Promise<string>;
+    stream(): Promise<ReadableStream<Uint8Array>>;
+    arrayBuffer(): Promise<ArrayBuffer>;
+    text(): Promise<string>;
 }
 
 export interface Named {

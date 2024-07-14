@@ -2,17 +2,19 @@
     import { mode } from "mode-watcher";
     import { Binary, Code } from "lucide-svelte";
     import type { Entry } from "$lib/workspace";
-    import { view } from "$lib/state";
+    import { editorView } from "$lib/state";
     import { close } from "$lib/action";
     import Loading from "$lib/components/loading.svelte";
     import { PaneHeader, PaneHeaderItem } from "$lib/components/pane";
     import { load, fromEntry } from "./lang";
-    import { read } from "./data";
+    import { detectView, read } from "./";
 
     export let entry: Entry | null = null;
 
-    $: text = $view === "text";
-    $: hex = $view === "hex";
+    $: view = $editorView === "auto" ? detectView(entry) : $editorView;
+
+    $: text = view === "text";
+    $: hex = view === "hex";
 
     $: language = entry && text ? fromEntry(entry) : hex ? "hex" : "plaintext";
 </script>
@@ -28,7 +30,7 @@
     </PaneHeader>
     <div class="relative basis-full overflow-hidden">
         {#if entry}
-            {#await Promise.all( [import("svelte-codemirror-editor"), import("./theme"), load(language), read($view, entry)] )}
+            {#await Promise.all( [import("svelte-codemirror-editor"), import("./theme"), load(language), read(view, entry)] )}
                 <Loading value={entry.type === "class" && text ? "Decompiling..." : "Reading..."} overlay />
             {:then [editor, { dark, light }, lang, value]}
                 <svelte:component
