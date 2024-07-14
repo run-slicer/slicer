@@ -8,7 +8,8 @@
     import { Modifier } from "$lib/shortcut";
     import { groupBy } from "$lib/arrays";
     import Shortcut from "./shortcut.svelte";
-    import ClearDialog from "./dialog/clear.svelte";
+    import AboutDialog from "./dialog/about.svelte";
+    import ClearConfirmDialog from "./dialog/clear.svelte";
     import {
         Menubar,
         MenubarMenu,
@@ -26,6 +27,7 @@
 
     $: disasm = $currentDisasm.id;
 
+    let aboutOpen = false;
     let clearConfirmOpen = false;
 </script>
 
@@ -33,7 +35,7 @@
     <MenubarMenu>
         <MenubarTrigger class="font-bold">slicer</MenubarTrigger>
         <MenubarContent>
-            <MenubarItem disabled>About</MenubarItem>
+            <MenubarItem on:click={() => (aboutOpen = true)}>About</MenubarItem>
             <MenubarSeparator />
             <MenubarSub>
                 <MenubarSubTrigger>Theme</MenubarSubTrigger>
@@ -85,10 +87,7 @@
             <MenubarSub>
                 <MenubarSubTrigger>Disassembler</MenubarSubTrigger>
                 <MenubarSubContent class="w-[12rem]">
-                    <MenubarRadioGroup
-                        bind:value={disasm}
-                        onValueChange={(id) => ($toolsDisasm = id || "")}
-                    >
+                    <MenubarRadioGroup bind:value={disasm} onValueChange={(id) => ($toolsDisasm = id || "")}>
                         {#each groupBy(Array.from(disasms.values()), (d) => d.group).entries() as [group, members]}
                             <MenubarLabel>{group || "Other"}</MenubarLabel>
                             {#each members as { id, name }}
@@ -103,4 +102,5 @@
 </Menubar>
 <Separator />
 
-<ClearDialog bind:open={clearConfirmOpen} />
+<AboutDialog bind:open={aboutOpen} />
+<ClearConfirmDialog bind:open={clearConfirmOpen} />
