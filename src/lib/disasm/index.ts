@@ -44,7 +44,7 @@ export const current = derived(toolsDisasm, ($toolsDisasm) => {
 
 current.subscribe(() => {
     const entry = get(currentWs);
-    if (entry && entry.type === "class" && get(editorView) === "text") {
+    if (entry && entry.type === "class" && get(editorView) !== "hex") {
         currentWs.set(entry); // disassembled view, force update
     }
 });

@@ -22,8 +22,8 @@
         MenubarItem,
         MenubarRadioGroup,
         MenubarRadioItem,
+        MenubarLabel,
     } from "$lib/components/ui/menubar";
-    import { MenubarLabel } from "$lib/components/ui/menubar/index.js";
 
     $: disasm = $currentDisasm.id;
 

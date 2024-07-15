@@ -1,6 +1,6 @@
 import { createSource, type Disassembler } from "./";
+import type { UTF8Entry } from "$lib/reader/pool";
 import { type ClassEntry, classes } from "$lib/workspace";
-import { getClassConst, getUtf8Const } from "$lib/reader";
 import { get } from "svelte/store";
 
 const vf: Disassembler = {
@@ -12,7 +12,7 @@ const vf: Disassembler = {
         const { decompile } = await import("@run-slicer/vf");
 
         const buf = new Uint8Array(await data.arrayBuffer());
-        const name = getUtf8Const(node.pool, getClassConst(node.pool, node.this_)!)!;
+        const name = (node.pool[node.this_.name] as UTF8Entry).value;
 
         const classes0 = get(classes);
         return await decompile(name, {
