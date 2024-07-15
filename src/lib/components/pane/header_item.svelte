@@ -17,7 +17,10 @@
     };
 </script>
 
-<button class={cn("inline-flex h-full items-center bg-background px-3 cursor-default", active || "bg-background/40")} on:click>
+<button
+    class={cn("inline-flex h-full cursor-default items-center bg-background px-3", active || "bg-background/40")}
+    on:click
+>
     {#if icon}
         <svelte:component this={icon} size={16} class="mr-1.5 text-muted-foreground" />
     {/if}

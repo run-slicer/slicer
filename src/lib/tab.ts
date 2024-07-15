@@ -18,14 +18,14 @@ export const update = (tab: Tab) => {
     tabs.update(($tabs) => {
         $tabs.set(tab.id, tab);
         return $tabs;
-    })
+    });
 };
 
 export const remove = (id: string) => {
     tabs.update(($tabs) => {
         $tabs.delete(id);
         return $tabs;
-    })
+    });
 };
 
 export const clear = () => {
@@ -36,5 +36,5 @@ export const clear = () => {
             }
         }
         return $tabs;
-    })
+    });
 };
