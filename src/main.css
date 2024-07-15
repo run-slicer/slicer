@@ -80,3 +80,7 @@
         @apply flex min-h-full flex-col overflow-hidden;
     }
 }
+
+.scrollbar-none::-webkit-scrollbar {
+    display: none;
+}

@@ -1,7 +1,8 @@
 <script lang="ts">
     import { ResizableHandle, ResizablePane, ResizablePaneGroup } from "$lib/components/ui/resizable";
-    import { TreePane, CodePane, WelcomePane } from "$lib/components/pane";
+    import { TreePane, CodePane, WelcomePane, PaneHeader, PaneHeaderItem } from "$lib/components/pane";
     import { current as entry, entries } from "$lib/workspace";
+    import { tabs } from "$lib/tab";
 
     export let layoutId = "content-pane";
 
@@ -15,10 +16,24 @@
     </ResizablePane>
     <ResizableHandle />
     <ResizablePane>
-        {#if $entry}
-            <CodePane bind:entry={$entry} />
-        {:else}
-            <WelcomePane />
-        {/if}
+        <div class="flex h-full w-full flex-col">
+            <PaneHeader>
+                {#each $tabs.values() as tab}
+                    <PaneHeaderItem
+                        name={tab.name}
+                        active={tab.active(tab)}
+                        icon={tab.icon}
+                        closeable={Boolean(tab.close)}
+                        on:click={() => tab.open?.(tab)}
+                        on:close={() => tab.close?.(tab)}
+                    />
+                {/each}
+            </PaneHeader>
+            {#if $entry}
+                <CodePane entry={$entry} />
+            {:else}
+                <WelcomePane />
+            {/if}
+        </div>
     </ResizablePane>
 </ResizablePaneGroup>

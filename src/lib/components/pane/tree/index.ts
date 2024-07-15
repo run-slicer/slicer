@@ -1,4 +1,4 @@
-import { type Entry, remove as removeWs } from "$lib/workspace";
+import type { Entry } from "$lib/workspace";
 import { addToast } from "$lib/components/toaster.svelte";
 import { open, remove } from "$lib/action";
 import { Braces, Coffee, File, Text, Image, Code, TextQuote, FileArchive, FileText } from "lucide-svelte";
@@ -18,7 +18,7 @@ const deleteNode = (node: Node): number => {
     }
 
     if (node.entry) {
-        removeWs(node.entry);
+        remove(node.entry, true);
         return 1;
     }
     return 0;

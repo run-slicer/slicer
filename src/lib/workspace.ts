@@ -148,9 +148,9 @@ const load0 = async (entries: Map<string, Entry>, d: Data): Promise<LoadResult> 
 export const load = async (d: Data): Promise<LoadResult> => {
     const result = await load0(get(entries), d);
     if (result.created) {
-        entries.update((e) => {
-            e.set(d.name, result.entry);
-            return e;
+        entries.update(($entries) => {
+            $entries.set(d.name, result.entry);
+            return $entries;
         });
     }
 
@@ -161,13 +161,13 @@ export const loadBatch = async (d: Data[]): Promise<LoadResult[]> => {
     const entries0 = get(entries);
 
     const results = await Promise.all(d.map((data) => load0(entries0, data)));
-    entries.update((e) => {
+    entries.update(($entries) => {
         for (const { entry, created } of results) {
             if (created) {
-                e.set(entry.data.name, entry);
+                $entries.set(entry.data.name, entry);
             }
         }
-        return e;
+        return $entries;
     });
 
     return results;
@@ -187,16 +187,16 @@ export const remove = (entry: Entry) => {
         current.set(null); // opened, close it before removing
     }
 
-    entries.update((e) => {
-        e.delete(entry.data.name);
-        return e;
+    entries.update(($entries) => {
+        $entries.delete(entry.data.name);
+        return $entries;
     });
 };
 
 export const clear = () => {
     current.set(null); // close opened entry
-    entries.update((e) => {
-        e.clear();
-        return e;
+    entries.update(($entries) => {
+        $entries.clear();
+        return $entries;
     });
 };

@@ -4,12 +4,22 @@
     import { ToggleGroup, ToggleGroupItem } from "$lib/components/ui/toggle-group";
     import { FilePlus2, Folder, Moon, Settings, Sparkles, Sun } from "lucide-svelte";
     import { Button } from "$lib/components/ui/button";
-    import { PaneHeader, PaneHeaderItem } from "$lib/components/pane";
+    import { update as updateTab } from "$lib/tab";
+    import { current as currentWs } from "$lib/workspace";
+    import { onMount } from "svelte";
+    import { get } from "svelte/store";
+
+    onMount(() => {
+        updateTab({
+            id: "slicer:welcome",
+            name: "Welcome",
+            icon: Sparkles,
+            active: () => get(currentWs) === null,
+            open: () => currentWs.set(null),
+        });
+    });
 </script>
 
-<PaneHeader>
-    <PaneHeaderItem name="Welcome" icon={Sparkles} />
-</PaneHeader>
 <div class="m-24">
     <h1 class="mb-8 text-4xl font-bold">Welcome</h1>
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
