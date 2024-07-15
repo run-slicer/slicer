@@ -32,6 +32,9 @@
                         class="hover:text-blue-500 hover:underline">{process.env.APP_COMMIT}</a
                     >, branch {process.env.APP_BRANCH}
                 </p>
+                <p class="mt-6 font-mono text-sm">
+                    {navigator.userAgent}
+                </p>
             </div>
         </div>
         <p class="mt-2 text-center text-sm text-muted-foreground">
