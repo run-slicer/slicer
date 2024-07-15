@@ -3,9 +3,12 @@
 
     export let open = false;
 
-    let imageId = Math.floor(Math.random() * 3);
+    let imageId = Math.floor(Math.random() * 4);
     const changeImage = () => {
-        imageId = Math.floor(Math.random() * 3);
+        imageId++;
+        if (imageId > 3) {
+            imageId = 0; // wrap around
+        }
     };
 </script>
 
