@@ -30,8 +30,8 @@ importers:
         specifier: 0.1.2-0.152
         version: 0.1.2-0.152
       '@run-slicer/vf':
-        specifier: 0.1.1-1.10.1
-        version: 0.1.1-1.10.1
+        specifier: 0.1.2-1.10.1
+        version: 0.1.2-1.10.1
       '@uiw/codemirror-theme-github':
         specifier: ^4.22.2
         version: 4.22.2(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.28.1)
@@ -466,8 +466,8 @@ packages:
   '@run-slicer/cfr@0.1.2-0.152':
     resolution: {integrity: sha512-pQZzk3UE6c0E4igGRrNXkSvOobQTGd6GlPYZ7MsppciQ4BftUANQy1nHbG31iJM9HRcMHttQTaCYps9nY9qRVg==}
 
-  '@run-slicer/vf@0.1.1-1.10.1':
-    resolution: {integrity: sha512-XruoDtIEqJppE9XfstBMb7zVDsZon3G5W8YNwNS52B4jVe4Y1xQyUSgXwW0tatospWzE7PDTYGSs98S0E5ShZA==}
+  '@run-slicer/vf@0.1.2-1.10.1':
+    resolution: {integrity: sha512-EuDLNIDllcCeUELAhblG0qHdb+3jZvSghO2p5khwa2gvvymzMOj9QRKxGjvkGLAVJi73etcTNSFfrGb7k9tfXQ==}
 
   '@sveltejs/vite-plugin-svelte-inspector@2.1.0':
     resolution: {integrity: sha512-9QX28IymvBlSCqsCll5t0kQVxipsfhFFL+L2t3nTWfXnddYwxBuAEtTtlaVQpRz9c37BhJjltSeY4AJSC03SSg==}
@@ -1700,7 +1700,7 @@ snapshots:
 
   '@run-slicer/cfr@0.1.2-0.152': {}
 
-  '@run-slicer/vf@0.1.1-1.10.1': {}
+  '@run-slicer/vf@0.1.2-1.10.1': {}
 
   '@sveltejs/vite-plugin-svelte-inspector@2.1.0(@sveltejs/vite-plugin-svelte@3.1.1(svelte@4.2.18)(vite@5.3.1(@types/node@20.14.6)))(svelte@4.2.18)(vite@5.3.1(@types/node@20.14.6))':
     dependencies:

@@ -36,7 +36,7 @@
         "@codemirror/language": "^6.10.2",
         "@melt-ui/svelte": "^0.81.0",
         "@run-slicer/cfr": "0.1.2-0.152",
-        "@run-slicer/vf": "0.1.1-1.10.1",
+        "@run-slicer/vf": "0.1.2-1.10.1",
         "@uiw/codemirror-theme-github": "^4.22.2",
         "bits-ui": "^0.21.10",
         "clsx": "^2.1.1",
