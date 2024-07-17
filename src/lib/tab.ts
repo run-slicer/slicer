@@ -1,11 +1,11 @@
 import type { Entry } from "$lib/workspace";
 import { writable } from "svelte/store";
-import type { Icon } from "$lib/components/icons";
+import type { StyledIcon } from "$lib/components/icons";
 
 export interface Tab {
     id: string;
     name: string;
-    icon?: Icon;
+    icon?: StyledIcon;
     entry?: Entry;
     active: (tab: Tab) => boolean;
     open?: (tab: Tab) => void;

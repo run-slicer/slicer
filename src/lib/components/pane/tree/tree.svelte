@@ -41,7 +41,7 @@
 
 <div class="flex h-full w-full flex-col">
     <PaneHeader>
-        <PaneHeaderItem name="Project" icon={Folders} />
+        <PaneHeaderItem name="Project" icon={{ icon: Folders, classes: ["text-muted-foreground"] }} />
     </PaneHeader>
     <div class="flex h-full w-full overflow-auto text-nowrap p-2 scrollbar-thin">
         {#if root.nodes && root.nodes.length > 0}

@@ -7,10 +7,10 @@ import { formatHex } from "./hex";
 // prettier-ignore
 const extensions = {
     // text: new Set(["txt", "yml", "yaml", "MF", "java", "class" /* disassembled */, "properties", "html", "xml", "xhtml", "mhtml", "htm", "json", "md", "rst", "adoc"]),
-    binary: new Set(["bin", "tar", "gz", "rar", "zip", "jar", "jpg", "jpeg", "gif", "png", "lzma", "dll", "so", "dylib", "exe", "kotlin_builtins", "kotlin_metadata", "kotlin_module"]),
+    binary: new Set(["bin", "tar", "gz", "rar", "zip", "jar", "jpg", "jpeg", "gif", "png", "lzma", "dll", "so", "dylib", "exe", "kotlin_builtins", "kotlin_metadata", "kotlin_module", "nbt"]),
 };
 
-export const detectView = (entry: Entry | null): View => {
+export const detect = (entry: Entry | null): View => {
     const ext = entry?.data?.extension;
     if (!entry || !ext) {
         return "text";

@@ -1,18 +1,19 @@
 <script lang="ts">
     import { mode } from "mode-watcher";
-    import { Binary, Code } from "lucide-svelte";
+    import { Binary } from "lucide-svelte";
     import { current as currentWs, type Entry } from "$lib/workspace";
     import { editorView } from "$lib/state";
+    import { fileIcon } from "$lib/components/icons";
     import Loading from "$lib/components/loading.svelte";
     import { remove as removeTab, update as updateTab } from "$lib/tab";
     import { close } from "$lib/action/close";
     import { load, fromEntry } from "./lang";
-    import { detectView, read } from "./";
+    import { detect, read } from "./";
     import { get } from "svelte/store";
 
     export let entry: Entry;
 
-    $: view = $editorView === "auto" ? detectView(entry) : $editorView;
+    $: view = $editorView === "auto" ? detect(entry) : $editorView;
 
     $: text = view === "text";
     $: hex = view === "hex";
@@ -22,7 +23,7 @@
     $: updateTab({
         id: entry.data.name,
         name: entry.data.shortName,
-        icon: hex ? Binary : Code,
+        icon: hex ? { icon: Binary, classes: ["text-muted-foreground"] } : fileIcon(entry.data.shortName),
         entry: entry,
         active: (tab) => get(currentWs)?.data?.name === tab.id,
         open: (tab) => {

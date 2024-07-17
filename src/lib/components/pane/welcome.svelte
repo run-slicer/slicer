@@ -13,7 +13,7 @@
         updateTab({
             id: "slicer:welcome",
             name: "Welcome",
-            icon: Sparkles,
+            icon: { icon: Sparkles, classes: ["text-muted-foreground"] },
             active: () => get(currentWs) === null,
             open: () => currentWs.set(null),
         });
