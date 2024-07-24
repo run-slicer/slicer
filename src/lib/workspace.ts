@@ -6,6 +6,7 @@ export interface BlobLike {
     stream(): Promise<ReadableStream<Uint8Array>>;
     arrayBuffer(): Promise<ArrayBuffer>;
     text(): Promise<string>;
+    blob(): Promise<Blob>;
 }
 
 export interface Named {
@@ -50,6 +51,7 @@ export const fileData = (file: File): FileData => {
         stream: async () => file.stream(),
         arrayBuffer: () => file.arrayBuffer(),
         text: () => file.text(),
+        blob: async () => file,
         ...parseName(file.name),
     };
 };
@@ -73,6 +75,7 @@ export const zipData = async (file: File): Promise<ZipData[]> => {
                 stream: async () => (await v.blob()).stream(),
                 arrayBuffer: () => v.arrayBuffer(),
                 text: () => v.text(),
+                blob: () => v.blob(),
                 ...parseName(n),
             };
         });

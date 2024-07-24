@@ -3,7 +3,7 @@
     import { Button } from "$lib/components/ui/button";
     import type { Entry } from "$lib/workspace";
     import TreeNode from "./node.svelte";
-    import { type Node, openEntry } from "./";
+    import { type Node, openEntry, exportEntry } from "./";
     import DeleteDialog from "./dialog/delete.svelte";
     import { load } from "$lib/action";
     import { PaneHeader, PaneHeaderItem } from "$lib/components/pane";
@@ -51,6 +51,7 @@
                         data={node}
                         on:open={(e) => openEntry(e.detail)}
                         on:delete={(e) => (deleteData = e.detail)}
+                        on:download={(e) => exportEntry(e.detail)}
                     />
                 {/each}
             </div>

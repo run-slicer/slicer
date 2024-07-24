@@ -16,6 +16,27 @@ export const readFiles = (pattern: string, multiple: boolean): Promise<File[]> =
     });
 };
 
+export const downloadBlob = (name: string, blob: Blob): Promise<void> => {
+    return new Promise<void>((resolve) => {
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+        link.style.display = "none";
+        link.href = url;
+        link.download = name;
+
+        link.click();
+
+        // pretty primitive solution, but should work
+        setTimeout(() => {
+            link.remove();
+            URL.revokeObjectURL(url);
+
+            resolve();
+        }, 200);
+    });
+};
+
 export interface TimedResult<T> {
     result: T;
     time: number;

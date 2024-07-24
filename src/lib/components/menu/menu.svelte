@@ -1,7 +1,7 @@
 <script lang="ts">
     import { userPrefersMode } from "mode-watcher";
     import { Separator } from "$lib/components/ui/separator";
-    import { add, load, close } from "$lib/action";
+    import { add, load, close, export_ } from "$lib/action";
     import { current as currentDisasm, all as disasms } from "$lib/disasm";
     import { editorView, toolsDisasm } from "$lib/state";
     import { current as entry, entries } from "$lib/workspace";
@@ -61,12 +61,15 @@
             <MenubarItem on:click={add}>
                 Add <Shortcut key="o" modifier={Modifier.Ctrl | Modifier.Shift} />
             </MenubarItem>
-            <MenubarSeparator />
-            <MenubarItem disabled={$entry === null} on:click={close}>
-                Close <Shortcut key="e" modifier={Modifier.Ctrl} />
-            </MenubarItem>
             <MenubarItem disabled={$entries.size === 0} on:click={() => (clearConfirmOpen = true)}>
                 Clear workspace
+            </MenubarItem>
+            <MenubarSeparator />
+            <MenubarItem disabled={$entry === null} on:click={() => export_()}>
+                Export <Shortcut key="e" modifier={Modifier.Ctrl} />
+            </MenubarItem>
+            <MenubarItem disabled={$entry === null} on:click={close}>
+                Close <Shortcut key="w" modifier={Modifier.Ctrl | Modifier.Alt} />
             </MenubarItem>
         </MenubarContent>
     </MenubarMenu>

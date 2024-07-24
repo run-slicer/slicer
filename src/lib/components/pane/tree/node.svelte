@@ -67,6 +67,7 @@
                     bind:data={node}
                     on:open
                     on:delete
+                    on:download
                     class={cn("ml-0.5 pl-[16px]", hasNonLeaf || "ml-1 pl-[32px]")}
                 />
             {/each}
@@ -80,7 +81,7 @@
                     <span class="text-sm">{data.label}</span>
                 </button>
             </ContextMenuTrigger>
-            <NodeMenu {data} on:delete />
+            <NodeMenu {data} on:delete on:download />
         </ContextMenu>
     {/if}
 </div>

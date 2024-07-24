@@ -1,4 +1,4 @@
-import { add, close, load } from "$lib/action";
+import { add, close, load, export_ } from "$lib/action";
 
 // https://stackoverflow.com/questions/38241480/detect-macos-ios-windows-android-and-linux-os-with-js
 const isMac = /Macintosh|Mac OS|MacIntel|MacPPC|Mac68K/gi.test(navigator.userAgent);
@@ -36,7 +36,8 @@ export const register = () => {
 
     listen("o", Modifier.Ctrl | Modifier.Shift, add);
     listen("o", Modifier.Ctrl, load);
-    listen("e", Modifier.Ctrl, close);
+    listen("w", Modifier.Ctrl | Modifier.Alt, close);
+    listen("e", Modifier.Ctrl, () => export_());
 };
 
 export const format = (key: string, mod: number): string => {

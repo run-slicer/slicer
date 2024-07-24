@@ -1,6 +1,6 @@
 import type { Entry } from "$lib/workspace";
 import { addToast } from "$lib/components/toaster.svelte";
-import { open, remove } from "$lib/action";
+import { open, remove, export_ } from "$lib/action";
 
 export interface Node {
     label: string;
@@ -36,3 +36,5 @@ export const deleteEntry = (data: Node) => {
         remove(data.entry);
     }
 };
+
+export const exportEntry = (data: Node) => export_(data.entry);
