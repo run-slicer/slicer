@@ -1,4 +1,4 @@
-import { type Entry, current as currentWs, narrow } from "$lib/workspace";
+import { type Entry, current as currentWs, readDetail } from "$lib/workspace";
 import { get } from "svelte/store";
 
 export const open = async (entry: Entry) => {
@@ -6,5 +6,5 @@ export const open = async (entry: Entry) => {
         return; // already opened
     }
 
-    currentWs.set(await narrow(entry));
+    currentWs.set(await readDetail(entry));
 };

@@ -62,7 +62,7 @@
                 Add <Shortcut key="o" modifier={Modifier.Ctrl | Modifier.Shift} />
             </MenubarItem>
             <MenubarItem disabled={$entries.size === 0} on:click={() => (clearConfirmOpen = true)}>
-                Clear workspace
+                Clear all
             </MenubarItem>
             <MenubarSeparator />
             <MenubarItem disabled={$entry === null} on:click={() => export_()}>

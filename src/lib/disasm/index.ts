@@ -1,6 +1,6 @@
 import { derived, get } from "svelte/store";
 import { toolsDisasm, editorView } from "$lib/state";
-import { type Entry, type ClassEntry, current as currentWs, narrow } from "$lib/workspace";
+import { type Entry, type ClassEntry, current as currentWs, readDetail } from "$lib/workspace";
 import cfr from "./cfr";
 import vf from "./vf";
 
@@ -24,7 +24,7 @@ export const createSource = (classes: Map<string, Entry>, name: string, buf: Uin
             return null;
         }
 
-        entry = await narrow(entry);
+        entry = await readDetail(entry);
         if (entry.type !== "class") {
             return null; // not a class
         }

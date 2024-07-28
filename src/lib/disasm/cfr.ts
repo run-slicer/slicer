@@ -1,5 +1,5 @@
 import { createSource, type Disassembler } from "./";
-import type { UTF8Entry } from "$lib/reader/pool";
+import type { UTF8Entry } from "@run-slicer/asm/pool";
 import { type ClassEntry, classes } from "$lib/workspace";
 import { get } from "svelte/store";
 
@@ -12,7 +12,7 @@ const cfr: Disassembler = {
         const { decompile } = await import("@run-slicer/cfr");
 
         const buf = new Uint8Array(await data.arrayBuffer());
-        const name = (node.pool[node.this_.name] as UTF8Entry).value;
+        const name = (node.pool[node.thisClass.name] as UTF8Entry).decode();
 
         const output = await decompile(name, { source: createSource(get(classes), name, buf) });
 

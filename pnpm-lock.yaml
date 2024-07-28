@@ -26,6 +26,9 @@ importers:
       '@melt-ui/svelte':
         specifier: ^0.81.0
         version: 0.81.0(svelte@4.2.18)
+      '@run-slicer/asm':
+        specifier: ^0.1.1
+        version: 0.1.1
       '@run-slicer/cfr':
         specifier: 0.1.2-0.152
         version: 0.1.2-0.152
@@ -462,6 +465,9 @@ packages:
     resolution: {integrity: sha512-UOo5FdvOL0+eIVTgS4tIdbW+TtnBLWg1YBCcU2KWM7nuNwRz9bksDX1bekJJCpu25N1DVWaCwnT39dVQxzqS8g==}
     cpu: [x64]
     os: [win32]
+
+  '@run-slicer/asm@0.1.1':
+    resolution: {integrity: sha512-Fbn3Hmnyh8tbnJcetLmw84+wyuHOpqcOCQoBAMu72uvzoGoouP61zXZD7+IeaWCe/guRdtb1orAVIFtGBMLoXw==}
 
   '@run-slicer/cfr@0.1.2-0.152':
     resolution: {integrity: sha512-pQZzk3UE6c0E4igGRrNXkSvOobQTGd6GlPYZ7MsppciQ4BftUANQy1nHbG31iJM9HRcMHttQTaCYps9nY9qRVg==}
@@ -1697,6 +1703,8 @@ snapshots:
 
   '@rollup/rollup-win32-x64-msvc@4.18.0':
     optional: true
+
+  '@run-slicer/asm@0.1.1': {}
 
   '@run-slicer/cfr@0.1.2-0.152': {}
 

@@ -1,5 +1,5 @@
 import { derived, get, writable } from "svelte/store";
-import { type Node, read } from "$lib/reader";
+import { type Node, read } from "@run-slicer/asm";
 import { unzip, type ZipEntry, type ZipInfo } from "unzipit";
 
 export interface BlobLike {
@@ -93,18 +93,26 @@ export interface ClassEntry extends Entry {
     node: Node;
 }
 
-export const narrow = async (entry: Entry): Promise<Entry> => {
+export const readDetail = async (entry: Entry): Promise<Entry> => {
     if (entry.type !== "file") {
-        return entry;
+        return entry; // not a generic entry
     }
 
-    // try to specialize entry from a generic one
-    const node = await read(await entry.data.stream());
-    if (!node) {
-        return entry;
+    const buffer = await entry.data.arrayBuffer();
+
+    const view = new DataView(buffer.slice(0, 4));
+    if (view.getUint32(0, false) === 0xcafebabe) {
+        // try to read as class
+        try {
+            const node = read(new Uint8Array(buffer));
+
+            return { ...entry, type: "class", node: node } as ClassEntry;
+        } catch (e) {
+            console.error("failed to read class", e);
+        }
     }
 
-    return { ...entry, type: "class", node: node } as ClassEntry;
+    return entry;
 };
 
 export const entries = writable<Map<string, Entry>>(new Map());
@@ -178,6 +186,8 @@ export const loadBatch = async (d: Data[]): Promise<LoadResult[]> => {
 
 export const loadFile = async (f: File): Promise<LoadResult[]> => {
     const view = new DataView(await f.slice(0, 4).arrayBuffer());
+
+    // TODO: ZIPs can have bogus data at the beginning, failing this check
     if (view.getInt32(0, true) === 0x04034b50) {
         return loadBatch(await zipData(f)); // detected zip header
     }
