@@ -24,8 +24,8 @@
             // scroll to the last line automatically
             const lastLine = view.state.doc.line(view.state.doc.lines);
 
-            view.focus();
-            view.dispatch({ selection: { anchor: lastLine.from, head: lastLine.from }, scrollIntoView: true });
+            const { node } = view.domAtPos(lastLine.from);
+            node.parentElement?.scrollIntoView({ block: "end" });
         }
     }
 </script>
