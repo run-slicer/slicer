@@ -2,7 +2,6 @@
     import { PaneHeader, PaneHeaderItem } from "$lib/components/pane";
     import { Terminal } from "lucide-svelte";
     import type { EditorView } from "@codemirror/view";
-    import { loggingOpen } from "$lib/state";
     import { type LogEntry, entries } from "$lib/logging";
 
     const readEntries = (logs: LogEntry[]): string => {
@@ -31,12 +30,7 @@
 
 <div class="flex h-full w-full flex-col">
     <PaneHeader>
-        <PaneHeaderItem
-            name="Logging"
-            icon={{ icon: Terminal, classes: ["text-muted-foreground"] }}
-            closeable
-            on:close={() => ($loggingOpen = false)}
-        />
+        <PaneHeaderItem name="Logging" icon={{ icon: Terminal, classes: ["text-muted-foreground"] }} />
     </PaneHeader>
     <div class="relative basis-full overflow-hidden scrollbar-thin">
         {#await Promise.all([import("./code/editor.svelte"), import("./code/lang/log")]) then [editor, { log }]}

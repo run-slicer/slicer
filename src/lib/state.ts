@@ -5,6 +5,7 @@ const root = "slicer.state";
 
 export type View = "auto" | "text" | "hex";
 
+export const projectOpen = persisted<boolean>(`${root}.project.open`, true);
 export const editorView = persisted<View>(`${root}.editor.view`, "auto");
 export const toolsDisasm = persisted<string>(`${root}.tools.disasm`, cfr.id);
 export const loggingOpen = persisted<boolean>(`${root}.logging.open`, false);

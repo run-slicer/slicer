@@ -14,7 +14,8 @@
     import { ResizableHandle, ResizablePane, ResizablePaneGroup } from "$lib/components/ui/resizable";
     import { TreePane, CodePane, WelcomePane, LoggingPane, PaneHeader, PaneHeaderItem } from "$lib/components/pane";
     import { current as entry, entries } from "$lib/workspace";
-    import { loggingOpen } from "$lib/state";
+    import { projectOpen, loggingOpen } from "$lib/state";
+    import { cn } from "$lib/utils";
 
     export let layoutId = "content-pane";
 
@@ -23,10 +24,11 @@
 </script>
 
 <ResizablePaneGroup direction="horizontal" class="grow basis-0" autoSaveId={layoutId}>
-    <ResizablePane defaultSize={20}>
+    <!-- only hide the project pane, because we don't actually want to force a re-render of the tree -->
+    <ResizablePane defaultSize={20} class={cn($projectOpen || "hidden")}>
         <TreePane bind:entries={entries0} />
     </ResizablePane>
-    <ResizableHandle />
+    <ResizableHandle class={cn($projectOpen || "hidden")} />
     <ResizablePane>
         <ResizablePaneGroup direction="vertical">
             <ResizablePane>
