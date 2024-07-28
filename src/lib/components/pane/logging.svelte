@@ -1,5 +1,4 @@
 <script lang="ts">
-    import Loading from "$lib/components/loading.svelte";
     import { PaneHeader, PaneHeaderItem } from "$lib/components/pane";
     import { Terminal } from "lucide-svelte";
     import type { EditorView } from "@codemirror/view";
@@ -40,9 +39,7 @@
         />
     </PaneHeader>
     <div class="relative basis-full overflow-hidden scrollbar-thin">
-        {#await Promise.all([import("./code/editor.svelte"), import("./code/lang/log")])}
-            <Loading value="Loading..." overlay />
-        {:then [editor, { log }]}
+        {#await Promise.all([import("./code/editor.svelte"), import("./code/lang/log")]) then [editor, { log }]}
             <svelte:component this={editor.default} readonly {value} lang={log()} on:ready={(e) => (view = e.detail)} />
         {/await}
     </div>

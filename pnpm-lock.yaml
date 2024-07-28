@@ -105,6 +105,9 @@ importers:
       svelte-check:
         specifier: ^3.8.4
         version: 3.8.4(postcss-load-config@4.0.2(postcss@8.4.40))(postcss@8.4.40)(svelte@4.2.18)
+      svelte-dnd-action:
+        specifier: ^0.9.49
+        version: 0.9.49(svelte@4.2.18)
       svelte-preprocess:
         specifier: ^6.0.2
         version: 6.0.2(postcss-load-config@4.0.2(postcss@8.4.40))(postcss@8.4.40)(svelte@4.2.18)(typescript@5.5.4)
@@ -1177,6 +1180,11 @@ packages:
     peerDependencies:
       codemirror: ^6.0.0
       svelte: ^3.0.0 || ^4.0.0
+
+  svelte-dnd-action@0.9.49:
+    resolution: {integrity: sha512-kAIDTSMoTZcJCqUpT8COLAkF0/NRBoJ/pIbPUra9UVRnyJljLy6dLgRuL2OojSqyNs3nToBvn5XOGaFMREwjfQ==}
+    peerDependencies:
+      svelte: '>=3.23.0 || ^5.0.0-next.0'
 
   svelte-hmr@0.16.0:
     resolution: {integrity: sha512-Gyc7cOS3VJzLlfj7wKS0ZnzDVdv3Pn2IuVeJPk9m2skfhcu5bq3wtIZyQGggr7/Iim5rH5cncyQft/kRLupcnA==}
@@ -2363,6 +2371,10 @@ snapshots:
   svelte-codemirror-editor@1.4.0(codemirror@6.0.1(@lezer/common@1.2.1))(svelte@4.2.18):
     dependencies:
       codemirror: 6.0.1(@lezer/common@1.2.1)
+      svelte: 4.2.18
+
+  svelte-dnd-action@0.9.49(svelte@4.2.18):
+    dependencies:
       svelte: 4.2.18
 
   svelte-hmr@0.16.0(svelte@4.2.18):
