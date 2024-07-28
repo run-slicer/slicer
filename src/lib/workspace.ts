@@ -101,7 +101,7 @@ export const readDetail = async (entry: Entry): Promise<Entry> => {
     const buffer = await entry.data.arrayBuffer();
 
     const view = new DataView(buffer.slice(0, 4));
-    if (view.getUint32(0, false) === 0xcafebabe) {
+    if (view.byteLength >= 4 && view.getUint32(0, false) === 0xcafebabe) {
         // try to read as class
         try {
             const node = read(new Uint8Array(buffer));
@@ -188,7 +188,7 @@ export const loadFile = async (f: File): Promise<LoadResult[]> => {
     const view = new DataView(await f.slice(0, 4).arrayBuffer());
 
     // TODO: ZIPs can have bogus data at the beginning, failing this check
-    if (view.getInt32(0, true) === 0x04034b50) {
+    if (view.byteLength >= 4 && view.getInt32(0, true) === 0x04034b50) {
         return loadBatch(await zipData(f)); // detected zip header
     }
 
