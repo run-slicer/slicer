@@ -36,6 +36,7 @@ export default defineConfig({
             "@codemirror/lang-xml",
             "@codemirror/lang-yaml",
             "@codemirror/language",
+            "@codemirror/view",
             "@uiw/codemirror-theme-github",
         ],
     },

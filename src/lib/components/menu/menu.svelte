@@ -3,7 +3,7 @@
     import { Separator } from "$lib/components/ui/separator";
     import { add, load, close, export_ } from "$lib/action";
     import { current as currentDisasm, all as disasms } from "$lib/disasm";
-    import { editorView, toolsDisasm } from "$lib/state";
+    import { editorView, loggingOpen, toolsDisasm } from "$lib/state";
     import { current as entry, entries } from "$lib/workspace";
     import { Modifier } from "$lib/shortcut";
     import { groupBy } from "$lib/arrays";
@@ -23,7 +23,9 @@
         MenubarRadioGroup,
         MenubarRadioItem,
         MenubarLabel,
+        MenubarCheckboxItem,
     } from "$lib/components/ui/menubar";
+    import { Terminal } from "lucide-svelte";
 
     $: disasm = $currentDisasm.id;
 
@@ -76,6 +78,14 @@
     <MenubarMenu>
         <MenubarTrigger class="relative">View</MenubarTrigger>
         <MenubarContent>
+            <MenubarSub>
+                <MenubarSubTrigger>Pane</MenubarSubTrigger>
+                <MenubarSubContent class="w-[12rem]">
+                    <MenubarCheckboxItem bind:checked={$loggingOpen}>
+                        <Terminal size={16} class="mr-1.5" /> Logging
+                    </MenubarCheckboxItem>
+                </MenubarSubContent>
+            </MenubarSub>
             <MenubarSub>
                 <MenubarSubTrigger>Mode</MenubarSubTrigger>
                 <MenubarSubContent class="w-[12rem]">

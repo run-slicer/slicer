@@ -1,3 +1,5 @@
+import { log } from "$lib/logging";
+
 export const readFiles = (pattern: string, multiple: boolean): Promise<File[]> => {
     return new Promise<File[]>((resolve) => {
         const input = document.createElement("input");
@@ -47,7 +49,7 @@ export const timed = async <T>(name: string, run: () => Promise<T>): Promise<Tim
     const result = await run();
     const time = Date.now() - start;
 
-    console.log(`${name} took ${time}ms`);
+    log(`${name} took ${time}ms`);
     return { result, time };
 };
 
@@ -56,6 +58,6 @@ export const timedSync = <T>(name: string, run: () => T): TimedResult<T> => {
     const result = run();
     const time = Date.now() - start;
 
-    console.log(`${name} took ${time}ms`);
+    log(`${name} took ${time}ms`);
     return { result, time };
 };

@@ -5,7 +5,7 @@ import { readFiles, timed } from "./utils";
 
 export const add = async () => {
     const results = await Promise.all(
-        (await readFiles("", true)).map((f) => timed("add action", () => load(fileData(f))))
+        (await readFiles("", true)).map((f) => timed(`add ${f.name}`, () => load(fileData(f))))
     );
 
     const [created, skipped] = partition(results, (r) => r.result.created);

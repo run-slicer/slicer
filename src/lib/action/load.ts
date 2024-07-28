@@ -5,7 +5,7 @@ import { readFiles, timed } from "./utils";
 
 export const load = async () => {
     const results = await Promise.all(
-        (await readFiles(".jar,.zip", true)).map((f) => timed("load action", () => loadFile(f)))
+        (await readFiles(".jar,.zip", true)).map((f) => timed(`load ${f.name}`, () => loadFile(f)))
     );
 
     const time = results.reduce((acc, v) => acc + v.time, 0);

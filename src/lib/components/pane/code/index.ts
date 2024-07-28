@@ -3,6 +3,7 @@ import type { View } from "$lib/state";
 import { current } from "$lib/disasm";
 import { get } from "svelte/store";
 import { formatHex } from "./hex";
+import { timed } from "$lib/action/utils";
 
 // prettier-ignore
 const extensions = {
@@ -25,13 +26,17 @@ export const read = async (view: View, entry: Entry | null): Promise<string> => 
         return "";
     }
 
-    if (view === "hex") {
-        return await formatHex(entry.data);
-    } else if (entry.type === "class") {
-        const decompiler = get(current);
+    const { result } = await timed(`read ${entry.data.name}`, async () => {
+        if (view === "hex") {
+            return await formatHex(entry.data);
+        } else if (entry.type === "class") {
+            const decompiler = get(current);
 
-        return await decompiler.run(entry as ClassEntry);
-    }
+            return await decompiler.run(entry as ClassEntry);
+        }
 
-    return await entry.data.text();
+        return await entry.data.text();
+    });
+
+    return result;
 };

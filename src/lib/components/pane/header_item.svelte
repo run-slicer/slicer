@@ -15,10 +15,18 @@
         e.stopPropagation();
         dispatch("close");
     };
+
+    let elem: HTMLButtonElement;
+    $: {
+        if (elem && active) {
+            elem.scrollIntoView();
+        }
+    }
 </script>
 
 <button
     class={cn("inline-flex h-full cursor-default items-center bg-background px-3", active || "bg-background/40")}
+    bind:this={elem}
     on:click
 >
     {#if icon}

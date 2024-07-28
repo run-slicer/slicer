@@ -2,6 +2,7 @@ import Header from "./header.svelte";
 import HeaderItem from "./header_item.svelte";
 import Content from "./content.svelte";
 import Welcome from "./welcome.svelte";
+import Logging from "./logging.svelte";
 import Tree from "./tree/tree.svelte";
 import Code from "./code/code.svelte";
 
@@ -12,4 +13,5 @@ export {
     Tree as TreePane,
     Code as CodePane,
     Welcome as WelcomePane,
+    Logging as LoggingPane,
 };

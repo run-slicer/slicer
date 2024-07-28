@@ -1,4 +1,5 @@
-import { createSource, type Disassembler } from "./";
+import type { Disassembler } from "./";
+import { createSource } from "./source";
 import type { UTF8Entry } from "@run-slicer/asm/pool";
 import { type ClassEntry, classes } from "$lib/workspace";
 import { get } from "svelte/store";

@@ -1,6 +1,7 @@
 import { derived, get, writable } from "svelte/store";
 import { type Node, read } from "@run-slicer/asm";
 import { unzip, type ZipEntry, type ZipInfo } from "unzipit";
+import { error } from "$lib/logging";
 
 export interface BlobLike {
     stream(): Promise<ReadableStream<Uint8Array>>;
@@ -108,7 +109,7 @@ export const readDetail = async (entry: Entry): Promise<Entry> => {
 
             return { ...entry, type: "class", node: node } as ClassEntry;
         } catch (e) {
-            console.error("failed to read class", e);
+            error(`failed to read class ${entry.data.name}`, e);
         }
     }
 
