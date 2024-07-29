@@ -17,6 +17,11 @@ export interface Named {
 }
 
 const parseName = (name: string): Named => {
+    if (name.endsWith("/")) {
+        // some obfuscators make non-directory ZIP entries with a trailing separator, remove it
+        name = name.substring(0, name.length - 1);
+    }
+
     let shortName = name;
 
     const slashIndex = name.lastIndexOf("/");
@@ -34,31 +39,42 @@ const parseName = (name: string): Named => {
     return { name, shortName, extension };
 };
 
-export type DataType = "file" | "zip";
+export const enum DataType {
+    FILE,
+    ZIP,
+}
 
 export interface Data extends BlobLike, Named {
     type: DataType;
 }
 
 export interface FileData extends Data {
-    type: "file";
+    type: DataType.FILE;
     file: File;
 }
 
 export const fileData = (file: File): FileData => {
     return {
-        type: "file",
+        type: DataType.FILE,
         file: file,
-        stream: async () => file.stream(),
-        arrayBuffer: () => file.arrayBuffer(),
-        text: () => file.text(),
-        blob: async () => file,
         ...parseName(file.name),
+        stream(): Promise<ReadableStream<Uint8Array>> {
+            return Promise.resolve(file.stream());
+        },
+        arrayBuffer(): Promise<ArrayBuffer> {
+            return file.arrayBuffer();
+        },
+        text(): Promise<string> {
+            return file.text();
+        },
+        blob(): Promise<Blob> {
+            return Promise.resolve(file);
+        },
     };
 };
 
 export interface ZipData extends Data {
-    type: "zip";
+    type: DataType.ZIP;
     parent: ZipInfo;
     entry: ZipEntry;
 }
@@ -70,19 +86,30 @@ export const zipData = async (file: File): Promise<ZipData[]> => {
         .filter(([_, v]) => !v.isDirectory)
         .map(([n, v]) => {
             return {
-                type: "zip",
+                type: DataType.ZIP,
                 parent: info,
                 entry: v,
-                stream: async () => (await v.blob()).stream(),
-                arrayBuffer: () => v.arrayBuffer(),
-                text: () => v.text(),
-                blob: () => v.blob(),
                 ...parseName(n),
+                async stream(): Promise<ReadableStream<Uint8Array>> {
+                    return (await v.blob()).stream();
+                },
+                arrayBuffer(): Promise<ArrayBuffer> {
+                    return v.arrayBuffer();
+                },
+                text(): Promise<string> {
+                    return v.text();
+                },
+                blob(): Promise<Blob> {
+                    return v.blob();
+                },
             };
         });
 };
 
-export type EntryType = "class" | "file";
+export const enum EntryType {
+    FILE,
+    CLASS,
+}
 
 export interface Entry {
     type: EntryType;
@@ -90,12 +117,12 @@ export interface Entry {
 }
 
 export interface ClassEntry extends Entry {
-    type: "class";
+    type: EntryType.CLASS;
     node: Node;
 }
 
 export const readDetail = async (entry: Entry): Promise<Entry> => {
-    if (entry.type !== "file") {
+    if (entry.type !== EntryType.FILE) {
         return entry; // not a generic entry
     }
 
@@ -107,7 +134,7 @@ export const readDetail = async (entry: Entry): Promise<Entry> => {
         try {
             const node = read(new Uint8Array(buffer));
 
-            return { ...entry, type: "class", node: node } as ClassEntry;
+            return { ...entry, type: EntryType.CLASS, node: node } as ClassEntry;
         } catch (e) {
             error(`failed to read class ${entry.data.name}`, e);
         }
@@ -148,7 +175,7 @@ const load0 = async (entries: Map<string, Entry>, d: Data): Promise<LoadResult> 
     }
 
     const entry: Entry = {
-        type: "file",
+        type: EntryType.FILE,
         data: d,
     };
 

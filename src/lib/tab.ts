@@ -6,7 +6,7 @@ import { writableDerived } from "$lib/store";
 
 export const enum TabType {
     WELCOME,
-    CODE
+    CODE,
 }
 
 export interface Tab {
@@ -36,7 +36,7 @@ export const current = writable<Tab | null>(welcomeTab);
 
 // set window name based on currently opened tab
 current.subscribe((tab) => {
-    document.title = tab ? `slicer - ${tab.name}` : "slicer";
+    document.title = tab ? `${tab.name} - slicer` : "slicer";
 });
 
 export const update = (tab: Tab) => {

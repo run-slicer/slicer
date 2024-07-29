@@ -3,7 +3,7 @@
     import { Separator } from "$lib/components/ui/separator";
     import { add, load, close, export_ } from "$lib/action";
     import { current as currentDisasm, all as disasms } from "$lib/disasm";
-    import { projectOpen, editorView, loggingOpen, toolsDisasm } from "$lib/state";
+    import { projectOpen, editorView, loggingOpen, toolsDisasm, View } from "$lib/state";
     import { entries } from "$lib/workspace";
     import { current as currentTab } from "$lib/tab";
     import { Modifier } from "$lib/shortcut";
@@ -95,9 +95,9 @@
                 <MenubarSubTrigger>Mode</MenubarSubTrigger>
                 <MenubarSubContent class="w-[12rem]">
                     <MenubarRadioGroup bind:value={$editorView}>
-                        <MenubarRadioItem value="auto">Automatic</MenubarRadioItem>
-                        <MenubarRadioItem value="text">Textual</MenubarRadioItem>
-                        <MenubarRadioItem value="hex">Hexadecimal</MenubarRadioItem>
+                        <MenubarRadioItem value={View.AUTO}>Automatic</MenubarRadioItem>
+                        <MenubarRadioItem value={View.TEXT}>Textual</MenubarRadioItem>
+                        <MenubarRadioItem value={View.HEX}>Hexadecimal</MenubarRadioItem>
                     </MenubarRadioGroup>
                 </MenubarSubContent>
             </MenubarSub>
