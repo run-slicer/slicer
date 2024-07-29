@@ -4,7 +4,8 @@
     import { add, load, close, export_ } from "$lib/action";
     import { current as currentDisasm, all as disasms } from "$lib/disasm";
     import { projectOpen, editorView, loggingOpen, toolsDisasm } from "$lib/state";
-    import { current as entry, entries } from "$lib/workspace";
+    import { entries } from "$lib/workspace";
+    import { current as currentTab } from "$lib/tab";
     import { Modifier } from "$lib/shortcut";
     import { groupBy } from "$lib/arrays";
     import Shortcut from "./shortcut.svelte";
@@ -28,6 +29,7 @@
     import { Terminal, Folders } from "lucide-svelte";
 
     $: disasm = $currentDisasm.id;
+    $: entry = $currentTab?.entry || null;
 
     let aboutOpen = false;
     let clearConfirmOpen = false;
@@ -67,10 +69,10 @@
                 Clear all
             </MenubarItem>
             <MenubarSeparator />
-            <MenubarItem disabled={$entry === null} on:click={() => export_()}>
+            <MenubarItem disabled={entry === null} on:click={() => export_()}>
                 Export <Shortcut key="e" modifier={Modifier.Ctrl} />
             </MenubarItem>
-            <MenubarItem disabled={$entry === null} on:click={close}>
+            <MenubarItem disabled={entry === null} on:click={close}>
                 Close <Shortcut key="w" modifier={Modifier.Ctrl | Modifier.Alt} />
             </MenubarItem>
         </MenubarContent>

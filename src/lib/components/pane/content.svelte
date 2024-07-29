@@ -1,26 +1,15 @@
-<script lang="ts" context="module">
-    import { type Tab, tabs as tabsMap } from "$lib/tab";
-    import { writableDerived } from "$lib/store";
-
-    export const tabs = writableDerived<Map<string, Tab>, Tab[]>(
-        tabsMap,
-        (m) => Array.from(m.values()),
-        (a) => new Map(a.map((e) => [e.id, e]))
-    );
-</script>
-
 <script lang="ts">
     import { dndzone } from "svelte-dnd-action";
     import { ResizableHandle, ResizablePane, ResizablePaneGroup } from "$lib/components/ui/resizable";
     import { TreePane, CodePane, WelcomePane, LoggingPane, PaneHeader, PaneHeaderItem } from "$lib/components/pane";
-    import { current as entry, entries } from "$lib/workspace";
+    import { entries } from "$lib/workspace";
+    import { current, orderedTabs, remove, TabType } from "$lib/tab";
     import { projectOpen, loggingOpen } from "$lib/state";
     import { cn } from "$lib/utils";
 
     export let layoutId = "content-pane";
 
     $: entries0 = Array.from($entries.values());
-    $: document.title = $entry ? `slicer - ${$entry.data.shortName}` : "slicer";
 </script>
 
 <ResizablePaneGroup direction="horizontal" class="grow basis-0" autoSaveId={layoutId}>
@@ -37,29 +26,31 @@
                         <div
                             class="flex w-full"
                             use:dndzone={{
-                                items: $tabs,
+                                items: $orderedTabs,
                                 dropFromOthersDisabled: true,
                                 dropTargetStyle: {},
                             }}
-                            on:consider={(e) => ($tabs = e.detail.items)}
-                            on:finalize={(e) => ($tabs = e.detail.items)}
+                            on:consider={(e) => ($orderedTabs = e.detail.items)}
+                            on:finalize={(e) => ($orderedTabs = e.detail.items)}
                         >
-                            {#each $tabs as tab (tab.id)}
+                            {#each $orderedTabs as tab (tab.id)}
                                 <PaneHeaderItem
                                     name={tab.name}
-                                    active={tab.active(tab)}
+                                    active={$current?.id === tab.id}
                                     icon={tab.icon}
-                                    closeable={Boolean(tab.close)}
-                                    on:click={() => tab.open?.(tab)}
-                                    on:close={() => tab.close?.(tab)}
+                                    closeable
+                                    on:click={() => ($current = tab)}
+                                    on:close={() => remove(tab.id)}
                                 />
                             {/each}
                         </div>
                     </PaneHeader>
-                    {#if $entry}
-                        <CodePane entry={$entry} />
-                    {:else}
-                        <WelcomePane />
+                    {#if $current}
+                        {#if $current.type === TabType.WELCOME}
+                            <WelcomePane />
+                        {:else if $current.type === TabType.CODE && $current.entry}
+                            <CodePane entry={$current.entry} />
+                        {/if}
                     {/if}
                 </div>
             </ResizablePane>

@@ -1,10 +1,16 @@
-import { type Entry, current as currentWs, readDetail } from "$lib/workspace";
+import { type Entry, readDetail } from "$lib/workspace";
+import { current, TabType } from "$lib/tab";
 import { get } from "svelte/store";
 
 export const open = async (entry: Entry) => {
-    if (get(currentWs)?.data?.name === entry.data.name) {
+    if (get(current)?.entry?.data?.name === entry.data.name) {
         return; // already opened
     }
 
-    currentWs.set(await readDetail(entry));
+    current.set({
+        id: entry.data.name,
+        type: TabType.CODE,
+        name: entry.data.shortName,
+        entry: await readDetail(entry),
+    });
 };

@@ -2,22 +2,8 @@
     import { userPrefersMode } from "mode-watcher";
     import { load, add } from "$lib/action";
     import { ToggleGroup, ToggleGroupItem } from "$lib/components/ui/toggle-group";
-    import { FilePlus2, Folder, Moon, Settings, Sparkles, Sun } from "lucide-svelte";
+    import { FilePlus2, Folder, Moon, Settings, Sun } from "lucide-svelte";
     import { Button } from "$lib/components/ui/button";
-    import { update as updateTab } from "$lib/tab";
-    import { current as currentWs } from "$lib/workspace";
-    import { onMount } from "svelte";
-    import { get } from "svelte/store";
-
-    onMount(() => {
-        updateTab({
-            id: "slicer:welcome",
-            name: "Welcome",
-            icon: { icon: Sparkles, classes: ["text-muted-foreground"] },
-            active: () => get(currentWs) === null,
-            open: () => currentWs.set(null),
-        });
-    });
 </script>
 
 <div class="m-24">

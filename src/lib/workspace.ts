@@ -124,8 +124,6 @@ entries.subscribe((e) => {
     window.onbeforeunload = e.size > 0 ? unloadHandler : null;
 });
 
-export const current = writable<Entry | null>(null);
-
 export const classes = derived(entries, ($entries) => {
     return new Map(
         Array.from($entries.values())
@@ -197,10 +195,6 @@ export const loadFile = async (f: File): Promise<LoadResult[]> => {
 };
 
 export const remove = (entry: Entry) => {
-    if (get(current)?.data?.name === entry.data.name) {
-        current.set(null); // opened, close it before removing
-    }
-
     entries.update(($entries) => {
         $entries.delete(entry.data.name);
         return $entries;
@@ -208,7 +202,6 @@ export const remove = (entry: Entry) => {
 };
 
 export const clear = () => {
-    current.set(null); // close opened entry
     entries.update(($entries) => {
         $entries.clear();
         return $entries;
