@@ -45,6 +45,7 @@
         nodes={writable(nodes)}
         edges={writable(edges)}
         fitView
+        minZoom={0.001}
         colorMode={$mode || "system"}
         bind:nodesDraggable={draggable}
         nodesConnectable={false}

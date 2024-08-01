@@ -97,6 +97,10 @@
 }
 
 /* xyflow graphs */
+.svelte-flow__handle {
+    background-color: transparent;
+    border: none;
+}
 .svelte-flow__node-block {
     padding: 10px;
     border-radius: var(--xy-node-border-radius, var(--xy-node-border-radius-default));
