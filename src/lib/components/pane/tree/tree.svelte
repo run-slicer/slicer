@@ -49,7 +49,7 @@
                 {#each root.nodes as node (node.label)}
                     <TreeNode
                         data={node}
-                        on:open={(e) => openEntry(e.detail)}
+                        on:open={(e) => openEntry(e.detail.data, e.detail.type)}
                         on:delete={(e) => (deleteData = e.detail)}
                         on:download={(e) => exportEntry(e.detail)}
                     />

@@ -1,6 +1,7 @@
 import type { Entry } from "$lib/workspace";
 import { addToast } from "$lib/components/toaster.svelte";
 import { open, remove, export_ } from "$lib/action";
+import type { TabType } from "$lib/tab";
 
 export interface Node {
     label: string;
@@ -22,7 +23,7 @@ const deleteNode = (node: Node): number => {
     return 0;
 };
 
-export const openEntry = (data: Node) => open(data.entry!);
+export const openEntry = (data: Node, type: TabType) => open(data.entry!, type);
 
 export const deleteEntry = (data: Node) => {
     if (data.nodes) {

@@ -18,7 +18,7 @@
     $: language = text ? fromEntry(entry) : hex ? "hex" : "plaintext";
 
     $: updateTab({
-        id: entry.data.name,
+        id: `${TabType.CODE}:${entry.data.name}`,
         type: TabType.CODE,
         name: entry.data.shortName,
         icon: hex ? { icon: Binary, classes: ["text-muted-foreground"] } : fileIcon(entry.data.shortName),

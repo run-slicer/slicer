@@ -1,3 +1,4 @@
+import type { Member } from "@run-slicer/asm";
 import type { Entry } from "$lib/workspace";
 import { get, writable } from "svelte/store";
 import type { StyledIcon } from "$lib/components/icons";
@@ -5,8 +6,9 @@ import { Sparkles } from "lucide-svelte";
 import { writableDerived } from "$lib/store";
 
 export const enum TabType {
-    WELCOME,
-    CODE,
+    WELCOME = "welcome",
+    CODE = "code",
+    FLOW_GRAPH = "flow_graph",
 }
 
 export interface Tab {
@@ -15,10 +17,11 @@ export interface Tab {
     name: string;
     icon?: StyledIcon;
     entry?: Entry;
+    member?: Member;
 }
 
 const welcomeTab: Tab = {
-    id: "slicer:welcome",
+    id: `${TabType.WELCOME}:slicer`,
     type: TabType.WELCOME,
     name: "Welcome",
     icon: { icon: Sparkles, classes: ["text-muted-foreground"] },

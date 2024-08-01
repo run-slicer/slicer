@@ -1,11 +1,19 @@
 <script lang="ts">
     import { dndzone } from "svelte-dnd-action";
     import { ResizableHandle, ResizablePane, ResizablePaneGroup } from "$lib/components/ui/resizable";
-    import { TreePane, CodePane, WelcomePane, LoggingPane, PaneHeader, PaneHeaderItem } from "$lib/components/pane";
     import { entries } from "$lib/workspace";
     import { current, orderedTabs, remove, TabType } from "$lib/tab";
     import { projectOpen, loggingOpen } from "$lib/state";
     import { cn } from "$lib/utils";
+    import {
+        TreePane,
+        CodePane,
+        FlowPane,
+        WelcomePane,
+        LoggingPane,
+        PaneHeader,
+        PaneHeaderItem,
+    } from "$lib/components/pane";
 
     export let layoutId = "content-pane";
 
@@ -45,13 +53,17 @@
                             {/each}
                         </div>
                     </PaneHeader>
-                    {#if $current}
-                        {#if $current.type === TabType.WELCOME}
-                            <WelcomePane />
-                        {:else if $current.type === TabType.CODE && $current.entry}
-                            <CodePane entry={$current.entry} />
+                    {#key $current}
+                        {#if $current}
+                            {#if $current.type === TabType.WELCOME}
+                                <WelcomePane />
+                            {:else if $current.type === TabType.CODE && $current.entry}
+                                <CodePane entry={$current.entry} />
+                            {:else if $current.type === TabType.FLOW_GRAPH && $current.entry}
+                                <FlowPane entry={$current.entry} member={$current.member || null} />
+                            {/if}
                         {/if}
-                    {/if}
+                    {/key}
                 </div>
             </ResizablePane>
             {#if $loggingOpen}
