@@ -2,7 +2,7 @@ import { LanguageSupport, StreamLanguage, type StreamParser } from "@codemirror/
 
 const parser: StreamParser<any> = {
     name: "log",
-    token: (stream) => {
+    token(stream) {
         if (stream.sol()) {
             while (true) {
                 stream.next();

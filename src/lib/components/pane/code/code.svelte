@@ -5,17 +5,17 @@
     import { fileIcon } from "$lib/components/icons";
     import Loading from "$lib/components/loading.svelte";
     import { TabType, update as updateTab } from "$lib/tab";
-    import { fromEntry, load } from "./lang";
-    import { detect, read } from "./";
+    import { load as loadLanguage } from "$lib/lang";
+    import { detectLanguage, detectView, read } from "./";
 
     export let entry: Entry;
 
-    $: view = $editorView === View.AUTO ? detect(entry) : $editorView;
+    $: view = $editorView === View.AUTO ? detectView(entry) : $editorView;
 
     $: text = view === View.TEXT;
     $: hex = view === View.HEX;
 
-    $: language = text ? fromEntry(entry) : hex ? "hex" : "plaintext";
+    $: language = detectLanguage(view, entry);
 
     $: updateTab({
         id: `${TabType.CODE}:${entry.data.name}`,
@@ -27,8 +27,8 @@
 </script>
 
 <div class="relative basis-full overflow-hidden scrollbar-thin">
-    {#await Promise.all([import("./editor.svelte"), load(language), read(view, entry)])}
-        <Loading value={entry.type === EntryType.CLASS && text ? "Decompiling..." : "Reading..."} overlay />
+    {#await Promise.all([import("./editor.svelte"), loadLanguage(language), read(view, entry)])}
+        <Loading value={entry.type === EntryType.CLASS && text ? "Disassembling..." : "Reading..."} overlay />
     {:then [editor, lang, value]}
         <svelte:component this={editor.default} {value} readonly {lang} />
     {/await}

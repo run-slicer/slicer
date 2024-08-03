@@ -33,7 +33,7 @@
         <PaneHeaderItem name="Logging" icon={{ icon: Terminal, classes: ["text-muted-foreground"] }} />
     </PaneHeader>
     <div class="relative basis-full overflow-hidden scrollbar-thin">
-        {#await Promise.all([import("./code/editor.svelte"), import("./code/lang/log")]) then [editor, { log }]}
+        {#await Promise.all([import("./code/editor.svelte"), import("$lib/lang/log")]) then [editor, { log }]}
             <svelte:component this={editor.default} readonly {value} lang={log()} on:ready={(e) => (view = e.detail)} />
         {/await}
     </div>

@@ -41,6 +41,9 @@ importers:
       '@run-slicer/cfr':
         specifier: 0.1.2-0.152
         version: 0.1.2-0.152
+      '@run-slicer/jasm':
+        specifier: 0.1.0-2.5.0
+        version: 0.1.0-2.5.0
       '@run-slicer/vf':
         specifier: 0.1.2-1.10.1
         version: 0.1.2-1.10.1
@@ -493,6 +496,9 @@ packages:
 
   '@run-slicer/cfr@0.1.2-0.152':
     resolution: {integrity: sha512-pQZzk3UE6c0E4igGRrNXkSvOobQTGd6GlPYZ7MsppciQ4BftUANQy1nHbG31iJM9HRcMHttQTaCYps9nY9qRVg==}
+
+  '@run-slicer/jasm@0.1.0-2.5.0':
+    resolution: {integrity: sha512-jf6twAE6IubD622WPTbpKPgzht9J+O+2TpAGmmDaPVHIc0Bn1rfqeRfwMv0gWdlUFlY6Zbm8mI8ek9G571ONMA==}
 
   '@run-slicer/vf@0.1.2-1.10.1':
     resolution: {integrity: sha512-EuDLNIDllcCeUELAhblG0qHdb+3jZvSghO2p5khwa2gvvymzMOj9QRKxGjvkGLAVJi73etcTNSFfrGb7k9tfXQ==}
@@ -1795,6 +1801,8 @@ snapshots:
   '@run-slicer/asm@0.7.0': {}
 
   '@run-slicer/cfr@0.1.2-0.152': {}
+
+  '@run-slicer/jasm@0.1.0-2.5.0': {}
 
   '@run-slicer/vf@0.1.2-1.10.1': {}
 

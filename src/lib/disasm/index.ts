@@ -2,17 +2,21 @@ import { derived, get } from "svelte/store";
 import { editorView, toolsDisasm, View } from "$lib/state";
 import { type ClassEntry, EntryType } from "$lib/workspace";
 import { current as currentTab, TabType } from "$lib/tab";
+import jasm from "./jasm";
 import cfr from "./cfr";
 import vf from "./vf";
+import type { Language } from "$lib/lang";
 
 export interface Disassembler {
     id: string;
     name?: string;
     group?: string;
+    lang?: Language;
     run(entry: ClassEntry): Promise<string>;
 }
 
 export const all: Map<string, Disassembler> = new Map([
+    [jasm.id, jasm],
     [cfr.id, cfr],
     [vf.id, vf],
 ]);

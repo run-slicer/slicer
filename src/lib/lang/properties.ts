@@ -9,7 +9,7 @@ interface State {
 
 const parser: StreamParser<State> = {
     name: "properties",
-    token: (stream, state) => {
+    token(stream, state) {
         const sol = stream.sol() || state.afterSection;
         const eol = stream.eol();
 
@@ -53,12 +53,14 @@ const parser: StreamParser<State> = {
 
         return state.position;
     },
-    startState: () => ({
-        position: "def",
-        nextMultiline: false,
-        inMultiline: false,
-        afterSection: false,
-    }),
+    startState() {
+        return {
+            position: "def",
+            nextMultiline: false,
+            inMultiline: false,
+            afterSection: false,
+        };
+    },
 };
 
 export const properties = (): LanguageSupport => {

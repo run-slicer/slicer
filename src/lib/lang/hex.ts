@@ -2,7 +2,7 @@ import { LanguageSupport, StreamLanguage, type StreamParser } from "@codemirror/
 
 const parser: StreamParser<any> = {
     name: "hexadecimal",
-    token: (stream) => {
+    token(stream) {
         if (stream.sol()) {
             for (let i = 0; i < 8; i++) {
                 stream.next();

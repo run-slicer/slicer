@@ -8,6 +8,7 @@ const vf: Disassembler = {
     id: "vf",
     name: "Vineflower",
     group: "Decompilers",
+    lang: "java",
     run: async (entry: ClassEntry): Promise<string> => {
         const { node, data } = entry;
         const { decompile } = await import("@run-slicer/vf");

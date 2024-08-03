@@ -4,6 +4,7 @@ import { current } from "$lib/disasm";
 import { get } from "svelte/store";
 import { formatHex } from "./hex";
 import { timed } from "$lib/action/utils";
+import { fromExtension, type Language } from "$lib/lang";
 
 // prettier-ignore
 const extensions = {
@@ -11,7 +12,7 @@ const extensions = {
     binary: new Set(["bin", "tar", "gz", "rar", "zip", "jar", "jpg", "jpeg", "gif", "png", "lzma", "dll", "so", "dylib", "exe", "kotlin_builtins", "kotlin_metadata", "kotlin_module", "nbt"]),
 };
 
-export const detect = (entry: Entry | null): View => {
+export const detectView = (entry: Entry | null): View => {
     const ext = entry?.data?.extension;
     if (!entry || !ext) {
         return View.TEXT;
@@ -19,6 +20,21 @@ export const detect = (entry: Entry | null): View => {
 
     // TODO: detect non-ASCII values in file header
     return extensions.binary.has(ext) ? View.HEX : View.TEXT;
+};
+
+export const detectLanguage = (view: View, entry: Entry | null): Language => {
+    if (!entry) {
+        return "plaintext";
+    }
+
+    if (view === View.HEX) {
+        return "hex";
+    } else if (entry.type === EntryType.CLASS) {
+        // disassembled view
+        return get(current).lang || "plaintext";
+    }
+
+    return entry.data.extension ? fromExtension(entry.data.extension) : "plaintext";
 };
 
 export const read = async (view: View, entry: Entry | null): Promise<string> => {

@@ -1,7 +1,6 @@
 import type { LanguageSupport } from "@codemirror/language";
-import type { Entry } from "$lib/workspace";
 
-export type Language = "java" | "xml" | "json" | "yaml" | "properties" | "hex" | "plaintext";
+export type Language = "java" | "xml" | "json" | "yaml" | "properties" | "hex" | "jasm" | "plaintext";
 
 export const load = async (lang: Language): Promise<LanguageSupport | null> => {
     switch (lang) {
@@ -17,6 +16,8 @@ export const load = async (lang: Language): Promise<LanguageSupport | null> => {
             return (await import("./properties")).properties();
         case "hex":
             return (await import("./hex")).hex();
+        case "jasm":
+            return (await import("./jasm")).jasm();
     }
 
     return null;
@@ -43,8 +44,4 @@ export const fromExtension = (ext: string): Language => {
     }
 
     return "plaintext";
-};
-
-export const fromEntry = (entry: Entry): Language => {
-    return entry.data.extension ? fromExtension(entry.data.extension) : "plaintext";
 };
