@@ -1,25 +1,11 @@
 import { type Node, type Edge, MarkerType } from "@xyflow/svelte";
 import type { Member } from "@run-slicer/asm";
+import type { Pool } from "@run-slicer/asm/pool";
 import type { CodeAttribute } from "@run-slicer/asm/attr";
-import { AttributeType, Opcode, OPCODE_MNEMONICS } from "@run-slicer/asm/spec";
+import { AttributeType } from "@run-slicer/asm/spec";
 import { type Node as GraphNode, EdgeType, computeGraph } from "@run-slicer/asm/analysis/graph";
 import { layout, graphlib } from "@dagrejs/dagre";
-import type {
-    Pool,
-    ClassEntry,
-    UTF8Entry,
-    DynamicEntry,
-    NameTypeEntry,
-    RefEntry,
-} from "@run-slicer/asm/pool";
-import type {
-    Instruction,
-    TypeInstruction,
-    PushInstruction,
-    IncrementInstruction,
-    WideInstruction,
-    InvokeInstruction,
-} from "@run-slicer/asm/insn";
+import { formatInsn } from "./insn";
 
 export type NodeData = {
     node: GraphNode;
@@ -43,94 +29,6 @@ const computeTextSize = (text: string): TextMetrics => {
 
 const NODE_MARGIN = 25;
 
-const stringifyInsn = (insn: Instruction, pool: Pool): string => {
-    // TODO: finish all opcodes
-    let value = OPCODE_MNEMONICS[insn.opcode] || "<unknown opcode>";
-    switch (insn.opcode) {
-        case Opcode.ALOAD:
-        case Opcode.ASTORE:
-        case Opcode.DLOAD:
-        case Opcode.DSTORE:
-        case Opcode.FLOAD:
-        case Opcode.FSTORE:
-        case Opcode.ILOAD:
-        case Opcode.ISTORE:
-        case Opcode.LLOAD:
-        case Opcode.LSTORE:
-        case Opcode.RET:
-        case Opcode.GETFIELD:
-        case Opcode.GETSTATIC:
-        case Opcode.PUTFIELD:
-        case Opcode.PUTSTATIC:
-            break;
-        case Opcode.IINC:
-            const iincInsn = insn as IncrementInstruction;
-
-            value += ` ${iincInsn.index} ${iincInsn.const}`;
-            break;
-        case Opcode.WIDE:
-            const wideInsn = insn as WideInstruction;
-
-            value += ` ${OPCODE_MNEMONICS[wideInsn.insn.opcode] || "<unknown opcode>"}`;
-            switch (wideInsn.insn.opcode) {
-                case Opcode.IINC: {
-                    const iincInsn = wideInsn.insn as IncrementInstruction;
-
-                    value += ` ${iincInsn.index} ${iincInsn.const}`;
-                    break;
-                }
-            }
-            break;
-        case Opcode.INVOKEDYNAMIC:
-        case Opcode.INVOKEINTERFACE:
-        case Opcode.INVOKESPECIAL:
-        case Opcode.INVOKESTATIC:
-        case Opcode.INVOKEVIRTUAL:
-            const invokeInsn = insn as InvokeInstruction;
-            if (invokeInsn.opcode === Opcode.INVOKEDYNAMIC) {
-                const indyInfo = pool[invokeInsn.ref] as DynamicEntry;
-                const nameType = pool[indyInfo.nameType] as NameTypeEntry;
-
-                value += ` ${indyInfo.bsmIndex}`;
-                value += ` ${(pool[nameType.name] as UTF8Entry).decode()} ${(pool[nameType.type_] as UTF8Entry).decode()}`;
-            } else {
-                const refInfo = pool[invokeInsn.ref] as RefEntry;
-
-                const clazz = pool[refInfo.ref] as ClassEntry;
-                const nameType = pool[refInfo.nameType] as NameTypeEntry;
-
-                value += ` ${(pool[clazz.name] as UTF8Entry).decode()}`;
-                value += ` ${(pool[nameType.name] as UTF8Entry).decode()} ${(pool[nameType.type_] as UTF8Entry).decode()}`;
-            }
-
-            break;
-        case Opcode.LDC:
-        case Opcode.LDC_W:
-        case Opcode.LDC2_W:
-            break;
-        case Opcode.CHECKCAST:
-        case Opcode.INSTANCEOF:
-        case Opcode.NEW:
-            const typeInsn = insn as TypeInstruction;
-            const nameEntry = pool[(pool[typeInsn.index] as ClassEntry).name] as UTF8Entry;
-
-            value += ` ${nameEntry.decode()}`;
-            break;
-        case Opcode.BIPUSH:
-        case Opcode.SIPUSH:
-            const pushInsn = insn as PushInstruction;
-
-            value += ` ${pushInsn.value}`;
-            break;
-        case Opcode.ANEWARRAY:
-        case Opcode.NEWARRAY:
-        case Opcode.MULTIANEWARRAY:
-            break;
-    }
-
-    return value;
-};
-
 export const createComputedGraph = (method: Member | null, pool: Pool): [Node[], Edge[]] => {
     if (!method) {
         return [[], []]; // no method
@@ -146,7 +44,7 @@ export const createComputedGraph = (method: Member | null, pool: Pool): [Node[],
     const { nodes, edges } = computeGraph(code.insns);
 
     const data: NodeData[] = nodes.map((node) => {
-        const lines = node.insns.map((i) => stringifyInsn(i, pool));
+        const lines = node.insns.map((i) => formatInsn(i, pool));
         const metrics = computeTextSize(lines.reduce((a, b) => (a.length > b.length ? a : b)));
 
         return {

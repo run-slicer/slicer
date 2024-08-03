@@ -12,6 +12,6 @@
 
 <Handle type="target" position={Position.Top} />
 {#each typedData.lines as line}
-    <p>{line}</p>
+    <p class="font-mono tracking-tight whitespace-nowrap">{line}</p>
 {/each}
 <Handle type="source" position={Position.Bottom} />
