@@ -74,6 +74,7 @@
         --xy-background-color: hsl(var(--background));
         --xy-node-background-color: hsl(var(--muted));
         --xy-node-border: 1px solid hsl(var(--border));
+        --xy-edge-label-background-color: hsl(var(--background));
         --xy-controls-button-background-color: hsl(var(--muted));
         --xy-controls-button-background-color-hover: hsl(var(--muted) / 0.6);
     }

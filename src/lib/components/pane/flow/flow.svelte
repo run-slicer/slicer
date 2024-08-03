@@ -12,7 +12,11 @@
     import { createComputedGraph } from "./";
 
     export let entry: Entry;
-    const methods = entry.type === EntryType.CLASS ? (entry as ClassEntry).node.methods : [];
+
+    const node = entry.type === EntryType.CLASS ? (entry as ClassEntry).node : null;
+
+    const pool = node ? node.pool : [];
+    const methods = node ? node.methods : [];
 
     export let member: Member | null;
     if (!member) {
@@ -26,7 +30,7 @@
     let method: Selected<number> = { value: member ? methods.indexOf(member) : -1, label: createLabel(member) };
     $: member = method.value !== -1 ? methods[method.value] : null;
 
-    $: [nodes, edges] = createComputedGraph(member);
+    $: [nodes, edges] = createComputedGraph(member, pool);
 
     $: updateTab({
         id: `${TabType.FLOW_GRAPH}:${entry.data.name}`,
@@ -45,7 +49,7 @@
         nodes={writable(nodes)}
         edges={writable(edges)}
         fitView
-        minZoom={0.001}
+        minZoom={0}
         colorMode={$mode || "system"}
         bind:nodesDraggable={draggable}
         nodesConnectable={false}
@@ -72,13 +76,13 @@
         <SelectTrigger class="h-7 whitespace-nowrap text-xs [&_svg]:ml-2 [&_svg]:h-4 [&_svg]:w-4">
             <div class="overflow-hidden text-ellipsis">
                 <span class="mr-2 text-muted-foreground">Method: </span>
-                {method.label}
+                <span class="font-mono tracking-tight">{method.label}</span>
             </div>
         </SelectTrigger>
         <SelectContent class="max-h-[240px] w-full overflow-scroll">
             {#each methods as mth, i}
                 {@const label = createLabel(mth)}
-                <SelectItem value={i} {label} class="break-all text-xs">
+                <SelectItem value={i} {label} class="break-all text-xs font-mono tracking-tight">
                     {label}
                 </SelectItem>
             {/each}
