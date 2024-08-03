@@ -5,7 +5,7 @@
     import { current as currentDisasm, all as disasms } from "$lib/disasm";
     import { projectOpen, editorView, loggingOpen, toolsDisasm, View } from "$lib/state";
     import { entries } from "$lib/workspace";
-    import { current as currentTab } from "$lib/tab";
+    import { current as currentTab, TabType } from "$lib/tab";
     import { Modifier } from "$lib/shortcut";
     import { groupBy } from "$lib/arrays";
     import Shortcut from "./shortcut.svelte";
@@ -26,7 +26,8 @@
         MenubarLabel,
         MenubarCheckboxItem,
     } from "$lib/components/ui/menubar";
-    import { Terminal, Folders } from "lucide-svelte";
+    import { Terminal, Folders, GitBranchPlus } from "lucide-svelte";
+    import { openEntry } from "./";
 
     $: disasm = $currentDisasm.id;
     $: entry = $currentTab?.entry || null;
@@ -115,6 +116,13 @@
                     </MenubarRadioGroup>
                 </MenubarSubContent>
             </MenubarSub>
+            <MenubarItem
+                class="justify-between"
+                disabled={entry === null}
+                on:click={() => openEntry(TabType.FLOW_GRAPH)}
+            >
+                Flow graph <GitBranchPlus size={16} />
+            </MenubarItem>
         </MenubarContent>
     </MenubarMenu>
 </Menubar>

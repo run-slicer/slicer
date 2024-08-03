@@ -82,7 +82,7 @@
         <SelectContent class="max-h-[240px] w-full overflow-scroll">
             {#each methods as mth, i}
                 {@const label = createLabel(mth)}
-                <SelectItem value={i} {label} class="break-all text-xs font-mono tracking-tight">
+                <SelectItem value={i} {label} class="break-all font-mono text-xs tracking-tight">
                     {label}
                 </SelectItem>
             {/each}
