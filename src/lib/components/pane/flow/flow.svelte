@@ -44,48 +44,50 @@
     let draggable = false;
 </script>
 
-{#key method}
-    <SvelteFlow
-        nodes={writable(nodes)}
-        edges={writable(edges)}
-        fitView
-        minZoom={0}
-        colorMode={$mode || "system"}
-        bind:nodesDraggable={draggable}
-        nodesConnectable={false}
-        elementsSelectable={false}
-        proOptions={{ hideAttribution: true }}
-        nodeTypes={{ block: FlowNode }}
-    >
-        <Background />
-        <Controls showLock={false} position="bottom-right">
-            <!-- override interactivity control: we only want it to toggle draggability -->
-            <ControlButton
-                class="svelte-flow__controls-interactive"
-                on:click={() => (draggable = !draggable)}
-                title="toggle interactivity"
-                aria-label="toggle interactivity"
-            >
-                <svelte:component this={draggable ? LockOpen : Lock} size={12} class="!fill-none" />
-            </ControlButton>
-        </Controls>
-    </SvelteFlow>
-{/key}
-<div class="absolute bottom-0 m-[15px] max-w-[425px]">
-    <Select bind:selected={method}>
-        <SelectTrigger class="h-7 whitespace-nowrap text-xs [&_svg]:ml-2 [&_svg]:h-4 [&_svg]:w-4">
-            <div class="overflow-hidden text-ellipsis">
-                <span class="mr-2 text-muted-foreground">Method: </span>
-                <span class="font-mono tracking-tight">{method.label}</span>
-            </div>
-        </SelectTrigger>
-        <SelectContent class="max-h-[240px] w-full overflow-scroll">
-            {#each methods as mth, i}
-                {@const label = createLabel(mth)}
-                <SelectItem value={i} {label} class="break-all font-mono text-xs tracking-tight">
-                    {label}
-                </SelectItem>
-            {/each}
-        </SelectContent>
-    </Select>
+<div class="relative h-full w-full">
+    {#key method}
+        <SvelteFlow
+            nodes={writable(nodes)}
+            edges={writable(edges)}
+            fitView
+            minZoom={0}
+            colorMode={$mode || "system"}
+            bind:nodesDraggable={draggable}
+            nodesConnectable={false}
+            elementsSelectable={false}
+            proOptions={{ hideAttribution: true }}
+            nodeTypes={{ block: FlowNode }}
+        >
+            <Background />
+            <Controls showLock={false} position="bottom-right">
+                <!-- override interactivity control: we only want it to toggle draggability -->
+                <ControlButton
+                    class="svelte-flow__controls-interactive"
+                    on:click={() => (draggable = !draggable)}
+                    title="toggle interactivity"
+                    aria-label="toggle interactivity"
+                >
+                    <svelte:component this={draggable ? LockOpen : Lock} size={12} class="!fill-none" />
+                </ControlButton>
+            </Controls>
+        </SvelteFlow>
+    {/key}
+    <div class="absolute bottom-0 m-[15px] max-w-[425px]">
+        <Select bind:selected={method}>
+            <SelectTrigger class="h-7 whitespace-nowrap text-xs [&_svg]:ml-2 [&_svg]:h-4 [&_svg]:w-4">
+                <div class="overflow-hidden text-ellipsis">
+                    <span class="mr-2 text-muted-foreground">Method: </span>
+                    <span class="font-mono tracking-tight">{method.label}</span>
+                </div>
+            </SelectTrigger>
+            <SelectContent class="max-h-[240px] w-full overflow-scroll">
+                {#each methods as mth, i}
+                    {@const label = createLabel(mth)}
+                    <SelectItem value={i} {label} class="break-all font-mono text-xs tracking-tight">
+                        {label}
+                    </SelectItem>
+                {/each}
+            </SelectContent>
+        </Select>
+    </div>
 </div>
