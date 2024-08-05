@@ -12,7 +12,11 @@ const parser: StreamParser<State> = {
             stream.eatSpace();
 
             // this madness is from JASM itself, jesus
-            if (stream.match(/^-?(?:(?:\d[\d_]*\.(?:\d[\d_]*)?([eE]-?\d[\d_]*)?|\.\d[\d_]*(?:[eE]-?\d[\d_]*)?|\d[\d_]*[eE]-?\d[\d_]*|0[xX][\dA-Fa-f_]*(\.[\dA-Fa-f_]*)?[pP]-?\d[\d_]*)[fFdD]?|(?:0[xX][\dA-fa-f_]+|\d[\d_]*)[LlFfDd]?)/)) {
+            if (
+                stream.match(
+                    /^-?(?:(?:\d[\d_]*\.(?:\d[\d_]*)?([eE]-?\d[\d_]*)?|\.\d[\d_]*(?:[eE]-?\d[\d_]*)?|\d[\d_]*[eE]-?\d[\d_]*|0[xX][\dA-Fa-f_]*(\.[\dA-Fa-f_]*)?[pP]-?\d[\d_]*)[fFdD]?|(?:0[xX][\dA-fa-f_]+|\d[\d_]*)[LlFfDd]?)/
+                )
+            ) {
                 return "number";
             }
         }
@@ -26,7 +30,9 @@ const parser: StreamParser<State> = {
             stream.eatSpace();
 
             // include any following modifiers as well
-            stream.match(/(?:(?:public|private|protected|static|final|abstract|strictfp|transient|volatile|synchronized|native|varargs|bridge|synthetic|enum|annotation|module|super|interface|record|sealed|open|non-sealed)\s+)+/);
+            stream.match(
+                /(?:(?:public|private|protected|static|final|abstract|strictfp|transient|volatile|synchronized|native|varargs|bridge|synthetic|enum|annotation|module|super|interface|record|sealed|open|non-sealed)\s+)+/
+            );
             return "keyword";
         }
         // labels
@@ -65,7 +71,7 @@ const parser: StreamParser<State> = {
         return {
             inLabel: false,
         };
-    }
+    },
 };
 
 export const jasm = (): LanguageSupport => {

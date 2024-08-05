@@ -1,4 +1,6 @@
+# lock files
 pnpm-lock.yaml
+
+# shadcn-svelte
 /src/lib/components/ui
-/src/lib/disasm/cfr
-/src/lib/disasm/vf
+/src/lib/components/utils.ts

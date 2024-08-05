@@ -2,7 +2,7 @@
     import { onMount } from "svelte";
     import { Loader2 } from "lucide-svelte";
     import { fade } from "svelte/transition";
-    import { cn } from "$lib/utils";
+    import { cn } from "./utils";
 
     export let value: string | null = null;
     export let overlay = false;

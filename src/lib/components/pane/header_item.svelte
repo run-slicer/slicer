@@ -2,7 +2,7 @@
     import { X } from "lucide-svelte";
     import { createEventDispatcher } from "svelte";
     import type { StyledIcon } from "$lib/components/icons";
-    import { cn } from "$lib/utils";
+    import { cn } from "$lib/components/utils";
 
     export let name = "";
     export let icon: StyledIcon | null = null;

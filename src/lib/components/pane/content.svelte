@@ -4,7 +4,7 @@
     import { entries } from "$lib/workspace";
     import { current, orderedTabs, remove, TabType } from "$lib/tab";
     import { projectOpen, loggingOpen } from "$lib/state";
-    import { cn } from "$lib/utils";
+    import { cn } from "$lib/components/utils";
     import {
         TreePane,
         CodePane,

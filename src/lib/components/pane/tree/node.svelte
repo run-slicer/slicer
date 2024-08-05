@@ -7,7 +7,7 @@
 <script lang="ts">
     import { ChevronDown, ChevronRight, Folder } from "lucide-svelte";
     import { createEventDispatcher } from "svelte";
-    import { cn } from "$lib/utils";
+    import { cn } from "$lib/components/utils";
     import { TabType } from "$lib/tab";
     import { fileIcon } from "$lib/components/icons";
     import { ContextMenu, ContextMenuTrigger } from "$lib/components/ui/context-menu";

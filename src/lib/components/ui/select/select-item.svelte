@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Check from "lucide-svelte/icons/check";
 	import { Select as SelectPrimitive } from "bits-ui";
-	import { cn } from "$lib/utils.js";
+	import { cn } from "$lib/components/utils.js";
 
 	type $$Props = SelectPrimitive.ItemProps;
 	type $$Events = SelectPrimitive.ItemEvents;
