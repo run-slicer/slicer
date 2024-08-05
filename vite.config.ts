@@ -40,4 +40,13 @@ export default defineConfig({
             "@uiw/codemirror-theme-github",
         ],
     },
+    build: {
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    xyflow: ["@xyflow/svelte"],
+                },
+            },
+        },
+    },
 });
