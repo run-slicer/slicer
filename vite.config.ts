@@ -23,7 +23,7 @@ export default defineConfig({
             ],
         }),
         sitemap({
-            hostname: process.env.CF_PAGES_URL || "http://localhost/",
+            hostname: "https://slicer.run/" /* process.env.CF_PAGES_URL || "http://localhost/" */,
             changefreq: "never", // it's an SPA
         }),
     ],
