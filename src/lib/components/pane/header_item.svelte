@@ -34,7 +34,7 @@
     {/if}
     <span class="whitespace-nowrap break-keep text-sm">{name}</span>
     {#if closeable}
-        <button class="ml-3" on:click={handleClose}>
+        <button class="ml-3" aria-label="Close" on:click={handleClose}>
             <X size={14} class="min-w-[14px] text-muted-foreground/40 hover:text-muted-foreground/60" />
         </button>
     {/if}

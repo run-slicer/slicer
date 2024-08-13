@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import { resolve } from "path";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
 import { sveltePreprocess } from "svelte-preprocess";
+import sitemap from "vite-plugin-sitemap";
 import { version } from "./package.json";
 
 // https://vitejs.dev/config/
@@ -21,7 +22,14 @@ export default defineConfig({
                 }),
             ],
         }),
+        sitemap({
+            hostname: process.env.CF_PAGES_URL || "http://localhost/",
+            changefreq: "never", // it's an SPA
+        }),
     ],
+    build: {
+        sourcemap: "hidden",
+    },
     resolve: {
         alias: {
             $lib: resolve("./src/lib"),

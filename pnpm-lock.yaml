@@ -132,6 +132,9 @@ importers:
       vite:
         specifier: ^5.3.5
         version: 5.3.5(@types/node@20.14.14)
+      vite-plugin-sitemap:
+        specifier: ^0.7.1
+        version: 0.7.1
 
 packages:
 
@@ -1419,6 +1422,9 @@ packages:
   uzip-module@1.0.3:
     resolution: {integrity: sha512-AMqwWZaknLM77G+VPYNZLEruMGWGzyigPK3/Whg99B3S6vGHuqsyl5ZrOv1UUF3paGK1U6PM0cnayioaryg/fA==}
 
+  vite-plugin-sitemap@0.7.1:
+    resolution: {integrity: sha512-4NRTkiWytLuAmcikckrLcLl9iYA20+5v6l8XshcOrzxH1WR8H0O3S6sTQYfjMrE8su/LG6Y0cTodvOdcOIxaLw==}
+
   vite@5.3.5:
     resolution: {integrity: sha512-MdjglKR6AQXQb9JGiS7Rc2wC6uMjcm7Go/NHNO63EwiJXfuk9PgqiP/n5IDJCziMkfw9n4Ubp7lttNwz+8ZVKA==}
     engines: {node: ^18.0.0 || >=20.0.0}
@@ -2679,6 +2685,8 @@ snapshots:
   util-deprecate@1.0.2: {}
 
   uzip-module@1.0.3: {}
+
+  vite-plugin-sitemap@0.7.1: {}
 
   vite@5.3.5(@types/node@20.14.14):
     dependencies:

@@ -60,6 +60,7 @@
                 'destructive'
                     ? 'text-red-300 hover:text-red-50'
                     : 'text-foreground/50 hover:text-foreground'} "
+                aria-label="Close"
             >
                 <X class="h-4 w-4" />
             </button>

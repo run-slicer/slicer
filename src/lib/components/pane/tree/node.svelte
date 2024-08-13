@@ -50,7 +50,7 @@
     {#if data.nodes}
         <ContextMenu open={$currentMenu === menuId} onOpenChange={setOpened}>
             <ContextMenuTrigger>
-                <button on:click={() => (expanded = !expanded)} class="highlight flex w-full py-[0.2rem]">
+                <button class="highlight flex w-full py-[0.2rem]" on:click={() => (expanded = !expanded)}>
                     <svelte:component
                         this={expanded ? ChevronDown : ChevronRight}
                         size={14}
