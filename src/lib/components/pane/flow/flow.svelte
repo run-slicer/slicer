@@ -8,8 +8,6 @@
     import Loading from "$lib/components/loading.svelte";
     import { Select, SelectContent, SelectItem, SelectTrigger } from "$lib/components/ui/select";
     import type { Selected } from "bits-ui";
-    import FlowNode from "./node.svelte";
-    import { createComputedGraph } from "./";
 
     export let entry: Entry;
 
@@ -30,8 +28,6 @@
     let method: Selected<number> = { value: member ? methods.indexOf(member) : -1, label: createLabel(member) };
     $: member = method.value !== -1 ? methods[method.value] : null;
 
-    $: [nodes, edges] = createComputedGraph(member, pool);
-
     $: updateTab({
         id: `${TabType.FLOW_GRAPH}:${entry.data.name}`,
         type: TabType.FLOW_GRAPH,
@@ -45,10 +41,11 @@
 </script>
 
 <div class="relative h-full w-full">
-    {#await import("@xyflow/svelte")}
+    {#await Promise.all([import("@xyflow/svelte"), import("./node.svelte"), import("./")])}
         <Loading value="Loading..." overlay />
-    {:then { Background, Controls, SvelteFlow, ControlButton }}
-        {#key method}
+    {:then [{ Background, Controls, SvelteFlow, ControlButton }, FlowNode, { createComputedGraph }]}
+        {@const [nodes, edges] = createComputedGraph(member, pool)}
+        {#key member}
             <svelte:component
                 this={SvelteFlow}
                 nodes={writable(nodes)}
@@ -60,7 +57,7 @@
                 nodesConnectable={false}
                 elementsSelectable={false}
                 proOptions={{ hideAttribution: true }}
-                nodeTypes={{ block: FlowNode }}
+                nodeTypes={{ block: FlowNode.default }}
             >
                 <Background />
                 <Controls showLock={false} position="bottom-right">

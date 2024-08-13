@@ -1,4 +1,4 @@
-import { type Node, type Edge, MarkerType } from "@xyflow/svelte";
+import type { Node, Edge, MarkerType } from "@xyflow/svelte";
 import type { Member } from "@run-slicer/asm";
 import type { Pool } from "@run-slicer/asm/pool";
 import type { CodeAttribute } from "@run-slicer/asm/attr";
@@ -108,7 +108,7 @@ export const createComputedGraph = (method: Member | null, pool: Pool): [Node[],
                 target: `${edge.target}`,
                 animated: !edge.jump,
                 markerEnd: {
-                    type: MarkerType.ArrowClosed,
+                    type: "arrowclosed" as MarkerType /* skip non-type import */,
                 },
             };
         }),
