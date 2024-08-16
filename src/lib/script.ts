@@ -16,13 +16,7 @@ export interface ProtoScript {
     context: ScriptContext | null;
 }
 
-// TODO: load scripts from state store
 export const scripts = writable<ProtoScript[]>([]);
-
-scripts.subscribe(($scripts) => {
-    // synchronize stores
-    scriptingScripts.update(() => $scripts.map((s) => ({ url: s.url, load: s.state === ScriptState.LOADED })));
-});
 
 const createContext = (script: Script, parent: ScriptContext | null): ScriptContext => {
     const scriptListeners = new Map<EventType, EventListener<any>[]>();
@@ -73,7 +67,7 @@ const createContext = (script: Script, parent: ScriptContext | null): ScriptCont
     };
 };
 
-const rootContext = createContext(
+export const rootContext = createContext(
     {
         id: "slicer",
         name: "slicer scripting engine",
@@ -104,7 +98,7 @@ export const read = async (url: string): Promise<ProtoScript> => {
     scripts.update(($scripts) => {
         $scripts.push(script);
         return $scripts;
-    })
+    });
 
     return script;
 };
@@ -144,3 +138,23 @@ export const unload = async (def: ProtoScript): Promise<void> => {
 
     scripts.update(($scripts) => $scripts); // forcefully synchronize store
 };
+
+// script loading
+
+const scriptPromises = get(scriptingScripts).map(async (s) => {
+    const script = await read(s.url);
+    if (s.load) {
+        await load(script);
+    }
+
+    return script;
+});
+
+Promise.all(scriptPromises).then(() => {
+    // start synchronizing stores only after all scripts have tried to load
+    scripts.subscribe(($scripts) => {
+        scriptingScripts.update(() => {
+            return $scripts.map((s) => ({ url: s.url, load: s.state === ScriptState.LOADED }));
+        });
+    });
+});
