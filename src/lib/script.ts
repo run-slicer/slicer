@@ -1,3 +1,4 @@
+import { addToast } from "$lib/components/toaster.svelte";
 import { get, writable } from "svelte/store";
 import type { Event, EventListener, EventMap, EventType, Script, ScriptContext } from "@run-slicer/script";
 import { error } from "$lib/logging";
@@ -150,7 +151,20 @@ const scriptPromises = get(scriptingScripts).map(async (s) => {
     return script;
 });
 
-Promise.all(scriptPromises).then(() => {
+Promise.all(scriptPromises).then((scripts0) => {
+    for (const protoScript of scripts0) {
+        const script = protoScript.script;
+
+        if (protoScript.state === ScriptState.FAILED) {
+            addToast({
+                title: "Script failed",
+                description:
+                    "Failed to " + (script ? `load script ${script.id}` : `read a script`) + ", check the console.",
+                variant: "destructive",
+            });
+        }
+    }
+
     // start synchronizing stores only after all scripts have tried to load
     scripts.subscribe(($scripts) => {
         scriptingScripts.update(() => {

@@ -5,6 +5,7 @@
     import { current as currentDisasm, all as disasms } from "$lib/disasm";
     import { projectOpen, editorView, loggingOpen, toolsDisasm, View } from "$lib/state";
     import { entries } from "$lib/workspace";
+    import { scripts } from "$lib/script";
     import { current as currentTab, TabType } from "$lib/tab";
     import { Modifier } from "$lib/shortcut";
     import { groupBy } from "$lib/arrays";
@@ -52,9 +53,9 @@
                     </MenubarRadioGroup>
                 </MenubarSubContent>
             </MenubarSub>
-            <MenubarItem disabled>
+            <!-- <MenubarItem disabled>
                 Preferences <Shortcut key="s" modifier={Modifier.Ctrl | Modifier.Alt} />
-            </MenubarItem>
+            </MenubarItem> -->
         </MenubarContent>
     </MenubarMenu>
     <MenubarMenu>
@@ -125,6 +126,22 @@
             >
                 Flow graph <GitBranchPlus size={16} />
             </MenubarItem>
+        </MenubarContent>
+    </MenubarMenu>
+    <MenubarMenu>
+        <MenubarTrigger class="relative">Scripts</MenubarTrigger>
+        <MenubarContent>
+            {#each $scripts as protoScript (protoScript.url)}
+                {@const script = protoScript.script}
+                <MenubarSub>
+                    <MenubarSubTrigger>{script ? (script.name || script.id) : "<unknown>"}</MenubarSubTrigger>
+                    <MenubarSubContent class="w-[12rem]">
+                        {#if script?.options}
+                            <!-- TODO -->
+                        {/if}
+                    </MenubarSubContent>
+                </MenubarSub>
+            {/each}
         </MenubarContent>
     </MenubarMenu>
 </Menubar>
