@@ -1,18 +1,19 @@
 <script lang="ts">
     import { userPrefersMode } from "mode-watcher";
     import { Separator } from "$lib/components/ui/separator";
+    import { addToast } from "$lib/components/toaster.svelte";
     import { add, load, close, export_ } from "$lib/action";
     import { current as currentDisasm, all as disasms } from "$lib/disasm";
     import { projectOpen, editorView, loggingOpen, toolsDisasm, View } from "$lib/state";
     import { entries } from "$lib/workspace";
-    import { scripts } from "$lib/script";
+    import { type ProtoScript, read, scripts } from "$lib/script";
     import { current as currentTab, TabType } from "$lib/tab";
-    import { listen, Modifier } from "$lib/shortcut";
+    import { Modifier } from "$lib/shortcut";
     import { groupBy } from "$lib/arrays";
     import Shortcut from "./shortcut.svelte";
     import ScriptMenu from "./script/menu.svelte";
     import AboutDialog from "./dialog/about.svelte";
-    import ScriptsDialog from "./dialog/script.svelte";
+    import ScriptDialog from "./dialog/script.svelte";
     import ClearConfirmDialog from "./dialog/clear.svelte";
     import {
         Menubar,
@@ -36,10 +37,35 @@
     $: entry = $currentTab?.entry || null;
 
     let aboutOpen = false;
-    let scriptsOpen = false;
     let clearConfirmOpen = false;
 
-    listen("s", Modifier.Ctrl | Modifier.Alt, () => (scriptsOpen = true));
+    let scriptInfoOpen: ProtoScript | null = null;
+    const loadClipboard = async () => {
+        if (!navigator.clipboard) {
+            addToast({
+                title: "Error occurred",
+                description: `Could not copy from clipboard, feature not available.`,
+                variant: "destructive",
+            });
+            return;
+        }
+
+        try {
+            const data = await navigator.clipboard.readText();
+            const proto = await read(`data:text/javascript;base64,${window.btoa(data)}`);
+
+            addToast({
+                title: "Imported",
+                description: `Imported script ${proto.script?.id || proto.id}.`,
+            });
+        } catch (e) {
+            addToast({
+                title: "Error occurred",
+                description: `Could not copy from clipboard, access denied.`,
+                variant: "destructive",
+            });
+        }
+    };
 </script>
 
 <Menubar class="rounded-none border-b border-none px-2 lg:px-4">
@@ -58,9 +84,6 @@
                     </MenubarRadioGroup>
                 </MenubarSubContent>
             </MenubarSub>
-            <MenubarItem on:click={() => (scriptsOpen = true)}>
-                Scripts <Shortcut key="s" modifier={Modifier.Ctrl | Modifier.Alt} />
-            </MenubarItem>
         </MenubarContent>
     </MenubarMenu>
     <MenubarMenu>
@@ -133,23 +156,21 @@
             </MenubarItem>
         </MenubarContent>
     </MenubarMenu>
-    {#if $scripts.length > 0}
-        <MenubarMenu>
-            <MenubarTrigger class="relative">Scripts</MenubarTrigger>
-            <MenubarContent>
-                <MenubarItem on:click={() => (scriptsOpen = true)}>
-                    Manage <Shortcut key="s" modifier={Modifier.Ctrl | Modifier.Alt} />
-                </MenubarItem>
+    <MenubarMenu>
+        <MenubarTrigger class="relative">Scripts</MenubarTrigger>
+        <MenubarContent>
+            <MenubarItem on:click={loadClipboard}>Import from clipboard</MenubarItem>
+            {#if $scripts.length > 0}
                 <MenubarSeparator />
                 {#each $scripts as proto (proto.id)}
-                    <ScriptMenu {proto} />
+                    <ScriptMenu {proto} on:open={(e) => (scriptInfoOpen = e.detail.proto)} />
                 {/each}
-            </MenubarContent>
-        </MenubarMenu>
-    {/if}
+            {/if}
+        </MenubarContent>
+    </MenubarMenu>
 </Menubar>
 <Separator />
 
 <AboutDialog bind:open={aboutOpen} />
-<ScriptsDialog bind:open={scriptsOpen} />
+<ScriptDialog bind:proto={scriptInfoOpen} />
 <ClearConfirmDialog bind:open={clearConfirmOpen} />

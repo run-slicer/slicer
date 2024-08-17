@@ -8,14 +8,19 @@
     } from "$lib/components/ui/menubar";
     import { load, unload, ScriptState, type ProtoScript } from "$lib/script";
     import ScriptOption from "./option.svelte";
+    import { MenubarItem } from "$lib/components/ui/menubar/index.js";
+    import { createEventDispatcher } from "svelte";
 
     export let proto: ProtoScript;
     const script = proto.script;
+
+    const dispatch = createEventDispatcher();
 </script>
 
 <MenubarSub>
     <MenubarSubTrigger>{script ? script.name || script.id : proto.id}</MenubarSubTrigger>
     <MenubarSubContent class="w-[12rem]">
+        <MenubarItem on:click={() => dispatch("open", { proto })}>Detail</MenubarItem>
         <MenubarCheckboxItem
             checked={proto.state === ScriptState.LOADED}
             disabled={proto.state === ScriptState.FAILED}
