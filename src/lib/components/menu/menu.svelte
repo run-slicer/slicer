@@ -7,11 +7,12 @@
     import { entries } from "$lib/workspace";
     import { scripts } from "$lib/script";
     import { current as currentTab, TabType } from "$lib/tab";
-    import { Modifier } from "$lib/shortcut";
+    import { listen, Modifier } from "$lib/shortcut";
     import { groupBy } from "$lib/arrays";
     import Shortcut from "./shortcut.svelte";
     import ScriptMenu from "./script/menu.svelte";
     import AboutDialog from "./dialog/about.svelte";
+    import ScriptsDialog from "./dialog/script.svelte";
     import ClearConfirmDialog from "./dialog/clear.svelte";
     import {
         Menubar,
@@ -35,7 +36,10 @@
     $: entry = $currentTab?.entry || null;
 
     let aboutOpen = false;
+    let scriptsOpen = false;
     let clearConfirmOpen = false;
+
+    listen("s", Modifier.Ctrl | Modifier.Alt, () => (scriptsOpen = true));
 </script>
 
 <Menubar class="rounded-none border-b border-none px-2 lg:px-4">
@@ -54,9 +58,9 @@
                     </MenubarRadioGroup>
                 </MenubarSubContent>
             </MenubarSub>
-            <!-- <MenubarItem disabled>
-                Preferences <Shortcut key="s" modifier={Modifier.Ctrl | Modifier.Alt} />
-            </MenubarItem> -->
+            <MenubarItem on:click={() => (scriptsOpen = true)}>
+                Scripts <Shortcut key="s" modifier={Modifier.Ctrl | Modifier.Alt} />
+            </MenubarItem>
         </MenubarContent>
     </MenubarMenu>
     <MenubarMenu>
@@ -129,16 +133,23 @@
             </MenubarItem>
         </MenubarContent>
     </MenubarMenu>
-    <MenubarMenu>
-        <MenubarTrigger class="relative">Scripts</MenubarTrigger>
-        <MenubarContent>
-            {#each $scripts as proto (proto.id)}
-                <ScriptMenu {proto} />
-            {/each}
-        </MenubarContent>
-    </MenubarMenu>
+    {#if $scripts.length > 0}
+        <MenubarMenu>
+            <MenubarTrigger class="relative">Scripts</MenubarTrigger>
+            <MenubarContent>
+                <MenubarItem on:click={() => (scriptsOpen = true)}>
+                    Manage <Shortcut key="s" modifier={Modifier.Ctrl | Modifier.Alt} />
+                </MenubarItem>
+                <MenubarSeparator />
+                {#each $scripts as proto (proto.id)}
+                    <ScriptMenu {proto} />
+                {/each}
+            </MenubarContent>
+        </MenubarMenu>
+    {/if}
 </Menubar>
 <Separator />
 
 <AboutDialog bind:open={aboutOpen} />
+<ScriptsDialog bind:open={scriptsOpen} />
 <ClearConfirmDialog bind:open={clearConfirmOpen} />

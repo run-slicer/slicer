@@ -23,8 +23,8 @@
         >
             Enabled
         </MenubarCheckboxItem>
-        <MenubarSeparator />
         {#if script?.options}
+            <MenubarSeparator />
             {#each script.options as option (option.id)}
                 <ScriptOption {proto} {option} />
             {/each}

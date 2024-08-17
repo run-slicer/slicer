@@ -9,7 +9,7 @@ export const enum Modifier {
     Alt = 1 << 2,
 }
 
-const listen = (key: string, mod: number, callback: (e: KeyboardEvent) => void) => {
+export const listen = (key: string, mod: number, callback: (e: KeyboardEvent) => void) => {
     const checks: ((e: KeyboardEvent) => boolean)[] = [(e) => e.key.toLowerCase() === key];
     if ((mod & Modifier.Ctrl) !== 0) {
         checks.push((e) => e.getModifierState(isMac ? "Meta" : "Control"));
@@ -60,7 +60,7 @@ export const format = (key: string, mod: number): string => {
     return keys.join("+");
 };
 
-export const formatMac = (key: string, mod: number): string => {
+const formatMac = (key: string, mod: number): string => {
     let mods = "";
     if ((mod & Modifier.Alt) !== 0) {
         mods += "\u2325"; // Option

@@ -74,7 +74,7 @@ export const rootContext = createContext(
     {
         id: "slicer",
         name: "slicer scripting engine",
-        version: process.env.APP_VERSION,
+        // version: process.env.APP_VERSION,
         load(_context: ScriptContext): void {},
         unload(_context: ScriptContext): void {},
     },
@@ -82,18 +82,25 @@ export const rootContext = createContext(
 );
 
 const read0 = async (url: string): Promise<ProtoScript> => {
+    const id = cyrb53(url).toString(16);
     try {
-        const script = (await import(url)).default as Script;
+        const script = (await import(/* @vite-ignore */ url)).default as Script;
         if (!script || !script.id || !script.load || !script.unload) {
             throw new Error("Invalid script, missing required properties");
         }
 
-        return { url, id: cyrb53(url).toString(16), state: ScriptState.UNLOADED, script, context: null };
+        return { url, id, state: ScriptState.UNLOADED, script, context: null };
     } catch (e) {
         error("failed to read script", e);
+
+        addToast({
+            title: "Script failed",
+            description: `Failed to read script ${id}, check the console.`,
+            variant: "destructive",
+        });
     }
 
-    return { url, id: cyrb53(url).toString(16), state: ScriptState.FAILED, script: null, context: null };
+    return { url, id, state: ScriptState.FAILED, script: null, context: null };
 };
 
 export const read = async (url: string): Promise<ProtoScript> => {
@@ -119,6 +126,12 @@ export const load = async (def: ProtoScript): Promise<void> => {
     } catch (e) {
         error("failed to load script", e);
         def.state = ScriptState.FAILED;
+
+        addToast({
+            title: "Script failed",
+            description: `Failed to load script ${def.script!.id}, check the console.`,
+            variant: "destructive",
+        });
     }
 
     scripts.update(($scripts) => $scripts); // forcefully synchronize store
@@ -137,6 +150,12 @@ export const unload = async (def: ProtoScript): Promise<void> => {
     } catch (e) {
         error("failed to unload script", e);
         def.state = ScriptState.FAILED;
+
+        addToast({
+            title: "Script failed",
+            description: `Failed to unload script ${def.script!.id}, check the console.`,
+            variant: "destructive",
+        });
     }
 
     scripts.update(($scripts) => $scripts); // forcefully synchronize store
