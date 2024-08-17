@@ -10,6 +10,7 @@
     import { Modifier } from "$lib/shortcut";
     import { groupBy } from "$lib/arrays";
     import Shortcut from "./shortcut.svelte";
+    import ScriptMenu from "./script/menu.svelte";
     import AboutDialog from "./dialog/about.svelte";
     import ClearConfirmDialog from "./dialog/clear.svelte";
     import {
@@ -131,16 +132,8 @@
     <MenubarMenu>
         <MenubarTrigger class="relative">Scripts</MenubarTrigger>
         <MenubarContent>
-            {#each $scripts as protoScript (protoScript.url)}
-                {@const script = protoScript.script}
-                <MenubarSub>
-                    <MenubarSubTrigger>{script ? (script.name || script.id) : "<unknown>"}</MenubarSubTrigger>
-                    <MenubarSubContent class="w-[12rem]">
-                        {#if script?.options}
-                            <!-- TODO -->
-                        {/if}
-                    </MenubarSubContent>
-                </MenubarSub>
+            {#each $scripts as proto (proto.id)}
+                <ScriptMenu {proto} />
             {/each}
         </MenubarContent>
     </MenubarMenu>

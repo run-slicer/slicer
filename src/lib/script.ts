@@ -3,6 +3,7 @@ import { get, writable } from "svelte/store";
 import type { Event, EventListener, EventMap, EventType, Script, ScriptContext } from "@run-slicer/script";
 import { error } from "$lib/logging";
 import { scriptingScripts } from "$lib/state";
+import { cyrb53 } from "$lib/hash";
 
 export const enum ScriptState {
     UNLOADED,
@@ -12,6 +13,7 @@ export const enum ScriptState {
 
 export interface ProtoScript {
     url: string;
+    id: string; // computed based on url
     state: ScriptState;
     script: Script | null;
     context: ScriptContext | null;
@@ -86,12 +88,12 @@ const read0 = async (url: string): Promise<ProtoScript> => {
             throw new Error("Invalid script, missing required properties");
         }
 
-        return { url, state: ScriptState.UNLOADED, script, context: null };
+        return { url, id: cyrb53(url).toString(16), state: ScriptState.UNLOADED, script, context: null };
     } catch (e) {
         error("failed to read script", e);
     }
 
-    return { url, state: ScriptState.FAILED, script: null, context: null };
+    return { url, id: cyrb53(url).toString(16), state: ScriptState.FAILED, script: null, context: null };
 };
 
 export const read = async (url: string): Promise<ProtoScript> => {
