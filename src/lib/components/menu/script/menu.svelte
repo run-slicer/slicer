@@ -42,7 +42,7 @@
         {#if script?.options}
             <MenubarSeparator />
             {#each script.options as option (option.id)}
-                <ScriptOption {proto} {option} />
+                <ScriptOption inset {proto} {option} />
             {/each}
         {/if}
     </MenubarSubContent>
