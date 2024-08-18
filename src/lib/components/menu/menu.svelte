@@ -104,7 +104,9 @@
                     <MenubarRadioGroup bind:value={disasm} onValueChange={(id) => ($toolsDisasm = id || "")}>
                         {#each groupBy(Array.from(disasms.values()), (d) => d.group) as [group, members]}
                             {#if group}
+                                <MenubarSeparator />
                                 <MenubarLabel inset>{group}</MenubarLabel>
+                                <MenubarSeparator />
                             {/if}
                             {#each members as { id, name }}
                                 <MenubarRadioItem value={id}>{name || id}</MenubarRadioItem>
