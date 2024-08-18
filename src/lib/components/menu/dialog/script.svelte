@@ -7,11 +7,13 @@
 
 <Dialog open={proto !== null}>
     <DialogContent>
-        <DialogHeader>
-            <DialogTitle>{proto?.script?.name || proto?.script?.id || proto?.id}</DialogTitle>
-            <DialogDescription>
-                Information about the <span class="italic">{proto?.script?.id || proto?.id}</span> script.
-            </DialogDescription>
-        </DialogHeader>
+        {#if proto}
+            <DialogHeader>
+                <DialogTitle>{proto.script?.name || proto.id}</DialogTitle>
+                <DialogDescription>
+                    Information about the <span class="italic">{proto.id}</span> script.
+                </DialogDescription>
+            </DialogHeader>
+        {/if}
     </DialogContent>
 </Dialog>

@@ -4,7 +4,7 @@
     A fast and simple 53-bit string hash function with decent collision resistance.
     Largely inspired by MurmurHash2/3, but with a focus on speed/simplicity.
 */
-export const cyrb53 = (str: string, seed: number = 0) => {
+export const cyrb53 = (str: string, seed: number = 0): number => {
     let h1 = 0xdeadbeef ^ seed,
         h2 = 0x41c6ce57 ^ seed;
     for (let i = 0, ch; i < str.length; i++) {

@@ -9,7 +9,7 @@ export const enum Modifier {
     Alt = 1 << 2,
 }
 
-export const listen = (key: string, mod: number, callback: (e: KeyboardEvent) => void) => {
+const listen = (key: string, mod: number, callback: (e: KeyboardEvent) => void) => {
     const checks: ((e: KeyboardEvent) => boolean)[] = [(e) => e.key.toLowerCase() === key];
     if ((mod & Modifier.Ctrl) !== 0) {
         checks.push((e) => e.getModifierState(isMac ? "Meta" : "Control"));

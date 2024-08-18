@@ -1,12 +1,11 @@
 <script lang="ts">
     import { userPrefersMode } from "mode-watcher";
     import { Separator } from "$lib/components/ui/separator";
-    import { addToast } from "$lib/components/toaster.svelte";
     import { add, load, close, export_ } from "$lib/action";
     import { current as currentDisasm, all as disasms } from "$lib/disasm";
     import { projectOpen, editorView, loggingOpen, toolsDisasm, View } from "$lib/state";
     import { entries } from "$lib/workspace";
-    import { type ProtoScript, read, scripts } from "$lib/script";
+    import { type ProtoScript, scripts } from "$lib/script";
     import { current as currentTab, TabType } from "$lib/tab";
     import { Modifier } from "$lib/shortcut";
     import { groupBy } from "$lib/arrays";
@@ -14,6 +13,7 @@
     import ScriptMenu from "./script/menu.svelte";
     import AboutDialog from "./dialog/about.svelte";
     import ScriptDialog from "./dialog/script.svelte";
+    import ScriptDeleteConfirmDialog from "./dialog/script_delete.svelte";
     import ClearConfirmDialog from "./dialog/clear.svelte";
     import {
         Menubar,
@@ -30,8 +30,8 @@
         MenubarLabel,
         MenubarCheckboxItem,
     } from "$lib/components/ui/menubar";
-    import { Terminal, Folders, GitBranchPlus } from "lucide-svelte";
-    import { openEntry } from "./";
+    import { Terminal, Folders, GitBranchPlus, Clipboard } from "lucide-svelte";
+    import { openEntry, loadClipboardScript } from "./";
 
     $: disasm = $currentDisasm.id;
     $: entry = $currentTab?.entry || null;
@@ -39,33 +39,8 @@
     let aboutOpen = false;
     let clearConfirmOpen = false;
 
+    let scriptDeleteOpen: ProtoScript | null = null;
     let scriptInfoOpen: ProtoScript | null = null;
-    const loadClipboard = async () => {
-        if (!navigator.clipboard) {
-            addToast({
-                title: "Error occurred",
-                description: `Could not copy from clipboard, feature not available.`,
-                variant: "destructive",
-            });
-            return;
-        }
-
-        try {
-            const data = await navigator.clipboard.readText();
-            const proto = await read(`data:text/javascript;base64,${window.btoa(data)}`);
-
-            addToast({
-                title: "Imported",
-                description: `Imported script ${proto.script?.id || proto.id}.`,
-            });
-        } catch (e) {
-            addToast({
-                title: "Error occurred",
-                description: `Could not copy from clipboard, access denied.`,
-                variant: "destructive",
-            });
-        }
-    };
 </script>
 
 <Menubar class="rounded-none border-b border-none px-2 lg:px-4">
@@ -159,11 +134,22 @@
     <MenubarMenu>
         <MenubarTrigger class="relative">Scripts</MenubarTrigger>
         <MenubarContent>
-            <MenubarItem on:click={loadClipboard}>Import from clipboard</MenubarItem>
+            <MenubarSub>
+                <MenubarSubTrigger>Import</MenubarSubTrigger>
+                <MenubarSubContent class="w-[12rem]">
+                    <MenubarItem class="justify-between" on:click={loadClipboardScript}>
+                        From clipboard <Clipboard size={16} />
+                    </MenubarItem>
+                </MenubarSubContent>
+            </MenubarSub>
             {#if $scripts.length > 0}
                 <MenubarSeparator />
                 {#each $scripts as proto (proto.id)}
-                    <ScriptMenu {proto} on:open={(e) => (scriptInfoOpen = e.detail.proto)} />
+                    <ScriptMenu
+                        {proto}
+                        on:open={(e) => (scriptInfoOpen = e.detail.proto)}
+                        on:delete={(e) => (scriptDeleteOpen = e.detail.proto)}
+                    />
                 {/each}
             {/if}
         </MenubarContent>
@@ -173,4 +159,5 @@
 
 <AboutDialog bind:open={aboutOpen} />
 <ScriptDialog bind:proto={scriptInfoOpen} />
+<ScriptDeleteConfirmDialog bind:proto={scriptDeleteOpen} />
 <ClearConfirmDialog bind:open={clearConfirmOpen} />

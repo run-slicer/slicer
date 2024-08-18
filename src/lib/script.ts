@@ -85,7 +85,7 @@ const read0 = async (url: string): Promise<ProtoScript> => {
     const id = cyrb53(url).toString(16);
     try {
         const script = (await import(/* @vite-ignore */ url)).default as Script;
-        if (!script || !script.id || !script.load || !script.unload) {
+        if (!script || !script.load || !script.unload) {
             throw new Error("Invalid script, missing required properties");
         }
 
@@ -129,7 +129,7 @@ export const load = async (def: ProtoScript): Promise<void> => {
 
         addToast({
             title: "Script failed",
-            description: `Failed to load script ${def.script!.id}, check the console.`,
+            description: `Failed to load script ${def.id}, check the console.`,
             variant: "destructive",
         });
     }
@@ -153,12 +153,17 @@ export const unload = async (def: ProtoScript): Promise<void> => {
 
         addToast({
             title: "Script failed",
-            description: `Failed to unload script ${def.script!.id}, check the console.`,
+            description: `Failed to unload script ${def.id}, check the console.`,
             variant: "destructive",
         });
     }
 
     scripts.update(($scripts) => $scripts); // forcefully synchronize store
+};
+
+export const remove = async (def: ProtoScript): Promise<void> => {
+    await unload(def);
+    scripts.update(($scripts) => $scripts.filter((s) => s.id !== def.id));
 };
 
 // script loading
@@ -173,14 +178,11 @@ const scriptPromises = get(scriptingScripts).map(async (s) => {
 });
 
 Promise.all(scriptPromises).then((scripts0) => {
-    for (const protoScript of scripts0) {
-        const script = protoScript.script;
-
-        if (protoScript.state === ScriptState.FAILED) {
+    for (const proto of scripts0) {
+        if (proto.state === ScriptState.FAILED) {
             addToast({
                 title: "Script failed",
-                description:
-                    "Failed to " + (script ? `load script ${script.id}` : `read a script`) + ", check the console.",
+                description: `Failed to read script ${proto.id}, check the console.`,
                 variant: "destructive",
             });
         }
