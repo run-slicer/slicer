@@ -22,7 +22,7 @@
             </div>
             <div>
                 <p class="text-2xl">
-                    <button class="mr-1 cursor-help font-bold" on:click={changeImage}>slicer</button>
+                    <button class="mr-1 cursor-help font-semibold" on:click={changeImage}>slicer</button>
                     {process.env.APP_VERSION}
                 </p>
                 <p class="text-sm">

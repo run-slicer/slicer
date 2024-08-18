@@ -7,7 +7,7 @@
 </script>
 
 <div class="m-24">
-    <h1 class="mb-8 text-4xl font-bold">Welcome</h1>
+    <h1 class="mb-8 text-4xl font-semibold">Welcome</h1>
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
             <h2 class="text-lg font-medium text-muted-foreground">Get started</h2>
