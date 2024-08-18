@@ -32,6 +32,12 @@ importers:
       '@dagrejs/dagre':
         specifier: ^1.1.3
         version: 1.1.3
+      '@fontsource/geist-mono':
+        specifier: ^5.0.3
+        version: 5.0.3
+      '@fontsource/geist-sans':
+        specifier: ^5.0.3
+        version: 5.0.3
       '@melt-ui/svelte':
         specifier: ^0.81.0
         version: 0.81.0(svelte@4.2.18)
@@ -344,6 +350,12 @@ packages:
 
   '@floating-ui/utils@0.2.5':
     resolution: {integrity: sha512-sTcG+QZ6fdEUObICavU+aB3Mp8HY4n14wYHdxK4fXjPmv3PXZZeY5RaguJmGyeH/CJQhX3fqKUtS4qc1LoHwhQ==}
+
+  '@fontsource/geist-mono@5.0.3':
+    resolution: {integrity: sha512-ekY5FNiK7aMxan/c6lgVQa/rIwQ/AMEJZJWY7768jBrLVdkrCxfEfCe1ePpe7C3JnySy7c9R6HC4Xh4ksfjTaw==}
+
+  '@fontsource/geist-sans@5.0.3':
+    resolution: {integrity: sha512-oGwoSIqNPMvjtCwj1lZaEr47MeiG27XPhypwkF643u1TQduvwbm3V3hYB01JekeaT34SAGP4I1h+WCdRpJkcwA==}
 
   '@internationalized/date@3.5.5':
     resolution: {integrity: sha512-H+CfYvOZ0LTJeeLOqm19E3uj/4YjrmOFtBufDHPfvtI80hFAMqtrp7oCACpe4Cil5l8S0Qu/9dYfZc/5lY8WQQ==}
@@ -1662,6 +1674,10 @@ snapshots:
       '@floating-ui/utils': 0.2.5
 
   '@floating-ui/utils@0.2.5': {}
+
+  '@fontsource/geist-mono@5.0.3': {}
+
+  '@fontsource/geist-sans@5.0.3': {}
 
   '@internationalized/date@3.5.5':
     dependencies:

@@ -35,6 +35,10 @@
         ".cm-scroller": {
             // make scrollbar thinner
             "scrollbar-width": "thin",
+            // use new font
+            "font-family":
+                '"Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+            "font-size": "12px",
         },
         ".cm-panels": {
             // fix color on panel container
