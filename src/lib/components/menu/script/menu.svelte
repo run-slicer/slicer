@@ -19,12 +19,8 @@
 </script>
 
 <MenubarSub>
-    <MenubarSubTrigger>{script ? script.name || script.id : proto.id}</MenubarSubTrigger>
+    <MenubarSubTrigger>{script?.name || proto.id}</MenubarSubTrigger>
     <MenubarSubContent class="w-[12rem]">
-        <MenubarItem on:click={() => dispatch("open", { proto })}>
-            <Info class="mr-2" size={16} /> Info
-        </MenubarItem>
-        <MenubarSeparator />
         <MenubarCheckboxItem
             checked={proto.state === ScriptState.LOADED}
             disabled={proto.state === ScriptState.FAILED}
@@ -32,11 +28,15 @@
         >
             Enabled
         </MenubarCheckboxItem>
+        <MenubarSeparator />
+        <MenubarItem class="justify-between" on:click={() => dispatch("open", { proto })}>
+            Info <Info size={16} />
+        </MenubarItem>
         <MenubarItem
-            class="data-[highlighted]:bg-destructive data-[highlighted]:text-destructive-foreground"
+            class="justify-between data-[highlighted]:bg-destructive data-[highlighted]:text-destructive-foreground"
             on:click={() => dispatch("delete", { proto })}
         >
-            <Trash2 class="mr-2" size={16} /> Delete
+            Delete <Trash2 size={16} />
         </MenubarItem>
         {#if script?.options}
             <MenubarSeparator />

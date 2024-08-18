@@ -8,7 +8,7 @@
 
 <div class="m-24">
     <h1 class="mb-8 text-4xl font-semibold">Welcome</h1>
-    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <div class="flex max-w-lg flex-row flex-wrap justify-between gap-4">
         <div>
             <h2 class="text-lg font-medium text-muted-foreground">Get started</h2>
             <div class="flex flex-col items-start">
