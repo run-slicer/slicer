@@ -1,8 +1,27 @@
+<script lang="ts" context="module">
+    import { writable } from "svelte/store";
+    import { type Tab, tabs } from "$lib/tab";
+
+    export const orderedTabs = writable<Tab[]>([]);
+
+    // synchronize stores - order is kept only here, main store is unordered
+    tabs.subscribe((tabs0) => {
+        orderedTabs.update((orderedTabs0) => {
+            // pop removed tabs
+            const updatedTabs = orderedTabs0.filter((e) => tabs0.has(e.id));
+            // now add newly added tabs
+            updatedTabs.push(...Array.from(tabs0.values()).filter((e) => !orderedTabs0.includes(e)));
+
+            return updatedTabs;
+        });
+    });
+</script>
+
 <script lang="ts">
     import { dndzone } from "svelte-dnd-action";
     import { ResizableHandle, ResizablePane, ResizablePaneGroup } from "$lib/components/ui/resizable";
     import { entries } from "$lib/workspace";
-    import { current, orderedTabs, remove, TabType } from "$lib/tab";
+    import { current, remove, TabType } from "$lib/tab";
     import { projectOpen, loggingOpen } from "$lib/state";
     import { cn } from "$lib/components/utils";
     import {
@@ -53,17 +72,17 @@
                             {/each}
                         </div>
                     </PaneHeader>
-                    {#key $current}
-                        {#if $current}
-                            {#if $current.type === TabType.WELCOME}
+                    {#each $tabs as [id, tab] (id)}
+                        <div class={cn("flex h-full w-full flex-col", $current?.id === id || "hidden")}>
+                            {#if tab.type === TabType.WELCOME}
                                 <WelcomePane />
-                            {:else if $current.type === TabType.CODE && $current.entry}
-                                <CodePane entry={$current.entry} />
-                            {:else if $current.type === TabType.FLOW_GRAPH && $current.entry}
-                                <FlowPane entry={$current.entry} member={$current.member || null} />
+                            {:else if tab.type === TabType.CODE || tab.type === TabType.HEX}
+                                <CodePane {tab} />
+                            {:else if tab.type === TabType.FLOW_GRAPH}
+                                <FlowPane {tab} />
                             {/if}
-                        {/if}
-                    {/key}
+                        </div>
+                    {/each}
                 </div>
             </ResizablePane>
             {#if $loggingOpen}

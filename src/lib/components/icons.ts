@@ -1,5 +1,19 @@
 import type { ComponentType, SvelteComponent } from "svelte";
-import { Braces, Code, Coffee, File, FileArchive, FileText, Image, Text, TextQuote } from "lucide-svelte";
+import {
+    Binary,
+    Braces,
+    Code,
+    Coffee,
+    File,
+    FileArchive,
+    FileText,
+    GitPullRequest,
+    Image,
+    Sparkles,
+    Text,
+    TextQuote,
+} from "lucide-svelte";
+import { TabType } from "$lib/tab";
 
 export type Icon = ComponentType<SvelteComponent<{ size?: number | string; class?: string }>>;
 
@@ -7,6 +21,19 @@ export interface StyledIcon {
     icon: Icon;
     classes?: string[];
 }
+
+export const tabIcon = (tabType: TabType, label: string): StyledIcon => {
+    switch (tabType) {
+        case TabType.WELCOME:
+            return { icon: Sparkles, classes: ["text-muted-foreground"] };
+        case TabType.HEX:
+            return { icon: Binary, classes: ["text-muted-foreground"] };
+        case TabType.FLOW_GRAPH:
+            return { icon: GitPullRequest, classes: ["text-muted-foreground"] };
+    }
+
+    return fileIcon(label);
+};
 
 export const fileIcon = (label: string): StyledIcon => {
     const dotIndex = label.lastIndexOf(".");

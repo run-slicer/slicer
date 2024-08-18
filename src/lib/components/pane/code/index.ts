@@ -1,53 +1,34 @@
 import { type ClassEntry, type Entry, EntryType } from "$lib/workspace";
-import { View } from "$lib/state";
-import { current } from "$lib/disasm";
-import { get } from "svelte/store";
+import type { Disassembler } from "$lib/disasm";
 import { formatHex } from "./hex";
 import { timed } from "$lib/action/utils";
 import { fromExtension, type Language } from "$lib/lang";
+import { TabType } from "$lib/tab";
 
-// prettier-ignore
-const extensions = {
-    // text: new Set(["txt", "yml", "yaml", "MF", "java", "class" /* disassembled */, "properties", "html", "xml", "xhtml", "mhtml", "htm", "json", "md", "rst", "adoc"]),
-    binary: new Set(["bin", "tar", "gz", "rar", "zip", "jar", "jpg", "jpeg", "gif", "png", "lzma", "dll", "so", "dylib", "exe", "kotlin_builtins", "kotlin_metadata", "kotlin_module", "nbt"]),
-};
-
-export const detectView = (entry: Entry | null): View => {
-    const ext = entry?.data?.extension;
-    if (!entry || !ext) {
-        return View.TEXT;
-    }
-
-    // TODO: detect non-ASCII values in file header
-    return extensions.binary.has(ext) ? View.HEX : View.TEXT;
-};
-
-export const detectLanguage = (view: View, entry: Entry | null): Language => {
+export const detectLanguage = (tabType: TabType, entry: Entry | null, disasm: Disassembler): Language => {
     if (!entry) {
         return "plaintext";
     }
 
-    if (view === View.HEX) {
+    if (tabType === TabType.HEX) {
         return "hex";
     } else if (entry.type === EntryType.CLASS) {
         // disassembled view
-        return get(current).lang || "plaintext";
+        return disasm.lang || "plaintext";
     }
 
     return entry.data.extension ? fromExtension(entry.data.extension) : "plaintext";
 };
 
-export const read = async (view: View, entry: Entry | null): Promise<string> => {
+export const read = async (tabType: TabType, entry: Entry | null, disasm: Disassembler): Promise<string> => {
     if (!entry) {
         return "";
     }
 
     const { result } = await timed(`read ${entry.data.name}`, async () => {
-        if (view === View.HEX) {
+        if (tabType === TabType.HEX) {
             return await formatHex(entry.data);
         } else if (entry.type === EntryType.CLASS) {
-            const disasm = get(current);
-
             return await disasm.run(entry as ClassEntry);
         }
 
