@@ -11,6 +11,7 @@
     import type { CheckboxOption, GroupOption, Option, RadioOption } from "@run-slicer/script";
     import type { ProtoScript } from "$lib/script";
 
+    export let inset = false;
     export let proto: ProtoScript;
     export let option: Option;
 
@@ -34,23 +35,24 @@
 </script>
 
 {#if option.type === "group"}
+    {@const hasCheckbox = groupOption.options.some((o) => o.type === "checkbox")}
     <MenubarSub>
-        <MenubarSubTrigger>{option.label || option.id}</MenubarSubTrigger>
+        <MenubarSubTrigger {inset}>{option.label || option.id}</MenubarSubTrigger>
         <MenubarSubContent class="w-[12rem]">
             {#each groupOption.options as subOption (subOption.id)}
-                <svelte:self {proto} option={subOption} />
+                <svelte:self inset={hasCheckbox} {proto} option={subOption} />
             {/each}
         </MenubarSubContent>
     </MenubarSub>
 {:else if option.type === "button"}
-    <MenubarItem on:click={handleButton}>{option.label || option.id}</MenubarItem>
+    <MenubarItem {inset} on:click={handleButton}>{option.label || option.id}</MenubarItem>
 {:else if option.type === "checkbox"}
     <MenubarCheckboxItem checked={checkboxOption.checked} onCheckedChange={handleCheckbox}>
         {option.label || option.id}
     </MenubarCheckboxItem>
 {:else if option.type === "radio"}
     <MenubarSub>
-        <MenubarSubTrigger>{option.label || option.id}</MenubarSubTrigger>
+        <MenubarSubTrigger {inset}>{option.label || option.id}</MenubarSubTrigger>
         <MenubarSubContent class="w-[12rem]">
             <MenubarRadioGroup value={radioOption.selected} onValueChange={handleRadio}>
                 {#each radioOption.items as subOption (subOption.id)}

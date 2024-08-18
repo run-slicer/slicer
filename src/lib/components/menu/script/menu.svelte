@@ -29,10 +29,11 @@
             Enabled
         </MenubarCheckboxItem>
         <MenubarSeparator />
-        <MenubarItem class="justify-between" on:click={() => dispatch("open", { proto })}>
+        <MenubarItem inset class="justify-between" on:click={() => dispatch("open", { proto })}>
             Info <Info size={16} />
         </MenubarItem>
         <MenubarItem
+            inset
             class="justify-between data-[highlighted]:bg-destructive data-[highlighted]:text-destructive-foreground"
             on:click={() => dispatch("delete", { proto })}
         >
