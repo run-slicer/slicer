@@ -28,8 +28,8 @@
                     <TableBody>
                         <TableRow>
                             <TableCell class="break-all font-medium">{proto.id}</TableCell>
-                            <TableCell class="break-all">{proto.script?.name || "<unknown>"}</TableCell>
-                            <TableCell class="break-all">{proto.script?.description || "<unknown>"}</TableCell>
+                            <TableCell class="break-anywhere">{proto.script?.name || "<unknown>"}</TableCell>
+                            <TableCell class="break-anywhere">{proto.script?.description || "<unknown>"}</TableCell>
                             <TableCell class="break-all">{proto.script?.version || "<unknown>"}</TableCell>
                         </TableRow>
                     </TableBody>

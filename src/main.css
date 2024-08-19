@@ -93,6 +93,13 @@
     }
 }
 
+@layer utilities {
+    .break-anywhere {
+        overflow-wrap: anywhere;
+        word-break: normal;
+    }
+}
+
 .scrollbar-none::-webkit-scrollbar {
     display: none;
 }
