@@ -43,6 +43,7 @@ const parseName = (name: string): Named => {
 export const enum DataType {
     FILE,
     ZIP,
+    MEMORY,
 }
 
 export interface Data extends BlobLike, Named {
@@ -107,6 +108,39 @@ export const zipData = async (file: File): Promise<ZipData[]> => {
         });
 };
 
+export interface MemoryData extends Data {
+    type: DataType.MEMORY;
+    data: Uint8Array;
+}
+
+const decoder = new TextDecoder();
+export const memoryData = (name: Named, data: Uint8Array): MemoryData => {
+    return {
+        ...name,
+        type: DataType.MEMORY,
+        data,
+        stream(): Promise<ReadableStream<Uint8Array>> {
+            return Promise.resolve(
+                new ReadableStream({
+                    start(controller) {
+                        controller.enqueue(data);
+                        controller.close();
+                    },
+                })
+            );
+        },
+        arrayBuffer(): Promise<ArrayBuffer> {
+            return Promise.resolve(data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength));
+        },
+        text(): Promise<string> {
+            return Promise.resolve(decoder.decode(data));
+        },
+        blob(): Promise<Blob> {
+            return Promise.resolve(new Blob([data]));
+        },
+    };
+};
+
 export const enum EntryType {
     FILE,
     CLASS,
@@ -135,8 +169,12 @@ export const readDetail = async (entry: Entry): Promise<Entry> => {
         try {
             const event = await rootContext.dispatchEvent({ type: "preload", data: new Uint8Array(buffer) });
 
-            const node = read(event.data);
-            return { ...entry, type: EntryType.CLASS, node: node } as ClassEntry;
+            return {
+                ...entry,
+                type: EntryType.CLASS,
+                node: read(event.data),
+                data: memoryData(entry.data, event.data),
+            } as ClassEntry;
         } catch (e) {
             error(`failed to read class ${entry.data.name}`, e);
         }

@@ -28,8 +28,9 @@ const createContext = (script: Script, parent: ScriptContext | null): ScriptCont
         script,
         parent,
         addEventListener<K extends EventType>(type: K, listener: EventListener<EventMap[K]>) {
-            const listeners = scriptListeners.get(type) || [];
+            let listeners = scriptListeners.get(type);
             if (!listeners) {
+                listeners = [];
                 scriptListeners.set(type, listeners);
             }
 
@@ -52,13 +53,12 @@ const createContext = (script: Script, parent: ScriptContext | null): ScriptCont
         },
         async dispatchEvent<E extends Event>(event: E): Promise<E> {
             const listeners = scriptListeners.get(event.type);
-            if (!listeners) {
-                return event; // no listeners for type
+            if (listeners) {
+                for (const listener of listeners) {
+                    await listener(event, this);
+                }
             }
 
-            for (const listener of listeners) {
-                await listener(event, this);
-            }
             // no parent? we must be the root, propagate to scripts
             if (!this.parent) {
                 for (const protoScript of get(scripts)) {
