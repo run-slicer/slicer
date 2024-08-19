@@ -1,7 +1,7 @@
 import type { Entry } from "$lib/workspace";
-import { addToast } from "$lib/components/toaster.svelte";
-import { open, remove, export_ } from "$lib/action";
-import type { TabType } from "$lib/tab";
+import { toast } from "svelte-sonner";
+import { export_, open, remove } from "$lib/action";
+import { TabType } from "$lib/tab";
 
 export interface Node {
     label: string;
@@ -23,14 +23,23 @@ const deleteNode = (node: Node): number => {
     return 0;
 };
 
-export const openEntry = (data: Node, type: TabType) => open(data.entry!, type);
+// prettier-ignore
+const binaryExtensions = new Set([
+    "bin", "tar", "gz", "rar", "zip", "7z", "jar", "jpg", "jpeg", "gif", "png", "lzma", "dll", "so", "dylib", "exe",
+    "kotlin_builtins", "kotlin_metadata", "kotlin_module", "nbt", "ogg", "cer", "der", "crt",
+]);
+
+const detectTabType = (entry: Entry): TabType => {
+    return entry.data.extension && binaryExtensions.has(entry.data.extension) ? TabType.HEX : TabType.CODE;
+};
+
+export const openEntry = (data: Node, type: TabType | null) => open(data.entry!, type || detectTabType(data.entry!));
 
 export const deleteEntry = (data: Node) => {
     if (data.nodes) {
         const num = deleteNode(data);
 
-        addToast({
-            title: "Deleted",
+        toast.success("Deleted", {
             description: `Deleted ${num} ${num !== 1 ? "entries" : "entry"}.`,
         });
     } else if (data.entry) {

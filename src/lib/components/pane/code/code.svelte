@@ -1,34 +1,34 @@
+<svelte:options immutable />
+
 <script lang="ts">
-    import { Binary } from "lucide-svelte";
-    import { type Entry, EntryType } from "$lib/workspace";
-    import { editorView, View } from "$lib/state";
-    import { fileIcon } from "$lib/components/icons";
+    import { EntryType } from "$lib/workspace";
     import Loading from "$lib/components/loading.svelte";
-    import { TabType, update as updateTab } from "$lib/tab";
+    import { type Tab, current as currentTab, TabType } from "$lib/tab";
     import { load as loadLanguage } from "$lib/lang";
-    import { detectLanguage, detectView, read } from "./";
+    import { current as currentDisasm } from "$lib/disasm";
+    import { detectLanguage, read } from "./";
+    import { get } from "svelte/store";
 
-    export let entry: Entry;
+    export let tab: Tab;
+    let entry = tab.entry!;
 
-    $: view = $editorView === View.AUTO ? detectView(entry) : $editorView;
+    let language = detectLanguage(tab.type, entry, $currentDisasm);
+    $: {
+        const detectedLang = detectLanguage(tab.type, entry, $currentDisasm);
 
-    $: text = view === View.TEXT;
-    $: hex = view === View.HEX;
-
-    $: language = detectLanguage(view, entry);
-
-    $: updateTab({
-        id: `${TabType.CODE}:${entry.data.name}`,
-        type: TabType.CODE,
-        name: entry.data.shortName,
-        icon: hex ? { icon: Binary, classes: ["text-muted-foreground"] } : fileIcon(entry.data.shortName),
-        entry: entry,
-    });
+        // suppress updates if we're not active
+        if ($currentTab?.id === tab.id && language !== detectedLang /* no change? don't rerender */) {
+            language = detectedLang;
+        }
+    }
 </script>
 
 <div class="relative basis-full overflow-hidden scrollbar-thin">
-    {#await Promise.all([import("./editor.svelte"), loadLanguage(language), read(view, entry)])}
-        <Loading value={entry.type === EntryType.CLASS && text ? "Disassembling..." : "Reading..."} overlay />
+    {#await Promise.all([import("./editor.svelte"), loadLanguage(language), read(tab.type, entry, get(currentDisasm))])}
+        <Loading
+            value={entry.type === EntryType.CLASS && tab.type === TabType.CODE ? "Disassembling..." : "Reading..."}
+            overlay
+        />
     {:then [editor, lang, value]}
         <svelte:component this={editor.default} {value} readonly {lang} />
     {/await}

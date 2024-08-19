@@ -60,7 +60,7 @@ export const format = (key: string, mod: number): string => {
     return keys.join("+");
 };
 
-export const formatMac = (key: string, mod: number): string => {
+const formatMac = (key: string, mod: number): string => {
     let mods = "";
     if ((mod & Modifier.Alt) !== 0) {
         mods += "\u2325"; // Option

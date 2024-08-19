@@ -58,8 +58,7 @@
         {:else}
             <div class="flex grow items-center justify-center">
                 <Button variant="outline" size="sm" on:click={load}>
-                    <Plus class="mr-2 h-4 w-4" />
-                    Open
+                    <Plus class="mr-2 h-4 w-4" /> Open
                 </Button>
             </div>
         {/if}

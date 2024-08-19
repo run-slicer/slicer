@@ -2,6 +2,7 @@ import { derived, get, writable } from "svelte/store";
 import { type Node, read } from "@run-slicer/asm";
 import { unzip, type ZipEntry, type ZipInfo } from "unzipit";
 import { error } from "$lib/logging";
+import { rootContext } from "$lib/script";
 
 export interface BlobLike {
     stream(): Promise<ReadableStream<Uint8Array>>;
@@ -132,8 +133,9 @@ export const readDetail = async (entry: Entry): Promise<Entry> => {
     if (view.byteLength >= 4 && view.getUint32(0, false) === 0xcafebabe) {
         // try to read as class
         try {
-            const node = read(new Uint8Array(buffer));
+            const event = await rootContext.dispatchEvent({ type: "preload", data: new Uint8Array(buffer) });
 
+            const node = read(event.data);
             return { ...entry, type: EntryType.CLASS, node: node } as ClassEntry;
         } catch (e) {
             error(`failed to read class ${entry.data.name}`, e);

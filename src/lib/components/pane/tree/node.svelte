@@ -8,7 +8,6 @@
     import { ChevronDown, ChevronRight, Folder } from "lucide-svelte";
     import { createEventDispatcher } from "svelte";
     import { cn } from "$lib/components/utils";
-    import { TabType } from "$lib/tab";
     import { fileIcon } from "$lib/components/icons";
     import { ContextMenu, ContextMenuTrigger } from "$lib/components/ui/context-menu";
     import NodeMenu from "./menu.svelte";
@@ -79,7 +78,7 @@
             <ContextMenuTrigger>
                 <button
                     class="highlight flex w-full py-[0.2rem]"
-                    on:click={() => dispatch("open", { data, type: TabType.CODE })}
+                    on:click={() => dispatch("open", { data, type: null })}
                 >
                     <svelte:component this={icon} size={16} class={cn("my-auto mr-1 min-w-[16px]", classes)} />
                     <span class="text-sm">{data.label}</span>

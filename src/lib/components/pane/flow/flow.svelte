@@ -1,25 +1,25 @@
+<svelte:options immutable />
+
 <script lang="ts">
     import { writable } from "svelte/store";
-    import { type ClassEntry, type Entry, EntryType } from "$lib/workspace";
-    import { TabType, update as updateTab } from "$lib/tab";
+    import { type ClassEntry, EntryType } from "$lib/workspace";
+    import type { Tab } from "$lib/tab";
     import type { Member } from "@run-slicer/asm";
-    import { GitPullRequest, Lock, LockOpen } from "lucide-svelte";
+    import { Lock, LockOpen } from "lucide-svelte";
     import { mode } from "mode-watcher";
     import Loading from "$lib/components/loading.svelte";
     import { Select, SelectContent, SelectItem, SelectTrigger } from "$lib/components/ui/select";
     import type { Selected } from "bits-ui";
 
-    export let entry: Entry;
+    export let tab: Tab;
+    const entry = tab.entry!;
 
     const node = entry.type === EntryType.CLASS ? (entry as ClassEntry).node : null;
 
     const pool = node ? node.pool : [];
     const methods = node ? node.methods : [];
 
-    export let member: Member | null;
-    if (!member) {
-        member = methods.length > 0 ? methods[0] : null;
-    }
+    let member = methods.length > 0 ? methods[0] : null;
 
     const createLabel = (method: Member | null): string => {
         return !method ? "<none>" : `${method.name.decode()}${method.type.decode()}`;
@@ -27,15 +27,6 @@
 
     let method: Selected<number> = { value: member ? methods.indexOf(member) : -1, label: createLabel(member) };
     $: member = method.value !== -1 ? methods[method.value] : null;
-
-    $: updateTab({
-        id: `${TabType.FLOW_GRAPH}:${entry.data.name}`,
-        type: TabType.FLOW_GRAPH,
-        name: entry.data.shortName,
-        icon: { icon: GitPullRequest, classes: ["text-muted-foreground"] },
-        entry: entry,
-        member: member ?? undefined,
-    });
 
     let draggable = false;
 </script>

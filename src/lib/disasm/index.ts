@@ -1,5 +1,5 @@
 import { derived, get } from "svelte/store";
-import { editorView, toolsDisasm, View } from "$lib/state";
+import { toolsDisasm } from "$lib/state";
 import { type ClassEntry, EntryType } from "$lib/workspace";
 import { current as currentTab, TabType } from "$lib/tab";
 import jasm from "./jasm";
@@ -27,7 +27,7 @@ export const current = derived(toolsDisasm, ($toolsDisasm) => {
 
 current.subscribe(() => {
     const tab = get(currentTab);
-    if (tab && tab.type === TabType.CODE && tab.entry?.type === EntryType.CLASS && get(editorView) !== View.HEX) {
+    if (tab && tab.type === TabType.CODE && tab.entry?.type === EntryType.CLASS) {
         currentTab.set(tab); // disassembled view, force update
     }
 });

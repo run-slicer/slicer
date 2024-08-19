@@ -3,13 +3,18 @@
     import { Separator } from "$lib/components/ui/separator";
     import { add, load, close, export_ } from "$lib/action";
     import { current as currentDisasm, all as disasms } from "$lib/disasm";
-    import { projectOpen, editorView, loggingOpen, toolsDisasm, View } from "$lib/state";
+    import { projectOpen, loggingOpen, toolsDisasm } from "$lib/state";
     import { entries } from "$lib/workspace";
+    import { type ProtoScript, scripts } from "$lib/script";
     import { current as currentTab, TabType } from "$lib/tab";
     import { Modifier } from "$lib/shortcut";
     import { groupBy } from "$lib/arrays";
     import Shortcut from "./shortcut.svelte";
+    import ScriptMenu from "./script/menu.svelte";
     import AboutDialog from "./dialog/about.svelte";
+    import ScriptDialog from "./dialog/script.svelte";
+    import ScriptLoadDialog from "./dialog/script_load.svelte";
+    import ScriptDeleteConfirmDialog from "./dialog/script_delete.svelte";
     import ClearConfirmDialog from "./dialog/clear.svelte";
     import {
         Menubar,
@@ -26,14 +31,20 @@
         MenubarLabel,
         MenubarCheckboxItem,
     } from "$lib/components/ui/menubar";
-    import { Terminal, Folders, GitBranchPlus } from "lucide-svelte";
-    import { openEntry } from "./";
+    import { Terminal, Folders, GitBranchPlus, Clipboard, Binary, Code, Globe } from "lucide-svelte";
+    import { openEntry, loadClipboardScript } from "./";
 
     $: disasm = $currentDisasm.id;
+
+    $: tabType = $currentTab?.type;
     $: entry = $currentTab?.entry || null;
 
     let aboutOpen = false;
     let clearConfirmOpen = false;
+
+    let scriptLoadOpen = false;
+    let scriptDeleteOpen: ProtoScript | null = null;
+    let scriptInfoOpen: ProtoScript | null = null;
 </script>
 
 <Menubar class="rounded-none border-b border-none px-2 lg:px-4">
@@ -52,9 +63,6 @@
                     </MenubarRadioGroup>
                 </MenubarSubContent>
             </MenubarSub>
-            <MenubarItem disabled>
-                Preferences <Shortcut key="s" modifier={Modifier.Ctrl | Modifier.Alt} />
-            </MenubarItem>
         </MenubarContent>
     </MenubarMenu>
     <MenubarMenu>
@@ -93,23 +101,14 @@
                 </MenubarSubContent>
             </MenubarSub>
             <MenubarSub>
-                <MenubarSubTrigger>Mode</MenubarSubTrigger>
-                <MenubarSubContent class="w-[12rem]">
-                    <MenubarRadioGroup bind:value={$editorView}>
-                        <MenubarRadioItem value={View.AUTO}>Automatic</MenubarRadioItem>
-                        <MenubarRadioItem value={View.TEXT}>Textual</MenubarRadioItem>
-                        <MenubarRadioItem value={View.HEX}>Hexadecimal</MenubarRadioItem>
-                    </MenubarRadioGroup>
-                </MenubarSubContent>
-            </MenubarSub>
-            <MenubarSeparator />
-            <MenubarSub>
                 <MenubarSubTrigger>Disassembler</MenubarSubTrigger>
                 <MenubarSubContent class="w-[12rem]">
                     <MenubarRadioGroup bind:value={disasm} onValueChange={(id) => ($toolsDisasm = id || "")}>
-                        {#each groupBy(Array.from(disasms.values()), (d) => d.group).entries() as [group, members]}
+                        {#each groupBy(Array.from(disasms.values()), (d) => d.group) as [group, members]}
                             {#if group}
-                                <MenubarLabel>{group}</MenubarLabel>
+                                <MenubarSeparator />
+                                <MenubarLabel inset>{group}</MenubarLabel>
+                                <MenubarSeparator />
                             {/if}
                             {#each members as { id, name }}
                                 <MenubarRadioItem value={id}>{name || id}</MenubarRadioItem>
@@ -118,17 +117,61 @@
                     </MenubarRadioGroup>
                 </MenubarSubContent>
             </MenubarSub>
+            <MenubarSeparator />
             <MenubarItem
                 class="justify-between"
-                disabled={entry === null}
+                disabled={entry === null || tabType === TabType.CODE}
+                on:click={() => openEntry(TabType.CODE)}
+            >
+                Code <Code size={16} />
+            </MenubarItem>
+            <MenubarItem
+                class="justify-between"
+                disabled={entry === null || tabType === TabType.HEX}
+                on:click={() => openEntry(TabType.HEX)}
+            >
+                Hexadecimal <Binary size={16} />
+            </MenubarItem>
+            <MenubarItem
+                class="justify-between"
+                disabled={entry === null || tabType === TabType.FLOW_GRAPH}
                 on:click={() => openEntry(TabType.FLOW_GRAPH)}
             >
                 Flow graph <GitBranchPlus size={16} />
             </MenubarItem>
         </MenubarContent>
     </MenubarMenu>
+    <MenubarMenu>
+        <MenubarTrigger class="relative">Scripts</MenubarTrigger>
+        <MenubarContent>
+            <MenubarSub>
+                <MenubarSubTrigger>Import</MenubarSubTrigger>
+                <MenubarSubContent class="w-[12rem]">
+                    <MenubarItem class="justify-between" on:click={() => (scriptLoadOpen = true)}>
+                        From URL <Globe size={16} />
+                    </MenubarItem>
+                    <MenubarItem class="justify-between" on:click={loadClipboardScript}>
+                        From clipboard <Clipboard size={16} />
+                    </MenubarItem>
+                </MenubarSubContent>
+            </MenubarSub>
+            {#if $scripts.length > 0}
+                <MenubarSeparator />
+                {#each $scripts as proto (proto.id)}
+                    <ScriptMenu
+                        {proto}
+                        on:open={(e) => (scriptInfoOpen = e.detail.proto)}
+                        on:delete={(e) => (scriptDeleteOpen = e.detail.proto)}
+                    />
+                {/each}
+            {/if}
+        </MenubarContent>
+    </MenubarMenu>
 </Menubar>
 <Separator />
 
 <AboutDialog bind:open={aboutOpen} />
+<ScriptDialog bind:proto={scriptInfoOpen} />
+<ScriptLoadDialog bind:open={scriptLoadOpen} />
+<ScriptDeleteConfirmDialog bind:proto={scriptDeleteOpen} />
 <ClearConfirmDialog bind:open={clearConfirmOpen} />
