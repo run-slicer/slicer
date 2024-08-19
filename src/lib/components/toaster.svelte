@@ -48,7 +48,7 @@
                 <div
                     {...$description(id)}
                     use:description
-                    class="overflow-hidden text-ellipsis whitespace-nowrap text-sm opacity-90"
+                    class="break-words text-sm opacity-90"
                 >
                     {data.description}
                 </div>

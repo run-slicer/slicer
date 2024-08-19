@@ -176,17 +176,7 @@ const scriptPromises = get(scriptingScripts).map(async (s) => {
     return script;
 });
 
-Promise.all(scriptPromises).then((scripts0) => {
-    for (const proto of scripts0) {
-        if (proto.state === ScriptState.FAILED) {
-            addToast({
-                title: "Script failed",
-                description: `Failed to read script ${proto.id}, check the console.`,
-                variant: "destructive",
-            });
-        }
-    }
-
+Promise.all(scriptPromises).then(() => {
     // start synchronizing stores only after all scripts have tried to load
     scripts.subscribe(($scripts) => {
         scriptingScripts.update(() => {
