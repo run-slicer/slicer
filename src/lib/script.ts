@@ -116,10 +116,10 @@ export const load = async (def: ProtoScript): Promise<void> => {
     }
 
     try {
+        def.context = createContext(def.script!, rootContext);
         await def.script!.load(def.context!);
 
         def.state = ScriptState.LOADED;
-        def.context = createContext(def.script!, rootContext);
     } catch (e) {
         error("failed to load script", e);
         def.state = ScriptState.FAILED;
