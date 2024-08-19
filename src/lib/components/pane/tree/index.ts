@@ -1,5 +1,5 @@
 import type { Entry } from "$lib/workspace";
-import { addToast } from "$lib/components/toaster.svelte";
+import { toast } from "svelte-sonner";
 import { export_, open, remove } from "$lib/action";
 import { TabType } from "$lib/tab";
 
@@ -39,8 +39,7 @@ export const deleteEntry = (data: Node) => {
     if (data.nodes) {
         const num = deleteNode(data);
 
-        addToast({
-            title: "Deleted",
+        toast.success("Deleted", {
             description: `Deleted ${num} ${num !== 1 ? "entries" : "entry"}.`,
         });
     } else if (data.entry) {

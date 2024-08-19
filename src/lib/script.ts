@@ -1,4 +1,4 @@
-import { addToast } from "$lib/components/toaster.svelte";
+import { toast } from "svelte-sonner";
 import { get, writable } from "svelte/store";
 import type { Event, EventListener, EventMap, EventType, Script, ScriptContext } from "@run-slicer/script";
 import { error } from "$lib/logging";
@@ -92,10 +92,8 @@ const read0 = async (url: string): Promise<ProtoScript> => {
     } catch (e) {
         error("failed to read script", e);
 
-        addToast({
-            title: "Script failed",
+        toast.error("Script failed", {
             description: `Failed to read script ${id}, check the console.`,
-            variant: "destructive",
         });
     }
 
@@ -126,10 +124,8 @@ export const load = async (def: ProtoScript): Promise<void> => {
         error("failed to load script", e);
         def.state = ScriptState.FAILED;
 
-        addToast({
-            title: "Script failed",
+        toast.error("Script failed", {
             description: `Failed to load script ${def.id}, check the console.`,
-            variant: "destructive",
         });
     }
 
@@ -150,10 +146,8 @@ export const unload = async (def: ProtoScript): Promise<void> => {
         error("failed to unload script", e);
         def.state = ScriptState.FAILED;
 
-        addToast({
-            title: "Script failed",
+        toast.error("Script failed", {
             description: `Failed to unload script ${def.id}, check the console.`,
-            variant: "destructive",
         });
     }
 

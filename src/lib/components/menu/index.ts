@@ -1,5 +1,5 @@
 import Menu from "./menu.svelte";
-import { addToast } from "$lib/components/toaster.svelte";
+import { toast } from "svelte-sonner";
 import { current as currentTab, TabType } from "$lib/tab";
 import { get } from "svelte/store";
 import { open } from "$lib/action";
@@ -14,10 +14,8 @@ export const openEntry = async (type: TabType) => {
 
 export const loadClipboardScript = async () => {
     if (!navigator.clipboard) {
-        addToast({
-            title: "Error occurred",
+        toast.error("Error occurred", {
             description: `Could not copy from clipboard, feature not available.`,
-            variant: "destructive",
         });
         return;
     }
@@ -26,15 +24,12 @@ export const loadClipboardScript = async () => {
         const data = await navigator.clipboard.readText();
         const proto = await read(`data:text/javascript;base64,${window.btoa(data)}`);
 
-        addToast({
-            title: "Imported",
+        toast.success("Imported", {
             description: `Imported script ${proto.id}.`,
         });
     } catch (e) {
-        addToast({
-            title: "Error occurred",
+        toast.error("Error occurred", {
             description: `Could not copy from clipboard, access denied.`,
-            variant: "destructive",
         });
     }
 };

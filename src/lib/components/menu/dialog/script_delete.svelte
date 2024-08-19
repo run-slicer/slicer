@@ -11,12 +11,17 @@
     } from "$lib/components/ui/alert-dialog";
     import { Button } from "$lib/components/ui/button";
     import { type ProtoScript, remove } from "$lib/script";
+    import { toast } from "svelte-sonner";
 
     export let proto: ProtoScript | null = null;
 
     const handle = async (accepted: boolean) => {
         if (accepted) {
             await remove(proto!);
+
+            toast.success("Deleted", {
+                description: `Deleted script ${proto!.id}.`,
+            });
         }
         proto = null;
     };
