@@ -7,7 +7,6 @@ import { get } from "svelte/store";
 const cfr: Disassembler = {
     id: "cfr",
     name: "CFR",
-    group: "Decompilers",
     lang: "java",
     run: async (entry: ClassEntry): Promise<string> => {
         const { node, data } = entry;

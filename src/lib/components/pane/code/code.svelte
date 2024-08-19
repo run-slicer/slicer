@@ -3,33 +3,50 @@
 <script lang="ts">
     import { EntryType } from "$lib/workspace";
     import Loading from "$lib/components/loading.svelte";
-    import { type Tab, current as currentTab, TabType } from "$lib/tab";
+    import { type Tab, TabType } from "$lib/tab";
     import { load as loadLanguage } from "$lib/lang";
-    import { current as currentDisasm } from "$lib/disasm";
     import { detectLanguage, read } from "./";
-    import { get } from "svelte/store";
+    import { Select, SelectContent, SelectItem, SelectTrigger } from "$lib/components/ui/select";
+    import { all as disasms } from "$lib/disasm";
+    import vf from "$lib/disasm/vf";
+    import { toolsDisasm } from "$lib/state";
 
     export let tab: Tab;
     let entry = tab.entry!;
 
-    let language = detectLanguage(tab.type, entry, $currentDisasm);
-    $: {
-        const detectedLang = detectLanguage(tab.type, entry, $currentDisasm);
+    const shouldDisasm = entry.type === EntryType.CLASS && tab.type === TabType.CODE;
 
-        // suppress updates if we're not active
-        if ($currentTab?.id === tab.id && language !== detectedLang /* no change? don't rerender */) {
-            language = detectedLang;
-        }
-    }
+    const initialDisasm = $toolsDisasm;
+
+    $: disasmProto = { value: initialDisasm, label: initialDisasm };
+
+    $: $toolsDisasm = disasmProto.value;
+    $: disasm = disasms.get(disasmProto.value) || vf;
+
+    $: language = detectLanguage(tab.type, entry, disasm);
 </script>
 
 <div class="relative basis-full overflow-hidden scrollbar-thin">
-    {#await Promise.all([import("./editor.svelte"), loadLanguage(language), read(tab.type, entry, get(currentDisasm))])}
-        <Loading
-            value={entry.type === EntryType.CLASS && tab.type === TabType.CODE ? "Disassembling..." : "Reading..."}
-            overlay
-        />
+    {#await Promise.all([import("./editor.svelte"), loadLanguage(language), read(tab.type, entry, disasm)])}
+        <Loading value={shouldDisasm ? "Disassembling..." : "Reading..."} overlay />
     {:then [editor, lang, value]}
         <svelte:component this={editor.default} {value} readonly {lang} />
     {/await}
+    {#if shouldDisasm}
+        <div class="absolute bottom-0 right-0 m-[15px]">
+            <Select bind:selected={disasmProto}>
+                <SelectTrigger class="h-7 text-xs [&_svg]:ml-2 [&_svg]:h-4 [&_svg]:w-4">
+                    <span class="mr-2 text-muted-foreground">Disassembler: </span>
+                    <span class="tracking-tight">{disasm.name || disasm.id}</span>
+                </SelectTrigger>
+                <SelectContent class="max-h-[240px] w-full overflow-scroll">
+                    {#each disasms.values() as dism}
+                        <SelectItem value={dism.id} label={dism.id} class="text-xs tracking-tight">
+                            {dism.name || dism.id}
+                        </SelectItem>
+                    {/each}
+                </SelectContent>
+            </Select>
+        </div>
+    {/if}
 </div>

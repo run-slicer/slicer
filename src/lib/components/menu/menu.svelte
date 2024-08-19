@@ -2,13 +2,11 @@
     import { userPrefersMode } from "mode-watcher";
     import { Separator } from "$lib/components/ui/separator";
     import { add, load, close, export_ } from "$lib/action";
-    import { current as currentDisasm, all as disasms } from "$lib/disasm";
-    import { projectOpen, loggingOpen, toolsDisasm } from "$lib/state";
+    import { projectOpen, loggingOpen } from "$lib/state";
     import { entries } from "$lib/workspace";
     import { type ProtoScript, scripts } from "$lib/script";
     import { current as currentTab, TabType } from "$lib/tab";
     import { Modifier } from "$lib/shortcut";
-    import { groupBy } from "$lib/arrays";
     import Shortcut from "./shortcut.svelte";
     import ScriptMenu from "./script/menu.svelte";
     import AboutDialog from "./dialog/about.svelte";
@@ -28,13 +26,10 @@
         MenubarItem,
         MenubarRadioGroup,
         MenubarRadioItem,
-        MenubarLabel,
         MenubarCheckboxItem,
     } from "$lib/components/ui/menubar";
     import { Terminal, Folders, GitBranchPlus, Clipboard, Binary, Code, Globe } from "lucide-svelte";
     import { openEntry, loadClipboardScript } from "./";
-
-    $: disasm = $currentDisasm.id;
 
     $: tabType = $currentTab?.type;
     $: entry = $currentTab?.entry || null;
@@ -98,23 +93,6 @@
                     <MenubarCheckboxItem bind:checked={$loggingOpen}>
                         <Terminal size={16} class="mr-1.5" /> Logging
                     </MenubarCheckboxItem>
-                </MenubarSubContent>
-            </MenubarSub>
-            <MenubarSub>
-                <MenubarSubTrigger>Disassembler</MenubarSubTrigger>
-                <MenubarSubContent class="w-[12rem]">
-                    <MenubarRadioGroup bind:value={disasm} onValueChange={(id) => ($toolsDisasm = id || "")}>
-                        {#each groupBy(Array.from(disasms.values()), (d) => d.group) as [group, members]}
-                            {#if group}
-                                <MenubarSeparator />
-                                <MenubarLabel inset>{group}</MenubarLabel>
-                                <MenubarSeparator />
-                            {/if}
-                            {#each members as { id, name }}
-                                <MenubarRadioItem value={id}>{name || id}</MenubarRadioItem>
-                            {/each}
-                        {/each}
-                    </MenubarRadioGroup>
                 </MenubarSubContent>
             </MenubarSub>
             <MenubarSeparator />
