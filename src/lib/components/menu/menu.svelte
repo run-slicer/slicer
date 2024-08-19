@@ -13,6 +13,7 @@
     import ScriptMenu from "./script/menu.svelte";
     import AboutDialog from "./dialog/about.svelte";
     import ScriptDialog from "./dialog/script.svelte";
+    import ScriptLoadDialog from "./dialog/script_load.svelte";
     import ScriptDeleteConfirmDialog from "./dialog/script_delete.svelte";
     import ClearConfirmDialog from "./dialog/clear.svelte";
     import {
@@ -30,7 +31,7 @@
         MenubarLabel,
         MenubarCheckboxItem,
     } from "$lib/components/ui/menubar";
-    import { Terminal, Folders, GitBranchPlus, Clipboard, Binary, Code } from "lucide-svelte";
+    import { Terminal, Folders, GitBranchPlus, Clipboard, Binary, Code, Globe } from "lucide-svelte";
     import { openEntry, loadClipboardScript } from "./";
 
     $: disasm = $currentDisasm.id;
@@ -41,6 +42,7 @@
     let aboutOpen = false;
     let clearConfirmOpen = false;
 
+    let scriptLoadOpen = false;
     let scriptDeleteOpen: ProtoScript | null = null;
     let scriptInfoOpen: ProtoScript | null = null;
 </script>
@@ -145,6 +147,9 @@
             <MenubarSub>
                 <MenubarSubTrigger>Import</MenubarSubTrigger>
                 <MenubarSubContent class="w-[12rem]">
+                    <MenubarItem class="justify-between" on:click={() => (scriptLoadOpen = true)}>
+                        From URL <Globe size={16} />
+                    </MenubarItem>
                     <MenubarItem class="justify-between" on:click={loadClipboardScript}>
                         From clipboard <Clipboard size={16} />
                     </MenubarItem>
@@ -167,5 +172,6 @@
 
 <AboutDialog bind:open={aboutOpen} />
 <ScriptDialog bind:proto={scriptInfoOpen} />
+<ScriptLoadDialog bind:open={scriptLoadOpen} />
 <ScriptDeleteConfirmDialog bind:proto={scriptDeleteOpen} />
 <ClearConfirmDialog bind:open={clearConfirmOpen} />
