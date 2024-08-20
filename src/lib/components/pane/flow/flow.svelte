@@ -37,8 +37,7 @@
     {:then [{ Background, Controls, SvelteFlow, ControlButton }, FlowNode, { createComputedGraph }]}
         {@const [nodes, edges] = createComputedGraph(member, pool)}
         {#key member}
-            <svelte:component
-                this={SvelteFlow}
+            <SvelteFlow
                 nodes={writable(nodes)}
                 edges={writable(edges)}
                 fitView
@@ -62,7 +61,7 @@
                         <svelte:component this={draggable ? LockOpen : Lock} size={12} class="!fill-none" />
                     </ControlButton>
                 </Controls>
-            </svelte:component>
+            </SvelteFlow>
         {/key}
         <div class="absolute bottom-0 m-[15px] max-w-[425px]">
             <Select bind:selected={method}>
