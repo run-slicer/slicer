@@ -1,7 +1,6 @@
 <script lang="ts">
     import { PaneHeader, PaneHeaderItem } from "$lib/components/pane";
     import { Terminal } from "lucide-svelte";
-    import type { EditorView } from "@codemirror/view";
     import { type LogEntry, entries } from "$lib/logging";
 
     const readEntries = (logs: LogEntry[]): string => {
@@ -13,19 +12,7 @@
         return result.join("\n");
     };
 
-    let view: EditorView;
-
-    let value = readEntries($entries);
-    $: {
-        value = readEntries($entries);
-        if (view) {
-            // scroll to the last line automatically
-            const lastLine = view.state.doc.line(view.state.doc.lines);
-
-            const { node } = view.domAtPos(lastLine.from);
-            node.parentElement?.scrollIntoView({ block: "end" });
-        }
-    }
+    $: value = readEntries($entries);
 </script>
 
 <div class="flex h-full w-full flex-col">
@@ -34,7 +21,19 @@
     </PaneHeader>
     <div class="relative basis-full overflow-hidden scrollbar-thin">
         {#await Promise.all([import("./code/editor.svelte"), import("$lib/lang/log")]) then [editor, { log }]}
-            <svelte:component this={editor.default} readonly {value} lang={log()} on:ready={(e) => (view = e.detail)} />
+            <svelte:component
+                this={editor.default}
+                readOnly
+                {value}
+                lang={log()}
+                on:change={(e) => {
+                    // scroll to the last line automatically
+                    const lastLine = e.detail.state.doc.line(e.detail.state.doc.lines);
+
+                    const { node } = e.detail.view.domAtPos(lastLine.from);
+                    node.parentElement?.scrollIntoView({ block: "end" });
+                }}
+            />
         {/await}
     </div>
 </div>

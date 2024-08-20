@@ -35,17 +35,4 @@ export default defineConfig({
             $lib: resolve("./src/lib"),
         },
     },
-    optimizeDeps: {
-        exclude: [
-            "svelte-codemirror-editor",
-            "codemirror",
-            "@codemirror/lang-java",
-            "@codemirror/lang-json",
-            "@codemirror/lang-xml",
-            "@codemirror/lang-yaml",
-            "@codemirror/language",
-            "@codemirror/view",
-            "@uiw/codemirror-theme-github",
-        ],
-    },
 });
