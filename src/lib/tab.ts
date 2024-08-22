@@ -16,6 +16,9 @@ export interface Tab {
     name: string;
     icon?: StyledIcon;
     entry?: Entry;
+
+    _dirty?: boolean;
+    _dirtyFlag?: any;
 }
 
 const welcomeTab: Tab = {
@@ -44,6 +47,22 @@ export const update = (tab: Tab): Tab => {
         return $tabs;
     });
     return tab;
+};
+
+export const refresh = (tab: Tab): Tab => {
+    tab._dirty = true;
+    return update(tab);
+};
+
+export const checkDirty = (tab: Tab, current: Tab | null): any => {
+    if (current?.id === tab.id && tab._dirty) {
+        // change the flag only when we're active,
+        // we want to refresh tabs lazily
+        tab._dirty = false;
+        tab._dirtyFlag = {};
+    }
+
+    return tab._dirtyFlag;
 };
 
 export const remove = (id: string) => {

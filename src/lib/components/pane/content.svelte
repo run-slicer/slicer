@@ -21,18 +21,10 @@
     import { dndzone } from "svelte-dnd-action";
     import { ResizableHandle, ResizablePane, ResizablePaneGroup } from "$lib/components/ui/resizable";
     import { entries } from "$lib/workspace";
-    import { current, remove, TabType } from "$lib/tab";
+    import { current, checkDirty, remove } from "$lib/tab";
     import { projectOpen, loggingOpen } from "$lib/state";
     import { cn } from "$lib/components/utils";
-    import {
-        TreePane,
-        CodePane,
-        FlowPane,
-        WelcomePane,
-        LoggingPane,
-        PaneHeader,
-        PaneHeaderItem,
-    } from "$lib/components/pane";
+    import { TreePane, LoggingPane, PaneHeader, PaneHeaderItem, EditorPane } from "$lib/components/pane";
 
     export let layoutId = "content-pane";
 
@@ -74,13 +66,7 @@
                     </PaneHeader>
                     {#each $tabs as [id, tab] (id)}
                         <div class={cn("flex h-full w-full flex-col", $current?.id === id || "hidden")}>
-                            {#if tab.type === TabType.WELCOME}
-                                <WelcomePane />
-                            {:else if tab.type === TabType.CODE || tab.type === TabType.HEX}
-                                <CodePane {tab} />
-                            {:else if tab.type === TabType.FLOW_GRAPH}
-                                <FlowPane {tab} />
-                            {/if}
+                            <EditorPane {tab} dirtyFlag={checkDirty(tab, $current)} />
                         </div>
                     {/each}
                 </div>

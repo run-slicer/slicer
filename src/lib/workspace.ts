@@ -141,6 +141,42 @@ export const memoryData = (name: Named, data: Uint8Array): MemoryData => {
     };
 };
 
+export interface TransformData extends MemoryData {
+    origin: Data;
+}
+
+export const transformData = (origin: Data, data: Uint8Array): TransformData => {
+    return {
+        ...origin,
+        type: DataType.MEMORY,
+        data,
+        origin,
+        stream(): Promise<ReadableStream<Uint8Array>> {
+            return Promise.resolve(
+                new ReadableStream({
+                    start(controller) {
+                        controller.enqueue(data);
+                        controller.close();
+                    },
+                })
+            );
+        },
+        arrayBuffer(): Promise<ArrayBuffer> {
+            return Promise.resolve(data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength));
+        },
+        text(): Promise<string> {
+            return Promise.resolve(decoder.decode(data));
+        },
+        blob(): Promise<Blob> {
+            return Promise.resolve(new Blob([data]));
+        },
+    };
+};
+
+export const unwrapTransform = (data: Data): Data => {
+    return "origin" in data ? (data as TransformData).origin : data;
+};
+
 export const enum EntryType {
     FILE,
     CLASS,
@@ -167,13 +203,21 @@ export const readDetail = async (entry: Entry): Promise<Entry> => {
     if (view.byteLength >= 4 && view.getUint32(0, false) === 0xcafebabe) {
         // try to read as class
         try {
-            const event = await rootContext.dispatchEvent({ type: "preload", data: new Uint8Array(buffer) });
+            const buf = new Uint8Array(buffer);
+            const event = await rootContext.dispatchEvent({
+                type: "preload",
+                name: entry.data.name,
+                data: buf,
+            });
+
+            // create transformed data only if a transformation happened
+            const data = event.data !== buf ? transformData(entry.data, event.data) : entry.data;
 
             return {
                 ...entry,
                 type: EntryType.CLASS,
                 node: read(event.data),
-                data: memoryData(entry.data, event.data),
+                data,
             } as ClassEntry;
         } catch (e) {
             error(`failed to read class ${entry.data.name}`, e);

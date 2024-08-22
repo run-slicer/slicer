@@ -6,6 +6,7 @@ import Logging from "./logging.svelte";
 import Tree from "./tree/tree.svelte";
 import Code from "./code/code.svelte";
 import Flow from "./flow/flow.svelte";
+import Editor from "./editor.svelte";
 
 export {
     Header as PaneHeader,
@@ -16,4 +17,5 @@ export {
     Flow as FlowPane,
     Welcome as WelcomePane,
     Logging as LoggingPane,
+    Editor as EditorPane,
 };

@@ -47,7 +47,7 @@
         "@run-slicer/asm": "^0.8.0",
         "@run-slicer/cfr": "0.1.2-0.152",
         "@run-slicer/jasm": "0.2.0-2.6.0",
-        "@run-slicer/script": "^0.5.0",
+        "@run-slicer/script": "^0.7.2",
         "@run-slicer/vf": "0.1.2-1.10.1",
         "@uiw/codemirror-theme-github": "^4.23.0",
         "@xyflow/svelte": "^0.1.16",
@@ -61,5 +61,5 @@
         "tailwind-variants": "^0.2.1",
         "unzipit": "^1.4.3"
     },
-    "packageManager": "pnpm@9.7.0+sha512.dc09430156b427f5ecfc79888899e1c39d2d690f004be70e05230b72cb173d96839587545d09429b55ac3c429c801b4dc3c0e002f653830a420fa2dd4e3cf9cf"
+    "packageManager": "pnpm@9.7.1+sha512.faf344af2d6ca65c4c5c8c2224ea77a81a5e8859cbc4e06b1511ddce2f0151512431dd19e6aff31f2c6a8f5f2aced9bd2273e1fed7dd4de1868984059d2c4247"
 }

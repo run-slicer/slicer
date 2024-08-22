@@ -1,9 +1,23 @@
 import { toast } from "svelte-sonner";
 import { get, writable } from "svelte/store";
-import type { Event, EventListener, EventMap, EventType, Script, ScriptContext } from "@run-slicer/script";
 import { error } from "$lib/logging";
 import { scriptingScripts } from "$lib/state";
 import { cyrb53 } from "$lib/hash";
+import type {
+    EditorContext,
+    Entry as ScriptEntry,
+    EntryType as ScriptEntryType,
+    Event,
+    EventListener,
+    EventMap,
+    EventType,
+    Script,
+    ScriptContext,
+    Tab as ScriptTab,
+    TabType as ScriptTabType,
+} from "@run-slicer/script";
+import { current as currentTab, find as findTab, refresh as refreshTab, type Tab, tabs, TabType } from "$lib/tab";
+import { type Entry, EntryType, readDetail, unwrapTransform } from "$lib/workspace";
 
 export const enum ScriptState {
     UNLOADED,
@@ -21,12 +35,72 @@ export interface ProtoScript {
 
 export const scripts = writable<ProtoScript[]>([]);
 
+const wrapEntry = (e: Entry): ScriptEntry => {
+    let type: ScriptEntryType = "unspecific";
+    switch (e.type) {
+        case EntryType.CLASS:
+            type = "class";
+            break;
+    }
+
+    return { type, name: e.data.name };
+};
+
+const wrapTab = (t: Tab): ScriptTab => {
+    let type: ScriptTabType = "unspecific";
+    switch (t.type) {
+        case TabType.WELCOME:
+        case TabType.CODE:
+        case TabType.HEX:
+        case TabType.FLOW_GRAPH:
+            type = t.type;
+            break;
+    }
+
+    return {
+        type,
+        id: t.id,
+        label: t.name,
+        entry: t.entry ? wrapEntry(t.entry) : null,
+    };
+};
+
+const editorCtx: EditorContext = {
+    tabs(): ScriptTab[] {
+        return Array.from(get(tabs).values()).map(wrapTab);
+    },
+    find(id: string): ScriptTab | null {
+        const tab = findTab(id);
+        return tab ? wrapTab(tab) : null;
+    },
+    current(): ScriptTab | null {
+        const tab = get(currentTab);
+        return tab ? wrapTab(tab) : null;
+    },
+    async refresh(id: string, hard: boolean) {
+        const tab = findTab(id);
+        if (tab) {
+            if (hard && tab.entry) {
+                // script wanted a hard refresh, make sure to trigger a preload event
+                tab.entry = await readDetail({
+                    type: EntryType.FILE,
+                    // unwrap any transforms, a script may have touched the tab entry
+                    data: unwrapTransform(tab.entry.data),
+                });
+            }
+
+            refreshTab(tab);
+        }
+    },
+};
+
 const createContext = (script: Script, parent: ScriptContext | null): ScriptContext => {
     const scriptListeners = new Map<EventType, EventListener<any>[]>();
 
     return {
         script,
         parent,
+        editor: editorCtx,
         addEventListener<K extends EventType>(type: K, listener: EventListener<EventMap[K]>) {
             let listeners = scriptListeners.get(type);
             if (!listeners) {
@@ -138,10 +212,12 @@ export const unload = async (def: ProtoScript): Promise<void> => {
     }
 
     try {
-        await def.script!.unload(def.context!);
+        const context = def.context!;
+        def.context = null; // prevent any events from being handled from this point on
+
+        await def.script!.unload(context);
 
         def.state = ScriptState.UNLOADED;
-        def.context = null;
     } catch (e) {
         error("failed to unload script", e);
         def.state = ScriptState.FAILED;
