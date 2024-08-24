@@ -98,10 +98,10 @@
         overflow-wrap: anywhere;
         word-break: normal;
     }
-}
 
-.scrollbar-none::-webkit-scrollbar {
-    display: none;
+    .scrollbar-none::-webkit-scrollbar {
+        display: none;
+    }
 }
 
 /* xyflow graphs */

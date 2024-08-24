@@ -84,6 +84,8 @@ export const createComputedGraph = (method: Member | null, pool: Pool): [Node[],
                     x: positionedNode.x - nodeData.width / 2,
                     y: positionedNode.y - nodeData.height / 2,
                 },
+                // highlight entrypoint node
+                style: nodeData.node.offset === 0 ? "border: 1px solid hsl(var(--primary));" : undefined,
             };
         }),
         edges.map((edge) => {
