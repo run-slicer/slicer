@@ -41,7 +41,7 @@ export const createComputedGraph = (method: Member | null, pool: Pool): [Node[],
 
     const code = attr as CodeAttribute;
 
-    const { nodes, edges } = computeGraph(code.insns);
+    const { nodes, edges } = computeGraph(code);
 
     const data: NodeData[] = nodes.map((node) => {
         const lines = node.insns.map((i) => formatInsn(i, pool));
