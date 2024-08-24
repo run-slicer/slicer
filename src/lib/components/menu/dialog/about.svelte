@@ -40,7 +40,7 @@
         <p class="mt-2 text-center text-sm text-muted-foreground">
             Open-source ❤️
             <span class="mx-2">@</span>
-            <a href="https://github.com/run-slicer/slicer" class="hover:text-blue-500 hover:underline">
+            <a href="https://github.com/run-slicer/slicer" class="text-blue-500 hover:text-blue-600 hover:underline">
                 run-slicer/slicer
             </a>
         </p>
