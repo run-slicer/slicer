@@ -12,7 +12,7 @@ const vf: Disassembler = {
         const { node, data } = entry;
         const { decompile } = await import("@run-slicer/vf");
 
-        const buf = new Uint8Array(await data.arrayBuffer());
+        const buf = await data.bytes();
         const name = (node.pool[node.thisClass.name] as UTF8Entry).decode();
 
         const classes0 = get(classes);

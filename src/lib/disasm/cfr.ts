@@ -12,7 +12,7 @@ const cfr: Disassembler = {
         const { node, data } = entry;
         const { decompile } = await import("@run-slicer/cfr");
 
-        const buf = new Uint8Array(await data.arrayBuffer());
+        const buf = await data.bytes();
         const name = (node.pool[node.thisClass.name] as UTF8Entry).decode();
 
         const output = await decompile(name, { source: createSource(get(classes), name, buf) });

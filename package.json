@@ -49,6 +49,7 @@
         "@run-slicer/jasm": "0.2.0-2.6.0",
         "@run-slicer/script": "^0.7.2",
         "@run-slicer/vf": "0.1.2-1.10.1",
+        "@run-slicer/zip": "^0.1.2",
         "@uiw/codemirror-theme-github": "^4.23.0",
         "@xyflow/svelte": "^0.1.16",
         "bits-ui": "^0.21.13",
@@ -58,8 +59,7 @@
         "paneforge": "^0.0.5",
         "svelte-sonner": "^0.3.27",
         "tailwind-merge": "^2.5.2",
-        "tailwind-variants": "^0.2.1",
-        "unzipit": "^1.4.3"
+        "tailwind-variants": "^0.2.1"
     },
     "packageManager": "pnpm@9.8.0+sha512.8e4c3550fb500e808dbc30bb0ce4dd1eb614e30b1c55245f211591ec2cdf9c611cabd34e1364b42f564bd54b3945ed0f49d61d1bbf2ec9bd74b866fcdc723276"
 }

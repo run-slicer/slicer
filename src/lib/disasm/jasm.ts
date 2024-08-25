@@ -8,7 +8,7 @@ const jasm: Disassembler = {
     run: async (entry: ClassEntry): Promise<string> => {
         const { disassemble } = await import("@run-slicer/jasm");
 
-        return await disassemble(new Uint8Array(await entry.data.arrayBuffer()));
+        return await disassemble(await entry.data.bytes());
     },
 };
 

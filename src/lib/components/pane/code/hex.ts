@@ -3,7 +3,7 @@ import type { Data } from "$lib/workspace";
 const ROW_BYTES = 16;
 
 export const formatHex = async (data: Data): Promise<string> => {
-    const buffer = new Uint8Array(await data.arrayBuffer());
+    const buffer = await data.bytes();
 
     let result = "";
     for (let row = 0; row < buffer.length; row += ROW_BYTES) {

@@ -18,6 +18,6 @@ export const createSource = (classes: Map<string, Entry>, name: string, buf: Uin
             return null; // not a class
         }
 
-        return entry.data.arrayBuffer().then((ab) => new Uint8Array(ab));
+        return entry.data.bytes();
     };
 };

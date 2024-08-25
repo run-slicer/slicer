@@ -1,12 +1,12 @@
 import { derived, get, writable } from "svelte/store";
 import { type Node, read } from "@run-slicer/asm";
-import { unzip, type ZipEntry, type ZipInfo } from "unzipit";
+import { type Zip, type Entry as ZipEntry, readBlob } from "@run-slicer/zip";
 import { error } from "$lib/logging";
 import { rootContext } from "$lib/script";
 
 export interface BlobLike {
     stream(): Promise<ReadableStream<Uint8Array>>;
-    arrayBuffer(): Promise<ArrayBuffer>;
+    bytes(): Promise<Uint8Array>;
     text(): Promise<string>;
     blob(): Promise<Blob>;
 }
@@ -63,8 +63,8 @@ export const fileData = (file: File): FileData => {
         stream(): Promise<ReadableStream<Uint8Array>> {
             return Promise.resolve(file.stream());
         },
-        arrayBuffer(): Promise<ArrayBuffer> {
-            return file.arrayBuffer();
+        async bytes(): Promise<Uint8Array> {
+            return new Uint8Array(await file.arrayBuffer());
         },
         text(): Promise<string> {
             return file.text();
@@ -77,26 +77,26 @@ export const fileData = (file: File): FileData => {
 
 export interface ZipData extends Data {
     type: DataType.ZIP;
-    parent: ZipInfo;
+    parent: Zip;
     entry: ZipEntry;
 }
 
 export const zipData = async (file: File): Promise<ZipData[]> => {
-    const info = await unzip(file);
+    const info = await readBlob(file);
 
-    return Object.entries(info.entries)
-        .filter(([_, v]) => !v.isDirectory)
-        .map(([n, v]) => {
+    return info.entries
+        .filter((v) => !v.isDirectory)
+        .map((v) => {
             return {
                 type: DataType.ZIP,
                 parent: info,
                 entry: v,
-                ...parseName(n),
+                ...parseName(v.name),
                 async stream(): Promise<ReadableStream<Uint8Array>> {
                     return (await v.blob()).stream();
                 },
-                arrayBuffer(): Promise<ArrayBuffer> {
-                    return v.arrayBuffer();
+                bytes(): Promise<Uint8Array> {
+                    return v.bytes();
                 },
                 text(): Promise<string> {
                     return v.text();
@@ -129,8 +129,8 @@ export const memoryData = (name: Named, data: Uint8Array): MemoryData => {
                 })
             );
         },
-        arrayBuffer(): Promise<ArrayBuffer> {
-            return Promise.resolve(data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength));
+        bytes(): Promise<Uint8Array> {
+            return Promise.resolve(data);
         },
         text(): Promise<string> {
             return Promise.resolve(decoder.decode(data));
@@ -146,31 +146,7 @@ export interface TransformData extends MemoryData {
 }
 
 export const transformData = (origin: Data, data: Uint8Array): TransformData => {
-    return {
-        ...origin,
-        type: DataType.MEMORY,
-        data,
-        origin,
-        stream(): Promise<ReadableStream<Uint8Array>> {
-            return Promise.resolve(
-                new ReadableStream({
-                    start(controller) {
-                        controller.enqueue(data);
-                        controller.close();
-                    },
-                })
-            );
-        },
-        arrayBuffer(): Promise<ArrayBuffer> {
-            return Promise.resolve(data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength));
-        },
-        text(): Promise<string> {
-            return Promise.resolve(decoder.decode(data));
-        },
-        blob(): Promise<Blob> {
-            return Promise.resolve(new Blob([data]));
-        },
-    };
+    return { ...memoryData(origin, data), origin };
 };
 
 export const unwrapTransform = (data: Data): Data => {
@@ -197,21 +173,20 @@ export const readDetail = async (entry: Entry): Promise<Entry> => {
         return entry; // not a generic entry
     }
 
-    const buffer = await entry.data.arrayBuffer();
+    const buffer = await entry.data.bytes();
 
-    const view = new DataView(buffer.slice(0, 4));
-    if (view.byteLength >= 4 && view.getUint32(0, false) === 0xcafebabe) {
+    const view = new DataView(buffer.buffer, buffer.byteOffset, buffer.byteLength);
+    if (buffer.byteLength >= 4 && view.getUint32(0, false) === 0xcafebabe) {
         // try to read as class
         try {
-            const buf = new Uint8Array(buffer);
             const event = await rootContext.dispatchEvent({
                 type: "preload",
                 name: entry.data.name,
-                data: buf,
+                data: buffer,
             });
 
             // create transformed data only if a transformation happened
-            const data = event.data !== buf ? transformData(entry.data, event.data) : entry.data;
+            const data = event.data !== buffer ? transformData(entry.data, event.data) : entry.data;
 
             return {
                 ...entry,
