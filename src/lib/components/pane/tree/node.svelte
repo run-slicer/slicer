@@ -21,6 +21,8 @@
         }
     }
 
+    const { icon, classes } = fileIcon(data.label);
+
     let expanded = data.expanded;
     $: data.expanded = expanded;
 
@@ -55,36 +57,37 @@
                         size={14}
                         class="my-auto mr-1 min-w-[14px] text-muted-foreground"
                     />
-                    <Folder size={16} class="my-auto mr-1 min-w-[16px] fill-muted" />
+                    {#if data.entry}
+                        <svelte:component this={icon} size={16} class={cn("my-auto mr-1 min-w-[16px]", classes)} />
+                    {:else}
+                        <Folder size={16} class="my-auto mr-1 min-w-[16px] fill-muted" />
+                    {/if}
                     <span class="text-sm">{data.label}</span>
                 </button>
             </ContextMenuTrigger>
-            <NodeMenu {data} on:delete />
+            <NodeMenu {data} on:action />
         </ContextMenu>
         {#if expanded}
             {#each data.nodes as node (node.label)}
                 <svelte:self
                     bind:data={node}
-                    on:open
-                    on:delete
-                    on:download
+                    on:action
                     class={cn("ml-0.5 pl-[16px]", hasNonLeaf || "ml-1 pl-[32px]")}
                 />
             {/each}
         {/if}
     {:else}
-        {@const { icon, classes } = fileIcon(data.label)}
         <ContextMenu open={$currentMenu === menuId} onOpenChange={setOpened}>
             <ContextMenuTrigger>
                 <button
                     class="highlight flex w-full py-[0.2rem]"
-                    on:click={() => dispatch("open", { data, type: null })}
+                    on:click={() => dispatch("action", { type: "open", data })}
                 >
                     <svelte:component this={icon} size={16} class={cn("my-auto mr-1 min-w-[16px]", classes)} />
                     <span class="text-sm">{data.label}</span>
                 </button>
             </ContextMenuTrigger>
-            <NodeMenu {data} on:open on:delete on:download />
+            <NodeMenu {data} on:action />
         </ContextMenu>
     {/if}
 </div>

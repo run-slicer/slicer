@@ -1,3 +1,13 @@
+<script lang="ts" context="module">
+    import type { TabType } from "$lib/tab";
+
+    export interface Action {
+        type: "open" | "delete" | "download";
+        data: Node;
+        tabType?: TabType;
+    }
+</script>
+
 <script lang="ts">
     import { Folders, Plus } from "lucide-svelte";
     import { Button } from "$lib/components/ui/button";
@@ -37,6 +47,22 @@
     }
 
     let deleteData: Node | null = null;
+
+    const processAction = async (action: Action) => {
+        const { type, data, tabType } = action;
+
+        switch (type) {
+            case "open":
+                await openEntry(data, tabType);
+                break;
+            case "delete":
+                deleteData = data;
+                break;
+            case "download":
+                await exportEntry(data);
+                break;
+        }
+    };
 </script>
 
 <div class="flex h-full w-full flex-col">
@@ -47,12 +73,7 @@
         {#if root.nodes && root.nodes.length > 0}
             <div class="flex w-full flex-col">
                 {#each root.nodes as node (node.label)}
-                    <TreeNode
-                        data={node}
-                        on:open={(e) => openEntry(e.detail.data, e.detail.type)}
-                        on:delete={(e) => (deleteData = e.detail)}
-                        on:download={(e) => exportEntry(e.detail)}
-                    />
+                    <TreeNode data={node} on:action={(e) => processAction(e.detail)} />
                 {/each}
             </div>
         {:else}

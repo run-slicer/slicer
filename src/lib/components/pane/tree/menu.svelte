@@ -12,6 +12,7 @@
         ContextMenuSubTrigger,
         ContextMenuSubContent,
     } from "$lib/components/ui/context-menu";
+    import { EntryType } from "$lib/workspace";
 
     export let data: Node;
 
@@ -22,37 +23,39 @@
     <ContextMenuLabel class="overflow-hidden text-ellipsis text-center">{data.label}</ContextMenuLabel>
     <ContextMenuSeparator />
     {#if data.entry}
-        <ContextMenuSub>
-            <ContextMenuSubTrigger>Open as</ContextMenuSubTrigger>
-            <ContextMenuSubContent class="w-[12rem]">
-                <ContextMenuItem
-                    class="flex justify-between"
-                    on:click={() => dispatch("open", { data, type: TabType.CODE })}
-                >
-                    Code <Code size={16} />
-                </ContextMenuItem>
-                <ContextMenuItem
-                    class="flex justify-between"
-                    on:click={() => dispatch("open", { data, type: TabType.HEX })}
-                >
-                    Hexadecimal <Binary size={16} />
-                </ContextMenuItem>
-                <ContextMenuItem
-                    class="flex justify-between"
-                    on:click={() => dispatch("open", { data, type: TabType.FLOW_GRAPH })}
-                >
-                    Flow graph <GitBranchPlus size={16} />
-                </ContextMenuItem>
-            </ContextMenuSubContent>
-        </ContextMenuSub>
-        <ContextMenuSeparator />
-        <ContextMenuItem class="flex justify-between" on:click={() => dispatch("download", data)}>
+        {#if data.entry.type === EntryType.FILE}
+            <ContextMenuSub>
+                <ContextMenuSubTrigger>Open as</ContextMenuSubTrigger>
+                <ContextMenuSubContent class="w-[12rem]">
+                    <ContextMenuItem
+                        class="flex justify-between"
+                        on:click={() => dispatch("action", { type: "open", data, tabType: TabType.CODE })}
+                    >
+                        Code <Code size={16} />
+                    </ContextMenuItem>
+                    <ContextMenuItem
+                        class="flex justify-between"
+                        on:click={() => dispatch("action", { type: "open", data, tabType: TabType.HEX })}
+                    >
+                        Hexadecimal <Binary size={16} />
+                    </ContextMenuItem>
+                    <ContextMenuItem
+                        class="flex justify-between"
+                        on:click={() => dispatch("action", { type: "open", data, tabType: TabType.FLOW_GRAPH })}
+                    >
+                        Flow graph <GitBranchPlus size={16} />
+                    </ContextMenuItem>
+                </ContextMenuSubContent>
+            </ContextMenuSub>
+            <ContextMenuSeparator />
+        {/if}
+        <ContextMenuItem class="flex justify-between" on:click={() => dispatch("action", { type: "download", data })}>
             Download <Download size={16} />
         </ContextMenuItem>
     {/if}
     <ContextMenuItem
         class="flex justify-between data-[highlighted]:bg-destructive data-[highlighted]:text-destructive-foreground"
-        on:click={() => dispatch("delete", data)}
+        on:click={() => dispatch("action", { type: "delete", data })}
     >
         Delete <Trash2 size={16} />
     </ContextMenuItem>
