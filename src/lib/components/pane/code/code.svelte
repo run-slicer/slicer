@@ -9,7 +9,7 @@
     import { Select, SelectContent, SelectItem, SelectTrigger } from "$lib/components/ui/select";
     import { all as disasms } from "$lib/disasm";
     import vf from "$lib/disasm/vf";
-    import { toolsDisasm } from "$lib/state";
+    import { toolsDisasm, editorTextSize } from "$lib/state";
 
     export let tab: Tab;
     let entry = tab.entry!;
@@ -30,7 +30,7 @@
     {#await Promise.all([import("./editor.svelte"), loadLanguage(language), read(tab.type, entry, disasm)])}
         <Loading value={shouldDisasm ? "Disassembling..." : "Reading..."} overlay />
     {:then [editor, lang, value]}
-        <svelte:component this={editor.default} {value} readOnly {lang} />
+        <svelte:component this={editor.default} {value} readOnly {lang} bind:textSize={$editorTextSize} />
     {/await}
     {#if shouldDisasm}
         <div class="absolute bottom-0 right-0 m-[15px]">

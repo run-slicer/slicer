@@ -66,6 +66,10 @@
                 '"Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
             "font-size": "12px",
         },
+        ".cm-gutterElement": {
+            // use new font
+            "font-size": "12px",
+        },
         ".cm-panels": {
             // fix color on panel container
             "background-color": "hsl(var(--background))",
@@ -92,11 +96,11 @@
     import { EditorView } from "@codemirror/view";
     import { dark, light } from "./theme";
     import { Compartment } from "@codemirror/state";
-    import { editorTextSize } from "$lib/state";
 
     export let value: string = "";
     export let readOnly: boolean = false;
     export let lang: LanguageSupport | null = null;
+    export let textSize: number = 12;
 
     const readOnlyStore = new Compartment();
     const themeStore = new Compartment();
@@ -107,6 +111,8 @@
     $: view?.dispatch({ effects: themeStore.reconfigure($mode === "dark" ? dark : light) });
     $: view?.dispatch({ effects: langStore.reconfigure(lang || []) });
 
+    let parent: HTMLDivElement;
+
     $: {
         const oldValue = view?.state?.doc?.toString();
         if (oldValue !== value) {
@@ -114,16 +120,15 @@
         }
 
         if (view) {
-            view!.contentDOM.style.fontSize = `${$editorTextSize}px`;
+            view.contentDOM.style.fontSize = `${textSize}px`;
             for (const num of parent.querySelectorAll(".cm-gutterElement")) {
-                (num as HTMLElement).style.fontSize = view!.contentDOM.style.fontSize;
+                (num as HTMLElement).style.fontSize = view.contentDOM.style.fontSize;
             }
         }
     }
 
     const dispatch = createEventDispatcher();
 
-    let parent: HTMLDivElement;
     onMount(() => {
         view = new EditorView({
             state: EditorState.create({
@@ -152,8 +157,9 @@
         parent.addEventListener("wheel", (e) => {
             if (e.ctrlKey) {
                 e.preventDefault();
+
                 const toAdd = e.deltaY > 0 ? -1 : 1;
-                $editorTextSize = Math.max(8, Math.min(24, $editorTextSize + toAdd));
+                textSize = Math.max(8, Math.min(24, textSize + toAdd));
             }
         });
     });
