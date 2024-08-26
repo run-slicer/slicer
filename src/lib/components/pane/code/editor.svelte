@@ -92,7 +92,7 @@
     import { EditorView } from "@codemirror/view";
     import { dark, light } from "./theme";
     import { Compartment } from "@codemirror/state";
-    import { zoomSize } from "$lib/state";
+    import { editorTextSize } from "$lib/state";
 
     export let value: string = "";
     export let readOnly: boolean = false;
@@ -111,6 +111,13 @@
         const oldValue = view?.state?.doc?.toString();
         if (oldValue !== value) {
             view?.dispatch({ changes: { from: 0, to: view?.state?.doc?.length || 0, insert: value } });
+        }
+
+        if (view) {
+            view!.contentDOM.style.fontSize = `${$editorTextSize}px`;
+            for (const num of parent.querySelectorAll(".cm-gutterElement")) {
+                (num as HTMLElement).style.fontSize = view!.contentDOM.style.fontSize;
+            }
         }
     }
 
@@ -141,19 +148,14 @@
             }),
             parent,
         });
-        zoomSize.subscribe((size) => {
-            view!.contentDOM.style.fontSize = `${size}px`;
-            for (const num of parent.querySelectorAll('.cm-gutterElement')) {
-                (num as HTMLElement).style.fontSize = view!.contentDOM.style.fontSize;
-            }
-        });
-        parent.addEventListener('wheel', (e) => {
+
+        parent.addEventListener("wheel", (e) => {
             if (e.ctrlKey) {
                 e.preventDefault();
                 const toAdd = e.deltaY > 0 ? -1 : 1;
-                zoomSize.set(Math.max(8, Math.min(24, $zoomSize + toAdd)));
+                $editorTextSize = Math.max(8, Math.min(24, $editorTextSize + toAdd));
             }
-        })
+        });
     });
 </script>
 
