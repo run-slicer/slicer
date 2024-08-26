@@ -28,14 +28,24 @@
 
     $: textSize = $editorTextSizeSync
         ? editorTextSize
-        : writable<number>(get(editorTextSize) /* immediate value, no subscription */);
+        : writable(get(editorTextSize) /* immediate value, no subscription */);
+
+    const wrapStore = tab.state.editorWrap;
+    $: wrap = wrapStore ? $wrapStore : false;
 </script>
 
 <div class="relative basis-full overflow-hidden scrollbar-thin">
     {#await Promise.all([import("./editor.svelte"), loadLanguage(language), read(tab.type, entry, disasm)])}
         <Loading value={shouldDisasm ? "Disassembling..." : "Reading..."} overlay />
     {:then [editor, lang, value]}
-        <svelte:component this={editor.default} {value} readOnly {lang} bind:textSize={$textSize} />
+        <svelte:component
+            this={editor.default}
+            {value}
+            readOnly
+            {lang}
+            bind:textSize={$textSize}
+            {wrap}
+        />
     {/await}
     {#if shouldDisasm}
         <div class="absolute bottom-0 right-0 m-[15px]">

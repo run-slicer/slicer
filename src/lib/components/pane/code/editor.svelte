@@ -101,15 +101,18 @@
     export let readOnly: boolean = false;
     export let lang: LanguageSupport | null = null;
     export let textSize: number = 12;
+    export let wrap: boolean = false;
 
     const readOnlyStore = new Compartment();
     const themeStore = new Compartment();
     const langStore = new Compartment();
+    const wrapStore = new Compartment();
 
     export let view: EditorView | null = null;
     $: view?.dispatch({ effects: readOnlyStore.reconfigure(EditorState.readOnly.of(readOnly)) });
     $: view?.dispatch({ effects: themeStore.reconfigure($mode === "dark" ? dark : light) });
     $: view?.dispatch({ effects: langStore.reconfigure(lang || []) });
+    $: view?.dispatch({ effects: wrapStore.reconfigure(wrap ? EditorView.lineWrapping : []) });
 
     let parent: HTMLDivElement;
 
@@ -138,6 +141,7 @@
                     readOnlyStore.of(EditorState.readOnly.of(readOnly)),
                     themeStore.of($mode === "dark" ? dark : light),
                     langStore.of(lang || []),
+                    wrapStore.of(wrap ? EditorView.lineWrapping : []),
                     styles,
                     EditorView.updateListener.of((e) => {
                         if (e.docChanged) {

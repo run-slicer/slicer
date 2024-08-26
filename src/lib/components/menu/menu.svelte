@@ -30,9 +30,13 @@
     } from "$lib/components/ui/menubar";
     import { Terminal, Folders, GitBranchPlus, Clipboard, Binary, Code, Globe } from "lucide-svelte";
     import { openEntry, loadClipboardScript } from "./";
+    import { writable } from "svelte/store";
 
     $: tabType = $currentTab?.type;
     $: entry = $currentTab?.entry || null;
+
+    $: isEditor = Boolean($currentTab?.state?.editorWrap);
+    $: editorWrap = $currentTab?.state?.editorWrap || writable(false);
 
     let aboutOpen = false;
     let clearConfirmOpen = false;
@@ -92,6 +96,17 @@
                     </MenubarCheckboxItem>
                     <MenubarCheckboxItem bind:checked={$loggingOpen}>
                         <Terminal size={16} class="mr-1.5" /> Logging
+                    </MenubarCheckboxItem>
+                </MenubarSubContent>
+            </MenubarSub>
+            <MenubarSub disabled={!isEditor}>
+                <MenubarSubTrigger>Editor</MenubarSubTrigger>
+                <MenubarSubContent class="w-[12rem]">
+                    <MenubarCheckboxItem
+                        disabled={!(Boolean($currentTab?.state?.editorWrap))}
+                        bind:checked={$editorWrap}
+                    >
+                        Wrap lines
                     </MenubarCheckboxItem>
                 </MenubarSubContent>
             </MenubarSub>
