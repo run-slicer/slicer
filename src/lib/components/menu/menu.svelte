@@ -3,7 +3,7 @@
     import { Separator } from "$lib/components/ui/separator";
     import { add, load, close, export_ } from "$lib/action";
     import { projectOpen, loggingOpen, editorWrap } from "$lib/state";
-    import { entries } from "$lib/workspace";
+    import { entries, EntryType } from "$lib/workspace";
     import { type ProtoScript, scripts } from "$lib/script";
     import { current as currentTab, TabType } from "$lib/tab";
     import { Modifier } from "$lib/shortcut";
@@ -106,21 +106,21 @@
             <MenubarSeparator />
             <MenubarItem
                 class="justify-between"
-                disabled={entry === null || tabType === TabType.CODE}
+                disabled={!entry || entry.type === EntryType.ARCHIVE || tabType === TabType.CODE}
                 on:click={() => openEntry(TabType.CODE)}
             >
                 Code <Code size={16} />
             </MenubarItem>
             <MenubarItem
                 class="justify-between"
-                disabled={entry === null || tabType === TabType.HEX}
+                disabled={!entry || entry.type === EntryType.ARCHIVE || tabType === TabType.HEX}
                 on:click={() => openEntry(TabType.HEX)}
             >
                 Hexadecimal <Binary size={16} />
             </MenubarItem>
             <MenubarItem
                 class="justify-between"
-                disabled={entry === null || tabType === TabType.FLOW_GRAPH}
+                disabled={!entry || entry.type === EntryType.ARCHIVE || tabType === TabType.FLOW_GRAPH}
                 on:click={() => openEntry(TabType.FLOW_GRAPH)}
             >
                 Flow graph <GitBranchPlus size={16} />

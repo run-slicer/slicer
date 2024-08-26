@@ -1,7 +1,7 @@
 import { derived, get, writable } from "svelte/store";
 import { type Node, read } from "@run-slicer/asm";
 import { type Zip, type Entry as ZipEntry, readBlob } from "@run-slicer/zip";
-import { error } from "$lib/logging";
+import { error, warn } from "$lib/logging";
 import { rootContext } from "$lib/script";
 
 export interface BlobLike {
@@ -34,7 +34,7 @@ const parseName = (name: string): Named => {
 
     const dotIndex = shortName.lastIndexOf(".");
     if (dotIndex !== -1) {
-        extension = shortName.substring(dotIndex + 1);
+        extension = shortName.substring(dotIndex + 1).toLowerCase();
     }
 
     return { name, shortName, extension };
@@ -46,8 +46,9 @@ export const enum DataType {
     MEMORY,
 }
 
-export interface Data extends BlobLike, Named {
+export interface Data extends BlobLike {
     type: DataType;
+    name: string;
 }
 
 export interface FileData extends Data {
@@ -114,10 +115,10 @@ export interface MemoryData extends Data {
 }
 
 const decoder = new TextDecoder();
-export const memoryData = (name: Named, data: Uint8Array): MemoryData => {
+export const memoryData = (name: string, data: Uint8Array): MemoryData => {
     return {
-        ...name,
         type: DataType.MEMORY,
+        name,
         data,
         stream(): Promise<ReadableStream<Uint8Array>> {
             return Promise.resolve(
@@ -146,7 +147,7 @@ export interface TransformData extends MemoryData {
 }
 
 export const transformData = (origin: Data, data: Uint8Array): TransformData => {
-    return { ...memoryData(origin, data), origin };
+    return { ...memoryData(origin.name, data), origin };
 };
 
 export const unwrapTransform = (data: Data): Data => {
@@ -155,12 +156,18 @@ export const unwrapTransform = (data: Data): Data => {
 
 export const enum EntryType {
     FILE,
-    CLASS,
+    ARCHIVE,
+    CLASS, // only by readDetail
 }
 
-export interface Entry {
+export interface Entry extends Named {
     type: EntryType;
     data: Data;
+}
+
+export interface ArchiveEntry extends Entry {
+    type: EntryType.ARCHIVE;
+    archive: Zip;
 }
 
 export interface ClassEntry extends Entry {
@@ -181,7 +188,7 @@ export const readDetail = async (entry: Entry): Promise<Entry> => {
         try {
             const event = await rootContext.dispatchEvent({
                 type: "preload",
-                name: entry.data.name,
+                name: entry.name,
                 data: buffer,
             });
 
@@ -195,7 +202,7 @@ export const readDetail = async (entry: Entry): Promise<Entry> => {
                 data,
             } as ClassEntry;
         } catch (e) {
-            error(`failed to read class ${entry.data.name}`, e);
+            error(`failed to read class ${entry.name}`, e);
         }
     }
 
@@ -213,12 +220,8 @@ entries.subscribe((e) => {
 export const classes = derived(entries, ($entries) => {
     return new Map(
         Array.from($entries.values())
-            .filter((e) => e.data.extension === "class")
-            .map((e) => {
-                const name = e.data.name;
-
-                return [name.substring(0, name.indexOf(".class")), e];
-            })
+            .filter((e) => e.extension === "class")
+            .map((e) => [e.name.substring(0, e.name.indexOf(".class")), e])
     );
 });
 
@@ -227,6 +230,8 @@ export interface LoadResult {
     created: boolean;
 }
 
+const zipExtensions = new Set(["zip", "jar", "war", "ear", "jmod"]);
+
 const load0 = async (entries: Map<string, Entry>, d: Data): Promise<LoadResult> => {
     const dupeEntry = entries.get(d.name);
     if (dupeEntry) {
@@ -234,18 +239,31 @@ const load0 = async (entries: Map<string, Entry>, d: Data): Promise<LoadResult> 
     }
 
     const entry: Entry = {
+        ...parseName(d.name),
         type: EntryType.FILE,
         data: d,
     };
+    if (entry.extension && zipExtensions.has(entry.extension)) {
+        try {
+            const archiveEntry = entry as ArchiveEntry;
 
-    return { entry: entry, created: true };
+            // if we're loading a nested archive, hope it's uncompressed or pretty small
+            // if it isn't, then we're loading the entire thing into memory!
+            archiveEntry.archive = await readBlob(await d.blob());
+            archiveEntry.type = EntryType.ARCHIVE;
+        } catch (e) {
+            warn(`failed to read archive-like entry ${entry.name}`, e);
+        }
+    }
+
+    return { entry, created: true };
 };
 
 export const load = async (d: Data): Promise<LoadResult> => {
     const result = await load0(get(entries), d);
     if (result.created) {
         entries.update(($entries) => {
-            $entries.set(d.name, result.entry);
+            $entries.set(result.entry.name, result.entry);
             return $entries;
         });
     }
@@ -260,7 +278,7 @@ export const loadBatch = async (d: Data[]): Promise<LoadResult[]> => {
     entries.update(($entries) => {
         for (const { entry, created } of results) {
             if (created) {
-                $entries.set(entry.data.name, entry);
+                $entries.set(entry.name, entry);
             }
         }
         return $entries;
@@ -282,7 +300,7 @@ export const loadFile = async (f: File): Promise<LoadResult[]> => {
 
 export const remove = (entry: Entry) => {
     entries.update(($entries) => {
-        $entries.delete(entry.data.name);
+        $entries.delete(entry.name);
         return $entries;
     });
 };

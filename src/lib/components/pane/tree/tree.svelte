@@ -22,7 +22,7 @@
     const updateNode = (entry: Entry) => {
         let curr = root;
 
-        for (const part of entry.data.name.split("/")) {
+        for (const part of entry.name.split("/")) {
             if (!curr.nodes) curr.nodes = [];
 
             let next = curr.nodes.find((n) => n.label === part);

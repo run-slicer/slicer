@@ -5,11 +5,11 @@ import { tabIcon } from "$lib/components/icons";
 
 export const open = async (entry: Entry, type: TabType = TabType.CODE) => {
     let tab = get(current);
-    if (tab?.type === type && tab?.entry?.data?.name === entry.data.name) {
+    if (tab?.type === type && tab?.entry?.name === entry.name) {
         return; // already opened
     }
 
-    const id = `${type}:${entry.data.name}`;
+    const id = `${type}:${entry.name}`;
 
     tab = find(id);
     if (!tab) {
@@ -17,9 +17,9 @@ export const open = async (entry: Entry, type: TabType = TabType.CODE) => {
         tab = update({
             id,
             type,
-            name: entry.data.shortName,
+            name: entry.shortName,
             entry: await readDetail(entry),
-            icon: tabIcon(type, entry.data.shortName),
+            icon: tabIcon(type, entry.shortName),
         });
     }
 

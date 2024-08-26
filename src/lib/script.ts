@@ -43,7 +43,7 @@ const wrapEntry = (e: Entry): ScriptEntry => {
             break;
     }
 
-    return { type, name: e.data.name };
+    return { type, name: e.name };
 };
 
 const wrapTab = (t: Tab): ScriptTab => {
@@ -83,6 +83,7 @@ const editorCtx: EditorContext = {
             if (hard && tab.entry) {
                 // script wanted a hard refresh, make sure to trigger a preload event
                 tab.entry = await readDetail({
+                    ...tab.entry,
                     type: EntryType.FILE,
                     // unwrap any transforms, a script may have touched the tab entry
                     data: unwrapTransform(tab.entry.data),

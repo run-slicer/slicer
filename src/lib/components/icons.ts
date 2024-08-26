@@ -62,6 +62,9 @@ export const fileIcon = (label: string): StyledIcon => {
                 return { icon: FileArchive, classes: ["text-red-500"] };
             case "zip":
             case "tar":
+            case "war":
+            case "ear":
+            case "jmod":
             case "gz":
             case "rar":
             case "lzma":

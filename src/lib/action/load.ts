@@ -17,7 +17,7 @@ export const load = async () => {
         if (skipped.length <= 5) {
             for (const result of skipped) {
                 toast.info("Duplicate entry", {
-                    description: `Skipped adding ${result.entry.data.shortName}, as it is already present in the workspace.`,
+                    description: `Skipped adding ${result.entry.shortName}, as it is already present in the workspace.`,
                 });
             }
         } else {

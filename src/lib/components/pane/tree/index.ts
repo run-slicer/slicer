@@ -30,7 +30,7 @@ const binaryExtensions = new Set([
 ]);
 
 const detectTabType = (entry: Entry): TabType => {
-    return entry.data.extension && binaryExtensions.has(entry.data.extension) ? TabType.HEX : TabType.CODE;
+    return entry.extension && binaryExtensions.has(entry.extension) ? TabType.HEX : TabType.CODE;
 };
 
 export const openEntry = (data: Node, type?: TabType) => open(data.entry!, type || detectTabType(data.entry!));

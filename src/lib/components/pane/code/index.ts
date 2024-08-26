@@ -17,7 +17,7 @@ export const detectLanguage = (tabType: TabType, entry: Entry | null, disasm: Di
         return disasm.lang || "plaintext";
     }
 
-    return entry.data.extension ? fromExtension(entry.data.extension) : "plaintext";
+    return entry.extension ? fromExtension(entry.extension) : "plaintext";
 };
 
 export const read = async (tabType: TabType, entry: Entry | null, disasm: Disassembler): Promise<string> => {
@@ -25,7 +25,7 @@ export const read = async (tabType: TabType, entry: Entry | null, disasm: Disass
         return "";
     }
 
-    const { result } = await timed(`read ${entry.data.name}`, async () => {
+    const { result } = await timed(`read ${entry.name}`, async () => {
         if (tabType === TabType.HEX) {
             return await formatHex(entry.data);
         } else if (entry.type === EntryType.CLASS) {

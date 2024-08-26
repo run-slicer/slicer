@@ -23,32 +23,34 @@
     <ContextMenuLabel class="overflow-hidden text-ellipsis text-center">{data.label}</ContextMenuLabel>
     <ContextMenuSeparator />
     {#if data.entry}
-        {#if data.entry.type === EntryType.FILE}
-            <ContextMenuSub>
-                <ContextMenuSubTrigger>Open as</ContextMenuSubTrigger>
-                <ContextMenuSubContent class="w-[12rem]">
+        <ContextMenuSub>
+            <ContextMenuSubTrigger>Open as</ContextMenuSubTrigger>
+            <ContextMenuSubContent class="w-[12rem]">
+                {#if data.entry.type !== EntryType.ARCHIVE}
                     <ContextMenuItem
                         class="flex justify-between"
                         on:click={() => dispatch("action", { type: "open", data, tabType: TabType.CODE })}
                     >
                         Code <Code size={16} />
                     </ContextMenuItem>
-                    <ContextMenuItem
-                        class="flex justify-between"
-                        on:click={() => dispatch("action", { type: "open", data, tabType: TabType.HEX })}
-                    >
-                        Hexadecimal <Binary size={16} />
-                    </ContextMenuItem>
+                {/if}
+                <ContextMenuItem
+                    class="flex justify-between"
+                    on:click={() => dispatch("action", { type: "open", data, tabType: TabType.HEX })}
+                >
+                    Hexadecimal <Binary size={16} />
+                </ContextMenuItem>
+                {#if data.entry.type !== EntryType.ARCHIVE}
                     <ContextMenuItem
                         class="flex justify-between"
                         on:click={() => dispatch("action", { type: "open", data, tabType: TabType.FLOW_GRAPH })}
                     >
                         Flow graph <GitBranchPlus size={16} />
                     </ContextMenuItem>
-                </ContextMenuSubContent>
-            </ContextMenuSub>
-            <ContextMenuSeparator />
-        {/if}
+                {/if}
+            </ContextMenuSubContent>
+        </ContextMenuSub>
+        <ContextMenuSeparator />
         <ContextMenuItem class="flex justify-between" on:click={() => dispatch("action", { type: "download", data })}>
             Download <Download size={16} />
         </ContextMenuItem>
