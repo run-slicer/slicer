@@ -1,5 +1,5 @@
 import type { Entry } from "$lib/workspace";
-import { get, type Writable, writable } from "svelte/store";
+import { get, writable } from "svelte/store";
 import type { StyledIcon } from "$lib/components/icons";
 import { Sparkles } from "lucide-svelte";
 
@@ -10,20 +10,15 @@ export const enum TabType {
     FLOW_GRAPH = "flow_graph",
 }
 
-export interface TabState {
-    dirty: boolean;
-    _dirtyFlag?: any;
-
-    editorWrap?: Writable<boolean>;
-}
-
 export interface Tab {
     id: string;
     type: TabType;
     name: string;
     icon?: StyledIcon;
     entry?: Entry;
-    state: TabState;
+
+    _dirty?: boolean;
+    _dirtyFlag?: any;
 }
 
 const welcomeTab: Tab = {
@@ -31,7 +26,6 @@ const welcomeTab: Tab = {
     type: TabType.WELCOME,
     name: "Welcome",
     icon: { icon: Sparkles, classes: ["text-muted-foreground"] },
-    state: { dirty: false },
 };
 
 export const tabs = writable<Map<string, Tab>>(new Map([[welcomeTab.id, welcomeTab]]));
@@ -56,19 +50,19 @@ export const update = (tab: Tab): Tab => {
 };
 
 export const refresh = (tab: Tab): Tab => {
-    tab.state.dirty = true;
+    tab._dirty = true;
     return update(tab);
 };
 
 export const checkDirty = (tab: Tab, current: Tab | null): any => {
-    if (current?.id === tab.id && tab.state.dirty) {
+    if (current?.id === tab.id && tab._dirty) {
         // change the flag only when we're active,
         // we want to refresh tabs lazily
-        tab.state.dirty = false;
-        tab.state._dirtyFlag = {};
+        tab._dirty = false;
+        tab._dirtyFlag = {};
     }
 
-    return tab.state._dirtyFlag;
+    return tab._dirtyFlag;
 };
 
 export const remove = (id: string) => {

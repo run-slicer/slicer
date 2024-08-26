@@ -1,6 +1,6 @@
 import { type Entry, readDetail } from "$lib/workspace";
-import { current, find, TabType, update } from "$lib/tab";
-import { get, writable } from "svelte/store";
+import { current, update, TabType, find } from "$lib/tab";
+import { get } from "svelte/store";
 import { tabIcon } from "$lib/components/icons";
 
 export const open = async (entry: Entry, type: TabType = TabType.CODE) => {
@@ -20,10 +20,6 @@ export const open = async (entry: Entry, type: TabType = TabType.CODE) => {
             name: entry.data.shortName,
             entry: await readDetail(entry),
             icon: tabIcon(type, entry.data.shortName),
-            state: {
-                dirty: false,
-                editorWrap: type === TabType.CODE ? writable(false) : undefined,
-            },
         });
     }
 

@@ -9,7 +9,7 @@
     import { Select, SelectContent, SelectItem, SelectTrigger } from "$lib/components/ui/select";
     import { all as disasms } from "$lib/disasm";
     import vf from "$lib/disasm/vf";
-    import { toolsDisasm, editorTextSize, editorTextSizeSync } from "$lib/state";
+    import { toolsDisasm, editorTextSize, editorTextSizeSync, editorWrap } from "$lib/state";
     import { get, writable } from "svelte/store";
 
     export let tab: Tab;
@@ -29,16 +29,13 @@
     $: textSize = $editorTextSizeSync
         ? editorTextSize
         : writable(get(editorTextSize) /* immediate value, no subscription */);
-
-    const wrapStore = tab.state.editorWrap;
-    $: wrap = wrapStore ? $wrapStore : false;
 </script>
 
 <div class="relative basis-full overflow-hidden scrollbar-thin">
     {#await Promise.all([import("./editor.svelte"), loadLanguage(language), read(tab.type, entry, disasm)])}
         <Loading value={shouldDisasm ? "Disassembling..." : "Reading..."} overlay />
     {:then [editor, lang, value]}
-        <svelte:component this={editor.default} {value} readOnly {lang} bind:textSize={$textSize} {wrap} />
+        <svelte:component this={editor.default} {value} readOnly {lang} bind:textSize={$textSize} wrap={$editorWrap} />
     {/await}
     {#if shouldDisasm}
         <div class="absolute bottom-0 right-0 m-[15px]">

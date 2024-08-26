@@ -2,7 +2,7 @@
     import { userPrefersMode } from "mode-watcher";
     import { Separator } from "$lib/components/ui/separator";
     import { add, load, close, export_ } from "$lib/action";
-    import { projectOpen, loggingOpen } from "$lib/state";
+    import { projectOpen, loggingOpen, editorWrap } from "$lib/state";
     import { entries } from "$lib/workspace";
     import { type ProtoScript, scripts } from "$lib/script";
     import { current as currentTab, TabType } from "$lib/tab";
@@ -28,15 +28,11 @@
         MenubarRadioItem,
         MenubarCheckboxItem,
     } from "$lib/components/ui/menubar";
-    import { Terminal, Folders, GitBranchPlus, Clipboard, Binary, Code, Globe } from "lucide-svelte";
+    import { Terminal, Folders, GitBranchPlus, Clipboard, Binary, Code, Globe, WrapText } from "lucide-svelte";
     import { openEntry, loadClipboardScript } from "./";
-    import { writable } from "svelte/store";
 
     $: tabType = $currentTab?.type;
     $: entry = $currentTab?.entry || null;
-
-    $: isEditor = Boolean($currentTab?.state?.editorWrap);
-    $: editorWrap = $currentTab?.state?.editorWrap || writable(false);
 
     let aboutOpen = false;
     let clearConfirmOpen = false;
@@ -91,19 +87,19 @@
             <MenubarSub>
                 <MenubarSubTrigger>Pane</MenubarSubTrigger>
                 <MenubarSubContent class="w-[12rem]">
-                    <MenubarCheckboxItem bind:checked={$projectOpen}>
-                        <Folders size={16} class="mr-1.5" /> Project
+                    <MenubarCheckboxItem class="justify-between" bind:checked={$projectOpen}>
+                        Project <Folders size={16} />
                     </MenubarCheckboxItem>
-                    <MenubarCheckboxItem bind:checked={$loggingOpen}>
-                        <Terminal size={16} class="mr-1.5" /> Logging
+                    <MenubarCheckboxItem class="justify-between" bind:checked={$loggingOpen}>
+                        Logging <Terminal size={16} />
                     </MenubarCheckboxItem>
                 </MenubarSubContent>
             </MenubarSub>
-            <MenubarSub disabled={!isEditor}>
+            <MenubarSub>
                 <MenubarSubTrigger>Editor</MenubarSubTrigger>
                 <MenubarSubContent class="w-[12rem]">
-                    <MenubarCheckboxItem disabled={!Boolean($currentTab?.state?.editorWrap)} bind:checked={$editorWrap}>
-                        Wrap lines
+                    <MenubarCheckboxItem class="justify-between" bind:checked={$editorWrap}>
+                        Wrap lines <WrapText size={16} />
                     </MenubarCheckboxItem>
                 </MenubarSubContent>
             </MenubarSub>
