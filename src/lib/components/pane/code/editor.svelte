@@ -95,7 +95,7 @@
     export let value: string = "";
     export let readOnly: boolean = false;
     export let lang: LanguageSupport | null = null;
-    export let textSize: number = 12;
+    export let textSize: number = 0.75;
     export let wrap: boolean = false;
 
     const readOnlyStore = new Compartment();
