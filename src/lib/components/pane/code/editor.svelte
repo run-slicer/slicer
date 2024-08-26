@@ -64,11 +64,6 @@
             // use new font
             "font-family":
                 '"Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
-            "font-size": "12px",
-        },
-        ".cm-gutterElement": {
-            // use new font
-            "font-size": "12px",
         },
         ".cm-panels": {
             // fix color on panel container
@@ -121,12 +116,13 @@
         if (oldValue !== value) {
             view?.dispatch({ changes: { from: 0, to: view?.state?.doc?.length || 0, insert: value } });
         }
+    }
 
+    $: {
         if (view) {
-            view.contentDOM.style.fontSize = `${textSize}px`;
-            for (const num of parent.querySelectorAll(".cm-gutterElement")) {
-                (num as HTMLElement).style.fontSize = view.contentDOM.style.fontSize;
-            }
+            view.scrollDOM.style.fontSize = `${textSize}rem`;
+            view.contentDOM.style.fontSize = `${textSize}rem`;
+            view.requestMeasure();
         }
     }
 
@@ -162,8 +158,8 @@
             if (e.ctrlKey) {
                 e.preventDefault();
 
-                const toAdd = e.deltaY > 0 ? -1 : 1;
-                textSize = Math.max(8, Math.min(24, textSize + toAdd));
+                const toAdd = e.deltaY > 0 ? -0.05 : 0.05;
+                textSize = Math.max(0.25, Math.min(4, textSize + toAdd));
             }
         });
     });

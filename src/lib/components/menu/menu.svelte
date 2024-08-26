@@ -102,10 +102,7 @@
             <MenubarSub disabled={!isEditor}>
                 <MenubarSubTrigger>Editor</MenubarSubTrigger>
                 <MenubarSubContent class="w-[12rem]">
-                    <MenubarCheckboxItem
-                        disabled={!(Boolean($currentTab?.state?.editorWrap))}
-                        bind:checked={$editorWrap}
-                    >
+                    <MenubarCheckboxItem disabled={!Boolean($currentTab?.state?.editorWrap)} bind:checked={$editorWrap}>
                         Wrap lines
                     </MenubarCheckboxItem>
                 </MenubarSubContent>
