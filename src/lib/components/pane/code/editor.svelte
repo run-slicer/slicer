@@ -92,6 +92,7 @@
     import { EditorView } from "@codemirror/view";
     import { dark, light } from "./theme";
     import { Compartment } from "@codemirror/state";
+    import { zoomSize } from "$lib/state";
 
     export let value: string = "";
     export let readOnly: boolean = false;
@@ -140,6 +141,19 @@
             }),
             parent,
         });
+        zoomSize.subscribe((size) => {
+            view!.contentDOM.style.fontSize = `${size}px`;
+            for (const num of parent.querySelectorAll('.cm-gutterElement')) {
+                (num as HTMLElement).style.fontSize = view!.contentDOM.style.fontSize;
+            }
+        });
+        parent.addEventListener('wheel', (e) => {
+            if (e.ctrlKey) {
+                e.preventDefault();
+                const toAdd = e.deltaY > 0 ? -1 : 1;
+                zoomSize.set(Math.max(8, Math.min(24, $zoomSize + toAdd)));
+            }
+        })
     });
 </script>
 
