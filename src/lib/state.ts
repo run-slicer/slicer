@@ -14,3 +14,4 @@ export const loggingOpen = persisted<boolean>(`${root}.logging.open`, false);
 export const loggingMaxEntries = persisted<number>(`${root}.logging.max-entries`, 50);
 export const scriptingScripts = persisted<ScriptData[]>(`${root}.scripting.scripts`, []);
 export const editorTextSize = persisted<number>(`${root}.editor.text-size`, 12);
+export const editorTextSizeSync = persisted<boolean>(`${root}.editor.text-size.sync`, true);
