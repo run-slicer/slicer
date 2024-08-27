@@ -1,6 +1,6 @@
 import { derived, get, writable } from "svelte/store";
 import { type Node, read } from "@run-slicer/asm";
-import { type Zip, type Entry as ZipEntry, readBlob } from "@run-slicer/zip";
+import type { Zip, Entry as ZipEntry } from "@run-slicer/zip";
 import { error, warn } from "$lib/logging";
 import { rootContext } from "$lib/script";
 
@@ -255,6 +255,8 @@ const load0 = async (entries: Map<string, Entry>, d: Data, base: string = ""): P
         try {
             const archiveEntry = entry as ArchiveEntry;
 
+            const { readBlob } = await import("@run-slicer/zip");
+
             // if we're loading a nested archive, hope it's uncompressed or pretty small
             // if it isn't, then we're loading the entire thing into memory!
             archiveEntry.archive = await readBlob(await d.blob());
@@ -296,6 +298,8 @@ export const loadFile = async (f: File): Promise<LoadResult[]> => {
 };
 
 export const loadZip = async (f: File): Promise<LoadResult[]> => {
+    const { readBlob } = await import("@run-slicer/zip");
+
     return load(...(await zipData(await readBlob(f))));
 };
 
