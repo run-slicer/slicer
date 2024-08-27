@@ -56,7 +56,7 @@ export const createComputedGraph = (method: Member | null, pool: Pool, handlerEd
     });
 
     const graph = new graphlib.Graph();
-    graph.setGraph({ rankdir: "TB" });
+    graph.setGraph({ rankdir: "TB", ranker: "longest-path" });
     graph.setDefaultEdgeLabel(() => ({}));
 
     data.forEach((nodeData) => {
