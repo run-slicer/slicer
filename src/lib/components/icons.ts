@@ -68,7 +68,7 @@ export const fileIcon = (label: string): StyledIcon => {
             case "gz":
             case "rar":
             case "lzma":
-                return { icon: FileArchive, classes: ["fill-muted"] };
+                return { icon: FileArchive, classes: [] };
             case "properties":
             case "md":
             case "rst":

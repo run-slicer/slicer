@@ -1,11 +1,11 @@
 import { toast } from "svelte-sonner";
-import { loadFile } from "$lib/workspace";
+import { loadZip } from "$lib/workspace";
 import { partition } from "$lib/arrays";
 import { readFiles, timed } from "./utils";
 
 export const load = async () => {
     const results = await Promise.all(
-        (await readFiles(".jar,.zip", true)).map((f) => timed(`load ${f.name}`, () => loadFile(f)))
+        (await readFiles(".jar,.zip", true)).map((f) => timed(`load ${f.name}`, () => loadZip(f)))
     );
 
     const time = results.reduce((acc, v) => acc + v.time, 0);
@@ -29,7 +29,7 @@ export const load = async () => {
     }
     if (created.length > 0) {
         toast.success("Loaded", {
-            description: `Loaded ${created.length} file(s) in ${time}ms.`,
+            description: `Loaded ${created.length} ${created.length === 1 ? "entry" : "entries"} in ${time}ms.`,
         });
     }
 };

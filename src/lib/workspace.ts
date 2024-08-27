@@ -59,8 +59,8 @@ export interface FileData extends Data {
 export const fileData = (file: File): FileData => {
     return {
         type: DataType.FILE,
+        name: file.name,
         file: file,
-        ...parseName(file.name),
         stream(): Promise<ReadableStream<Uint8Array>> {
             return Promise.resolve(file.stream());
         },
@@ -82,17 +82,15 @@ export interface ZipData extends Data {
     entry: ZipEntry;
 }
 
-export const zipData = async (file: File): Promise<ZipData[]> => {
-    const info = await readBlob(file);
-
-    return info.entries
+export const zipData = async (zip: Zip): Promise<ZipData[]> => {
+    return zip.entries
         .filter((v) => !v.isDirectory)
         .map((v) => {
             return {
                 type: DataType.ZIP,
-                parent: info,
+                name: v.name,
+                parent: zip,
                 entry: v,
-                ...parseName(v.name),
                 async stream(): Promise<ReadableStream<Uint8Array>> {
                     return (await v.blob()).stream();
                 },
@@ -221,7 +219,9 @@ export const classes = derived(entries, ($entries) => {
     return new Map(
         Array.from($entries.values())
             .filter((e) => e.extension === "class")
-            .map((e) => [e.name.substring(0, e.name.indexOf(".class")), e])
+            // use the data name, since we don't want the prepended nested archive path
+            // this will be weird when you have conflicting classes across archives, but oh well
+            .map((e) => [e.data.name.substring(0, e.data.name.indexOf(".class")), e])
     );
 });
 
@@ -232,17 +232,25 @@ export interface LoadResult {
 
 const zipExtensions = new Set(["zip", "jar", "war", "ear", "jmod"]);
 
-const load0 = async (entries: Map<string, Entry>, d: Data): Promise<LoadResult> => {
+const joinPath = (...parts: string[]): string => {
+    return parts.filter((p) => Boolean(p)).join("/");
+};
+
+const load0 = async (entries: Map<string, Entry>, d: Data, base: string = ""): Promise<LoadResult[]> => {
     const dupeEntry = entries.get(d.name);
     if (dupeEntry) {
-        return { entry: dupeEntry, created: false };
+        return [{ entry: dupeEntry, created: false }];
     }
 
+    const results: LoadResult[] = [];
+
     const entry: Entry = {
-        ...parseName(d.name),
+        ...parseName(joinPath(base, d.name)),
         type: EntryType.FILE,
         data: d,
     };
+    results.push({ entry, created: true });
+
     if (entry.extension && zipExtensions.has(entry.extension)) {
         try {
             const archiveEntry = entry as ArchiveEntry;
@@ -251,51 +259,44 @@ const load0 = async (entries: Map<string, Entry>, d: Data): Promise<LoadResult> 
             // if it isn't, then we're loading the entire thing into memory!
             archiveEntry.archive = await readBlob(await d.blob());
             archiveEntry.type = EntryType.ARCHIVE;
+
+            // read nested archives
+            for (const zipEntry of await zipData(archiveEntry.archive)) {
+                results.push(...(await load0(entries, zipEntry, entry.name)));
+            }
         } catch (e) {
             warn(`failed to read archive-like entry ${entry.name}`, e);
         }
     }
 
-    return { entry, created: true };
+    return results;
 };
 
-export const load = async (d: Data): Promise<LoadResult> => {
-    const result = await load0(get(entries), d);
-    if (result.created) {
+export const load = async (...d: Data[]): Promise<LoadResult[]> => {
+    const entries0 = get(entries);
+    const results = (await Promise.all(d.map((data) => load0(entries0, data)))).flat();
+
+    const anyCreated = results.some((r) => r.created);
+    if (anyCreated) {
         entries.update(($entries) => {
-            $entries.set(result.entry.name, result.entry);
+            for (const { entry, created } of results) {
+                if (created) {
+                    $entries.set(entry.name, entry);
+                }
+            }
             return $entries;
         });
     }
-
-    return result;
-};
-
-export const loadBatch = async (d: Data[]): Promise<LoadResult[]> => {
-    const entries0 = get(entries);
-
-    const results = await Promise.all(d.map((data) => load0(entries0, data)));
-    entries.update(($entries) => {
-        for (const { entry, created } of results) {
-            if (created) {
-                $entries.set(entry.name, entry);
-            }
-        }
-        return $entries;
-    });
 
     return results;
 };
 
 export const loadFile = async (f: File): Promise<LoadResult[]> => {
-    const view = new DataView(await f.slice(0, 4).arrayBuffer());
+    return load(fileData(f));
+};
 
-    // TODO: ZIPs can have bogus data at the beginning, failing this check
-    if (view.byteLength >= 4 && view.getInt32(0, true) === 0x04034b50) {
-        return loadBatch(await zipData(f)); // detected zip header
-    }
-
-    return [await load(fileData(f))];
+export const loadZip = async (f: File): Promise<LoadResult[]> => {
+    return load(...(await zipData(await readBlob(f))));
 };
 
 export const remove = (entry: Entry) => {

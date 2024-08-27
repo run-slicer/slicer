@@ -1,17 +1,20 @@
 import { toast } from "svelte-sonner";
-import { fileData, load } from "$lib/workspace";
+import { loadFile } from "$lib/workspace";
 import { partition } from "$lib/arrays";
 import { readFiles, timed } from "./utils";
 
 export const add = async () => {
     const results = await Promise.all(
-        (await readFiles("", true)).map((f) => timed(`add ${f.name}`, () => load(fileData(f))))
+        (await readFiles("", true)).map((f) => timed(`add ${f.name}`, () => loadFile(f)))
     );
 
-    const [created, skipped] = partition(results, (r) => r.result.created);
+    const [created, skipped] = partition(
+        results.flatMap((r) => r.result),
+        (r) => r.created
+    );
     if (skipped.length > 0) {
         if (skipped.length <= 5) {
-            for (const { result } of skipped) {
+            for (const result of skipped) {
                 toast.info("Duplicate entry", {
                     description: `Skipped adding ${result.entry.name}, as it is already present in the workspace.`,
                 });
@@ -25,7 +28,7 @@ export const add = async () => {
     }
     if (created.length > 0) {
         toast.success("Added", {
-            description: `Added ${created.length} file(s).`,
+            description: `Added ${created.length} ${created.length === 1 ? "entry" : "entries"}.`,
         });
     }
 };
