@@ -5,7 +5,7 @@
     import { type ClassEntry, EntryType } from "$lib/workspace";
     import type { Tab } from "$lib/tab";
     import type { Member } from "@run-slicer/asm";
-    import { Lock, LockOpen } from "lucide-svelte";
+    import { Lock, LockOpen, Zap, ZapOff } from "lucide-svelte";
     import { mode } from "mode-watcher";
     import Loading from "$lib/components/loading.svelte";
     import { Select, SelectContent, SelectItem, SelectTrigger } from "$lib/components/ui/select";
@@ -29,14 +29,15 @@
     $: member = method.value !== -1 ? methods[method.value] : null;
 
     let draggable = false;
+    let showHandlerEdges = false;
 </script>
 
 <div class="relative h-full w-full">
     {#await Promise.all([import("@xyflow/svelte"), import("./node.svelte"), import("./")])}
         <Loading value="Loading..." overlay />
     {:then [{ Background, Controls, SvelteFlow, ControlButton }, FlowNode, { createComputedGraph }]}
-        {@const [nodes, edges] = createComputedGraph(member, pool)}
-        {#key member}
+        {@const [nodes, edges] = createComputedGraph(member, pool, showHandlerEdges)}
+        {#key [member, showHandlerEdges]}
             <SvelteFlow
                 nodes={writable(nodes)}
                 edges={writable(edges)}
@@ -59,6 +60,14 @@
                         aria-label="toggle interactivity"
                     >
                         <svelte:component this={draggable ? LockOpen : Lock} size={12} class="!fill-none" />
+                    </ControlButton>
+                    <ControlButton
+                        class="svelte-flow__controls-interactive"
+                        on:click={() => (showHandlerEdges = !showHandlerEdges)}
+                        title="toggle exception handler edges"
+                        aria-label="toggle exception handler edges"
+                    >
+                        <svelte:component this={showHandlerEdges ? Zap : ZapOff} size={12} class="!fill-none" />
                     </ControlButton>
                 </Controls>
             </SvelteFlow>

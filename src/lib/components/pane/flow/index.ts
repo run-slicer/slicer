@@ -1,6 +1,6 @@
 import type { Node, Edge, MarkerType } from "@xyflow/svelte";
 import type { Member } from "@run-slicer/asm";
-import type { Pool } from "@run-slicer/asm/pool";
+import { type Pool, formatEntry } from "@run-slicer/asm/pool";
 import type { CodeAttribute } from "@run-slicer/asm/attr";
 import { AttributeType } from "@run-slicer/asm/spec";
 import { formatInsn } from "@run-slicer/asm/insn";
@@ -29,7 +29,7 @@ const computeTextSize = (text: string): TextMetrics => {
 
 const NODE_MARGIN = 25;
 
-export const createComputedGraph = (method: Member | null, pool: Pool): [Node[], Edge[]] => {
+export const createComputedGraph = (method: Member | null, pool: Pool, handlerEdges: boolean): [Node[], Edge[]] => {
     if (!method) {
         return [[], []]; // no method
     }
@@ -88,31 +88,51 @@ export const createComputedGraph = (method: Member | null, pool: Pool): [Node[],
                 style: nodeData.node.offset === 0 ? "border: 1px solid hsl(var(--primary));" : undefined,
             };
         }),
-        edges.map((edge) => {
-            let label: string | undefined = undefined;
-            switch (edge.type) {
-                case EdgeType.CONDITION_FALSE:
-                    label = "false";
-                    break;
-                case EdgeType.CONDITION_TRUE:
-                    label = "true";
-                    break;
-                case EdgeType.SWITCH_DEFAULT:
-                    label = "default";
-                    break;
-            }
+        [
+            // jumps and immediate edges
+            ...edges.map((edge) => {
+                let label: string | undefined = undefined;
+                switch (edge.type) {
+                    case EdgeType.CONDITION_FALSE:
+                        label = "false";
+                        break;
+                    case EdgeType.CONDITION_TRUE:
+                        label = "true";
+                        break;
+                    case EdgeType.SWITCH_DEFAULT:
+                        label = "default";
+                        break;
+                }
 
-            return {
-                id: `edge-${edge.source}-${edge.target}`,
-                type: "smoothstep",
-                label,
-                source: `${edge.source}`,
-                target: `${edge.target}`,
-                animated: !edge.jump,
-                markerEnd: {
-                    type: "arrowclosed" as MarkerType /* skip non-type import */,
-                },
-            };
-        }),
+                return {
+                    id: `edge-${edge.source}-${edge.target}`,
+                    type: "smoothstep",
+                    label,
+                    source: `${edge.source}`,
+                    target: `${edge.target}`,
+                    animated: !edge.jump,
+                    markerEnd: {
+                        type: "arrowclosed" as MarkerType /* skip non-type import */,
+                    },
+                };
+            }),
+            // exception handlers
+            ...(handlerEdges ? nodes : []).flatMap((node) => {
+                return code.exceptionTable
+                    .filter((e) => node.offset >= e.startPC && node.insns[node.insns.length - 1].offset < e.endPC)
+                    .map((e) => ({
+                        id: `edge-exc-${node.offset}-${e.handlerPC}`,
+                        type: "smoothstep",
+                        style: "stroke: hsl(var(--destructive));",
+                        // https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-4.html#jvms-4.7.3 (exception_table[] -> catch_type)
+                        label: e.catchType === 0 ? "*" : formatEntry(pool[e.catchType]!, pool),
+                        source: `${node.offset}`,
+                        target: `${e.handlerPC}`,
+                        markerEnd: {
+                            type: "arrowclosed" as MarkerType /* skip non-type import */,
+                        },
+                    }));
+            }),
+        ],
     ];
 };
