@@ -1,16 +1,8 @@
-<script lang="ts" context="module">
-    import { writable } from "svelte/store";
-
-    export let currentMenu = writable({});
-</script>
-
 <script lang="ts">
     import { ChevronDown, ChevronRight, Folder } from "lucide-svelte";
     import { createEventDispatcher } from "svelte";
     import { cn } from "$lib/components/utils";
     import { fileIcon } from "$lib/components/icons";
-    import { ContextMenu, ContextMenuTrigger } from "$lib/components/ui/context-menu";
-    import NodeMenu from "./menu.svelte";
     import type { Node } from "./";
 
     export let data: Node;
@@ -29,66 +21,51 @@
     let hasNonLeaf = false;
     $: {
         hasNonLeaf = !data.nodes || data.nodes.some((n) => n.nodes);
-        if (data.nodes) {
+        if (data.nodes && hasNonLeaf) {
             // non-leaf nodes go first
             data.nodes.sort((a, b) => +Boolean(b.nodes) - +Boolean(a.nodes));
         }
     }
 
-    // this is a god-awful way to have only one context menu open at a time,
-    // but I do not care anymore - this works
-    const menuId = {};
-    const setOpened = (open: boolean) => {
-        if (open) {
-            $currentMenu = menuId;
-        }
-    };
-
     const dispatch = createEventDispatcher();
+    const handleContextMenu = (e: MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        dispatch("contextmenu", { event: new MouseEvent(e.type, e) /* clone */, data });
+    };
 </script>
 
-<div {...$$restProps}>
+<div role="button" tabindex="0" on:contextmenu={handleContextMenu} {...$$restProps}>
     {#if data.nodes}
-        <ContextMenu open={$currentMenu === menuId} onOpenChange={setOpened}>
-            <ContextMenuTrigger>
-                <button class="highlight flex w-full py-[0.2rem]" on:click={() => (expanded = !expanded)}>
-                    <svelte:component
-                        this={expanded ? ChevronDown : ChevronRight}
-                        size={14}
-                        class="my-auto mr-1 min-w-[14px] text-muted-foreground"
-                    />
-                    {#if data.entry}
-                        <svelte:component this={icon} size={16} class={cn("my-auto mr-1 min-w-[16px]", classes)} />
-                    {:else}
-                        <Folder size={16} class="my-auto mr-1 min-w-[16px] fill-muted" />
-                    {/if}
-                    <span class="text-sm">{data.label}</span>
-                </button>
-            </ContextMenuTrigger>
-            <NodeMenu {data} on:action />
-        </ContextMenu>
+        <button class="highlight flex w-full py-[0.2rem]" on:click={() => (expanded = !expanded)}>
+            <svelte:component
+                this={expanded ? ChevronDown : ChevronRight}
+                size={14}
+                class="my-auto mr-1 min-w-[14px] text-muted-foreground"
+            />
+            {#if data.entry}
+                <svelte:component this={icon} size={16} class={cn("my-auto mr-1 min-w-[16px]", classes)} />
+            {:else}
+                <Folder size={16} class="my-auto mr-1 min-w-[16px] fill-muted" />
+            {/if}
+            <span class="text-sm">{data.label}</span>
+        </button>
         {#if expanded}
             {#each data.nodes as node (node.label)}
                 <svelte:self
-                    bind:data={node}
-                    on:action
+                    data={node}
+                    on:open
+                    on:contextmenu
                     class={cn("ml-0.5 pl-[16px]", hasNonLeaf || "ml-1 pl-[32px]")}
                 />
             {/each}
         {/if}
     {:else}
-        <ContextMenu open={$currentMenu === menuId} onOpenChange={setOpened}>
-            <ContextMenuTrigger>
-                <button
-                    class="highlight flex w-full py-[0.2rem]"
-                    on:click={() => dispatch("action", { type: "open", data })}
-                >
-                    <svelte:component this={icon} size={16} class={cn("my-auto mr-1 min-w-[16px]", classes)} />
-                    <span class="text-sm">{data.label}</span>
-                </button>
-            </ContextMenuTrigger>
-            <NodeMenu {data} on:action />
-        </ContextMenu>
+        <button class="highlight flex w-full py-[0.2rem]" on:click={() => dispatch("open", { data })}>
+            <svelte:component this={icon} size={16} class={cn("my-auto mr-1 min-w-[16px]", classes)} />
+            <span class="text-sm">{data.label}</span>
+        </button>
     {/if}
 </div>
 
