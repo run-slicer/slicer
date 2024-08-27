@@ -3,6 +3,7 @@ import { type Node, read } from "@run-slicer/asm";
 import type { Zip, Entry as ZipEntry } from "@run-slicer/zip";
 import { error, warn } from "$lib/logging";
 import { rootContext } from "$lib/script";
+import { workspaceNestedArchives } from "$lib/state";
 
 export interface BlobLike {
     stream(): Promise<ReadableStream<Uint8Array>>;
@@ -252,6 +253,8 @@ const load0 = async (entries: Map<string, Entry>, d: Data, base: string = ""): P
     results.push({ entry, created: true });
 
     if (entry.extension && zipExtensions.has(entry.extension)) {
+        const shouldExpandNested = get(workspaceNestedArchives);
+
         try {
             const archiveEntry = entry as ArchiveEntry;
 
@@ -263,8 +266,10 @@ const load0 = async (entries: Map<string, Entry>, d: Data, base: string = ""): P
             archiveEntry.type = EntryType.ARCHIVE;
 
             // read nested archives
-            for (const zipEntry of await zipData(archiveEntry.archive)) {
-                results.push(...(await load0(entries, zipEntry, entry.name)));
+            if (shouldExpandNested) {
+                for (const zipEntry of await zipData(archiveEntry.archive)) {
+                    results.push(...(await load0(entries, zipEntry, entry.name)));
+                }
             }
         } catch (e) {
             warn(`failed to read archive-like entry ${entry.name}`, e);

@@ -8,6 +8,7 @@ export interface ScriptData {
     load: boolean;
 }
 
+export const workspaceNestedArchives = persisted<boolean>(`${root}.workspace.nested-archives`, true);
 export const projectOpen = persisted<boolean>(`${root}.project.open`, true);
 export const toolsDisasm = persisted<string>(`${root}.tools.disasm`, vf.id);
 export const loggingOpen = persisted<boolean>(`${root}.logging.open`, false);
