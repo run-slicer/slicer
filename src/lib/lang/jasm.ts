@@ -25,6 +25,12 @@ const parser: StreamParser<State> = {
             return null;
         }
 
+        // comments
+        if (stream.match("//")) {
+            stream.skipToEnd();
+            return "comment";
+        }
+
         // identifiers
         if (!state.inLabel && stream.match(/^\.([^"'{},:\s]+)/)) {
             stream.eatSpace();
