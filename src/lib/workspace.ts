@@ -179,29 +179,34 @@ export const readDetail = async (entry: Entry): Promise<Entry> => {
         return entry; // not a generic entry
     }
 
-    const buffer = await entry.data.bytes();
+    const blob = await entry.data.blob();
+    if (blob.size >= 4) {
+        const view = new DataView(await blob.slice(0, 4).arrayBuffer());
 
-    const view = new DataView(buffer.buffer, buffer.byteOffset, buffer.byteLength);
-    if (buffer.byteLength >= 4 && view.getUint32(0, false) === 0xcafebabe) {
-        // try to read as class
-        try {
-            const event = await rootContext.dispatchEvent({
-                type: "preload",
-                name: entry.name,
-                data: buffer,
-            });
+        // detect magic
+        if (view.getUint32(0, false) === 0xcafebabe) {
+            // try to read as class
+            const buffer = new Uint8Array(await blob.arrayBuffer());
 
-            // create transformed data only if a transformation happened
-            const data = event.data !== buffer ? transformData(entry.data, event.data) : entry.data;
+            try {
+                const event = await rootContext.dispatchEvent({
+                    type: "preload",
+                    name: entry.name,
+                    data: buffer,
+                });
 
-            return {
-                ...entry,
-                type: EntryType.CLASS,
-                node: read(event.data),
-                data,
-            } as ClassEntry;
-        } catch (e) {
-            error(`failed to read class ${entry.name}`, e);
+                // create transformed data only if a transformation happened
+                const data = event.data !== buffer ? transformData(entry.data, event.data) : entry.data;
+
+                return {
+                    ...entry,
+                    type: EntryType.CLASS,
+                    node: read(event.data),
+                    data,
+                } as ClassEntry;
+            } catch (e) {
+                error(`failed to read class ${entry.name}`, e);
+            }
         }
     }
 

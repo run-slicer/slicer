@@ -1,5 +1,5 @@
 import { type ClassEntry, type Entry, EntryType } from "$lib/workspace";
-import type { Disassembler } from "$lib/disasm";
+import { disasmSafe, type Disassembler } from "$lib/disasm";
 import { formatHex } from "./hex";
 import { timed } from "$lib/action/utils";
 import { fromExtension, type Language } from "$lib/lang";
@@ -29,7 +29,7 @@ export const read = async (tabType: TabType, entry: Entry | null, disasm: Disass
         if (tabType === TabType.HEX) {
             return await formatHex(entry.data);
         } else if (entry.type === EntryType.CLASS) {
-            return await disasm.run(entry as ClassEntry);
+            return await disasmSafe(disasm, entry as ClassEntry);
         }
 
         return await entry.data.text();
