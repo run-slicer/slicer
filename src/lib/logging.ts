@@ -23,7 +23,13 @@ const logFuncs: Record<string, LogFunc> = {
 };
 
 const log0 = (level: LogLevel, message: string, error?: any) => {
-    (logFuncs[level] || console.log)(...(error ? [message, error] : [message]));
+    const logFunc = logFuncs[level] || console.log;
+
+    logFunc(message);
+    if (error) {
+        // log error separately
+        logFunc(error);
+    }
 
     entries.update(($entries) => {
         $entries.push({ level, message, error });
