@@ -129,3 +129,24 @@
         }
     }
 }
+
+/* PWA title bar */
+@media (display-mode: window-controls-overlay) {
+    .window-controls {
+        position: sticky;
+        background-color: hsl(var(--background));
+
+        left: env(titlebar-area-x, 0);
+        top: env(titlebar-area-y, 0);
+        width: env(titlebar-area-width, 100%);
+        height: env(titlebar-area-height, 2.5rem);
+
+        -webkit-app-region: drag;
+        app-region: drag;
+    }
+
+    .window-controls > * {
+        -webkit-app-region: no-drag;
+        app-region: no-drag;
+    }
+}

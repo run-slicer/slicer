@@ -42,7 +42,7 @@
     let scriptInfoOpen: ProtoScript | null = null;
 </script>
 
-<Menubar class="rounded-none border-b border-none px-2 lg:px-4">
+<Menubar class="window-controls rounded-none border-b border-none px-2 lg:px-4">
     <MenubarMenu>
         <MenubarTrigger class="font-bold">slicer</MenubarTrigger>
         <MenubarContent>
