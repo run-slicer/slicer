@@ -29,7 +29,7 @@
                     <!-- this is ugly, but I don't want a space before the comma -->
                     <a
                         href={`https://github.com/run-slicer/slicer/commit/${process.env.APP_COMMIT}`}
-                        class="hover:text-blue-500 hover:underline">{process.env.APP_COMMIT}</a
+                        class="hover:text-blue-700 hover:underline">{process.env.APP_COMMIT}</a
                     >, branch {process.env.APP_BRANCH}
                 </p>
                 <p class="mt-6 font-mono text-sm">
@@ -40,7 +40,7 @@
         <p class="mt-2 text-center text-sm text-muted-foreground">
             Open-source ❤️
             <span class="mx-2">@</span>
-            <a href="https://github.com/run-slicer/slicer" class="text-blue-500 hover:text-blue-600 hover:underline">
+            <a href="https://github.com/run-slicer/slicer" class="text-blue-600 hover:text-blue-700 hover:underline">
                 run-slicer/slicer
             </a>
         </p>

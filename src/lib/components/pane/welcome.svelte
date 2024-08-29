@@ -43,10 +43,15 @@
                 <a
                     href="https://docs.slicer.run"
                     target="_blank"
-                    class="text-blue-500 hover:text-blue-600 hover:underline">docs.slicer.run</a
+                    class="text-blue-600 hover:text-blue-700 hover:underline">docs.slicer.run</a
                 >!
             </div>
-            <a href="https://github.com/run-slicer/slicer" target="_blank" class="hover:text-blue-600 hover:underline">
+            <a
+                href="https://github.com/run-slicer/slicer"
+                target="_blank"
+                aria-label="GitHub"
+                class="hover:text-blue-600 hover:underline"
+            >
                 <!-- Lucide's GitHub icon is deprecated, inline -->
                 <svg
                     xmlns="http://www.w3.org/2000/svg"

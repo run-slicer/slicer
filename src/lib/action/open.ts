@@ -28,7 +28,7 @@ export const open = async (entry: Entry, type: TabType = TabType.CODE) => {
             error(`failed to read entry ${entry.name}`, e);
 
             toast.error("Error occurred", {
-                description: `Could not read ${entry.name}, check the console.`
+                description: `Could not read ${entry.name}, check the console.`,
             });
             return;
         }
