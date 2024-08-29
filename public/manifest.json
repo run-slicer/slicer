@@ -1,5 +1,6 @@
 {
     "name": "slicer",
+    "description": "A modern Java reverse engineering tool for the web.",
     "icons": [
         {
             "src": "/favicon-192x192.png",
