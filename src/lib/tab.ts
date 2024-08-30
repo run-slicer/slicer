@@ -34,7 +34,12 @@ export const current = writable<Tab | null>(welcomeTab);
 
 // set window name based on currently opened tab
 current.subscribe((tab) => {
-    document.title = tab ? `${tab.name} - slicer` : "slicer";
+    // PWAs don't need the app name reiterated
+    if (window.matchMedia("(display-mode: standalone), (display-mode: window-controls-overlay)").matches) {
+        document.title = tab ? tab.name : "slicer";
+    } else {
+        document.title = tab ? `${tab.name} | slicer` : "slicer";
+    }
 });
 
 export const find = (id: string): Tab | null => {
