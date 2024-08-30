@@ -146,6 +146,11 @@
     }
 
     .window-controls > * {
+        /* fix item height on smaller title bars */
+        padding-top: 0;
+        padding-bottom: 0;
+        height: 100%;
+
         -webkit-app-region: no-drag;
         app-region: no-drag;
     }

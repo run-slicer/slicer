@@ -3,19 +3,17 @@
     import { Menu } from "$lib/components/menu";
     import { ContentPane } from "$lib/components/pane";
     import { Toaster } from "$lib/components/ui/sonner";
-    import { register as registerShortcuts } from "$lib/shortcut";
+    import { onMount } from "svelte";
 
-    registerShortcuts();
-
-    $: {
-        $mode; // trigger update on mode change
-
-        const meta = document.querySelector('meta[name="theme-color"]');
-        if (meta) {
-            const color = window.getComputedStyle(document.body, null).getPropertyValue("--background");
-            meta.setAttribute("content", `hsl(${color})`);
-        }
-    }
+    onMount(() => {
+        mode.subscribe(() => {
+            const meta = document.querySelector('meta[name="theme-color"]');
+            if (meta) {
+                const color = window.getComputedStyle(document.body, null).getPropertyValue("--background");
+                (meta as HTMLMetaElement).content = `hsl(${color})`;
+            }
+        });
+    });
 </script>
 
 <ModeWatcher />
