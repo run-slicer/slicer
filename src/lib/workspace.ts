@@ -326,3 +326,18 @@ export const clear = () => {
         return $entries;
     });
 };
+
+// PWA file handler
+// @ts-ignore - experimental APIs
+if (window.launchQueue) {
+    // @ts-ignore
+    window.launchQueue.setConsumer((launchParams) => {
+        if (launchParams.files) {
+            for (const handle of launchParams.files) {
+                if (handle.kind === "file") {
+                    handle.getFile().then(loadFile);
+                }
+            }
+        }
+    });
+}

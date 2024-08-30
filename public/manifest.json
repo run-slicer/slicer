@@ -17,5 +17,15 @@
     "display": "standalone",
     "display_override": ["window-controls-overlay"],
     "theme_color": "#000000",
-    "background_color": "#000000"
+    "background_color": "#000000",
+    "file_handlers": [
+        {
+            "action": ".",
+            "accept": {
+                "application/zip": [".zip"],
+                "application/java-archive": [".jar", ".war", ".ear", ".jmod"],
+                "application/octet-stream": [".class"]
+            }
+        }
+    ]
 }
