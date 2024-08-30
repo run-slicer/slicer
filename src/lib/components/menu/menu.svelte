@@ -28,8 +28,19 @@
         MenubarRadioItem,
         MenubarCheckboxItem,
     } from "$lib/components/ui/menubar";
-    import { Terminal, Folders, GitBranchPlus, Clipboard, Binary, Code, Globe, WrapText } from "lucide-svelte";
-    import { openEntry, loadClipboardScript } from "./";
+    import {
+        Terminal,
+        Folders,
+        GitBranchPlus,
+        Clipboard,
+        Binary,
+        Code,
+        Globe,
+        WrapText,
+        Upload,
+        Download,
+    } from "lucide-svelte";
+    import { openEntry, loadClipboardScript, loadPreferences, savePreferences } from "./";
 
     $: tabType = $currentTab?.type;
     $: entry = $currentTab?.entry || null;
@@ -56,6 +67,17 @@
                         <MenubarRadioItem value="dark">Dark</MenubarRadioItem>
                         <MenubarRadioItem value="light">Light</MenubarRadioItem>
                     </MenubarRadioGroup>
+                </MenubarSubContent>
+            </MenubarSub>
+            <MenubarSub>
+                <MenubarSubTrigger>Preferences</MenubarSubTrigger>
+                <MenubarSubContent class="w-[12rem]">
+                    <MenubarItem class="justify-between" on:click={loadPreferences}>
+                        Import <Upload size={16} />
+                    </MenubarItem>
+                    <MenubarItem class="justify-between" on:click={savePreferences}>
+                        Export <Download size={16} />
+                    </MenubarItem>
                 </MenubarSubContent>
             </MenubarSub>
         </MenubarContent>

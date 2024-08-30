@@ -1,7 +1,8 @@
 import { persisted } from "./store";
 import vf from "$lib/disasm/vf";
+import { error } from "$lib/logging";
 
-const root = "slicer.state";
+export const root = "slicer.state";
 
 export interface ScriptData {
     url: string;
@@ -17,3 +18,19 @@ export const scriptingScripts = persisted<ScriptData[]>(`${root}.scripting.scrip
 export const editorWrap = persisted<boolean>(`${root}.editor.wrap`, false);
 export const editorTextSize = persisted<number>(`${root}.editor.text-size`, 0.75);
 export const editorTextSizeSync = persisted<boolean>(`${root}.editor.text-size.sync`, true);
+
+export const load = (data: string): boolean => {
+    try {
+        Object.entries(JSON.parse(data) as Record<string, string>).forEach(([k, v]) => localStorage.setItem(k, v));
+    } catch (e) {
+        error("failed to parse state", e);
+        return false;
+    }
+
+    window.location.reload();
+    return true;
+};
+
+export const save = (): string => {
+    return JSON.stringify(localStorage, null, 2 /* pretty */);
+};

@@ -26,12 +26,10 @@
     import { cn } from "$lib/components/utils";
     import { TreePane, LoggingPane, PaneHeader, PaneHeaderItem, EditorPane } from "$lib/components/pane";
 
-    export let layoutId = "content-pane";
-
     $: entries0 = Array.from($entries.values());
 </script>
 
-<ResizablePaneGroup direction="horizontal" class="grow basis-0" autoSaveId={layoutId}>
+<ResizablePaneGroup direction="horizontal" class="grow basis-0">
     <!-- only hide the project pane, because we don't actually want to force a re-render of the tree -->
     <ResizablePane defaultSize={20} class={cn($projectOpen || "hidden")}>
         <TreePane bind:entries={entries0} />
