@@ -57,8 +57,8 @@ importers:
         specifier: 0.2.0-2.6.0
         version: 0.2.0-2.6.0
       '@run-slicer/script':
-        specifier: ^0.7.2
-        version: 0.7.2
+        specifier: ^0.8.0
+        version: 0.8.0
       '@run-slicer/vf':
         specifier: 0.1.2-1.10.1
         version: 0.1.2-1.10.1
@@ -516,8 +516,8 @@ packages:
   '@run-slicer/jasm@0.2.0-2.6.0':
     resolution: {integrity: sha512-txWAAm/WEe1/h1usCIHF3MM8SrURfecsJKTwb952Zsfi7QeqgZPrw8+R3indhvF2rBZgi78kom6qpoeKxsAsrg==}
 
-  '@run-slicer/script@0.7.2':
-    resolution: {integrity: sha512-0uCKC/VlltJi+qYtgLDCe+oUnOF2abr50doRP/t0crMJa5+seDFa4SgyyBxan/Mp1m18BX3MOjVqMqJz3hxK8w==}
+  '@run-slicer/script@0.8.0':
+    resolution: {integrity: sha512-4nxMOL16H93JBmc627/11cpsnmX/iZjP2O60RbRWbxc9m3/hKTJQDm6G7mAa02r9eQtO+UOxdDPAKBAaTil4TA==}
 
   '@run-slicer/vf@0.1.2-1.10.1':
     resolution: {integrity: sha512-EuDLNIDllcCeUELAhblG0qHdb+3jZvSghO2p5khwa2gvvymzMOj9QRKxGjvkGLAVJi73etcTNSFfrGb7k9tfXQ==}
@@ -1833,7 +1833,7 @@ snapshots:
 
   '@run-slicer/jasm@0.2.0-2.6.0': {}
 
-  '@run-slicer/script@0.7.2': {}
+  '@run-slicer/script@0.8.0': {}
 
   '@run-slicer/vf@0.1.2-1.10.1': {}
 

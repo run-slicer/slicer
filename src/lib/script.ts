@@ -4,6 +4,8 @@ import { error } from "$lib/logging";
 import { scriptingScripts } from "$lib/state";
 import { cyrb53 } from "$lib/hash";
 import type {
+    Disassembler as ScriptDisassembler,
+    DisassemblerContext,
     EditorContext,
     Entry as ScriptEntry,
     EntryType as ScriptEntryType,
@@ -17,7 +19,24 @@ import type {
     TabType as ScriptTabType,
 } from "@run-slicer/script";
 import { current as currentTab, find as findTab, refresh as refreshTab, type Tab, tabs, TabType } from "$lib/tab";
-import { type Entry, EntryType, readDetail, unwrapTransform } from "$lib/workspace";
+import {
+    type ClassEntry,
+    DataType,
+    type Entry,
+    EntryType,
+    type MemoryData,
+    readDetail,
+    unwrapTransform,
+} from "$lib/workspace";
+import { read as readNode } from "@run-slicer/asm";
+import {
+    add as addDisasm,
+    all as disasms,
+    type Disassembler,
+    find as findDisasm,
+    remove as removeDisasm,
+} from "$lib/disasm";
+import type { Language } from "$lib/lang";
 
 export const enum ScriptState {
     UNLOADED,
@@ -65,6 +84,41 @@ const wrapTab = (t: Tab): ScriptTab => {
     };
 };
 
+const wrapDisasm = (disasm: Disassembler): ScriptDisassembler => {
+    return {
+        id: disasm.id,
+        label: disasm.name || disasm.id,
+        language: disasm.lang,
+
+        run(data: Uint8Array): Promise<string> {
+            // create simulated entry
+            return disasm.run({
+                type: EntryType.CLASS,
+                name: "",
+                shortName: "",
+                data: {
+                    type: DataType.MEMORY,
+                    name: "",
+                    data,
+                } as MemoryData,
+                node: readNode(data),
+            });
+        },
+    };
+};
+
+const unwrapDisasm = (disasm: ScriptDisassembler): Disassembler => {
+    return {
+        id: disasm.id,
+        name: disasm.label || disasm.id,
+        lang: disasm.language as Language,
+
+        async run(entry: ClassEntry): Promise<string> {
+            return disasm.run(await entry.data.bytes());
+        },
+    };
+};
+
 const editorCtx: EditorContext = {
     tabs(): ScriptTab[] {
         return Array.from(get(tabs).values()).map(wrapTab);
@@ -95,6 +149,22 @@ const editorCtx: EditorContext = {
     },
 };
 
+const disasmCtx: DisassemblerContext = {
+    all(): ScriptDisassembler[] {
+        return Array.from(get(disasms).values()).map(wrapDisasm);
+    },
+    find(id: string): ScriptDisassembler | null {
+        const disasm = findDisasm(id);
+        return disasm ? wrapDisasm(disasm) : null;
+    },
+    add(disasm: ScriptDisassembler) {
+        addDisasm(unwrapDisasm(disasm));
+    },
+    remove(id: string) {
+        removeDisasm(id);
+    },
+};
+
 const createContext = (script: Script, parent: ScriptContext | null): ScriptContext => {
     const scriptListeners = new Map<EventType, EventListener<any>[]>();
 
@@ -102,6 +172,7 @@ const createContext = (script: Script, parent: ScriptContext | null): ScriptCont
         script,
         parent,
         editor: editorCtx,
+        disasm: disasmCtx,
         addEventListener<K extends EventType>(type: K, listener: EventListener<EventMap[K]>) {
             let listeners = scriptListeners.get(type);
             if (!listeners) {

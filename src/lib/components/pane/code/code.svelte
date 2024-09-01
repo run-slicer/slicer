@@ -22,7 +22,7 @@
     $: disasmProto = { value: initialDisasm, label: initialDisasm };
 
     $: $toolsDisasm = disasmProto.value;
-    $: disasm = disasms.get(disasmProto.value) || vf;
+    $: disasm = $disasms.get(disasmProto.value) || vf;
 
     $: language = detectLanguage(tab.type, entry, disasm);
 
@@ -45,7 +45,7 @@
                     <span class="tracking-tight">{disasm.name || disasm.id}</span>
                 </SelectTrigger>
                 <SelectContent class="max-h-[240px] w-full overflow-scroll">
-                    {#each disasms.values() as dism}
+                    {#each $disasms.values() as dism}
                         <SelectItem value={dism.id} label={dism.id} class="text-xs tracking-tight">
                             {dism.name || dism.id}
                         </SelectItem>
