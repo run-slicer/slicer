@@ -47,7 +47,7 @@
         "@run-slicer/asm": "^0.8.1",
         "@run-slicer/cfr": "0.1.2-0.152",
         "@run-slicer/jasm": "0.2.0-2.6.0",
-        "@run-slicer/script": "^0.8.0",
+        "@run-slicer/script": "^0.8.1",
         "@run-slicer/vf": "0.1.2-1.10.1",
         "@run-slicer/zip": "^0.3.0",
         "@uiw/codemirror-theme-github": "^4.23.0",

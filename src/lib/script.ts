@@ -87,7 +87,7 @@ const wrapTab = (t: Tab): ScriptTab => {
 const wrapDisasm = (disasm: Disassembler): ScriptDisassembler => {
     return {
         id: disasm.id,
-        label: disasm.name || disasm.id,
+        label: disasm.name,
         language: disasm.lang,
 
         run(data: Uint8Array): Promise<string> {
@@ -110,11 +110,11 @@ const wrapDisasm = (disasm: Disassembler): ScriptDisassembler => {
 const unwrapDisasm = (disasm: ScriptDisassembler): Disassembler => {
     return {
         id: disasm.id,
-        name: disasm.label || disasm.id,
+        name: disasm.label,
         lang: disasm.language as Language,
 
         async run(entry: ClassEntry): Promise<string> {
-            return disasm.run(await entry.data.bytes());
+            return await disasm.run(await entry.data.bytes());
         },
     };
 };
