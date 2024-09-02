@@ -44,9 +44,6 @@ export const disasmSafe = async (disasm: Disassembler, entry: ClassEntry): Promi
     } catch (e: any) {
         error(`failed to disassemble ${entry.name}`, e);
 
-        return `
-        // Failed to disassemble ${entry.name}; disassembler threw error.
-        // ${e.toString()}
-        `.trim();
+        return `// Failed to disassemble ${entry.name}; disassembler threw error.\n${e.toString().replaceAll(/^/gm, "// ")}`;
     }
 };
