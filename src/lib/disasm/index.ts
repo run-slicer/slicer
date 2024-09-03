@@ -14,11 +14,13 @@ export interface Disassembler {
     run(entry: ClassEntry): Promise<string>;
 }
 
-export const all = writable<Map<string, Disassembler>>(new Map([
-    [jasm.id, jasm],
-    [cfr.id, cfr],
-    [vf.id, vf],
-]));
+export const all = writable<Map<string, Disassembler>>(
+    new Map([
+        [jasm.id, jasm],
+        [cfr.id, cfr],
+        [vf.id, vf],
+    ])
+);
 
 export const find = (id: string): Disassembler | null => {
     return get(all).get(id) || null;
