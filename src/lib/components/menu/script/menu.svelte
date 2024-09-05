@@ -39,7 +39,7 @@
         >
             Delete <Trash2 size={16} />
         </MenubarItem>
-        {#if script?.options}
+        {#if proto.state === ScriptState.LOADED && script?.options}
             <MenubarSeparator />
             {#each script.options as option (option.id)}
                 <ScriptOption inset {proto} {option} />
