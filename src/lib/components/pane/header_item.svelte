@@ -25,7 +25,10 @@
 </script>
 
 <button
-    class={cn("inline-flex h-full cursor-default items-center bg-background px-3", active || "bg-background/40")}
+    class={cn(
+        "inline-flex h-full cursor-default items-center px-3",
+        !active || "border-t-[1px] border-t-primary bg-background"
+    )}
     bind:this={elem}
     on:click
 >
@@ -35,7 +38,7 @@
     <span class="whitespace-nowrap break-keep text-sm">{name}</span>
     {#if closeable}
         <button class="ml-3" aria-label="Close" on:click={handleClose}>
-            <X size={14} class="min-w-[14px] text-muted-foreground/40 hover:text-muted-foreground/60" />
+            <X size={14} class="min-w-[14px] text-muted-foreground/60 hover:text-muted-foreground/80" />
         </button>
     {/if}
 </button>
