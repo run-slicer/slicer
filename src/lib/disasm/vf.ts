@@ -1,7 +1,7 @@
 import type { Disassembler } from "./";
 import { type Worker, createFunc } from "./worker";
 import { wrap } from "comlink";
-import VFWorker from "./worker/vf.worker?worker";
+import VFWorker from "./worker/vf?worker";
 
 export default {
     id: "vf",
