@@ -8,7 +8,7 @@
     } from "$lib/components/ui/menubar";
     import { load, unload, ScriptState, type ProtoScript } from "$lib/script";
     import ScriptOption from "./option.svelte";
-    import { MenubarItem } from "$lib/components/ui/menubar/index.js";
+    import { MenubarItem } from "$lib/components/ui/menubar";
     import { createEventDispatcher } from "svelte";
     import { Info, Trash2 } from "lucide-svelte";
 

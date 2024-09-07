@@ -35,4 +35,7 @@ export default defineConfig({
             $lib: resolve("./src/lib"),
         },
     },
+    worker: {
+        format: "es",
+    },
 });
