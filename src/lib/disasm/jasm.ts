@@ -1,15 +1,11 @@
 import type { Disassembler } from "./";
-import { type ClassEntry } from "$lib/workspace";
+import { type Worker, createFunc } from "./worker";
+import { wrap } from "comlink";
+import JASMWorker from "./worker/jasm.worker?worker";
 
-const jasm: Disassembler = {
+export default {
     id: "jasm",
     name: "JASM",
     lang: "jasm",
-    run: async (entry: ClassEntry): Promise<string> => {
-        const { disassemble } = await import("@run-slicer/jasm");
-
-        return await disassemble(await entry.data.bytes());
-    },
-};
-
-export default jasm;
+    run: createFunc(wrap<Worker>(new JASMWorker())),
+} as Disassembler;
