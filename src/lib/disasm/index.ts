@@ -1,6 +1,6 @@
 import type { ClassEntry } from "$lib/workspace";
 import type { Language } from "$lib/lang";
-import { error } from "$lib/logging";
+import { error } from "$lib/log";
 import { get, writable } from "svelte/store";
 import jasm from "./jasm";
 import cfr from "./cfr";

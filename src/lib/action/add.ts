@@ -1,6 +1,6 @@
 import { toast } from "svelte-sonner";
 import { loadFile } from "$lib/workspace";
-import { partition } from "$lib/arrays";
+import { partition } from "$lib/utils";
 import { readFiles, timed } from "./utils";
 
 export const add = async () => {

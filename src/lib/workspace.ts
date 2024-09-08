@@ -1,7 +1,7 @@
 import { derived, get, writable } from "svelte/store";
 import { type Node, read } from "@run-slicer/asm";
 import type { Zip, Entry as ZipEntry } from "@run-slicer/zip";
-import { error, warn } from "$lib/logging";
+import { error, warn } from "$lib/log";
 import { rootContext } from "$lib/script";
 import { workspaceNestedArchives } from "$lib/state";
 

@@ -1,8 +1,8 @@
 import { toast } from "svelte-sonner";
 import { get, writable } from "svelte/store";
-import { error } from "$lib/logging";
+import { error } from "$lib/log";
 import { scriptingScripts } from "$lib/state";
-import { cyrb53 } from "$lib/hash";
+import { cyrb53 } from "$lib/utils";
 import type {
     Disassembler as ScriptDisassembler,
     DisassemblerContext,

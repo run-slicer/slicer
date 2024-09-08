@@ -1,6 +1,6 @@
-import { persisted } from "./store";
+import { persisted } from "$lib/utils";
 import vf from "$lib/disasm/vf";
-import { error } from "$lib/logging";
+import { error } from "$lib/log";
 
 export const root = "slicer.state";
 

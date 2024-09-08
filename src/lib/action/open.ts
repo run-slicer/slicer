@@ -3,7 +3,7 @@ import { current, update, TabType, find } from "$lib/tab";
 import { get } from "svelte/store";
 import { tabIcon } from "$lib/components/icons";
 import { toast } from "svelte-sonner";
-import { error } from "$lib/logging";
+import { error } from "$lib/log";
 
 export const open = async (entry: Entry, type: TabType = TabType.CODE) => {
     let tab = get(current);

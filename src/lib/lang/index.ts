@@ -13,11 +13,11 @@ export const load = async (lang: Language): Promise<LanguageSupport | null> => {
         case "yaml":
             return (await import("@codemirror/lang-yaml")).yaml();
         case "properties":
-            return (await import("./properties")).properties();
+            return (await import("./parser/properties")).properties();
         case "hex":
-            return (await import("./hex")).hex();
+            return (await import("./parser/hex")).hex();
         case "jasm":
-            return (await import("./jasm")).jasm();
+            return (await import("./parser/jasm")).jasm();
     }
 
     return null;

@@ -1,4 +1,4 @@
-import { log } from "$lib/logging";
+import { log } from "$lib/log";
 
 export const readFiles = (pattern: string, multiple: boolean): Promise<File[]> => {
     return new Promise<File[]>((resolve) => {
