@@ -23,6 +23,7 @@
     import { entries } from "$lib/workspace";
     import { current, checkDirty, remove } from "$lib/tab";
     import { projectOpen, loggingOpen } from "$lib/state";
+    import { distractionFree } from "$lib/mode";
     import { cn } from "$lib/components/utils";
     import { TreePane, LoggingPane, PaneHeader, PaneHeaderItem, EditorPane } from "$lib/components/pane";
 
@@ -31,10 +32,10 @@
 
 <ResizablePaneGroup direction="horizontal" class="grow basis-0">
     <!-- only hide the project pane, because we don't actually want to force a re-render of the tree -->
-    <ResizablePane defaultSize={20} class={cn($projectOpen || "hidden")}>
+    <ResizablePane defaultSize={20} class={cn(($projectOpen && !$distractionFree) || "hidden")}>
         <TreePane bind:entries={entries0} />
     </ResizablePane>
-    <ResizableHandle class={cn($projectOpen || "hidden")} />
+    <ResizableHandle class={cn(($projectOpen && !$distractionFree) || "hidden")} />
     <ResizablePane>
         <ResizablePaneGroup direction="vertical">
             <ResizablePane>
@@ -69,7 +70,7 @@
                     {/each}
                 </div>
             </ResizablePane>
-            {#if $loggingOpen}
+            {#if $loggingOpen && !$distractionFree}
                 <ResizableHandle />
                 <ResizablePane defaultSize={20}>
                     <LoggingPane />

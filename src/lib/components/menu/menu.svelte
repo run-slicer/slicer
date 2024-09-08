@@ -2,7 +2,8 @@
     import { userPrefersMode } from "mode-watcher";
     import { Separator } from "$lib/components/ui/separator";
     import { add, load, close, export_ } from "$lib/action";
-    import { projectOpen, loggingOpen, editorWrap } from "$lib/state";
+    import { viewMode, projectOpen, loggingOpen, editorWrap } from "$lib/state";
+    import { distractionFree } from "$lib/mode";
     import { entries, EntryType } from "$lib/workspace";
     import { type ProtoScript, scripts } from "$lib/script";
     import { current as currentTab, TabType } from "$lib/tab";
@@ -39,6 +40,10 @@
         WrapText,
         Upload,
         Download,
+        Square,
+        SquareX,
+        SquareCode,
+        Scan,
     } from "lucide-svelte";
     import { openEntry, loadClipboardScript, loadPreferences, savePreferences } from "./";
 
@@ -107,12 +112,39 @@
         <MenubarTrigger class="relative">View</MenubarTrigger>
         <MenubarContent>
             <MenubarSub>
+                <MenubarSubTrigger>Mode</MenubarSubTrigger>
+                <MenubarSubContent class="w-[12rem]">
+                    <MenubarRadioGroup bind:value={$viewMode}>
+                        <MenubarRadioItem class="justify-between" value="normal">
+                            Normal <Square size={16} />
+                        </MenubarRadioItem>
+                        <MenubarRadioItem class="justify-between" value="full_screen">
+                            Full screen <Scan size={16} />
+                        </MenubarRadioItem>
+                        <MenubarRadioItem class="justify-between" value="distraction_free">
+                            Distraction-free <SquareX size={16} />
+                        </MenubarRadioItem>
+                        <MenubarRadioItem class="justify-between" value="zen">
+                            Zen <SquareCode size={16} />
+                        </MenubarRadioItem>
+                    </MenubarRadioGroup>
+                </MenubarSubContent>
+            </MenubarSub>
+            <MenubarSub>
                 <MenubarSubTrigger>Pane</MenubarSubTrigger>
                 <MenubarSubContent class="w-[12rem]">
-                    <MenubarCheckboxItem class="justify-between" bind:checked={$projectOpen}>
+                    <MenubarCheckboxItem
+                        class="justify-between"
+                        disabled={$distractionFree}
+                        bind:checked={$projectOpen}
+                    >
                         Project <Folders size={16} />
                     </MenubarCheckboxItem>
-                    <MenubarCheckboxItem class="justify-between" bind:checked={$loggingOpen}>
+                    <MenubarCheckboxItem
+                        class="justify-between"
+                        disabled={$distractionFree}
+                        bind:checked={$loggingOpen}
+                    >
                         Logging <Terminal size={16} />
                     </MenubarCheckboxItem>
                 </MenubarSubContent>

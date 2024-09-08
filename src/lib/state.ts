@@ -1,14 +1,22 @@
 import { persisted } from "$lib/utils";
-import vf from "$lib/disasm/vf";
 import { error } from "$lib/log";
+import vf from "$lib/disasm/vf";
 
 export const root = "slicer.state";
+
+export const enum ViewMode {
+    NORMAL = "normal",
+    FULL_SCREEN = "full_screen",
+    DISTRACTION_FREE = "distraction_free",
+    ZEN = "zen",
+}
 
 export interface ScriptData {
     url: string;
     load: boolean;
 }
 
+export const viewMode = persisted<ViewMode>(`${root}.view.mode`, ViewMode.NORMAL);
 export const workspaceNestedArchives = persisted<boolean>(`${root}.workspace.nested-archives`, true);
 export const projectOpen = persisted<boolean>(`${root}.project.open`, true);
 export const toolsDisasm = persisted<string>(`${root}.tools.disasm`, vf.id);
