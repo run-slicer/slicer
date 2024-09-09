@@ -1,5 +1,4 @@
-import type { Worker } from "./";
-import type { EntrySource } from "../source";
+import type { Worker, EntrySource } from "./";
 import { expose } from "comlink";
 
 expose({

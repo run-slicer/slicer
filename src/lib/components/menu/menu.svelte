@@ -1,20 +1,22 @@
 <script lang="ts">
     import { userPrefersMode } from "mode-watcher";
     import { Separator } from "$lib/components/ui/separator";
-    import { add, load, close, export_ } from "$lib/action";
     import { viewMode, projectOpen, loggingOpen, editorWrap } from "$lib/state";
     import { distractionFree } from "$lib/mode";
     import { entries, EntryType } from "$lib/workspace";
     import { type ProtoScript, scripts } from "$lib/script";
     import { type Tab, TabType } from "$lib/tab";
+    import { ActionType } from "$lib/action";
     import { Modifier } from "$lib/shortcut";
     import Shortcut from "./shortcut.svelte";
     import ScriptMenu from "./script/menu.svelte";
-    import AboutDialog from "./dialog/about.svelte";
-    import ScriptDialog from "./dialog/script.svelte";
-    import ScriptLoadDialog from "./dialog/script_load.svelte";
-    import ScriptDeleteDialog from "./dialog/script_delete.svelte";
-    import ClearDialog from "./dialog/clear.svelte";
+    import {
+        AboutDialog,
+        ScriptDialog,
+        ScriptLoadDialog,
+        ScriptDeleteDialog,
+        ClearDialog,
+    } from "$lib/components/dialog";
     import {
         Menubar,
         MenubarMenu,
@@ -45,7 +47,8 @@
         SquareCode,
         Scan,
     } from "lucide-svelte";
-    import { openEntry, loadClipboardScript, loadPreferences, savePreferences } from "./";
+    import { loadClipboardScript, loadPreferences, savePreferences } from "./";
+    import { createEventDispatcher } from "svelte";
 
     export let tab: Tab | null;
 
@@ -55,6 +58,12 @@
     let scriptLoadOpen = false;
     let scriptDeleteOpen: ProtoScript | null = null;
     let scriptInfoOpen: ProtoScript | null = null;
+
+    const dispatch = createEventDispatcher();
+
+    const openEntry = (tabType: TabType) => {
+        dispatch("action", { type: ActionType.OPEN, entry: tab?.entry!, tabType });
+    };
 </script>
 
 <Menubar class="window-controls rounded-none border-b border-none px-2 lg:px-4">
@@ -89,18 +98,21 @@
     <MenubarMenu>
         <MenubarTrigger class="relative">File</MenubarTrigger>
         <MenubarContent>
-            <MenubarItem on:click={load}>
+            <MenubarItem on:click={() => dispatch("action", { type: ActionType.OPEN })}>
                 Open <Shortcut key="o" modifier={Modifier.Ctrl} />
             </MenubarItem>
-            <MenubarItem on:click={add}>
+            <MenubarItem on:click={() => dispatch("action", { type: ActionType.ADD })}>
                 Add <Shortcut key="o" modifier={Modifier.Ctrl | Modifier.Shift} />
             </MenubarItem>
             <MenubarItem disabled={$entries.size === 0} on:click={() => (clearOpen = true)}>Clear all</MenubarItem>
             <MenubarSeparator />
-            <MenubarItem disabled={tab?.entry === null} on:click={() => export_()}>
+            <MenubarItem
+                disabled={tab?.entry === null}
+                on:click={() => dispatch("action", { type: ActionType.EXPORT })}
+            >
                 Export <Shortcut key="e" modifier={Modifier.Ctrl} />
             </MenubarItem>
-            <MenubarItem disabled={tab?.entry === null} on:click={close}>
+            <MenubarItem disabled={tab?.entry === null} on:click={() => dispatch("action", { type: ActionType.CLOSE })}>
                 Close <Shortcut key="w" modifier={Modifier.Ctrl | Modifier.Alt} />
             </MenubarItem>
         </MenubarContent>
@@ -207,8 +219,8 @@
 </Menubar>
 <Separator />
 
-<AboutDialog bind:open={aboutOpen} />
-<ScriptDialog bind:proto={scriptInfoOpen} />
-<ScriptLoadDialog bind:open={scriptLoadOpen} />
-<ScriptDeleteDialog bind:proto={scriptDeleteOpen} />
-<ClearDialog bind:open={clearOpen} />
+<AboutDialog bind:open={aboutOpen} on:action />
+<ScriptDialog bind:proto={scriptInfoOpen} on:action />
+<ScriptLoadDialog bind:open={scriptLoadOpen} on:action />
+<ScriptDeleteDialog bind:proto={scriptDeleteOpen} on:action />
+<ClearDialog bind:open={clearOpen} on:action />

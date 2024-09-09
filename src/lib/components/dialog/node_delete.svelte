@@ -13,7 +13,7 @@
     import type { Node } from "$lib/components/pane/tree";
     import { createEventDispatcher } from "svelte";
 
-    export let data: Node | null = null;
+    export let data: Node | null;
 
     const handle = (accepted: boolean) => {
         if (accepted) {

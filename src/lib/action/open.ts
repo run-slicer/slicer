@@ -15,11 +15,7 @@ const detectTabType = (entry: Entry): TabType => {
     return entry.extension && binaryExtensions.has(entry.extension) ? TabType.HEX : TabType.CODE;
 };
 
-export const open = async (entry: Entry, type?: TabType) => {
-    if (!type) {
-        type = detectTabType(entry);
-    }
-
+export const open = async (entry: Entry, type: TabType = detectTabType(entry)) => {
     let tab = get(current);
     if (tab?.type === type && tab?.entry?.name === entry.name) {
         return; // already opened

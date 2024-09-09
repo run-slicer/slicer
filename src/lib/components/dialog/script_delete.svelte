@@ -13,7 +13,7 @@
     import { type ProtoScript, remove } from "$lib/script";
     import { toast } from "svelte-sonner";
 
-    export let proto: ProtoScript | null = null;
+    export let proto: ProtoScript | null;
 
     const handle = async (accepted: boolean) => {
         if (accepted) {

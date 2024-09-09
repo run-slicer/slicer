@@ -6,14 +6,12 @@ import jasm from "./jasm";
 import cfr from "./cfr";
 import vf from "./vf";
 
-export type DisassemblyFunc = (entry: ClassEntry) => Promise<string>;
-
 export interface Disassembler {
     id: string;
     name?: string;
     lang?: Language;
 
-    run: DisassemblyFunc;
+    run(entry: ClassEntry): Promise<string>;
 }
 
 export const all = writable<Map<string, Disassembler>>(
