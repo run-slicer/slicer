@@ -1,42 +1,13 @@
 <script lang="ts" context="module">
-    import { type Action, type EntryAction, type BulkEntryAction, ActionType } from "$lib/action";
     import type { Entry } from "$lib/workspace";
     import type { Node } from "./";
 
-    const collectEntries = (node: Node): Entry[] => {
+    export const collectEntries = (node: Node): Entry[] => {
         if (node.nodes) {
             return node.nodes.flatMap(collectEntries);
         }
 
         return node.entry ? [node.entry] : [];
-    };
-
-    interface DataAction extends Action {
-        node: Node;
-    }
-
-    export const unwrapAction = (action: Action): Action => {
-        if ("node" in action) {
-            const dataAction = action as DataAction;
-
-            switch (action.type) {
-                case ActionType.OPEN:
-                case ActionType.EXPORT: {
-                    return {
-                        ...action,
-                        entry: dataAction.node.entry!,
-                    } as EntryAction;
-                }
-                case ActionType.REMOVE: {
-                    return {
-                        ...action,
-                        entries: collectEntries(dataAction.node),
-                    } as BulkEntryAction;
-                }
-            }
-        }
-
-        return action;
     };
 </script>
 
@@ -46,6 +17,7 @@
     import { Button } from "$lib/components/ui/button";
     import { ContextMenu, ContextMenuTrigger } from "$lib/components/ui/context-menu";
     import { PaneHeader, PaneHeaderItem } from "$lib/components/pane/header";
+    import { ActionType } from "$lib/action";
     import TreeNode from "./node.svelte";
     import NodeMenu from "./menu.svelte";
 
@@ -122,7 +94,7 @@
             {/if}
         </ContextMenuTrigger>
         {#if menuData}
-            <NodeMenu node={menuData} on:action={(e) => dispatch("action", unwrapAction(e.detail))} />
+            <NodeMenu node={menuData} on:action />
         {/if}
     </ContextMenu>
 </div>

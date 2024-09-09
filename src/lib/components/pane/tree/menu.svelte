@@ -4,6 +4,7 @@
     import { EntryType } from "$lib/workspace";
     import { TabType } from "$lib/tab";
     import { ActionType } from "$lib/action";
+    import { collectEntries } from "./tree.svelte";
     import type { Node } from "./";
     import {
         ContextMenuContent,
@@ -20,7 +21,7 @@
     const dispatch = createEventDispatcher();
 
     const dispatchOpen = (tabType: TabType) => {
-        dispatch("action", { type: ActionType.OPEN, node, tabType });
+        dispatch("action", { type: ActionType.OPEN, entry: node.entry!, tabType });
     };
 </script>
 
@@ -49,14 +50,14 @@
         <ContextMenuSeparator />
         <ContextMenuItem
             class="flex justify-between"
-            on:click={() => dispatch("action", { type: ActionType.EXPORT, node })}
+            on:click={() => dispatch("action", { type: ActionType.EXPORT, entry: node.entry })}
         >
             Download <Download size={16} />
         </ContextMenuItem>
     {/if}
     <ContextMenuItem
         class="flex justify-between data-[highlighted]:bg-destructive data-[highlighted]:text-destructive-foreground"
-        on:click={() => dispatch("action", { type: ActionType.REMOVE, node })}
+        on:click={() => dispatch("action", { type: ActionType.REMOVE, entries: collectEntries(node) })}
     >
         Delete <Trash2 size={16} />
     </ContextMenuItem>
