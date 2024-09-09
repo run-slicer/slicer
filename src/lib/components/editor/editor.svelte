@@ -89,8 +89,8 @@
     import { mode } from "mode-watcher";
     import type { LanguageSupport } from "@codemirror/language";
     import { EditorView } from "@codemirror/view";
-    import { dark, light } from "./theme";
     import { Compartment } from "@codemirror/state";
+    import { dark, light } from "./theme";
 
     export let value: string = "";
     export let readOnly: boolean = false;

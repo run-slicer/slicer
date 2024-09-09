@@ -33,7 +33,7 @@
 </script>
 
 <div class="relative h-full w-full">
-    {#await Promise.all([import("@xyflow/svelte"), import("./node.svelte"), import("./")])}
+    {#await Promise.all([import("@xyflow/svelte"), import("./node.svelte"), import("./graph")])}
         <Loading value="Loading..." overlay />
     {:then [{ Background, Controls, SvelteFlow, ControlButton }, FlowNode, { createComputedGraph }]}
         {@const [nodes, edges] = createComputedGraph(member, pool, showHandlerEdges)}

@@ -1,7 +1,6 @@
 import type { Entry } from "$lib/workspace";
-import { toast } from "svelte-sonner";
-import { export_, open, remove } from "$lib/action";
 import { TabType } from "$lib/tab";
+import TreePane from "./tree.svelte";
 
 export interface Node {
     label: string;
@@ -11,7 +10,13 @@ export interface Node {
     expanded?: boolean;
 }
 
-const deleteNode = (node: Node): number => {
+export interface Action {
+    type: "load" | "open" | "delete" | "download";
+    data?: Node;
+    tabType?: TabType;
+}
+
+/*const deleteNode = (node: Node): number => {
     if (node.nodes) {
         return node.nodes.reduce((acc, v) => acc + deleteNode(v), 0);
     }
@@ -47,4 +52,6 @@ export const deleteEntry = (data: Node) => {
     }
 };
 
-export const exportEntry = (data: Node) => export_(data.entry);
+export const exportEntry = (data: Node) => export_(data.entry);*/
+
+export { TreePane };

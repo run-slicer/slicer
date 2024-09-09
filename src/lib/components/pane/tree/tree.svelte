@@ -1,24 +1,13 @@
-<script lang="ts" context="module">
-    import type { TabType } from "$lib/tab";
-
-    export interface Action {
-        type: "open" | "delete" | "download";
-        data: Node;
-        tabType?: TabType;
-    }
-</script>
-
 <script lang="ts">
+    import { createEventDispatcher } from "svelte";
     import { Folders, Plus } from "lucide-svelte";
     import { Button } from "$lib/components/ui/button";
     import { ContextMenu, ContextMenuTrigger } from "$lib/components/ui/context-menu";
+    import { PaneHeader, PaneHeaderItem } from "$lib/components/pane/header";
     import type { Entry } from "$lib/workspace";
     import TreeNode from "./node.svelte";
-    import { type Node, openEntry, exportEntry } from "./";
-    import DeleteDialog from "./dialog/delete.svelte";
-    import { load } from "$lib/action";
-    import { PaneHeader, PaneHeaderItem } from "$lib/components/pane";
     import NodeMenu from "./menu.svelte";
+    import type { Node } from "./";
 
     let root: Node = { label: "<root>", nodes: [] };
     const updateNode = (entry: Entry) => {
@@ -48,38 +37,22 @@
         root = root; // force an update
     }
 
-    let deleteData: Node | null = null;
     let menuData: Node | null = null;
 
-    const processAction = async (action: Action) => {
-        const { type, data, tabType } = action;
-
-        switch (type) {
-            case "open":
-                await openEntry(data, tabType);
-                break;
-            case "delete":
-                deleteData = data;
-                break;
-            case "download":
-                await exportEntry(data);
-                break;
-        }
-    };
-
     let triggerElem: HTMLDivElement;
-    const handleMenuChange = (open: boolean) => {
-        if (!open) {
-            menuData = null;
-        }
-    };
+
+    const dispatch = createEventDispatcher();
 </script>
 
 <div class="flex h-full w-full flex-col">
     <PaneHeader>
         <PaneHeaderItem name="Project" icon={{ icon: Folders, classes: ["text-muted-foreground"] }} />
     </PaneHeader>
-    <ContextMenu onOpenChange={handleMenuChange}>
+    <ContextMenu onOpenChange={(open) => {
+        if (!open) {
+            menuData = null;
+        }
+    }}>
         <ContextMenuTrigger
             bind:el={triggerElem}
             class="flex h-full w-full overflow-auto text-nowrap p-2 scrollbar-thin"
@@ -89,7 +62,7 @@
                     {#each root.nodes as node (node.label)}
                         <TreeNode
                             data={node}
-                            on:open={(e) => openEntry(e.detail.data)}
+                            on:open={(e) => dispatch("action", { type: "open", data: e.detail.data })}
                             on:contextmenu={(e) => {
                                 menuData = e.detail.data;
                                 // replay contextmenu event on trigger
@@ -100,16 +73,14 @@
                 </div>
             {:else}
                 <div class="flex grow items-center justify-center">
-                    <Button variant="outline" size="sm" on:click={load}>
+                    <Button variant="outline" size="sm" on:click={() => dispatch("action", { type: "load" })}>
                         <Plus class="mr-2 h-4 w-4" /> Open
                     </Button>
                 </div>
             {/if}
         </ContextMenuTrigger>
         {#if menuData}
-            <NodeMenu data={menuData} on:action={(e) => processAction(e.detail)} />
+            <NodeMenu data={menuData} on:action />
         {/if}
     </ContextMenu>
 </div>
-
-<DeleteDialog bind:data={deleteData} />

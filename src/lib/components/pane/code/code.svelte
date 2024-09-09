@@ -32,10 +32,16 @@
 </script>
 
 <div class="relative basis-full overflow-hidden scrollbar-thin">
-    {#await Promise.all([import("./editor.svelte"), loadLanguage(language), read(tab.type, entry, disasm)])}
+    {#await Promise.all([import("$lib/components/editor"), loadLanguage(language), read(tab.type, entry, disasm)])}
         <Loading value={shouldDisasm ? "Disassembling..." : "Reading..."} overlay />
-    {:then [editor, lang, value]}
-        <svelte:component this={editor.default} {value} readOnly {lang} bind:textSize={$textSize} wrap={$editorWrap} />
+    {:then [{ CodeEditor }, lang, value]}
+        <CodeEditor
+            {value}
+            readOnly
+            {lang}
+            bind:textSize={$textSize}
+            wrap={$editorWrap}
+        />
     {/await}
     {#if shouldDisasm}
         <div class="absolute bottom-0 right-0 m-[15px]">

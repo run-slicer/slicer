@@ -1,39 +1,43 @@
-<script lang="ts" context="module">
+<script lang="ts">
+    import { dndzone } from "svelte-dnd-action";
+    import { createEventDispatcher } from "svelte";
     import { writable } from "svelte/store";
-    import { type Tab, tabs } from "$lib/tab";
+    import { ResizableHandle, ResizablePane, ResizablePaneGroup } from "$lib/components/ui/resizable";
+    import type { Entry } from "$lib/workspace";
+    import { type Tab, checkDirty } from "$lib/tab";
+    import { projectOpen, loggingOpen } from "$lib/state";
+    import { distractionFree } from "$lib/mode";
+    import { entries as logEntries } from "$lib/log";
+    import { cn } from "$lib/components/utils";
+    import { TreePane, LoggingPane, EditorPane } from "$lib/components/pane";
+    import { PaneHeader, PaneHeaderItem } from "$lib/components/pane/header";
+    // import { DeleteNodeDialog } from "$lib/components/dialog";
 
-    export const orderedTabs = writable<Tab[]>([]);
+    export let tab: Tab | null;
+    export let tabs: Tab[];
 
-    // synchronize stores - order is kept only here, main store is unordered
-    tabs.subscribe((tabs0) => {
+    // order is kept only here, main store is unordered
+    const orderedTabs = writable(tabs);
+    $: {
         orderedTabs.update((orderedTabs0) => {
             // pop removed tabs
-            const updatedTabs = orderedTabs0.filter((e) => tabs0.has(e.id));
+            const updatedTabs = orderedTabs0.filter((e) => tabs.includes(e));
             // now add newly added tabs
-            updatedTabs.push(...Array.from(tabs0.values()).filter((e) => !orderedTabs0.includes(e)));
+            updatedTabs.push(...tabs.filter((e) => !orderedTabs0.includes(e)));
 
             return updatedTabs;
         });
-    });
-</script>
+    }
 
-<script lang="ts">
-    import { dndzone } from "svelte-dnd-action";
-    import { ResizableHandle, ResizablePane, ResizablePaneGroup } from "$lib/components/ui/resizable";
-    import { entries } from "$lib/workspace";
-    import { current, checkDirty, remove } from "$lib/tab";
-    import { projectOpen, loggingOpen } from "$lib/state";
-    import { distractionFree } from "$lib/mode";
-    import { cn } from "$lib/components/utils";
-    import { TreePane, LoggingPane, PaneHeader, PaneHeaderItem, EditorPane } from "$lib/components/pane";
+    export let entries: Entry[];
 
-    $: entries0 = Array.from($entries.values());
+    const dispatch = createEventDispatcher();
 </script>
 
 <ResizablePaneGroup direction="horizontal" class="grow basis-0">
     <!-- only hide the project pane, because we don't actually want to force a re-render of the tree -->
     <ResizablePane defaultSize={20} class={cn(($projectOpen && !$distractionFree) || "hidden")}>
-        <TreePane bind:entries={entries0} />
+        <TreePane {entries} />
     </ResizablePane>
     <ResizableHandle class={cn(($projectOpen && !$distractionFree) || "hidden")} />
     <ResizablePane>
@@ -51,21 +55,21 @@
                             on:consider={(e) => ($orderedTabs = e.detail.items)}
                             on:finalize={(e) => ($orderedTabs = e.detail.items)}
                         >
-                            {#each $orderedTabs as tab (tab.id)}
+                            {#each $orderedTabs as tab0 (tab0.id)}
                                 <PaneHeaderItem
-                                    name={tab.name}
-                                    active={$current?.id === tab.id}
-                                    icon={tab.icon}
+                                    name={tab0.name}
+                                    active={tab?.id === tab0.id}
+                                    icon={tab0.icon}
                                     closeable
-                                    on:click={() => ($current = tab)}
-                                    on:close={() => remove(tab.id)}
+                                    on:click={() => (tab = tab0)}
+                                    on:close={() => dispatch("remove", { tab: tab0 })}
                                 />
                             {/each}
                         </div>
                     </PaneHeader>
-                    {#each $tabs as [id, tab] (id)}
-                        <div class={cn("flex h-full w-full flex-col", $current?.id === id || "hidden")}>
-                            <EditorPane {tab} dirtyFlag={checkDirty(tab, $current)} />
+                    {#each tabs as tab0 (tab0.id)}
+                        <div class={cn("flex h-full w-full flex-col", tab?.id === tab0.id || "hidden")}>
+                            <EditorPane tab={tab0} dirtyFlag={checkDirty(tab0, tab)} />
                         </div>
                     {/each}
                 </div>
@@ -73,9 +77,11 @@
             {#if $loggingOpen && !$distractionFree}
                 <ResizableHandle />
                 <ResizablePane defaultSize={20}>
-                    <LoggingPane />
+                    <LoggingPane entries={$logEntries} />
                 </ResizablePane>
             {/if}
         </ResizablePaneGroup>
     </ResizablePane>
 </ResizablePaneGroup>
+
+<!--<DeleteNodeDialog bind:data={null} />-->

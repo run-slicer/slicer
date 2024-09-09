@@ -6,15 +6,15 @@
     import { distractionFree } from "$lib/mode";
     import { entries, EntryType } from "$lib/workspace";
     import { type ProtoScript, scripts } from "$lib/script";
-    import { current as currentTab, TabType } from "$lib/tab";
+    import { type Tab, TabType } from "$lib/tab";
     import { Modifier } from "$lib/shortcut";
     import Shortcut from "./shortcut.svelte";
     import ScriptMenu from "./script/menu.svelte";
     import AboutDialog from "./dialog/about.svelte";
     import ScriptDialog from "./dialog/script.svelte";
     import ScriptLoadDialog from "./dialog/script_load.svelte";
-    import ScriptDeleteConfirmDialog from "./dialog/script_delete.svelte";
-    import ClearConfirmDialog from "./dialog/clear.svelte";
+    import ScriptDeleteDialog from "./dialog/script_delete.svelte";
+    import ClearDialog from "./dialog/clear.svelte";
     import {
         Menubar,
         MenubarMenu,
@@ -47,11 +47,10 @@
     } from "lucide-svelte";
     import { openEntry, loadClipboardScript, loadPreferences, savePreferences } from "./";
 
-    $: tabType = $currentTab?.type;
-    $: entry = $currentTab?.entry || null;
+    export let tab: Tab | null;
 
     let aboutOpen = false;
-    let clearConfirmOpen = false;
+    let clearOpen = false;
 
     let scriptLoadOpen = false;
     let scriptDeleteOpen: ProtoScript | null = null;
@@ -96,14 +95,14 @@
             <MenubarItem on:click={add}>
                 Add <Shortcut key="o" modifier={Modifier.Ctrl | Modifier.Shift} />
             </MenubarItem>
-            <MenubarItem disabled={$entries.size === 0} on:click={() => (clearConfirmOpen = true)}>
+            <MenubarItem disabled={$entries.size === 0} on:click={() => (clearOpen = true)}>
                 Clear all
             </MenubarItem>
             <MenubarSeparator />
-            <MenubarItem disabled={entry === null} on:click={() => export_()}>
+            <MenubarItem disabled={tab?.entry === null} on:click={() => export_()}>
                 Export <Shortcut key="e" modifier={Modifier.Ctrl} />
             </MenubarItem>
-            <MenubarItem disabled={entry === null} on:click={close}>
+            <MenubarItem disabled={tab?.entry === null} on:click={close}>
                 Close <Shortcut key="w" modifier={Modifier.Ctrl | Modifier.Alt} />
             </MenubarItem>
         </MenubarContent>
@@ -160,21 +159,21 @@
             <MenubarSeparator />
             <MenubarItem
                 class="justify-between"
-                disabled={!entry || entry.type === EntryType.ARCHIVE || tabType === TabType.CODE}
+                disabled={!tab?.entry || tab.entry.type === EntryType.ARCHIVE || tab.type === TabType.CODE}
                 on:click={() => openEntry(TabType.CODE)}
             >
                 Code <Code size={16} />
             </MenubarItem>
             <MenubarItem
                 class="justify-between"
-                disabled={!entry || entry.type === EntryType.ARCHIVE || tabType === TabType.HEX}
+                disabled={!tab?.entry || tab.entry.type === EntryType.ARCHIVE || tab.type === TabType.HEX}
                 on:click={() => openEntry(TabType.HEX)}
             >
                 Hexadecimal <Binary size={16} />
             </MenubarItem>
             <MenubarItem
                 class="justify-between"
-                disabled={!entry || entry.type === EntryType.ARCHIVE || tabType === TabType.FLOW_GRAPH}
+                disabled={!tab?.entry || tab.entry.type === EntryType.ARCHIVE || tab.type === TabType.FLOW_GRAPH}
                 on:click={() => openEntry(TabType.FLOW_GRAPH)}
             >
                 Flow graph <GitBranchPlus size={16} />
@@ -213,5 +212,5 @@
 <AboutDialog bind:open={aboutOpen} />
 <ScriptDialog bind:proto={scriptInfoOpen} />
 <ScriptLoadDialog bind:open={scriptLoadOpen} />
-<ScriptDeleteConfirmDialog bind:proto={scriptDeleteOpen} />
-<ClearConfirmDialog bind:open={clearConfirmOpen} />
+<ScriptDeleteDialog bind:proto={scriptDeleteOpen} />
+<ClearDialog bind:open={clearOpen} />

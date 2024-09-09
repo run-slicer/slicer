@@ -5,6 +5,8 @@
     import { Toaster } from "$lib/components/ui/sonner";
     import Breadcrumb from "$lib/components/breadcrumb.svelte";
     import { onMount } from "svelte";
+    import { current as currentTab, tabs, remove as removeTab } from "$lib/tab";
+    import { entries } from "$lib/workspace";
     import { root as rootKey } from "$lib/state";
 
     onMount(() => {
@@ -20,6 +22,11 @@
 
 <ModeWatcher themeStorageKey={`${rootKey}.theme`} modeStorageKey={`${rootKey}.mode`} />
 <Toaster position="top-right" richColors />
-<Menu />
-<ContentPane />
-<Breadcrumb />
+<Menu tab={$currentTab} />
+<ContentPane
+    tab={$currentTab}
+    tabs={Array.from($tabs.values())}
+    entries={Array.from($entries.values())}
+    on:remove={(e) => removeTab(e.detail.tab.id)}
+/>
+<Breadcrumb tab={$currentTab} />

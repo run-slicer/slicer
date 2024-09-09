@@ -1,6 +1,7 @@
 <script lang="ts">
     import { Binary, Code, Download, GitBranchPlus, Trash2 } from "lucide-svelte";
     import { createEventDispatcher } from "svelte";
+    import { EntryType } from "$lib/workspace";
     import { TabType } from "$lib/tab";
     import type { Node } from "./";
     import {
@@ -12,7 +13,6 @@
         ContextMenuSubTrigger,
         ContextMenuSubContent,
     } from "$lib/components/ui/context-menu";
-    import { EntryType } from "$lib/workspace";
 
     export let data: Node;
 

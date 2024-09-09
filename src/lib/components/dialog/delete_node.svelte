@@ -10,16 +10,19 @@
         AlertDialogTitle,
     } from "$lib/components/ui/alert-dialog";
     import { Button } from "$lib/components/ui/button";
-    import { type Node, deleteEntry } from "../";
+    import type { Node } from "$lib/components/pane/tree";
+    import { createEventDispatcher } from "svelte";
 
     export let data: Node | null = null;
 
     const handle = (accepted: boolean) => {
         if (accepted) {
-            deleteEntry(data!);
+            dispatch("delete", { data: data! });
         }
         data = null;
     };
+
+    const dispatch = createEventDispatcher();
 </script>
 
 <AlertDialog open={data !== null}>
