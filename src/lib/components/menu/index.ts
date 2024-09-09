@@ -1,18 +1,8 @@
 import Menu from "./menu.svelte";
 import { toast } from "svelte-sonner";
-import { current as currentTab, TabType } from "$lib/tab";
-import { get } from "svelte/store";
-import { open } from "$lib/action";
 import { read } from "$lib/script";
 import { downloadBlob, readFiles } from "$lib/action/utils";
 import { load as loadState, save as saveState } from "$lib/state";
-
-export const openEntry = async (type: TabType) => {
-    const entry = get(currentTab)?.entry || null;
-    if (entry) {
-        await open(entry, type);
-    }
-};
 
 export const loadClipboardScript = async () => {
     if (!navigator.clipboard) {

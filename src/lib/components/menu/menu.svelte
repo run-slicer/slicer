@@ -95,9 +95,7 @@
             <MenubarItem on:click={add}>
                 Add <Shortcut key="o" modifier={Modifier.Ctrl | Modifier.Shift} />
             </MenubarItem>
-            <MenubarItem disabled={$entries.size === 0} on:click={() => (clearOpen = true)}>
-                Clear all
-            </MenubarItem>
+            <MenubarItem disabled={$entries.size === 0} on:click={() => (clearOpen = true)}>Clear all</MenubarItem>
             <MenubarSeparator />
             <MenubarItem disabled={tab?.entry === null} on:click={() => export_()}>
                 Export <Shortcut key="e" modifier={Modifier.Ctrl} />

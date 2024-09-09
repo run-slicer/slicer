@@ -22,7 +22,7 @@
         <PaneHeaderItem name="Logging" icon={{ icon: Terminal, classes: ["text-muted-foreground"] }} />
     </PaneHeader>
     <div class="relative basis-full overflow-hidden scrollbar-thin">
-        {#await Promise.all([import("$lib/components/editor"), import("$lib/lang/parser/log")]) then [{ CodeEditor }, { log }]}
+        {#await Promise.all( [import("$lib/components/editor"), import("$lib/lang/parser/log")] ) then [{ CodeEditor }, { log }]}
             <CodeEditor
                 readOnly
                 {value}

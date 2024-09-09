@@ -17,7 +17,11 @@
                     {@const last = i === parts.length - 1}
                     <BreadcrumbItem>
                         {#if last && tab?.icon}
-                            <svelte:component this={tab.icon.icon} size={14} class={cn("min-w-[14px]", tab.icon.classes)} />
+                            <svelte:component
+                                this={tab.icon.icon}
+                                size={14}
+                                class={cn("min-w-[14px]", tab.icon.classes)}
+                            />
                         {/if}
                         {part}
                     </BreadcrumbItem>

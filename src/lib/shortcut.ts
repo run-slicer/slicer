@@ -1,4 +1,4 @@
-import { add, close, load, export_ } from "$lib/action";
+import { ActionType, handle } from "$lib/action";
 
 // https://stackoverflow.com/questions/38241480/detect-macos-ios-windows-android-and-linux-os-with-js
 const isMac = /Macintosh|Mac OS|MacIntel|MacPPC|Mac68K/gi.test(navigator.userAgent);
@@ -34,10 +34,10 @@ const listen = (key: string, mod: number, callback: (e: KeyboardEvent) => void) 
 export const register = () => {
     // order matters, shortcuts with (more) modifiers should be registered earlier
 
-    listen("o", Modifier.Ctrl | Modifier.Shift, add);
-    listen("o", Modifier.Ctrl, load);
-    listen("w", Modifier.Ctrl | Modifier.Alt, close);
-    listen("e", Modifier.Ctrl, () => export_());
+    listen("o", Modifier.Ctrl | Modifier.Shift, () => handle({ type: ActionType.ADD }));
+    listen("o", Modifier.Ctrl, () => handle({ type: ActionType.LOAD }));
+    listen("w", Modifier.Ctrl | Modifier.Alt, () => handle({ type: ActionType.CLOSE }));
+    listen("e", Modifier.Ctrl, () => handle({ type: ActionType.EXPORT }));
 };
 
 export const format = (key: string, mod: number): string => {

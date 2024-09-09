@@ -1,9 +1,12 @@
 <script lang="ts">
     import { userPrefersMode } from "mode-watcher";
-    import { load, add } from "$lib/action";
-    import { ToggleGroup, ToggleGroupItem } from "$lib/components/ui/toggle-group";
     import { FilePlus2, Folder, Moon, Settings, Sun } from "lucide-svelte";
+    import { createEventDispatcher } from "svelte";
+    import { ToggleGroup, ToggleGroupItem } from "$lib/components/ui/toggle-group";
     import { Button } from "$lib/components/ui/button";
+    import { ActionType } from "$lib/action";
+
+    const dispatch = createEventDispatcher();
 </script>
 
 <div class="m-24 h-full">
@@ -13,10 +16,18 @@
             <div>
                 <h2 class="text-lg font-medium text-muted-foreground">Get started</h2>
                 <div class="flex flex-col items-start">
-                    <Button variant="link" class="h-8 p-0" on:click={load}>
+                    <Button
+                        variant="link"
+                        class="h-8 p-0"
+                        on:click={() => dispatch("action", { type: ActionType.LOAD })}
+                    >
                         <Folder class="mr-2 h-4 w-4" /> Open
                     </Button>
-                    <Button variant="link" class="h-8 p-0" on:click={add}>
+                    <Button
+                        variant="link"
+                        class="h-8 p-0"
+                        on:click={() => dispatch("action", { type: ActionType.ADD })}
+                    >
                         <FilePlus2 class="mr-2 h-4 w-4" /> Add file
                     </Button>
                 </div>

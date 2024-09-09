@@ -8,6 +8,7 @@
     import { projectOpen, loggingOpen } from "$lib/state";
     import { distractionFree } from "$lib/mode";
     import { entries as logEntries } from "$lib/log";
+    import { ActionType } from "$lib/action";
     import { cn } from "$lib/components/utils";
     import { TreePane, LoggingPane, EditorPane } from "$lib/components/pane";
     import { PaneHeader, PaneHeaderItem } from "$lib/components/pane/header";
@@ -37,7 +38,7 @@
 <ResizablePaneGroup direction="horizontal" class="grow basis-0">
     <!-- only hide the project pane, because we don't actually want to force a re-render of the tree -->
     <ResizablePane defaultSize={20} class={cn(($projectOpen && !$distractionFree) || "hidden")}>
-        <TreePane {entries} />
+        <TreePane {entries} on:action />
     </ResizablePane>
     <ResizableHandle class={cn(($projectOpen && !$distractionFree) || "hidden")} />
     <ResizablePane>
@@ -62,7 +63,7 @@
                                     icon={tab0.icon}
                                     closeable
                                     on:click={() => (tab = tab0)}
-                                    on:close={() => dispatch("remove", { tab: tab0 })}
+                                    on:close={() => dispatch("action", { type: ActionType.CLOSE, tab: tab0 })}
                                 />
                             {/each}
                         </div>

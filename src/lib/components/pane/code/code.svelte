@@ -35,13 +35,7 @@
     {#await Promise.all([import("$lib/components/editor"), loadLanguage(language), read(tab.type, entry, disasm)])}
         <Loading value={shouldDisasm ? "Disassembling..." : "Reading..."} overlay />
     {:then [{ CodeEditor }, lang, value]}
-        <CodeEditor
-            {value}
-            readOnly
-            {lang}
-            bind:textSize={$textSize}
-            wrap={$editorWrap}
-        />
+        <CodeEditor {value} readOnly {lang} bind:textSize={$textSize} wrap={$editorWrap} />
     {/await}
     {#if shouldDisasm}
         <div class="absolute bottom-0 right-0 m-[15px]">
