@@ -3,8 +3,8 @@
     import { Separator } from "$lib/components/ui/separator";
     import { viewMode, projectOpen, loggingOpen, editorWrap } from "$lib/state";
     import { distractionFree } from "$lib/mode";
-    import { entries, EntryType } from "$lib/workspace";
-    import { type ProtoScript, scripts } from "$lib/script";
+    import { type Entry, EntryType } from "$lib/workspace";
+    import type { ProtoScript } from "$lib/script";
     import { type Tab, TabType } from "$lib/tab";
     import { ActionType } from "$lib/action";
     import { Modifier } from "$lib/shortcut";
@@ -51,6 +51,8 @@
     import { createEventDispatcher } from "svelte";
 
     export let tab: Tab | null;
+    export let entries: Entry[];
+    export let scripts: ProtoScript[];
 
     let aboutOpen = false;
     let clearOpen = false;
@@ -98,21 +100,18 @@
     <MenubarMenu>
         <MenubarTrigger class="relative">File</MenubarTrigger>
         <MenubarContent>
-            <MenubarItem on:click={() => dispatch("action", { type: ActionType.OPEN })}>
+            <MenubarItem on:click={() => dispatch("action", { type: ActionType.LOAD })}>
                 Open <Shortcut key="o" modifier={Modifier.Ctrl} />
             </MenubarItem>
             <MenubarItem on:click={() => dispatch("action", { type: ActionType.ADD })}>
                 Add <Shortcut key="o" modifier={Modifier.Ctrl | Modifier.Shift} />
             </MenubarItem>
-            <MenubarItem disabled={$entries.size === 0} on:click={() => (clearOpen = true)}>Clear all</MenubarItem>
+            <MenubarItem disabled={entries.length === 0} on:click={() => (clearOpen = true)}>Clear all</MenubarItem>
             <MenubarSeparator />
-            <MenubarItem
-                disabled={tab?.entry === null}
-                on:click={() => dispatch("action", { type: ActionType.EXPORT })}
-            >
+            <MenubarItem disabled={!tab?.entry} on:click={() => dispatch("action", { type: ActionType.EXPORT })}>
                 Export <Shortcut key="e" modifier={Modifier.Ctrl} />
             </MenubarItem>
-            <MenubarItem disabled={tab?.entry === null} on:click={() => dispatch("action", { type: ActionType.CLOSE })}>
+            <MenubarItem disabled={!tab?.entry} on:click={() => dispatch("action", { type: ActionType.CLOSE })}>
                 Close <Shortcut key="w" modifier={Modifier.Ctrl | Modifier.Alt} />
             </MenubarItem>
         </MenubarContent>
@@ -204,9 +203,9 @@
                     </MenubarItem>
                 </MenubarSubContent>
             </MenubarSub>
-            {#if $scripts.length > 0}
+            {#if scripts.length > 0}
                 <MenubarSeparator />
-                {#each $scripts as proto (proto.id)}
+                {#each scripts as proto (proto.id)}
                     <ScriptMenu
                         {proto}
                         on:open={(e) => (scriptInfoOpen = e.detail.proto)}

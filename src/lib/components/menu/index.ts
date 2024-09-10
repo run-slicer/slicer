@@ -1,7 +1,7 @@
 import Menu from "./menu.svelte";
 import { toast } from "svelte-sonner";
 import { read } from "$lib/script";
-import { downloadBlob, readFiles } from "$lib/action/utils";
+import { downloadBlob, readFiles } from "$lib/utils";
 import { load as loadState, save as saveState } from "$lib/state";
 
 export const loadClipboardScript = async () => {

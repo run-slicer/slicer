@@ -1,7 +1,6 @@
 import { toast } from "svelte-sonner";
 import { loadFile } from "$lib/workspace";
-import { partition } from "$lib/utils";
-import { readFiles, timed } from "./utils";
+import { partition, readFiles, timed } from "$lib/utils";
 
 export const add = async () => {
     const results = await Promise.all(

@@ -7,10 +7,10 @@
     import { load as loadLanguage } from "$lib/lang";
     import { detectLanguage, read } from "./";
     import { Select, SelectContent, SelectItem, SelectTrigger } from "$lib/components/ui/select";
-    import { all as disasms } from "$lib/disasm";
-    import vf from "$lib/disasm/vf";
+    import { vf } from "$lib/disasm/builtin";
     import { toolsDisasm, editorTextSize, editorTextSizeSync, editorWrap } from "$lib/state";
     import { get, writable } from "svelte/store";
+    import type { Disassembler } from "$lib/disasm";
 
     export let tab: Tab;
     let entry = tab.entry!;
@@ -21,8 +21,10 @@
 
     $: disasmProto = { value: initialDisasm, label: initialDisasm };
 
+    export let disasms: Disassembler[];
+
     $: $toolsDisasm = disasmProto.value;
-    $: disasm = $disasms.get(disasmProto.value) || vf;
+    $: disasm = disasms.find((d) => d.id === disasmProto.value) || vf;
 
     $: language = detectLanguage(tab.type, entry, disasm);
 
@@ -45,7 +47,7 @@
                     <span class="tracking-tight">{disasm.name || disasm.id}</span>
                 </SelectTrigger>
                 <SelectContent class="max-h-[240px] w-full overflow-scroll">
-                    {#each $disasms.values() as dism}
+                    {#each disasms as dism}
                         <SelectItem value={dism.id} label={dism.id} class="text-xs tracking-tight">
                             {dism.name || dism.id}
                         </SelectItem>

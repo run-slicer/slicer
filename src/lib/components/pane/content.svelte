@@ -7,12 +7,12 @@
     import { type Tab, checkDirty } from "$lib/tab";
     import { projectOpen, loggingOpen } from "$lib/state";
     import { distractionFree } from "$lib/mode";
-    import { entries as logEntries } from "$lib/log";
     import { ActionType } from "$lib/action";
+    import type { LogEntry } from "$lib/log";
     import { cn } from "$lib/components/utils";
-    import { TreePane, LoggingPane, EditorPane } from "$lib/components/pane";
+    import { TreePane, LoggingPane, PaneGroup } from "$lib/components/pane";
     import { PaneHeader, PaneHeaderItem } from "$lib/components/pane/header";
-    // import { DeleteNodeDialog } from "$lib/components/dialog";
+    import type { Disassembler } from "$lib/disasm";
 
     export let tab: Tab | null;
     export let tabs: Tab[];
@@ -31,6 +31,9 @@
     }
 
     export let entries: Entry[];
+    export let logEntries: LogEntry[];
+
+    export let disasms: Disassembler[];
 
     const dispatch = createEventDispatcher();
 </script>
@@ -70,7 +73,7 @@
                     </PaneHeader>
                     {#each tabs as tab0 (tab0.id)}
                         <div class={cn("flex h-full w-full flex-col", tab?.id === tab0.id || "hidden")}>
-                            <EditorPane tab={tab0} dirtyFlag={checkDirty(tab0, tab)} />
+                            <PaneGroup tab={tab0} dirtyFlag={checkDirty(tab0, tab)} {disasms} />
                         </div>
                     {/each}
                 </div>
@@ -78,11 +81,9 @@
             {#if $loggingOpen && !$distractionFree}
                 <ResizableHandle />
                 <ResizablePane defaultSize={20}>
-                    <LoggingPane entries={$logEntries} />
+                    <LoggingPane entries={logEntries} />
                 </ResizablePane>
             {/if}
         </ResizablePaneGroup>
     </ResizablePane>
 </ResizablePaneGroup>
-
-<!--<DeleteNodeDialog bind:data={null} />-->

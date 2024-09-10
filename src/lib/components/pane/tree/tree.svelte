@@ -17,7 +17,8 @@
     import { Button } from "$lib/components/ui/button";
     import { ContextMenu, ContextMenuTrigger } from "$lib/components/ui/context-menu";
     import { PaneHeader, PaneHeaderItem } from "$lib/components/pane/header";
-    import { ActionType } from "$lib/action";
+    import { DeleteDialog } from "$lib/components/dialog";
+    import { type Action, ActionType, type BulkEntryAction } from "$lib/action";
     import TreeNode from "./node.svelte";
     import NodeMenu from "./menu.svelte";
 
@@ -50,10 +51,21 @@
     }
 
     let menuData: Node | null = null;
+    let deleteData: Entry[] | null = null;
 
     let triggerElem: HTMLDivElement;
 
     const dispatch = createEventDispatcher();
+
+    const handle = (e: CustomEvent<Action>) => {
+        const action = e.detail;
+        if (action.type === ActionType.REMOVE) {
+            // prompt confirmation dialog
+            deleteData = (action as BulkEntryAction).entries;
+        } else {
+            dispatch("action", action);
+        }
+    };
 </script>
 
 <div class="flex h-full w-full flex-col">
@@ -94,7 +106,9 @@
             {/if}
         </ContextMenuTrigger>
         {#if menuData}
-            <NodeMenu node={menuData} on:action />
+            <NodeMenu node={menuData} on:action={handle} />
         {/if}
     </ContextMenu>
 </div>
+
+<DeleteDialog bind:entries={deleteData} on:action />

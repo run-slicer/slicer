@@ -1,7 +1,7 @@
 import { type ClassEntry, type Entry, EntryType } from "$lib/workspace";
 import { disasmSafe, type Disassembler } from "$lib/disasm";
 import { formatHex } from "./hex";
-import { timed } from "$lib/action/utils";
+import { timed } from "$lib/utils";
 import { fromExtension, type Language } from "$lib/lang";
 import { TabType } from "$lib/tab";
 
