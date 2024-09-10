@@ -1,7 +1,7 @@
 <script lang="ts">
     import { ModeWatcher, mode } from "mode-watcher";
-    import { Menu } from "$lib/components/menu";
-    import { ContentPane } from "$lib/components/pane";
+    import Menu from "$lib/components/menu/menu.svelte";
+    import Content from "$lib/components/content.svelte";
     import { Toaster } from "$lib/components/ui/sonner";
     import Breadcrumb from "$lib/components/breadcrumb.svelte";
     import { onMount } from "svelte";
@@ -32,7 +32,7 @@
     scripts={$scripts}
     on:action={(e) => handle(e.detail)}
 />
-<ContentPane
+<Content
     bind:tab={$currentTab}
     tabs={Array.from($tabs.values())}
     entries={Array.from($entries.values())}

@@ -1,4 +1,3 @@
-import Menu from "./menu.svelte";
 import { toast } from "svelte-sonner";
 import { read } from "$lib/script";
 import { downloadBlob, readFiles } from "$lib/utils";
@@ -43,5 +42,3 @@ export const savePreferences = async () => {
         description: `Preferences exported successfully.`,
     });
 };
-
-export { Menu };

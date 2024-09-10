@@ -6,6 +6,7 @@
     import { type Tab, TabType } from "$lib/tab";
     import { load as loadLanguage } from "$lib/lang";
     import { detectLanguage, read } from "./";
+    import { CodeEditor } from "$lib/components/editor";
     import { Select, SelectContent, SelectItem, SelectTrigger } from "$lib/components/ui/select";
     import { vf } from "$lib/disasm/builtin";
     import { toolsDisasm, editorTextSize, editorTextSizeSync, editorWrap } from "$lib/state";
@@ -34,9 +35,9 @@
 </script>
 
 <div class="relative basis-full overflow-hidden scrollbar-thin">
-    {#await Promise.all([import("$lib/components/editor"), loadLanguage(language), read(tab.type, entry, disasm)])}
+    {#await Promise.all([loadLanguage(language), read(tab.type, entry, disasm)])}
         <Loading value={shouldDisasm ? "Disassembling..." : "Reading..."} overlay />
-    {:then [{ CodeEditor }, lang, value]}
+    {:then [lang, value]}
         <CodeEditor {value} readOnly {lang} bind:textSize={$textSize} wrap={$editorWrap} />
     {/await}
     {#if shouldDisasm}

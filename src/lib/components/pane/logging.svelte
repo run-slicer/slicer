@@ -1,5 +1,6 @@
 <script lang="ts">
     import { PaneHeader, PaneHeaderItem } from "$lib/components/pane/header";
+    import Loading from "$lib/components/loading.svelte";
     import { Terminal } from "lucide-svelte";
     import type { LogEntry } from "$lib/log";
 
@@ -22,7 +23,9 @@
         <PaneHeaderItem name="Logging" icon={{ icon: Terminal, classes: ["text-muted-foreground"] }} />
     </PaneHeader>
     <div class="relative basis-full overflow-hidden scrollbar-thin">
-        {#await Promise.all( [import("$lib/components/editor"), import("$lib/lang/parser/log")] ) then [{ CodeEditor }, { log }]}
+        {#await Promise.all([import("$lib/components/editor"), import("$lib/lang/parser/log")])}
+            <Loading overlay small />
+        {:then [{ CodeEditor }, { log }]}
             <CodeEditor
                 readOnly
                 {value}

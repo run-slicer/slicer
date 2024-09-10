@@ -1,8 +1,8 @@
 <svelte:options immutable />
 
 <script lang="ts">
+    import Lazy from "$lib/components/lazy.svelte";
     import { type Tab, TabType } from "$lib/tab";
-    import { CodePane, FlowPane, WelcomePane } from "$lib/components/pane";
     import type { Disassembler } from "$lib/disasm";
 
     export let tab: Tab;
@@ -13,10 +13,10 @@
 
 {#key dirtyFlag}
     {#if tab.type === TabType.WELCOME}
-        <WelcomePane />
+        <Lazy component={() => import("./welcome.svelte")} />
     {:else if tab.type === TabType.CODE || tab.type === TabType.HEX}
-        <CodePane {tab} {disasms} />
+        <Lazy component={() => import("./code/code.svelte")} {tab} {disasms} />
     {:else if tab.type === TabType.FLOW_GRAPH}
-        <FlowPane {tab} />
+        <Lazy component={() => import("./flow/flow.svelte")} {tab} />
     {/if}
 {/key}

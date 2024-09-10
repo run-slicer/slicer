@@ -6,6 +6,7 @@
 
     export let value: string | null = null;
     export let overlay = false;
+    export let small = false;
 
     let duration = 0;
     if (overlay) {
@@ -19,6 +20,7 @@
     class={cn(
         "flex flex-col items-center",
         !overlay || "absolute left-[50%] top-16 z-[9999] translate-x-[-50%]",
+        !overlay || !small || "top-8",
         $$props.class
     )}
 >

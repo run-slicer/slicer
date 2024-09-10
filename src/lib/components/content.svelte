@@ -10,7 +10,9 @@
     import { ActionType } from "$lib/action";
     import type { LogEntry } from "$lib/log";
     import { cn } from "$lib/components/utils";
-    import { TreePane, LoggingPane, PaneGroup } from "$lib/components/pane";
+    import TreePane from "$lib/components/pane/tree/tree.svelte";
+    import LoggingPane from "$lib/components/pane/logging.svelte";
+    import MainPane from "$lib/components/pane/main.svelte";
     import { PaneHeader, PaneHeaderItem } from "$lib/components/pane/header";
     import type { Disassembler } from "$lib/disasm";
 
@@ -72,8 +74,8 @@
                         </div>
                     </PaneHeader>
                     {#each tabs as tab0 (tab0.id)}
-                        <div class={cn("flex h-full w-full flex-col", tab?.id === tab0.id || "hidden")}>
-                            <PaneGroup tab={tab0} dirtyFlag={checkDirty(tab0, tab)} {disasms} />
+                        <div class={cn("relative flex h-full w-full flex-col", tab?.id === tab0.id || "hidden")}>
+                            <MainPane tab={tab0} dirtyFlag={checkDirty(tab0, tab)} {disasms} />
                         </div>
                     {/each}
                 </div>
