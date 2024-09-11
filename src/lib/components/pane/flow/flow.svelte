@@ -7,9 +7,11 @@
     import type { Member } from "@run-slicer/asm";
     import { Lock, LockOpen, Zap, ZapOff } from "lucide-svelte";
     import { mode } from "mode-watcher";
-    import Loading from "$lib/components/loading.svelte";
+    import { Background, Controls, SvelteFlow, ControlButton } from "@xyflow/svelte";
     import { Select, SelectContent, SelectItem, SelectTrigger } from "$lib/components/ui/select";
     import type { Selected } from "bits-ui";
+    import FlowNode from "./node.svelte";
+    import { createComputedGraph } from "./graph";
 
     export let tab: Tab;
     const entry = tab.entry!;
@@ -30,65 +32,62 @@
 
     let draggable = false;
     let showHandlerEdges = false;
+
+    $: [nodes, edges] = createComputedGraph(member, pool, showHandlerEdges);
 </script>
 
 <div class="relative h-full w-full">
-    {#await Promise.all([import("@xyflow/svelte"), import("./node.svelte"), import("./")])}
-        <Loading value="Loading..." overlay />
-    {:then [{ Background, Controls, SvelteFlow, ControlButton }, FlowNode, { createComputedGraph }]}
-        {@const [nodes, edges] = createComputedGraph(member, pool, showHandlerEdges)}
-        {#key [member, showHandlerEdges]}
-            <SvelteFlow
-                nodes={writable(nodes)}
-                edges={writable(edges)}
-                fitView
-                minZoom={0}
-                colorMode={$mode || "system"}
-                bind:nodesDraggable={draggable}
-                nodesConnectable={false}
-                elementsSelectable={false}
-                proOptions={{ hideAttribution: true }}
-                nodeTypes={{ block: FlowNode.default }}
-            >
-                <Background />
-                <Controls showLock={false} position="bottom-right">
-                    <!-- override interactivity control: we only want it to toggle draggability -->
-                    <ControlButton
-                        class="svelte-flow__controls-interactive"
-                        on:click={() => (draggable = !draggable)}
-                        title="toggle interactivity"
-                        aria-label="toggle interactivity"
-                    >
-                        <svelte:component this={draggable ? LockOpen : Lock} size={12} class="!fill-none" />
-                    </ControlButton>
-                    <ControlButton
-                        class="svelte-flow__controls-interactive"
-                        on:click={() => (showHandlerEdges = !showHandlerEdges)}
-                        title="toggle exception handler edges"
-                        aria-label="toggle exception handler edges"
-                    >
-                        <svelte:component this={showHandlerEdges ? Zap : ZapOff} size={12} class="!fill-none" />
-                    </ControlButton>
-                </Controls>
-            </SvelteFlow>
-        {/key}
-        <div class="absolute bottom-0 m-[15px] max-w-[425px]">
-            <Select bind:selected={method}>
-                <SelectTrigger class="h-7 whitespace-nowrap text-xs [&_svg]:ml-2 [&_svg]:h-4 [&_svg]:w-4">
-                    <div class="overflow-hidden text-ellipsis">
-                        <span class="mr-2 text-muted-foreground">Method: </span>
-                        <span class="font-mono tracking-tight">{method.label}</span>
-                    </div>
-                </SelectTrigger>
-                <SelectContent class="max-h-[240px] w-full overflow-scroll">
-                    {#each methods as mth, i}
-                        {@const label = createLabel(mth)}
-                        <SelectItem value={i} {label} class="break-all font-mono text-xs tracking-tight">
-                            {label}
-                        </SelectItem>
-                    {/each}
-                </SelectContent>
-            </Select>
-        </div>
-    {/await}
+    {#key [member, showHandlerEdges]}
+        <SvelteFlow
+            nodes={writable(nodes)}
+            edges={writable(edges)}
+            fitView
+            minZoom={0}
+            colorMode={$mode || "system"}
+            bind:nodesDraggable={draggable}
+            nodesConnectable={false}
+            elementsSelectable={false}
+            proOptions={{ hideAttribution: true }}
+            nodeTypes={{ block: FlowNode }}
+        >
+            <Background />
+            <Controls showLock={false} position="bottom-right">
+                <!-- override interactivity control: we only want it to toggle draggability -->
+                <ControlButton
+                    class="svelte-flow__controls-interactive"
+                    on:click={() => (draggable = !draggable)}
+                    title="toggle interactivity"
+                    aria-label="toggle interactivity"
+                >
+                    <svelte:component this={draggable ? LockOpen : Lock} size={12} class="!fill-none" />
+                </ControlButton>
+                <ControlButton
+                    class="svelte-flow__controls-interactive"
+                    on:click={() => (showHandlerEdges = !showHandlerEdges)}
+                    title="toggle exception handler edges"
+                    aria-label="toggle exception handler edges"
+                >
+                    <svelte:component this={showHandlerEdges ? Zap : ZapOff} size={12} class="!fill-none" />
+                </ControlButton>
+            </Controls>
+        </SvelteFlow>
+    {/key}
+    <div class="absolute bottom-0 m-[15px] max-w-[425px]">
+        <Select bind:selected={method}>
+            <SelectTrigger class="h-7 whitespace-nowrap text-xs [&_svg]:ml-2 [&_svg]:h-4 [&_svg]:w-4">
+                <div class="overflow-hidden text-ellipsis">
+                    <span class="mr-2 text-muted-foreground">Method: </span>
+                    <span class="font-mono tracking-tight">{method.label}</span>
+                </div>
+            </SelectTrigger>
+            <SelectContent class="max-h-[240px] w-full overflow-scroll">
+                {#each methods as mth, i}
+                    {@const label = createLabel(mth)}
+                    <SelectItem value={i} {label} class="break-all font-mono text-xs tracking-tight">
+                        {label}
+                    </SelectItem>
+                {/each}
+            </SelectContent>
+        </Select>
+    </div>
 </div>

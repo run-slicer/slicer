@@ -10,26 +10,37 @@
         AlertDialogTitle,
     } from "$lib/components/ui/alert-dialog";
     import { Button } from "$lib/components/ui/button";
-    import { type Node, deleteEntry } from "../";
+    import { createEventDispatcher } from "svelte";
+    import { ActionType } from "$lib/action";
+    import type { Entry } from "$lib/workspace";
 
-    export let data: Node | null = null;
+    export let entries: Entry[] | null;
 
     const handle = (accepted: boolean) => {
         if (accepted) {
-            deleteEntry(data!);
+            dispatch("action", { type: ActionType.REMOVE, entries: entries! });
         }
-        data = null;
+        entries = null;
     };
+
+    const dispatch = createEventDispatcher();
 </script>
 
-<AlertDialog open={data !== null}>
+<AlertDialog open={entries !== null}>
     <AlertDialogContent class="sm:max-w-[425px]">
-        {#if data}
+        {#if entries}
             <AlertDialogHeader>
                 <AlertDialogTitle>Are you sure, absolutely sure?</AlertDialogTitle>
                 <AlertDialogDescription>
                     This will permanently delete
-                    <span class="break-all italic">{data.label}</span> from the workspace.
+                    <span class="break-all italic">
+                        {#if entries.length === 1}
+                            {entries[0].name}
+                        {:else}
+                            {entries.length} entries
+                        {/if}
+                    </span>
+                    from the workspace.
                     <p class="mt-2 font-semibold">This action cannot be undone.</p>
                 </AlertDialogDescription>
             </AlertDialogHeader>

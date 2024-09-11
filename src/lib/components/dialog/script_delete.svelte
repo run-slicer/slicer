@@ -10,18 +10,17 @@
         AlertDialogTitle,
     } from "$lib/components/ui/alert-dialog";
     import { Button } from "$lib/components/ui/button";
-    import { type ProtoScript, remove } from "$lib/script";
-    import { toast } from "svelte-sonner";
+    import type { ProtoScript } from "$lib/script";
+    import { createEventDispatcher } from "svelte";
+    import { ActionType } from "$lib/action";
 
-    export let proto: ProtoScript | null = null;
+    export let proto: ProtoScript | null;
+
+    const dispatch = createEventDispatcher();
 
     const handle = async (accepted: boolean) => {
         if (accepted) {
-            await remove(proto!);
-
-            toast.success("Deleted", {
-                description: `Deleted script ${proto!.id}.`,
-            });
+            dispatch("action", { type: ActionType.SCRIPT_REMOVE, proto });
         }
         proto = null;
     };

@@ -1,6 +1,5 @@
 import { persisted } from "$lib/utils";
 import { error } from "$lib/log";
-import vf from "$lib/disasm/vf";
 
 export const root = "slicer.state";
 
@@ -19,7 +18,7 @@ export interface ScriptData {
 export const viewMode = persisted<ViewMode>(`${root}.view.mode`, ViewMode.NORMAL);
 export const workspaceNestedArchives = persisted<boolean>(`${root}.workspace.nested-archives`, true);
 export const projectOpen = persisted<boolean>(`${root}.project.open`, true);
-export const toolsDisasm = persisted<string>(`${root}.tools.disasm`, vf.id);
+export const toolsDisasm = persisted<string>(`${root}.tools.disasm`, "vf" /* vf.id ($lib/disasm/builtin) */);
 export const loggingOpen = persisted<boolean>(`${root}.logging.open`, false);
 export const loggingMaxEntries = persisted<number>(`${root}.logging.max-entries`, 50);
 export const scriptingScripts = persisted<ScriptData[]>(`${root}.scripting.scripts`, []);

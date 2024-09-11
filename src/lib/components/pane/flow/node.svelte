@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Position, Handle, type NodeProps } from "@xyflow/svelte";
-    import type { NodeData } from "./";
+    import type { NodeData } from "./graph";
 
     interface $$Props extends NodeProps {}
 

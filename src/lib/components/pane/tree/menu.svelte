@@ -1,7 +1,10 @@
 <script lang="ts">
     import { Binary, Code, Download, GitBranchPlus, Trash2 } from "lucide-svelte";
     import { createEventDispatcher } from "svelte";
+    import { EntryType } from "$lib/workspace";
     import { TabType } from "$lib/tab";
+    import { ActionType } from "$lib/action";
+    import { collectEntries } from "./tree.svelte";
     import type { Node } from "./";
     import {
         ContextMenuContent,
@@ -12,52 +15,49 @@
         ContextMenuSubTrigger,
         ContextMenuSubContent,
     } from "$lib/components/ui/context-menu";
-    import { EntryType } from "$lib/workspace";
 
-    export let data: Node;
+    export let node: Node;
 
     const dispatch = createEventDispatcher();
+
+    const dispatchOpen = (tabType: TabType) => {
+        dispatch("action", { type: ActionType.OPEN, entry: node.entry!, tabType });
+    };
 </script>
 
 <ContextMenuContent class="no-shadow min-w-[12rem] max-w-[16rem]">
-    <ContextMenuLabel class="overflow-hidden text-ellipsis text-center">{data.label}</ContextMenuLabel>
+    <ContextMenuLabel class="overflow-hidden text-ellipsis text-center">{node.label}</ContextMenuLabel>
     <ContextMenuSeparator />
-    {#if data.entry}
+    {#if node.entry}
         <ContextMenuSub>
             <ContextMenuSubTrigger>Open as</ContextMenuSubTrigger>
             <ContextMenuSubContent class="w-[12rem]">
-                {#if data.entry.type !== EntryType.ARCHIVE}
-                    <ContextMenuItem
-                        class="flex justify-between"
-                        on:click={() => dispatch("action", { type: "open", data, tabType: TabType.CODE })}
-                    >
+                {#if node.entry.type !== EntryType.ARCHIVE}
+                    <ContextMenuItem class="flex justify-between" on:click={() => dispatchOpen(TabType.CODE)}>
                         Code <Code size={16} />
                     </ContextMenuItem>
                 {/if}
-                <ContextMenuItem
-                    class="flex justify-between"
-                    on:click={() => dispatch("action", { type: "open", data, tabType: TabType.HEX })}
-                >
+                <ContextMenuItem class="flex justify-between" on:click={() => dispatchOpen(TabType.HEX)}>
                     Hexadecimal <Binary size={16} />
                 </ContextMenuItem>
-                {#if data.entry.type !== EntryType.ARCHIVE}
-                    <ContextMenuItem
-                        class="flex justify-between"
-                        on:click={() => dispatch("action", { type: "open", data, tabType: TabType.FLOW_GRAPH })}
-                    >
+                {#if node.entry.type !== EntryType.ARCHIVE}
+                    <ContextMenuItem class="flex justify-between" on:click={() => dispatchOpen(TabType.FLOW_GRAPH)}>
                         Flow graph <GitBranchPlus size={16} />
                     </ContextMenuItem>
                 {/if}
             </ContextMenuSubContent>
         </ContextMenuSub>
         <ContextMenuSeparator />
-        <ContextMenuItem class="flex justify-between" on:click={() => dispatch("action", { type: "download", data })}>
+        <ContextMenuItem
+            class="flex justify-between"
+            on:click={() => dispatch("action", { type: ActionType.EXPORT, entry: node.entry })}
+        >
             Download <Download size={16} />
         </ContextMenuItem>
     {/if}
     <ContextMenuItem
         class="flex justify-between data-[highlighted]:bg-destructive data-[highlighted]:text-destructive-foreground"
-        on:click={() => dispatch("action", { type: "delete", data })}
+        on:click={() => dispatch("action", { type: ActionType.REMOVE, entries: collectEntries(node) })}
     >
         Delete <Trash2 size={16} />
     </ContextMenuItem>

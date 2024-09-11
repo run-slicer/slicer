@@ -1,20 +1,22 @@
 <script lang="ts">
     import { userPrefersMode } from "mode-watcher";
     import { Separator } from "$lib/components/ui/separator";
-    import { add, load, close, export_ } from "$lib/action";
     import { viewMode, projectOpen, loggingOpen, editorWrap } from "$lib/state";
     import { distractionFree } from "$lib/mode";
-    import { entries, EntryType } from "$lib/workspace";
-    import { type ProtoScript, scripts } from "$lib/script";
-    import { current as currentTab, TabType } from "$lib/tab";
+    import { type Entry, EntryType } from "$lib/workspace";
+    import type { ProtoScript } from "$lib/script";
+    import { type Tab, TabType } from "$lib/tab";
+    import { ActionType } from "$lib/action";
     import { Modifier } from "$lib/shortcut";
     import Shortcut from "./shortcut.svelte";
     import ScriptMenu from "./script/menu.svelte";
-    import AboutDialog from "./dialog/about.svelte";
-    import ScriptDialog from "./dialog/script.svelte";
-    import ScriptLoadDialog from "./dialog/script_load.svelte";
-    import ScriptDeleteConfirmDialog from "./dialog/script_delete.svelte";
-    import ClearConfirmDialog from "./dialog/clear.svelte";
+    import {
+        AboutDialog,
+        ScriptDialog,
+        ScriptLoadDialog,
+        ScriptDeleteDialog,
+        ClearDialog,
+    } from "$lib/components/dialog";
     import {
         Menubar,
         MenubarMenu,
@@ -45,17 +47,47 @@
         SquareCode,
         Scan,
     } from "lucide-svelte";
-    import { openEntry, loadClipboardScript, loadPreferences, savePreferences } from "./";
+    import { createEventDispatcher } from "svelte";
+    import { toast } from "svelte-sonner";
 
-    $: tabType = $currentTab?.type;
-    $: entry = $currentTab?.entry || null;
+    export let tab: Tab | null;
+    export let entries: Entry[];
+    export let scripts: ProtoScript[];
 
     let aboutOpen = false;
-    let clearConfirmOpen = false;
+    let clearOpen = false;
 
     let scriptLoadOpen = false;
     let scriptDeleteOpen: ProtoScript | null = null;
     let scriptInfoOpen: ProtoScript | null = null;
+
+    const dispatch = createEventDispatcher();
+
+    const openEntry = (tabType: TabType) => {
+        dispatch("action", { type: ActionType.OPEN, entry: tab?.entry!, tabType });
+    };
+
+    const loadClipboardScript = async () => {
+        if (!navigator.clipboard) {
+            toast.error("Error occurred", {
+                description: `Could not copy from clipboard, feature not available.`,
+            });
+            return;
+        }
+
+        try {
+            const data = await navigator.clipboard.readText();
+
+            dispatch("action", {
+                type: ActionType.SCRIPT_ADD,
+                url: `data:text/javascript;base64,${window.btoa(data)}`,
+            });
+        } catch (e) {
+            toast.error("Error occurred", {
+                description: `Could not copy from clipboard, access denied.`,
+            });
+        }
+    };
 </script>
 
 <Menubar class="window-controls rounded-none border-b border-none px-2 lg:px-4">
@@ -77,10 +109,16 @@
             <MenubarSub>
                 <MenubarSubTrigger>Preferences</MenubarSubTrigger>
                 <MenubarSubContent class="w-[12rem]">
-                    <MenubarItem class="justify-between" on:click={loadPreferences}>
+                    <MenubarItem
+                        class="justify-between"
+                        on:click={() => dispatch("action", { type: ActionType.PREFS_LOAD })}
+                    >
                         Import <Upload size={16} />
                     </MenubarItem>
-                    <MenubarItem class="justify-between" on:click={savePreferences}>
+                    <MenubarItem
+                        class="justify-between"
+                        on:click={() => dispatch("action", { type: ActionType.PREFS_EXPORT })}
+                    >
                         Export <Download size={16} />
                     </MenubarItem>
                 </MenubarSubContent>
@@ -90,20 +128,18 @@
     <MenubarMenu>
         <MenubarTrigger class="relative">File</MenubarTrigger>
         <MenubarContent>
-            <MenubarItem on:click={load}>
+            <MenubarItem on:click={() => dispatch("action", { type: ActionType.LOAD })}>
                 Open <Shortcut key="o" modifier={Modifier.Ctrl} />
             </MenubarItem>
-            <MenubarItem on:click={add}>
+            <MenubarItem on:click={() => dispatch("action", { type: ActionType.ADD })}>
                 Add <Shortcut key="o" modifier={Modifier.Ctrl | Modifier.Shift} />
             </MenubarItem>
-            <MenubarItem disabled={$entries.size === 0} on:click={() => (clearConfirmOpen = true)}>
-                Clear all
-            </MenubarItem>
+            <MenubarItem disabled={entries.length === 0} on:click={() => (clearOpen = true)}>Clear all</MenubarItem>
             <MenubarSeparator />
-            <MenubarItem disabled={entry === null} on:click={() => export_()}>
+            <MenubarItem disabled={!tab?.entry} on:click={() => dispatch("action", { type: ActionType.EXPORT })}>
                 Export <Shortcut key="e" modifier={Modifier.Ctrl} />
             </MenubarItem>
-            <MenubarItem disabled={entry === null} on:click={close}>
+            <MenubarItem disabled={!tab?.entry} on:click={() => dispatch("action", { type: ActionType.CLOSE })}>
                 Close <Shortcut key="w" modifier={Modifier.Ctrl | Modifier.Alt} />
             </MenubarItem>
         </MenubarContent>
@@ -160,21 +196,21 @@
             <MenubarSeparator />
             <MenubarItem
                 class="justify-between"
-                disabled={!entry || entry.type === EntryType.ARCHIVE || tabType === TabType.CODE}
+                disabled={!tab?.entry || tab.entry.type === EntryType.ARCHIVE || tab.type === TabType.CODE}
                 on:click={() => openEntry(TabType.CODE)}
             >
                 Code <Code size={16} />
             </MenubarItem>
             <MenubarItem
                 class="justify-between"
-                disabled={!entry || entry.type === EntryType.ARCHIVE || tabType === TabType.HEX}
+                disabled={!tab?.entry || tab.entry.type === EntryType.ARCHIVE || tab.type === TabType.HEX}
                 on:click={() => openEntry(TabType.HEX)}
             >
                 Hexadecimal <Binary size={16} />
             </MenubarItem>
             <MenubarItem
                 class="justify-between"
-                disabled={!entry || entry.type === EntryType.ARCHIVE || tabType === TabType.FLOW_GRAPH}
+                disabled={!tab?.entry || tab.entry.type === EntryType.ARCHIVE || tab.type === TabType.FLOW_GRAPH}
                 on:click={() => openEntry(TabType.FLOW_GRAPH)}
             >
                 Flow graph <GitBranchPlus size={16} />
@@ -195,11 +231,12 @@
                     </MenubarItem>
                 </MenubarSubContent>
             </MenubarSub>
-            {#if $scripts.length > 0}
+            {#if scripts.length > 0}
                 <MenubarSeparator />
-                {#each $scripts as proto (proto.id)}
+                {#each scripts as proto (proto.id)}
                     <ScriptMenu
                         {proto}
+                        on:action
                         on:open={(e) => (scriptInfoOpen = e.detail.proto)}
                         on:delete={(e) => (scriptDeleteOpen = e.detail.proto)}
                     />
@@ -210,8 +247,8 @@
 </Menubar>
 <Separator />
 
-<AboutDialog bind:open={aboutOpen} />
-<ScriptDialog bind:proto={scriptInfoOpen} />
-<ScriptLoadDialog bind:open={scriptLoadOpen} />
-<ScriptDeleteConfirmDialog bind:proto={scriptDeleteOpen} />
-<ClearConfirmDialog bind:open={clearConfirmOpen} />
+<AboutDialog bind:open={aboutOpen} on:action />
+<ScriptDialog bind:proto={scriptInfoOpen} on:action />
+<ScriptLoadDialog bind:open={scriptLoadOpen} on:action />
+<ScriptDeleteDialog bind:proto={scriptDeleteOpen} on:action />
+<ClearDialog bind:open={clearOpen} on:action />

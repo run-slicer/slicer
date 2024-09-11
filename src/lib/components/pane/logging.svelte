@@ -1,7 +1,10 @@
 <script lang="ts">
-    import { PaneHeader, PaneHeaderItem } from "$lib/components/pane";
+    import { PaneHeader, PaneHeaderItem } from "$lib/components/pane/header";
+    import Loading from "$lib/components/loading.svelte";
     import { Terminal } from "lucide-svelte";
-    import { type LogEntry, entries } from "$lib/log";
+    import type { LogEntry } from "$lib/log";
+
+    export let entries: LogEntry[];
 
     const readEntries = (logs: LogEntry[]): string => {
         let result: string[] = [];
@@ -12,7 +15,7 @@
         return result.join("\n");
     };
 
-    $: value = readEntries($entries);
+    $: value = readEntries(entries);
 </script>
 
 <div class="flex h-full w-full flex-col">
@@ -20,9 +23,10 @@
         <PaneHeaderItem name="Logging" icon={{ icon: Terminal, classes: ["text-muted-foreground"] }} />
     </PaneHeader>
     <div class="relative basis-full overflow-hidden scrollbar-thin">
-        {#await Promise.all([import("./code/editor.svelte"), import("$lib/lang/parser/log")]) then [editor, { log }]}
-            <svelte:component
-                this={editor.default}
+        {#await Promise.all([import("$lib/components/editor"), import("$lib/lang/parser/log")])}
+            <Loading overlay small />
+        {:then [{ CodeEditor }, { log }]}
+            <CodeEditor
                 readOnly
                 {value}
                 lang={log()}

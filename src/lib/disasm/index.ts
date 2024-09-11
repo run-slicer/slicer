@@ -2,18 +2,14 @@ import type { ClassEntry } from "$lib/workspace";
 import type { Language } from "$lib/lang";
 import { error } from "$lib/log";
 import { get, writable } from "svelte/store";
-import jasm from "./jasm";
-import cfr from "./cfr";
-import vf from "./vf";
-
-export type DisassemblyFunc = (entry: ClassEntry) => Promise<string>;
+import { cfr, jasm, vf } from "./builtin";
 
 export interface Disassembler {
     id: string;
     name?: string;
     lang?: Language;
 
-    run: DisassemblyFunc;
+    run(entry: ClassEntry): Promise<string>;
 }
 
 export const all = writable<Map<string, Disassembler>>(

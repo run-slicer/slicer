@@ -10,9 +10,12 @@
         AlertDialogTitle,
     } from "$lib/components/ui/alert-dialog";
     import { Button } from "$lib/components/ui/button";
-    import { clear } from "$lib/action";
+    import { createEventDispatcher } from "svelte";
+    import { ActionType } from "$lib/action";
 
     export let open = false;
+
+    const dispatch = createEventDispatcher();
 </script>
 
 <AlertDialog bind:open>
@@ -27,7 +30,11 @@
         <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction asChild let:builder>
-                <Button builders={[builder]} variant="destructive" on:click={clear}>Delete</Button>
+                <Button
+                    builders={[builder]}
+                    variant="destructive"
+                    on:click={() => dispatch("action", { type: ActionType.CLEAR })}>Delete</Button
+                >
             </AlertDialogAction>
         </AlertDialogFooter>
     </AlertDialogContent>
