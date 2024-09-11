@@ -1,5 +1,6 @@
 import type { Entry } from "$lib/workspace";
 import type { Tab, TabType } from "$lib/tab";
+import type { ProtoScript } from "$lib/script";
 import { handle } from "./handler";
 
 export const enum ActionType {
@@ -10,6 +11,12 @@ export const enum ActionType {
     REMOVE,
     EXPORT,
     CLOSE,
+    SCRIPT_ADD,
+    SCRIPT_LOAD,
+    SCRIPT_UNLOAD,
+    SCRIPT_REMOVE,
+    PREFS_LOAD,
+    PREFS_EXPORT,
 }
 
 export interface Action {
@@ -34,6 +41,16 @@ export interface OpenAction extends EntryAction {
 export interface TabAction extends Action {
     type: ActionType.CLOSE;
     tab?: Tab;
+}
+
+export interface ScriptAddAction extends Action {
+    type: ActionType.SCRIPT_ADD;
+    url: string;
+}
+
+export interface ScriptAction extends Action {
+    type: ActionType.SCRIPT_LOAD | ActionType.SCRIPT_UNLOAD | ActionType.SCRIPT_REMOVE;
+    proto: ProtoScript;
 }
 
 export { handle };

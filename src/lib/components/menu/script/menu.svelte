@@ -6,11 +6,12 @@
         MenubarSubContent,
         MenubarSubTrigger,
     } from "$lib/components/ui/menubar";
-    import { load, unload, ScriptState, type ProtoScript } from "$lib/script";
+    import { ScriptState, type ProtoScript } from "$lib/script";
     import ScriptOption from "./option.svelte";
     import { MenubarItem } from "$lib/components/ui/menubar";
     import { createEventDispatcher } from "svelte";
     import { Info, Trash2 } from "lucide-svelte";
+    import { ActionType } from "$lib/action";
 
     export let proto: ProtoScript;
     const script = proto.script;
@@ -24,7 +25,8 @@
         <MenubarCheckboxItem
             checked={proto.state === ScriptState.LOADED}
             disabled={proto.state === ScriptState.FAILED}
-            onCheckedChange={(checked) => (checked ? load : unload)(proto)}
+            onCheckedChange={(checked) =>
+                dispatch("action", { type: checked ? ActionType.SCRIPT_LOAD : ActionType.SCRIPT_UNLOAD, proto })}
         >
             Enabled
         </MenubarCheckboxItem>

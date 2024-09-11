@@ -47,8 +47,8 @@
         SquareCode,
         Scan,
     } from "lucide-svelte";
-    import { loadClipboardScript, loadPreferences, savePreferences } from "./";
     import { createEventDispatcher } from "svelte";
+    import { toast } from "svelte-sonner";
 
     export let tab: Tab | null;
     export let entries: Entry[];
@@ -65,6 +65,28 @@
 
     const openEntry = (tabType: TabType) => {
         dispatch("action", { type: ActionType.OPEN, entry: tab?.entry!, tabType });
+    };
+
+    const loadClipboardScript = async () => {
+        if (!navigator.clipboard) {
+            toast.error("Error occurred", {
+                description: `Could not copy from clipboard, feature not available.`,
+            });
+            return;
+        }
+
+        try {
+            const data = await navigator.clipboard.readText();
+
+            dispatch("action", {
+                type: ActionType.SCRIPT_ADD,
+                url: `data:text/javascript;base64,${window.btoa(data)}`,
+            });
+        } catch (e) {
+            toast.error("Error occurred", {
+                description: `Could not copy from clipboard, access denied.`,
+            });
+        }
     };
 </script>
 
@@ -87,10 +109,16 @@
             <MenubarSub>
                 <MenubarSubTrigger>Preferences</MenubarSubTrigger>
                 <MenubarSubContent class="w-[12rem]">
-                    <MenubarItem class="justify-between" on:click={loadPreferences}>
+                    <MenubarItem
+                        class="justify-between"
+                        on:click={() => dispatch("action", { type: ActionType.PREFS_LOAD })}
+                    >
                         Import <Upload size={16} />
                     </MenubarItem>
-                    <MenubarItem class="justify-between" on:click={savePreferences}>
+                    <MenubarItem
+                        class="justify-between"
+                        on:click={() => dispatch("action", { type: ActionType.PREFS_EXPORT })}
+                    >
                         Export <Download size={16} />
                     </MenubarItem>
                 </MenubarSubContent>
@@ -208,6 +236,7 @@
                 {#each scripts as proto (proto.id)}
                     <ScriptMenu
                         {proto}
+                        on:action
                         on:open={(e) => (scriptInfoOpen = e.detail.proto)}
                         on:delete={(e) => (scriptDeleteOpen = e.detail.proto)}
                     />

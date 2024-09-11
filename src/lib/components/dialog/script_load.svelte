@@ -10,9 +10,9 @@
     import { Label } from "$lib/components/ui/label";
     import { Input } from "$lib/components/ui/input";
     import { Button } from "$lib/components/ui/button";
-    import { toast } from "svelte-sonner";
-    import { read } from "$lib/script";
     import { cn } from "$lib/components/utils";
+    import { createEventDispatcher } from "svelte";
+    import { ActionType } from "$lib/action";
 
     export let open = false;
 
@@ -23,6 +23,8 @@
             value = "";
         }
     }
+
+    const dispatch = createEventDispatcher();
 
     let invalid = false;
 
@@ -35,10 +37,7 @@
 
         open = false;
 
-        const proto = await read(value0);
-        toast.success("Imported", {
-            description: `Imported script ${proto.id}.`,
-        });
+        dispatch("action", { type: ActionType.SCRIPT_ADD, url: value0 });
     };
 </script>
 
