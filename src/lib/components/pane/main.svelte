@@ -15,7 +15,7 @@
     {#if tab.type === TabType.WELCOME}
         <Lazy component={() => import("./welcome.svelte")} />
     {:else if tab.type === TabType.CODE || tab.type === TabType.HEX}
-        <Lazy component={() => import("./code/code.svelte")} {tab} {disasms} />
+        <Lazy component={() => import("./code/code.svelte")} {tab} {disasms} on:action />
     {:else if tab.type === TabType.FLOW_GRAPH}
         <Lazy component={() => import("./flow/flow.svelte")} {tab} />
     {/if}

@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import { resolve } from "path";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
 import { sveltePreprocess } from "svelte-preprocess";
+import delegateEvents from "svelte-preprocess-delegate-events/preprocess";
 import sitemap from "vite-plugin-sitemap";
 
 // https://vitejs.dev/config/
@@ -9,6 +10,7 @@ export default defineConfig({
     plugins: [
         svelte({
             preprocess: [
+                delegateEvents(),
                 sveltePreprocess({
                     replace: [
                         [/process\.env\.APP_BRANCH/g, JSON.stringify(process.env.CF_PAGES_BRANCH || "unknown")],

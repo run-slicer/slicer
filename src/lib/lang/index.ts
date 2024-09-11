@@ -23,6 +23,16 @@ export const load = async (lang: Language): Promise<LanguageSupport | null> => {
     return null;
 };
 
+export const toExtension = (lang: Language): string => {
+    switch (lang) {
+        case "hex":
+        case "plaintext":
+            return "txt";
+    }
+
+    return lang;
+};
+
 export const fromExtension = (ext: string): Language => {
     switch (ext) {
         case "java":

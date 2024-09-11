@@ -12,6 +12,8 @@
     import { toolsDisasm, editorTextSize, editorTextSizeSync, editorWrap } from "$lib/state";
     import { get, writable } from "svelte/store";
     import type { Disassembler } from "$lib/disasm";
+    import { ContextMenu, ContextMenuTrigger } from "$lib/components/ui/context-menu";
+    import CodeMenu from "./menu.svelte";
 
     export let tab: Tab;
     let entry = tab.entry!;
@@ -38,7 +40,12 @@
     {#await Promise.all([loadLanguage(language), read(tab.type, entry, disasm)])}
         <Loading value={shouldDisasm ? "Disassembling..." : "Reading..."} overlay />
     {:then [lang, value]}
-        <CodeEditor {value} readOnly {lang} bind:textSize={$textSize} wrap={$editorWrap} />
+        <ContextMenu>
+            <ContextMenuTrigger>
+                <CodeEditor {value} readOnly {lang} bind:textSize={$textSize} wrap={$editorWrap} />
+            </ContextMenuTrigger>
+            <CodeMenu {tab} {value} lang={language} on:action />
+        </ContextMenu>
     {/await}
     {#if shouldDisasm}
         <div class="absolute bottom-0 right-0 m-[15px]">

@@ -25,7 +25,7 @@
     };
 </script>
 
-<ContextMenuContent class="no-shadow min-w-[12rem] max-w-[16rem]">
+<ContextMenuContent class="min-w-[12rem] max-w-[16rem]">
     <ContextMenuLabel class="overflow-hidden text-ellipsis text-center">{node.label}</ContextMenuLabel>
     <ContextMenuSeparator />
     {#if node.entry}

@@ -8,5 +8,5 @@
 {#await component().then(({ default: C }) => C)}
     <Loading value="Loading..." overlay />
 {:then Component}
-    <Component {...$$restProps} />
+    <Component {...$$restProps} on:* />
 {/await}
