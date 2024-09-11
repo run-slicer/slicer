@@ -23,7 +23,6 @@
             <div>
                 <p class="text-2xl">
                     <button class="mr-1 cursor-help font-semibold" on:click={changeImage}>slicer</button>
-                    {process.env.APP_VERSION}
                 </p>
                 <p class="text-sm">
                     <!-- this is ugly, but I don't want a space before the comma -->

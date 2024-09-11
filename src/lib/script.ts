@@ -219,7 +219,6 @@ const createContext = (script: Script, parent: ScriptContext | null): ScriptCont
 export const rootContext = createContext(
     {
         name: "slicer scripting engine",
-        // version: process.env.APP_VERSION,
         load(_context: ScriptContext): void {},
         unload(_context: ScriptContext): void {},
     },

@@ -3,7 +3,6 @@ import { resolve } from "path";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
 import { sveltePreprocess } from "svelte-preprocess";
 import sitemap from "vite-plugin-sitemap";
-import { version } from "./package.json";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -12,7 +11,6 @@ export default defineConfig({
             preprocess: [
                 sveltePreprocess({
                     replace: [
-                        [/process\.env\.APP_VERSION/g, JSON.stringify(version)],
                         [/process\.env\.APP_BRANCH/g, JSON.stringify(process.env.CF_PAGES_BRANCH || "unknown")],
                         [
                             /process\.env\.APP_COMMIT/g,
