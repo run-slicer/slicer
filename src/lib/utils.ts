@@ -111,18 +111,9 @@ export interface TimedResult<T> {
     time: number;
 }
 
-export const timed = async <T>(name: string, run: () => Promise<T>): Promise<TimedResult<T>> => {
+export const timed = async <T>(name: string, run: () => T | Promise<T>): Promise<TimedResult<T>> => {
     const start = Date.now();
     const result = await run();
-    const time = Date.now() - start;
-
-    log(`${name} took ${time}ms`);
-    return { result, time };
-};
-
-export const timedSync = <T>(name: string, run: () => T): TimedResult<T> => {
-    const start = Date.now();
-    const result = run();
     const time = Date.now() - start;
 
     log(`${name} took ${time}ms`);

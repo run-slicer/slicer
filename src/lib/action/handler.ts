@@ -19,6 +19,7 @@ import {
     tabs,
     TabType,
     update as updateTab,
+    detectType as detectTabType,
 } from "$lib/tab";
 import { toast } from "svelte-sonner";
 import { downloadBlob, partition, readFiles, timed } from "$lib/utils";
@@ -92,16 +93,6 @@ const add = async () => {
             description: `Added ${created.length} ${created.length === 1 ? "entry" : "entries"}.`,
         });
     }
-};
-
-// prettier-ignore
-const binaryExtensions = new Set([
-    "bin", "tar", "gz", "rar", "zip", "7z", "jar", "jpg", "jpeg", "gif", "png", "lzma", "dll", "so", "dylib", "exe",
-    "kotlin_builtins", "kotlin_metadata", "kotlin_module", "nbt", "ogg", "cer", "der", "crt",
-]);
-
-const detectTabType = (entry: Entry): TabType => {
-    return entry.extension && binaryExtensions.has(entry.extension) ? TabType.HEX : TabType.CODE;
 };
 
 const open = async (entry: Entry, type: TabType = detectTabType(entry)) => {

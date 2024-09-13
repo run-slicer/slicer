@@ -97,3 +97,13 @@ export const clear = () => {
 
     current.set(welcomeTab);
 };
+
+// prettier-ignore
+const binaryExtensions = new Set([
+    "bin", "tar", "gz", "rar", "zip", "7z", "jar", "jpg", "jpeg", "gif", "png", "lzma", "dll", "so", "dylib", "exe",
+    "kotlin_builtins", "kotlin_metadata", "kotlin_module", "nbt", "ogg", "cer", "der", "crt",
+]);
+
+export const detectType = (entry: Entry): TabType => {
+    return entry.extension && binaryExtensions.has(entry.extension) ? TabType.HEX : TabType.CODE;
+};

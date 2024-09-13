@@ -308,16 +308,16 @@ export const remove = async (def: ProtoScript): Promise<void> => {
 
 // script loading
 
-const scriptPromises = get(scriptingScripts).map(async (s) => {
-    const script = await read(s.url);
-    if (s.load) {
-        await load(script);
-    }
+Promise.all(
+    get(scriptingScripts).map(async (s) => {
+        const script = await read(s.url);
+        if (s.load) {
+            await load(script);
+        }
 
-    return script;
-});
-
-Promise.all(scriptPromises).then(() => {
+        return script;
+    })
+).then(() => {
     // start synchronizing stores only after all scripts have tried to load
     scripts.subscribe(($scripts) => {
         scriptingScripts.update(() => {
