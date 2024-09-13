@@ -1,7 +1,7 @@
 import { type StreamParser, StreamLanguage, LanguageSupport } from "@codemirror/language";
 
 interface State {
-    inLabel: boolean;
+    braces: boolean[]; // marks whether a block contains a label
 }
 
 const parser: StreamParser<State> = {
@@ -31,8 +31,10 @@ const parser: StreamParser<State> = {
             return "comment";
         }
 
+        const braceIndex = state.braces.length - 1;
+
         // identifiers
-        if (!state.inLabel && stream.match(/^\.([^"'{},:\s]+)/)) {
+        if (!state.braces[braceIndex] && stream.match(/^\.([^"'{},:\s]+)/)) {
             stream.eatSpace();
 
             // include any following modifiers as well
@@ -43,7 +45,10 @@ const parser: StreamParser<State> = {
         }
         // labels
         if (stream.match(/^([^"'{},:\s]+):/)) {
-            state.inLabel = true;
+            if (braceIndex >= 0) {
+                state.braces[braceIndex] = true;
+            }
+
             return "variable";
         }
 
@@ -52,20 +57,27 @@ const parser: StreamParser<State> = {
             return "number";
         }
 
+        // https://gist.github.com/cellularmitosis/6fd5fc2a65225364f72d3574abd9d5d5
+
         // strings
-        if (stream.match(/^"([^"]|(""))*"/)) {
+        if (stream.match(/^"(?:[^"\\]|\\[\s\S])*"/)) {
             return "string";
         }
         // characters
-        if (stream.match(/^'([^']|(''))*'/)) {
+        if (stream.match(/^'(?:[^'\\]|\\[\s\S])*'/)) {
             return "string";
         }
 
         switch (stream.next()) {
             case "{":
-            case "}":
-                state.inLabel = false;
+                state.braces.push(Boolean(state.braces[braceIndex]) /* propagate state */);
                 return "brace";
+            case "}":
+                state.braces.pop();
+                return "brace";
+            case "(":
+            case ")":
+                return "paren";
             case ",":
             case ":":
                 return "punctuation";
@@ -75,7 +87,7 @@ const parser: StreamParser<State> = {
     },
     startState() {
         return {
-            inLabel: false,
+            braces: [],
         };
     },
 };
