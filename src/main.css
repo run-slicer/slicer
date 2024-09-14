@@ -75,6 +75,7 @@
         --xy-node-background-color: hsl(var(--muted));
         --xy-node-border: 1px solid hsl(var(--border));
         --xy-node-border-radius: calc(var(--radius) / 2);
+        --xy-edge-stroke: hsl(var(--border));
         --xy-edge-label-background-color: hsl(var(--background));
         --xy-controls-button-background-color: hsl(var(--muted));
         --xy-controls-button-background-color-hover: hsl(var(--muted) / 0.6);
@@ -129,6 +130,14 @@
             box-shadow: var(--xy-node-boxshadow-selected, var(--xy-node-boxshadow-selected-default));
         }
     }
+}
+.svelte-flow__controls > :first-child {
+    border-top-left-radius: calc(var(--radius) / 2);
+    border-top-right-radius: calc(var(--radius) / 2);
+}
+.svelte-flow__controls > :last-child {
+    border-bottom-left-radius: calc(var(--radius) / 2);
+    border-bottom-right-radius: calc(var(--radius) / 2);
 }
 
 /* PWA title bar */
