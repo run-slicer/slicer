@@ -15,6 +15,8 @@ export interface ScriptData {
     load: boolean;
 }
 
+export const themeColor = persisted<string>(`${root}.theme.color`, "zinc");
+export const themeRadius = persisted<number>(`${root}.theme.radius`, 0.5);
 export const viewMode = persisted<ViewMode>(`${root}.view.mode`, ViewMode.NORMAL);
 export const workspaceNestedArchives = persisted<boolean>(`${root}.workspace.nested-archives`, true);
 export const projectOpen = persisted<boolean>(`${root}.project.open`, true);

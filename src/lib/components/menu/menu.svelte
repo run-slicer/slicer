@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { userPrefersMode } from "mode-watcher";
+    import { mode, userPrefersMode } from "mode-watcher";
     import { Separator } from "$lib/components/ui/separator";
-    import { viewMode, projectOpen, loggingOpen, editorWrap } from "$lib/state";
+    import { themeColor, themeRadius, viewMode, projectOpen, loggingOpen, editorWrap } from "$lib/state";
     import { distractionFree } from "$lib/mode";
     import { type Entry, EntryType } from "$lib/workspace";
     import type { ProtoScript } from "$lib/script";
@@ -30,6 +30,7 @@
         MenubarRadioGroup,
         MenubarRadioItem,
         MenubarCheckboxItem,
+        MenubarLabel,
     } from "$lib/components/ui/menubar";
     import {
         Terminal,
@@ -46,9 +47,14 @@
         SquareX,
         SquareCode,
         Scan,
+        Circle,
+        Settings,
+        Moon,
+        Sun,
     } from "lucide-svelte";
     import { createEventDispatcher } from "svelte";
     import { toast } from "svelte-sonner";
+    import { themes } from "$lib/theme";
 
     export let tab: Tab | null;
     export let entries: Entry[];
@@ -99,10 +105,52 @@
             <MenubarSub>
                 <MenubarSubTrigger>Theme</MenubarSubTrigger>
                 <MenubarSubContent class="w-[12rem]">
+                    <MenubarSub>
+                        <MenubarSubTrigger inset>Color</MenubarSubTrigger>
+                        <MenubarSubContent class="w-[12rem]">
+                            <MenubarRadioGroup bind:value={$themeColor}>
+                                {#each themes as theme (theme.name)}
+                                    {@const activeColor =
+                                        $mode === "light" ? theme.activeColor.light : theme.activeColor.dark}
+                                    <MenubarRadioItem value={theme.name} class="justify-between">
+                                        {theme.label || theme.name}
+                                        <Circle
+                                            size={16}
+                                            style="stroke: hsl({activeColor}); fill: hsl({activeColor});"
+                                        />
+                                    </MenubarRadioItem>
+                                {/each}
+                            </MenubarRadioGroup>
+                        </MenubarSubContent>
+                    </MenubarSub>
+                    <MenubarSub>
+                        <MenubarSubTrigger inset>Radius</MenubarSubTrigger>
+                        <MenubarSubContent class="w-[12rem]">
+                            <MenubarRadioGroup
+                                value={$themeRadius.toString()}
+                                onValueChange={(v) => ($themeRadius = parseFloat(v || "0.5"))}
+                            >
+                                <MenubarRadioItem value="0">None</MenubarRadioItem>
+                                <MenubarRadioItem value="0.3">Small</MenubarRadioItem>
+                                <MenubarRadioItem value="0.5">Normal</MenubarRadioItem>
+                                <MenubarRadioItem value="0.75">Large</MenubarRadioItem>
+                                <MenubarRadioItem value="1">Extra-large</MenubarRadioItem>
+                            </MenubarRadioGroup>
+                        </MenubarSubContent>
+                    </MenubarSub>
+                    <MenubarSeparator />
+                    <MenubarLabel inset>Mode</MenubarLabel>
+                    <MenubarSeparator />
                     <MenubarRadioGroup bind:value={$userPrefersMode}>
-                        <MenubarRadioItem value="system">System</MenubarRadioItem>
-                        <MenubarRadioItem value="dark">Dark</MenubarRadioItem>
-                        <MenubarRadioItem value="light">Light</MenubarRadioItem>
+                        <MenubarRadioItem value="system" class="justify-between">
+                            System <Settings size={16} />
+                        </MenubarRadioItem>
+                        <MenubarRadioItem value="dark" class="justify-between">
+                            Dark <Moon size={16} />
+                        </MenubarRadioItem>
+                        <MenubarRadioItem value="light" class="justify-between">
+                            Light <Sun size={16} />
+                        </MenubarRadioItem>
                     </MenubarRadioGroup>
                 </MenubarSubContent>
             </MenubarSub>
@@ -148,7 +196,7 @@
         <MenubarTrigger class="relative">View</MenubarTrigger>
         <MenubarContent>
             <MenubarSub>
-                <MenubarSubTrigger>Mode</MenubarSubTrigger>
+                <MenubarSubTrigger inset>Mode</MenubarSubTrigger>
                 <MenubarSubContent class="w-[12rem]">
                     <MenubarRadioGroup bind:value={$viewMode}>
                         <MenubarRadioItem class="justify-between" value="normal">
@@ -167,7 +215,7 @@
                 </MenubarSubContent>
             </MenubarSub>
             <MenubarSub>
-                <MenubarSubTrigger>Pane</MenubarSubTrigger>
+                <MenubarSubTrigger inset>Pane</MenubarSubTrigger>
                 <MenubarSubContent class="w-[12rem]">
                     <MenubarCheckboxItem
                         class="justify-between"
@@ -185,16 +233,9 @@
                     </MenubarCheckboxItem>
                 </MenubarSubContent>
             </MenubarSub>
-            <MenubarSub>
-                <MenubarSubTrigger>Editor</MenubarSubTrigger>
-                <MenubarSubContent class="w-[12rem]">
-                    <MenubarCheckboxItem class="justify-between" bind:checked={$editorWrap}>
-                        Wrap lines <WrapText size={16} />
-                    </MenubarCheckboxItem>
-                </MenubarSubContent>
-            </MenubarSub>
             <MenubarSeparator />
             <MenubarItem
+                inset
                 class="justify-between"
                 disabled={!tab?.entry || tab.entry.type === EntryType.ARCHIVE || tab.type === TabType.CODE}
                 on:click={() => openEntry(TabType.CODE)}
@@ -202,6 +243,7 @@
                 Code <Code size={16} />
             </MenubarItem>
             <MenubarItem
+                inset
                 class="justify-between"
                 disabled={!tab?.entry || tab.entry.type === EntryType.ARCHIVE || tab.type === TabType.HEX}
                 on:click={() => openEntry(TabType.HEX)}
@@ -209,12 +251,17 @@
                 Hexadecimal <Binary size={16} />
             </MenubarItem>
             <MenubarItem
+                inset
                 class="justify-between"
                 disabled={!tab?.entry || tab.entry.type === EntryType.ARCHIVE || tab.type === TabType.FLOW_GRAPH}
                 on:click={() => openEntry(TabType.FLOW_GRAPH)}
             >
                 Flow graph <GitBranchPlus size={16} />
             </MenubarItem>
+            <MenubarSeparator />
+            <MenubarCheckboxItem class="justify-between" bind:checked={$editorWrap}>
+                Wrap lines <WrapText size={16} />
+            </MenubarCheckboxItem>
         </MenubarContent>
     </MenubarMenu>
     <MenubarMenu>
