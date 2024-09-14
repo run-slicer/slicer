@@ -1,4 +1,5 @@
 import { themeColor, themeRadius } from "$lib/state";
+import { mode } from "mode-watcher";
 
 export interface Theme {
     name: string;
@@ -652,3 +653,16 @@ const themeMap = new Map<string, Theme>(themes.map((t) => [t.name, t]));
 themeColor.subscribe(($themeColor) => apply(themeMap.get($themeColor) || themes[0] /* zinc */));
 
 themeRadius.subscribe(($themeRadius) => document.documentElement.style.setProperty("--radius", `${$themeRadius}rem`));
+
+// update meta color for PWAs
+
+const updateMeta = () => {
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) {
+        const color = window.getComputedStyle(document.body, null).getPropertyValue("--background");
+        (meta as HTMLMetaElement).content = `hsl(${color})`;
+    }
+};
+
+mode.subscribe(updateMeta);
+themeColor.subscribe(updateMeta);
