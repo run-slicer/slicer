@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Binary, Code, Download, GitBranchPlus, Trash2 } from "lucide-svelte";
+    import { Binary, Code, Download, GitBranchPlus, Image, Trash2 } from "lucide-svelte";
     import { createEventDispatcher } from "svelte";
     import { EntryType } from "$lib/workspace";
     import { TabType } from "$lib/tab";
@@ -39,6 +39,9 @@
                 {/if}
                 <ContextMenuItem class="flex justify-between" on:click={() => dispatchOpen(TabType.HEX)}>
                     Hexadecimal <Binary size={16} />
+                </ContextMenuItem>
+                <ContextMenuItem class="flex justify-between" on:click={() => dispatchOpen(TabType.IMAGE)}>
+                    Image <Image size={16} />
                 </ContextMenuItem>
                 {#if node.entry.type !== EntryType.ARCHIVE}
                     <ContextMenuItem class="flex justify-between" on:click={() => dispatchOpen(TabType.FLOW_GRAPH)}>

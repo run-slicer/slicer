@@ -153,16 +153,16 @@
             }),
             parent,
         });
-
-        parent.addEventListener("wheel", (e) => {
-            if (e.ctrlKey) {
-                e.preventDefault();
-
-                const toAdd = e.deltaY > 0 ? -0.05 : 0.05;
-                textSize = Math.max(0.25, Math.min(4, textSize + toAdd));
-            }
-        });
     });
+
+    const rescale = (e: WheelEvent) => {
+        if (e.ctrlKey) {
+            e.preventDefault();
+
+            const toAdd = e.deltaY > 0 ? -0.05 : 0.05;
+            textSize = Math.max(0.25, Math.min(4, textSize + toAdd));
+        }
+    };
 </script>
 
-<div bind:this={parent} class="absolute h-full w-full" />
+<div bind:this={parent} class="absolute h-full w-full" on:wheel={rescale} />

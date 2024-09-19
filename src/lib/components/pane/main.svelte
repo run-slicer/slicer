@@ -18,5 +18,7 @@
         <Lazy component={() => import("./code/code.svelte")} {tab} {disasms} on:action />
     {:else if tab.type === TabType.FLOW_GRAPH}
         <Lazy component={() => import("./flow/flow.svelte")} {tab} />
+    {:else if tab.type === TabType.IMAGE}
+        <Lazy component={() => import("./image.svelte")} {tab} />
     {/if}
 {/key}

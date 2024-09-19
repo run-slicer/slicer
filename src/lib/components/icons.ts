@@ -47,6 +47,7 @@ export const fileIcon = (label: string): StyledIcon => {
             case "jpeg":
             case "png":
             case "gif":
+            case "webp":
                 return { icon: Image, classes: ["text-blue-500"] };
             case "html":
             case "xml":

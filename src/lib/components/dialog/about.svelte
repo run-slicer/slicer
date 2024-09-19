@@ -28,6 +28,7 @@
                     <!-- this is ugly, but I don't want a space before the comma -->
                     <a
                         href={`https://github.com/run-slicer/slicer/commit/${process.env.APP_COMMIT}`}
+                        target="_blank"
                         class="hover:text-blue-700 hover:underline">{process.env.APP_COMMIT}</a
                     >, branch {process.env.APP_BRANCH}
                 </p>

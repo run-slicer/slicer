@@ -16,7 +16,7 @@
     import CodeMenu from "./menu.svelte";
 
     export let tab: Tab;
-    let entry = tab.entry!;
+    const entry = tab.entry!;
 
     const shouldDisasm = entry.type === EntryType.CLASS && tab.type === TabType.CODE;
 

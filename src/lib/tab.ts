@@ -8,6 +8,7 @@ export const enum TabType {
     CODE = "code",
     HEX = "hex",
     FLOW_GRAPH = "flow_graph",
+    IMAGE = "image",
 }
 
 export interface Tab {
@@ -100,10 +101,22 @@ export const clear = () => {
 
 // prettier-ignore
 const binaryExtensions = new Set([
-    "bin", "tar", "gz", "rar", "zip", "7z", "jar", "jpg", "jpeg", "gif", "png", "lzma", "dll", "so", "dylib", "exe",
-    "kotlin_builtins", "kotlin_metadata", "kotlin_module", "nbt", "ogg", "cer", "der", "crt",
+    "bin", "tar", "gz", "rar", "zip", "7z", "jar", "lzma", "dll", "so", "dylib", "exe", "kotlin_builtins",
+    "kotlin_metadata", "kotlin_module", "nbt", "ogg", "cer", "der", "crt",
 ]);
 
+// prettier-ignore
+const imageExtensions = new Set(["jpg", "jpeg", "gif", "png", "webp"]);
+
 export const detectType = (entry: Entry): TabType => {
-    return entry.extension && binaryExtensions.has(entry.extension) ? TabType.HEX : TabType.CODE;
+    if (entry.extension) {
+        if (binaryExtensions.has(entry.extension)) {
+            return TabType.HEX;
+        }
+        if (imageExtensions.has(entry.extension)) {
+            return TabType.IMAGE;
+        }
+    }
+
+    return TabType.CODE;
 };
