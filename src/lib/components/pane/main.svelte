@@ -19,6 +19,6 @@
     {:else if tab.type === TabType.FLOW_GRAPH}
         <Lazy component={() => import("./flow/flow.svelte")} {tab} />
     {:else if tab.type === TabType.IMAGE}
-        <Lazy component={() => import("./image.svelte")} {tab} />
+        <Lazy component={() => import("./image/image.svelte")} {tab} />
     {/if}
 {/key}

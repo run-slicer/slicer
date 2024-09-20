@@ -5,16 +5,15 @@
     import { tweened } from "svelte/motion";
     import { onDestroy } from "svelte";
     import { humanSize } from "$lib/utils";
+    import { Fullscreen, ZoomIn, ZoomOut } from "lucide-svelte";
+    import MenuButton from "./menu_button.svelte";
 
     export let tab: Tab;
     let entry = tab.entry!;
 
     const scale = tweened<number>(1.0, { duration: 125 });
-    const rescale = (e: WheelEvent) => {
-        $scale = Math.max(
-            0.5 /* minimum scale */,
-            Math.min(2.0 /* maximum scale */, $scale * (1.0 - e.deltaY / 250) /* smoothing */)
-        );
+    const rescale = (scaler: (old: number) => number) => {
+        $scale = Math.max(0.5 /* minimum scale */, Math.min(2.0 /* maximum scale */, scaler($scale)));
     };
 
     let elem: HTMLImageElement;
@@ -30,7 +29,12 @@
     <Loading value="Reading..." overlay />
 {:then blob}
     <div class="flex h-8 min-h-8 w-full flex-col">
-        <div class="flex grow flex-row items-center justify-end bg-background px-2">
+        <div class="flex grow flex-row items-center justify-between bg-background px-2">
+            <div class="flex gap-2">
+                <MenuButton icon={Fullscreen} label="Reset zoom" on:click={() => rescale(() => 1.0)} />
+                <MenuButton icon={ZoomIn} label="Zoom in" on:click={() => rescale((s) => s + 0.5)} />
+                <MenuButton icon={ZoomOut} label="Zoom out" on:click={() => rescale((s) => s - 0.5)} />
+            </div>
             <div class="text-xs">
                 {elem?.naturalWidth}x{elem?.naturalHeight}
                 {entry.extension?.toUpperCase() || "image"}
@@ -42,7 +46,7 @@
     <div class="relative h-full w-full">
         <div
             class="absolute bottom-0 left-0 right-0 top-0 flex items-center justify-center overflow-hidden"
-            on:wheel={rescale}
+            on:wheel={(e) => rescale((s) => s * (1.0 - e.deltaY / 250) /* smoothing */)}
         >
             <img
                 bind:this={elem}
