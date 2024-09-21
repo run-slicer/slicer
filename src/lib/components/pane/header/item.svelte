@@ -26,7 +26,7 @@
 
 <button
     class={cn(
-        "inline-flex h-full cursor-default items-center px-3",
+        "inline-flex h-full max-w-96 cursor-default items-center px-3",
         !active || "border-t-[1px] border-t-primary bg-background"
     )}
     bind:this={elem}
@@ -35,7 +35,7 @@
     {#if icon}
         <svelte:component this={icon.icon} size={16} class={cn("mr-1.5 min-w-[16px]", icon.classes)} />
     {/if}
-    <span class="whitespace-nowrap break-keep text-sm">{name}</span>
+    <span class="overflow-hidden text-ellipsis whitespace-nowrap break-keep text-sm">{name}</span>
     {#if closeable}
         <button class="ml-3" aria-label="Close" on:click={handleClose}>
             <X size={14} class="min-w-[14px] text-muted-foreground/60 hover:text-muted-foreground/80" />
