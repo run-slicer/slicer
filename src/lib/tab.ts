@@ -1,4 +1,4 @@
-import type { Entry } from "$lib/workspace";
+import { type Entry, EntryType } from "$lib/workspace";
 import { get, writable } from "svelte/store";
 import type { StyledIcon } from "$lib/components/icons";
 import { Sparkles } from "lucide-svelte";
@@ -122,10 +122,14 @@ export const detectType = (entry: Entry): TabType => {
     return TabType.CODE;
 };
 
+export const isEncodingDependent = (tab: Tab): boolean => {
+    return tab.type === TabType.CODE && tab.entry?.type !== EntryType.CLASS /* not disassembled */;
+};
+
 // soft-refresh code tabs on encoding change
 workspaceEncoding.subscribe(() => {
     for (const tab of get(tabs).values()) {
-        if (tab.type === TabType.CODE) {
+        if (isEncodingDependent(tab)) {
             refresh(tab);
         }
     }

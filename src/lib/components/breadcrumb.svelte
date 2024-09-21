@@ -2,11 +2,11 @@
     import { Separator } from "$lib/components/ui/separator";
     import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbSeparator } from "$lib/components/ui/breadcrumb";
     import { cn } from "$lib/components/utils";
-    import { type Tab, TabType } from "$lib/tab";
+    import { isEncodingDependent, type Tab } from "$lib/tab";
     import type { Encoding } from "$lib/workspace/encoding";
 
     export let tab: Tab | null;
-    export let encoding: Encoding;
+    export let encoding: Encoding | null;
 </script>
 
 <Separator />
@@ -33,7 +33,7 @@
                 {/each}
             </BreadcrumbList>
         </Breadcrumb>
-        {#if tab.type === TabType.CODE}
+        {#if encoding && isEncodingDependent(tab)}
             <div class="text-xs text-muted-foreground">
                 {encoding.label || encoding.id.toUpperCase()}
             </div>

@@ -164,31 +164,6 @@
             <MenubarSub>
                 <MenubarSubTrigger>Preferences</MenubarSubTrigger>
                 <MenubarSubContent class="w-[12rem]">
-                    <MenubarSub>
-                        <MenubarSubTrigger>Encoding</MenubarSubTrigger>
-                        <MenubarSubContent class="w-[12rem]">
-                            <MenubarRadioGroup bind:value={$workspaceEncoding}>
-                                {#each Object.values(encodings) as encoding}
-                                    <MenubarRadioItem value={encoding.id} class="justify-between">
-                                        {encoding.label || encoding.id.toUpperCase()}
-                                    </MenubarRadioItem>
-                                {/each}
-                            </MenubarRadioGroup>
-                        </MenubarSubContent>
-                    </MenubarSub>
-                    <MenubarSub>
-                        <MenubarSubTrigger>Archive encoding</MenubarSubTrigger>
-                        <MenubarSubContent class="w-[12rem]">
-                            <MenubarRadioGroup bind:value={$workspaceArchiveEncoding}>
-                                {#each Object.values(encodings) as encoding}
-                                    <MenubarRadioItem value={encoding.id} class="justify-between">
-                                        {encoding.label || encoding.id.toUpperCase()}
-                                    </MenubarRadioItem>
-                                {/each}
-                            </MenubarRadioGroup>
-                        </MenubarSubContent>
-                    </MenubarSub>
-                    <MenubarSeparator />
                     <MenubarItem
                         class="justify-between"
                         on:click={() => dispatch("action", { type: ActionType.PREFS_LOAD })}
@@ -222,6 +197,19 @@
             <MenubarItem disabled={!tab?.entry} on:click={() => dispatch("action", { type: ActionType.CLOSE })}>
                 Close <Shortcut key="w" modifier={Modifier.Ctrl | Modifier.Alt} />
             </MenubarItem>
+            <MenubarSeparator />
+            <MenubarSub>
+                <MenubarSubTrigger>ZIP encoding</MenubarSubTrigger>
+                <MenubarSubContent class="w-[12rem]">
+                    <MenubarRadioGroup bind:value={$workspaceArchiveEncoding}>
+                        {#each Object.values(encodings) as encoding}
+                            <MenubarRadioItem value={encoding.id} class="justify-between">
+                                {encoding.label || encoding.id.toUpperCase()}
+                            </MenubarRadioItem>
+                        {/each}
+                    </MenubarRadioGroup>
+                </MenubarSubContent>
+            </MenubarSub>
         </MenubarContent>
     </MenubarMenu>
     <MenubarMenu>
@@ -291,6 +279,18 @@
                 Flow graph <GitBranchPlus size={16} />
             </MenubarItem>
             <MenubarSeparator />
+            <MenubarSub>
+                <MenubarSubTrigger inset>Encoding</MenubarSubTrigger>
+                <MenubarSubContent class="w-[12rem]">
+                    <MenubarRadioGroup bind:value={$workspaceEncoding}>
+                        {#each Object.values(encodings) as encoding}
+                            <MenubarRadioItem value={encoding.id} class="justify-between">
+                                {encoding.label || encoding.id.toUpperCase()}
+                            </MenubarRadioItem>
+                        {/each}
+                    </MenubarRadioGroup>
+                </MenubarSubContent>
+            </MenubarSub>
             <MenubarCheckboxItem class="justify-between" bind:checked={$editorWrap}>
                 Wrap lines <WrapText size={16} />
             </MenubarCheckboxItem>
