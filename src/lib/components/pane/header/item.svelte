@@ -25,11 +25,12 @@
 </script>
 
 <button
+    bind:this={elem}
     class={cn(
         "inline-flex h-full max-w-96 cursor-default items-center px-3",
         !active || "border-t-[1px] border-t-primary bg-background"
     )}
-    bind:this={elem}
+    aria-label={name}
     on:click
 >
     {#if icon}
