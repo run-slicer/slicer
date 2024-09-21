@@ -1,4 +1,5 @@
-import { type ClassEntry, type Entry, EntryType, memoryData } from "$lib/workspace";
+import { type ClassEntry, type Entry, EntryType } from "$lib/workspace";
+import { memoryData } from "$lib/workspace/data";
 import { disasmSafe, type Disassembler } from "$lib/disasm";
 import { formatHex } from "./hex";
 import { timed } from "$lib/utils";
@@ -43,7 +44,10 @@ const replaceExt = (path: string, ext: string): string => {
     return `${path}.${ext}`;
 };
 
+// UTF-8
 const encoder = new TextEncoder();
+const decoder = new TextDecoder();
+
 export const createTextEntry = (entry: Entry, lang: Language, value: string): Entry => {
     const ext = toExtension(lang);
 
@@ -52,6 +56,6 @@ export const createTextEntry = (entry: Entry, lang: Language, value: string): En
         name: replaceExt(entry.name, ext),
         shortName: replaceExt(entry.shortName, ext),
         extension: ext,
-        data: memoryData(replaceExt(entry.data.name, ext), encoder.encode(value)),
+        data: memoryData(replaceExt(entry.data.name, ext), encoder.encode(value), decoder),
     };
 };

@@ -2,13 +2,15 @@
     import { Separator } from "$lib/components/ui/separator";
     import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbSeparator } from "$lib/components/ui/breadcrumb";
     import { cn } from "$lib/components/utils";
-    import type { Tab } from "$lib/tab";
+    import { type Tab, TabType } from "$lib/tab";
+    import type { Encoding } from "$lib/workspace/encoding";
 
     export let tab: Tab | null;
+    export let encoding: Encoding;
 </script>
 
 <Separator />
-<div class="flex h-6 items-center overflow-x-auto px-2 scrollbar-none">
+<div class="flex h-6 items-center justify-between overflow-x-auto px-2 scrollbar-none">
     {#if tab?.entry}
         {@const parts = tab.entry.name.split("/")}
         <Breadcrumb>
@@ -31,5 +33,10 @@
                 {/each}
             </BreadcrumbList>
         </Breadcrumb>
+        {#if tab.type === TabType.CODE}
+            <div class="text-xs text-muted-foreground">
+                {encoding.label || encoding.id.toUpperCase()}
+            </div>
+        {/if}
     {/if}
 </div>

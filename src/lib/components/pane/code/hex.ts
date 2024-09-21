@@ -1,4 +1,4 @@
-import type { Data } from "$lib/workspace";
+import type { Data } from "$lib/workspace/data";
 
 const ROW_BYTES = 16;
 

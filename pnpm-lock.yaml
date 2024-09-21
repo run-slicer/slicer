@@ -63,8 +63,8 @@ importers:
         specifier: 0.1.2-1.10.1
         version: 0.1.2-1.10.1
       '@run-slicer/zip':
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.4.0
+        version: 0.4.0
       '@uiw/codemirror-theme-github':
         specifier: ^4.23.2
         version: 4.23.2(@codemirror/language@6.10.3)(@codemirror/state@6.4.1)(@codemirror/view@6.33.0)
@@ -528,8 +528,8 @@ packages:
   '@run-slicer/vf@0.1.2-1.10.1':
     resolution: {integrity: sha512-EuDLNIDllcCeUELAhblG0qHdb+3jZvSghO2p5khwa2gvvymzMOj9QRKxGjvkGLAVJi73etcTNSFfrGb7k9tfXQ==}
 
-  '@run-slicer/zip@0.3.0':
-    resolution: {integrity: sha512-zibKiw/W6IH2TMA5SzBQdDf+/zf5S1YoxAPr1tasjVboZgaBtiKA+Ba85O8q9LjDIx5giOraemUIXTxv1lTYew==}
+  '@run-slicer/zip@0.4.0':
+    resolution: {integrity: sha512-syzi8I0YSGdokXrZn9nVfuBTDOIpIC9M2VOSgx3lORzQBujp+fvInpvYvn406ohwvLWDYn8zy3c6DdAVUToT9w==}
 
   '@svelte-put/shortcut@3.1.1':
     resolution: {integrity: sha512-2L5EYTZXiaKvbEelVkg5znxqvfZGZai3m97+cAiUBhLZwXnGtviTDpHxOoZBsqz41szlfRMcamW/8o0+fbW3ZQ==}
@@ -1760,7 +1760,7 @@ snapshots:
 
   '@run-slicer/vf@0.1.2-1.10.1': {}
 
-  '@run-slicer/zip@0.3.0':
+  '@run-slicer/zip@0.4.0':
     dependencies:
       pako: 2.1.0
 

@@ -19,15 +19,8 @@ import type {
     TabType as ScriptTabType,
 } from "@run-slicer/script";
 import { current as currentTab, find as findTab, refresh as refreshTab, type Tab, tabs, TabType } from "$lib/tab";
-import {
-    type ClassEntry,
-    DataType,
-    type Entry,
-    EntryType,
-    type MemoryData,
-    readDetail,
-    unwrapTransform,
-} from "$lib/workspace";
+import { type ClassEntry, type Entry, EntryType, readDetail } from "$lib/workspace";
+import { DataType, type MemoryData, unwrapTransform } from "$lib/workspace/data";
 import { read as readNode } from "@run-slicer/asm";
 import {
     add as addDisasm,

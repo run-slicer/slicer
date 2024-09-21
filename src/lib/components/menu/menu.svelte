@@ -1,9 +1,19 @@
 <script lang="ts">
     import { mode, userPrefersMode } from "mode-watcher";
     import { Separator } from "$lib/components/ui/separator";
-    import { themeColor, themeRadius, viewMode, projectOpen, loggingOpen, editorWrap } from "$lib/state";
+    import {
+        themeColor,
+        themeRadius,
+        viewMode,
+        projectOpen,
+        loggingOpen,
+        editorWrap,
+        workspaceEncoding,
+        workspaceArchiveEncoding,
+    } from "$lib/state";
     import { distractionFree } from "$lib/mode";
     import { type Entry, EntryType } from "$lib/workspace";
+    import { encodings } from "$lib/workspace/encoding";
     import type { ProtoScript } from "$lib/script";
     import { type Tab, TabType } from "$lib/tab";
     import { ActionType } from "$lib/action";
@@ -30,7 +40,6 @@
         MenubarRadioGroup,
         MenubarRadioItem,
         MenubarCheckboxItem,
-        MenubarLabel,
     } from "$lib/components/ui/menubar";
     import {
         Terminal,
@@ -139,8 +148,6 @@
                         </MenubarSubContent>
                     </MenubarSub>
                     <MenubarSeparator />
-                    <MenubarLabel inset>Mode</MenubarLabel>
-                    <MenubarSeparator />
                     <MenubarRadioGroup bind:value={$userPrefersMode}>
                         <MenubarRadioItem value="system" class="justify-between">
                             System <Settings size={16} />
@@ -157,6 +164,31 @@
             <MenubarSub>
                 <MenubarSubTrigger>Preferences</MenubarSubTrigger>
                 <MenubarSubContent class="w-[12rem]">
+                    <MenubarSub>
+                        <MenubarSubTrigger>Encoding</MenubarSubTrigger>
+                        <MenubarSubContent class="w-[12rem]">
+                            <MenubarRadioGroup bind:value={$workspaceEncoding}>
+                                {#each Object.values(encodings) as encoding}
+                                    <MenubarRadioItem value={encoding.id} class="justify-between">
+                                        {encoding.label || encoding.id.toUpperCase()}
+                                    </MenubarRadioItem>
+                                {/each}
+                            </MenubarRadioGroup>
+                        </MenubarSubContent>
+                    </MenubarSub>
+                    <MenubarSub>
+                        <MenubarSubTrigger>Archive encoding</MenubarSubTrigger>
+                        <MenubarSubContent class="w-[12rem]">
+                            <MenubarRadioGroup bind:value={$workspaceArchiveEncoding}>
+                                {#each Object.values(encodings) as encoding}
+                                    <MenubarRadioItem value={encoding.id} class="justify-between">
+                                        {encoding.label || encoding.id.toUpperCase()}
+                                    </MenubarRadioItem>
+                                {/each}
+                            </MenubarRadioGroup>
+                        </MenubarSubContent>
+                    </MenubarSub>
+                    <MenubarSeparator />
                     <MenubarItem
                         class="justify-between"
                         on:click={() => dispatch("action", { type: ActionType.PREFS_LOAD })}

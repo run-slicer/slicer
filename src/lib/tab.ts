@@ -2,6 +2,7 @@ import type { Entry } from "$lib/workspace";
 import { get, writable } from "svelte/store";
 import type { StyledIcon } from "$lib/components/icons";
 import { Sparkles } from "lucide-svelte";
+import { workspaceEncoding } from "$lib/state";
 
 export const enum TabType {
     WELCOME = "welcome",
@@ -120,3 +121,12 @@ export const detectType = (entry: Entry): TabType => {
 
     return TabType.CODE;
 };
+
+// soft-refresh code tabs on encoding change
+workspaceEncoding.subscribe(() => {
+    for (const tab of get(tabs).values()) {
+        if (tab.type === TabType.CODE) {
+            refresh(tab);
+        }
+    }
+});

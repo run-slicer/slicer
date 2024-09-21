@@ -6,6 +6,7 @@
     import Breadcrumb from "$lib/components/breadcrumb.svelte";
     import { current as currentTab, tabs } from "$lib/tab";
     import { entries } from "$lib/workspace";
+    import { current as currentEncoding } from "$lib/workspace/encoding";
     import { scripts } from "$lib/script";
     import { entries as logEntries } from "$lib/log";
     import { all as disasms } from "$lib/disasm";
@@ -29,4 +30,4 @@
     disasms={Array.from($disasms.values())}
     on:action={(e) => handle(e.detail)}
 />
-<Breadcrumb tab={$currentTab} />
+<Breadcrumb tab={$currentTab} encoding={$currentEncoding} />

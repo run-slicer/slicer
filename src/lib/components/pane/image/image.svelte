@@ -9,7 +9,7 @@
     import MenuButton from "./menu_button.svelte";
 
     export let tab: Tab;
-    let entry = tab.entry!;
+    const entry = tab.entry!;
 
     const scale = tweened<number>(1.0, { duration: 125 });
     const rescale = (scaler: (old: number) => number) => {
