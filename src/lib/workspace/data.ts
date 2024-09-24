@@ -86,7 +86,7 @@ export const zipData = async (zip: Zip): Promise<ZipData[]> => {
         .map((v) => {
             return {
                 type: DataType.ZIP,
-                name: v.name,
+                name: v.fileName || v.name,
                 parent: zip,
                 entry: v,
                 async stream(): Promise<ReadableStream<Uint8Array>> {
