@@ -70,6 +70,7 @@ const add = async () => {
         (await readFiles("", true)).map((f) => timed(`add ${f.name}`, () => loadFile(f)))
     );
 
+    const time = results.reduce((acc, v) => acc + v.time, 0);
     const [created, skipped] = partition(
         results.flatMap((r) => r.result),
         (r) => r.created
@@ -90,7 +91,7 @@ const add = async () => {
     }
     if (created.length > 0) {
         toast.success("Added", {
-            description: `Added ${created.length} ${created.length === 1 ? "entry" : "entries"}.`,
+            description: `Added ${created.length} ${created.length === 1 ? "entry" : "entries"} in ${time}ms.`,
         });
     }
 };
