@@ -14,6 +14,7 @@ export const enum EntryType {
 
 export interface Entry extends Named {
     type: EntryType;
+    parent?: Entry;
     data: Data;
 }
 
@@ -91,11 +92,7 @@ export interface LoadResult {
 
 const zipExtensions = new Set(["zip", "jar", "war", "ear", "jmod"]);
 
-const joinPath = (...parts: string[]): string => {
-    return parts.filter((p) => Boolean(p)).join("/");
-};
-
-const load0 = async (entries: Map<string, Entry>, d: Data, base: string = ""): Promise<LoadResult[]> => {
+const load0 = async (entries: Map<string, Entry>, d: Data, parent?: Entry): Promise<LoadResult[]> => {
     const dupeEntry = entries.get(d.name);
     if (dupeEntry) {
         return [{ entry: dupeEntry, created: false }];
@@ -104,8 +101,9 @@ const load0 = async (entries: Map<string, Entry>, d: Data, base: string = ""): P
     const results: LoadResult[] = [];
 
     const entry: Entry = {
-        ...parseName(joinPath(base, d.name)),
+        ...parseName(parent ? `${parent.name}/${d.name}` : d.name),
         type: EntryType.FILE,
+        parent,
         data: d,
     };
     results.push({ entry, created: true });
@@ -126,7 +124,7 @@ const load0 = async (entries: Map<string, Entry>, d: Data, base: string = ""): P
             // read nested archives
             if (shouldExpandNested) {
                 for (const zipEntry of await zipData(archiveEntry.archive)) {
-                    results.push(...(await load0(entries, zipEntry, entry.name)));
+                    results.push(...(await load0(entries, zipEntry, entry)));
                 }
             }
         } catch (e) {
