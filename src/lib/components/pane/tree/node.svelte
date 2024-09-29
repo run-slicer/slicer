@@ -57,7 +57,7 @@
                     data={node}
                     on:open
                     on:contextmenu
-                    class={cn("ml-0.5 pl-[16px]", hasNonLeaf || "ml-1 pl-[32px]")}
+                    class={cn("border-l border-l-border pl-[1.125rem]", hasNonLeaf || "pl-[2.25rem]")}
                 />
             {/each}
         {/if}
