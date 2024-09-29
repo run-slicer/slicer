@@ -15,7 +15,7 @@
 
     const { icon, classes } = fileIcon(data.label);
 
-    let expanded = data.expanded;
+    let expanded = data.expanded === undefined ? (data.parent?.nodes?.length || 0) === 1 : data.expanded;
     $: data.expanded = expanded;
 
     let hasNonLeaf = false;
