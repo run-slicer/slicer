@@ -17,6 +17,7 @@ export const enum ActionType {
     SCRIPT_REMOVE,
     PREFS_LOAD,
     PREFS_EXPORT,
+    PREFS_CLEAR,
 }
 
 export interface Action {

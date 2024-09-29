@@ -45,3 +45,8 @@ export const load = (data: string): boolean => {
 export const save = (): string => {
     return JSON.stringify(localStorage, null, 2 /* pretty */);
 };
+
+export const clear = () => {
+    localStorage.clear();
+    window.location.reload();
+};

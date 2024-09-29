@@ -26,6 +26,7 @@
         ScriptLoadDialog,
         ScriptDeleteDialog,
         ClearDialog,
+        PrefsClearDialog,
     } from "$lib/components/dialog";
     import {
         Menubar,
@@ -60,6 +61,7 @@
         Settings,
         Moon,
         Sun,
+        MonitorX,
     } from "lucide-svelte";
     import { createEventDispatcher } from "svelte";
     import { toast } from "svelte-sonner";
@@ -71,6 +73,7 @@
 
     let aboutOpen = false;
     let clearOpen = false;
+    let prefsClearOpen = false;
 
     let scriptLoadOpen = false;
     let scriptDeleteOpen: ProtoScript | null = null;
@@ -175,6 +178,10 @@
                         on:click={() => dispatch("action", { type: ActionType.PREFS_EXPORT })}
                     >
                         Export <Download size={16} />
+                    </MenubarItem>
+                    <MenubarSeparator />
+                    <MenubarItem class="justify-between" on:click={() => (prefsClearOpen = true)}>
+                        Reset <MonitorX size={16} />
                     </MenubarItem>
                 </MenubarSubContent>
             </MenubarSub>
@@ -331,3 +338,4 @@
 <ScriptLoadDialog bind:open={scriptLoadOpen} on:action />
 <ScriptDeleteDialog bind:proto={scriptDeleteOpen} on:action />
 <ClearDialog bind:open={clearOpen} on:action />
+<PrefsClearDialog bind:open={prefsClearOpen} on:action />

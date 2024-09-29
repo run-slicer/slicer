@@ -32,7 +32,7 @@ import {
     remove as removeScript,
     type ProtoScript,
 } from "$lib/script";
-import { load as loadState, save as saveState } from "$lib/state";
+import { load as loadState, save as saveState, clear as clearState } from "$lib/state";
 
 const load = async () => {
     const results = await Promise.all(
@@ -196,6 +196,8 @@ export const prefsExport = async () => {
     });
 };
 
+export const prefsClear = clearState;
+
 export const handle = async (action: Action) => {
     const { type } = action;
 
@@ -240,5 +242,7 @@ export const handle = async (action: Action) => {
             return prefsLoad();
         case ActionType.PREFS_EXPORT:
             return prefsExport();
+        case ActionType.PREFS_CLEAR:
+            return prefsClear();
     }
 };
