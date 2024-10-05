@@ -1,6 +1,5 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { Loader2 } from "lucide-svelte";
     import { fade } from "svelte/transition";
     import { cn } from "./utils";
 
@@ -24,7 +23,7 @@
         $$props.class
     )}
 >
-    <Loader2 class="h-16 w-16 animate-spin text-primary" />
+    <div class="w-16 h-16 border-4 border-t-4 border-muted border-t-primary rounded-full animate-spin"></div>
     {#if value}
         <span class="mt-2 text-muted-foreground">{value}</span>
     {/if}
