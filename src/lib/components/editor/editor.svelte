@@ -20,7 +20,7 @@
         foldKeymap,
     } from "@codemirror/language";
     import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
-    import { searchKeymap, highlightSelectionMatches } from "@codemirror/search";
+    import { searchKeymap, search, highlightSelectionMatches } from "@codemirror/search";
 
     export const basicSetup: Extension = (() => [
         lineNumbers(),
@@ -32,6 +32,7 @@
         dropCursor(),
         EditorState.allowMultipleSelections.of(true),
         indentOnInput(),
+        search({ top: true }),
         syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
         bracketMatching(),
         rectangularSelection(),
@@ -68,6 +69,8 @@
         ".cm-panels": {
             // fix color on panel container
             "background-color": "hsl(var(--background))",
+            // fix overlapping
+            "z-index": "auto",
         },
         ".cm-search": {
             // fix alignment on search panel
@@ -76,9 +79,13 @@
         },
         ".cm-button": {
             // fix color on search button
-            "background-color": "hsl(var(--secondary))",
             "border-color": "hsl(var(--secondary))",
             "border-radius": "0.25rem", // rounded
+            "background-image": "unset",
+        },
+        ".cm-button:active": {
+            // fix color on search button
+            "background-color": "hsl(var(--secondary))",
             "background-image": "unset",
         },
     });

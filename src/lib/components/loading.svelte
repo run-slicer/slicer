@@ -23,7 +23,7 @@
         $$props.class
     )}
 >
-    <div class="w-16 h-16 border-4 border-t-4 border-muted border-t-primary rounded-full animate-spin"></div>
+    <div class="h-16 w-16 animate-spin rounded-full border-4 border-t-4 border-muted border-t-primary"></div>
     {#if value}
         <span class="mt-2 text-muted-foreground">{value}</span>
     {/if}
