@@ -1,5 +1,6 @@
 <script lang="ts">
     import { ModeWatcher } from "mode-watcher";
+    import Loader from "$lib/components/loader.svelte";
     import Menu from "$lib/components/menu/menu.svelte";
     import Content from "$lib/components/content.svelte";
     import { Toaster } from "$lib/components/ui/sonner";
@@ -15,6 +16,7 @@
 </script>
 
 <ModeWatcher themeStorageKey={`${rootKey}.theme`} modeStorageKey={`${rootKey}.mode`} />
+<Loader />
 <Toaster position="top-right" richColors />
 <Menu
     tab={$currentTab}

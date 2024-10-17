@@ -144,6 +144,7 @@
 @media (display-mode: window-controls-overlay) {
     .window-controls {
         position: sticky;
+        z-index: 9999;
         background-color: hsl(var(--background));
 
         left: env(titlebar-area-x, 0);

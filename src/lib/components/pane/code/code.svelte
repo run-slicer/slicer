@@ -38,7 +38,7 @@
 
 <div class="relative basis-full overflow-hidden scrollbar-thin">
     {#await Promise.all([loadLanguage(language), read(tab.type, entry, disasm)])}
-        <Loading value={shouldDisasm ? "Disassembling..." : "Reading..."} overlay />
+        <Loading value={shouldDisasm ? "Disassembling..." : "Reading..."} />
     {:then [lang, value]}
         <ContextMenu>
             <ContextMenuTrigger>
@@ -48,7 +48,7 @@
         </ContextMenu>
     {/await}
     {#if shouldDisasm}
-        <div class="absolute bottom-0 right-0 m-[15px]">
+        <div class="absolute bottom-0 right-0 z-20 m-[15px]">
             <Select bind:selected={disasmProto}>
                 <SelectTrigger class="h-7 text-xs [&_svg]:ml-2 [&_svg]:h-4 [&_svg]:w-4">
                     <span class="mr-2 text-muted-foreground">Disassembler: </span>

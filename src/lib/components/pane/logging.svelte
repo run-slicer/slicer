@@ -24,7 +24,7 @@
     </PaneHeader>
     <div class="relative basis-full overflow-hidden scrollbar-thin">
         {#await Promise.all([import("$lib/components/editor"), import("$lib/lang/parser/log")])}
-            <Loading overlay small />
+            <Loading small />
         {:then [{ CodeEditor }, { log }]}
             <CodeEditor
                 readOnly

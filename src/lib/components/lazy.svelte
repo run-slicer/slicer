@@ -6,7 +6,7 @@
 </script>
 
 {#await component().then(({ default: C }) => C)}
-    <Loading value="Loading..." overlay />
+    <Loading value="Loading..." />
 {:then Component}
     <Component {...$$restProps} on:* />
 {/await}
