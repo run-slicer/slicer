@@ -81,10 +81,10 @@
     >
         <ContextMenuTrigger
             bind:el={triggerElem}
-            class="flex h-full w-full overflow-auto text-nowrap p-2 scrollbar-thin"
+            class="flex h-full w-full"
         >
             {#if root.nodes && root.nodes.length > 0}
-                <div class="flex w-full flex-col">
+                <div class="flex w-full flex-col overflow-auto text-nowrap p-2 scrollbar-thin contain-strict">
                     {#each root.nodes as node (node.label)}
                         <TreeNode
                             data={node}
