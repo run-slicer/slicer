@@ -27,8 +27,6 @@ const computeTextSize = (text: string): TextMetrics => {
     return context.measureText(text);
 };
 
-const NODE_MARGIN = 25;
-
 export const createComputedGraph = (method: Member | null, pool: Pool, handlerEdges: boolean): [Node[], Edge[]] => {
     if (!method) {
         return [[], []]; // no method
@@ -56,13 +54,13 @@ export const createComputedGraph = (method: Member | null, pool: Pool, handlerEd
     });
 
     const graph = new graphlib.Graph();
-    graph.setGraph({ rankdir: "TB", ranker: "longest-path" });
+    graph.setGraph({ rankdir: "TB", nodesep: 150, edgesep: 100, ranksep: 100, ranker: "longest-path" });
     graph.setDefaultEdgeLabel(() => ({}));
 
     data.forEach((nodeData) => {
         graph.setNode(`${nodeData.node.offset}`, {
-            width: nodeData.width + NODE_MARGIN,
-            height: nodeData.height + NODE_MARGIN,
+            width: nodeData.width,
+            height: nodeData.height,
         });
     });
 
