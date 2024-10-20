@@ -34,15 +34,14 @@
         "@run-slicer/zip": "^0.4.0",
         "@uiw/codemirror-theme-github": "^4.23.5",
         "@xyflow/svelte": "^0.1.20",
-        "bits-ui": "^0.21.16",
         "clsx": "^2.1.1",
         "comlink": "^4.4.1",
-        "lucide-svelte": "^0.447.0",
         "mode-watcher": "^0.4.1",
         "paneforge": "^0.0.6",
         "svelte-sonner": "^0.3.28",
         "tailwind-merge": "^2.5.3",
-        "tailwind-variants": "^0.2.1"
+        "tailwind-variants": "^0.2.1",
+        "virtua": "^0.35.1"
     },
     "devDependencies": {
         "@sveltejs/vite-plugin-svelte": "^3.1.2",
@@ -50,6 +49,9 @@
         "@tsconfig/svelte": "^5.0.4",
         "@types/node": "^22.7.4",
         "autoprefixer": "^10.4.20",
+        "bits-ui": "^0.21.16",
+        "cmdk-sv": "^0.0.18",
+        "lucide-svelte": "^0.447.0",
         "postcss": "^8.4.47",
         "prettier": "^3.3.3",
         "prettier-plugin-svelte": "^3.2.7",

@@ -36,7 +36,13 @@
     };
 </script>
 
-<div role="button" tabindex="0" on:contextmenu={handleContextMenu} class="contain-style contain-layout" {...$$restProps}>
+<div
+    role="button"
+    tabindex="0"
+    on:contextmenu={handleContextMenu}
+    class="contain-layout contain-style"
+    {...$$restProps}
+>
     {#if data.nodes}
         <button class="highlight flex w-full py-[0.2rem]" on:click={() => (expanded = !expanded)}>
             <svelte:component
