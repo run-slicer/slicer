@@ -6,6 +6,7 @@
 
 <script lang="ts">
     import {
+        Command,
         CommandDialog,
         CommandInput,
         CommandList,
@@ -91,10 +92,19 @@
         </CommandList>
     {:else}
         <CommandList>
-            <CommandEmpty>No results found.</CommandEmpty>
+            <CommandEmpty class="px-2 py-1">
+                <Command>
+                    <CommandList>
+                        <CommandItem onSelect={() => (page = Page.SEARCH)}>
+                            <Search class="mr-2" />
+                            <span>Search '{search}' in workspace</span>
+                        </CommandItem>
+                    </CommandList>
+                </Command>
+            </CommandEmpty>
             <CommandGroup heading="Suggestions">
                 <CommandItem onSelect={() => (page = Page.SEARCH)}>
-                    <Search class="mr-2 h-4 w-4" />
+                    <Search class="mr-2" />
                     <span>Search workspace</span>
                 </CommandItem>
             </CommandGroup>
