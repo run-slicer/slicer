@@ -5,15 +5,7 @@
 </script>
 
 <script lang="ts">
-    import {
-        Command,
-        CommandDialog,
-        CommandInput,
-        CommandList,
-        CommandGroup,
-        CommandItem,
-        CommandEmpty,
-    } from "$lib/components/ui/command";
+    import { CommandDialog, CommandInput, CommandList, CommandGroup, CommandItem } from "$lib/components/ui/command";
     import VirtualList from "./list.svelte";
     import { onMount } from "svelte";
     import type { Entry } from "$lib/workspace";
@@ -68,46 +60,36 @@
 
 <CommandDialog bind:open shouldFilter={page !== Page.SEARCH}>
     <CommandInput bind:value={search} placeholder="Type a command or search..." />
-    {#if page === Page.SEARCH}
-        <CommandList class="h-[80vh] max-h-[80vh] [&>div]:contents">
+    <CommandList class={cn(page !== Page.SEARCH || "h-[80vh] max-h-[80vh] [&>div]:contents")}>
+        {#if page === Page.SEARCH}
             {#if entries.length > 0}
-                <CommandGroup alwaysRender class="h-full !p-0 [&>div]:h-full">
-                    <VirtualList data={filtered} getKey={(e) => e.name} let:item={entry} class="overflow-y-auto p-2">
-                        <CommandItem class="!py-2.5 text-xs" onSelect={() => handleClick(entry)}>
-                            {@const icon = fileIcon(entry.shortName)}
-                            <svelte:component
-                                this={icon.icon}
-                                size={16}
-                                class={cn("mr-2 !w-[16px] min-w-[16px]", icon.classes)}
-                            />
-                            <span>{entry.name}</span>
-                        </CommandItem>
-                    </VirtualList>
-                </CommandGroup>
+                <VirtualList data={filtered} getKey={(e) => e.name} let:item={entry} class="overflow-y-auto p-2">
+                    <CommandItem class="!py-2.5 text-xs" onSelect={() => handleClick(entry)}>
+                        {@const icon = fileIcon(entry.shortName)}
+                        <svelte:component
+                            this={icon.icon}
+                            size={16}
+                            class={cn("mr-2 !w-[16px] min-w-[16px]", icon.classes)}
+                        />
+                        <span>{entry.name}</span>
+                    </CommandItem>
+                </VirtualList>
             {:else}
                 <p class="py-4 text-center text-sm text-muted-foreground">
                     There's nothing here? Add something to the workspace.
                 </p>
             {/if}
-        </CommandList>
-    {:else}
-        <CommandList>
-            <CommandEmpty class="px-2 py-1">
-                <Command>
-                    <CommandList>
-                        <CommandItem onSelect={() => (page = Page.SEARCH)}>
-                            <Search class="mr-2" />
-                            <span>Search '{search}' in workspace</span>
-                        </CommandItem>
-                    </CommandList>
-                </Command>
-            </CommandEmpty>
-            <CommandGroup heading="Suggestions">
-                <CommandItem onSelect={() => (page = Page.SEARCH)}>
+        {:else}
+            <CommandGroup alwaysRender heading="Workspace">
+                <CommandItem alwaysRender value="Search workspace" onSelect={() => (page = Page.SEARCH)}>
                     <Search class="mr-2" />
-                    <span>Search workspace</span>
+                    {#if search}
+                        <span>Search '{search}' in workspace</span>
+                    {:else}
+                        <span>Search workspace</span>
+                    {/if}
                 </CommandItem>
             </CommandGroup>
-        </CommandList>
-    {/if}
+        {/if}
+    </CommandList>
 </CommandDialog>
