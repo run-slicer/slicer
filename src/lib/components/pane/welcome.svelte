@@ -1,3 +1,13 @@
+<script lang="ts" context="module">
+    const tips = [
+        `View our documentation at <a href="https://docs.slicer.run" target="_blank" class="text-blue-600 hover:text-blue-700 hover:underline">docs.slicer.run</a>!`,
+        `Double-tap <span class="text-xs bg-muted rounded p-1">Shift</span> to view the command palette!`,
+    ];
+
+    export const nextTip = (tip: string): string => tips[tips.indexOf(tip) + 1] || tips[0];
+    export const randomTip = (): string => tips[Math.floor(Math.random() * tips.length)];
+</script>
+
 <script lang="ts">
     import { userPrefersMode } from "mode-watcher";
     import { FilePlus2, Folder, Moon, Settings, Sun } from "lucide-svelte";
@@ -7,6 +17,8 @@
     import { ActionType } from "$lib/action";
 
     const dispatch = createEventDispatcher();
+
+    let tip = randomTip();
 </script>
 
 <div class="m-24 h-full">
@@ -48,15 +60,10 @@
             </div>
         </div>
         <div class="flex flex-row items-center justify-between">
-            <div class="text-sm">
-                <span class="text-base font-semibold text-muted-foreground">Tip: </span>
-                View our documentation at
-                <a
-                    href="https://docs.slicer.run"
-                    target="_blank"
-                    class="text-blue-600 hover:text-blue-700 hover:underline">docs.slicer.run</a
-                >!
-            </div>
+            <button class="cursor-help text-sm" on:click={() => (tip = nextTip(tip))}>
+                <span class="text-base font-medium text-accent-foreground/60">Tip: </span>
+                {@html tip}
+            </button>
             <a
                 href="https://github.com/run-slicer/slicer"
                 target="_blank"
