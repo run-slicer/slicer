@@ -19,6 +19,12 @@
     const dispatch = createEventDispatcher();
 
     let tip = randomTip();
+    const handleRevolver = (e: MouseEvent) => {
+        // ignore click events coming from links
+        if ((e.target as HTMLElement)?.tagName !== "A") {
+            tip = nextTip(tip);
+        }
+    };
 </script>
 
 <div class="m-24 h-full">
@@ -60,7 +66,7 @@
             </div>
         </div>
         <div class="flex flex-row items-center justify-between">
-            <button class="cursor-help text-sm" on:click={() => (tip = nextTip(tip))}>
+            <button class="cursor-help text-sm" on:click={handleRevolver}>
                 <span class="text-base font-medium text-accent-foreground/60">Tip: </span>
                 {@html tip}
             </button>
