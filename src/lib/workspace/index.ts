@@ -7,9 +7,9 @@ import { workspaceArchiveEncoding, workspaceArchiveNested } from "$lib/state";
 import { type Data, type Named, transformData, parseName, fileData, zipData } from "./data";
 
 export const enum EntryType {
-    FILE,
-    ARCHIVE,
-    CLASS, // only by readDetail
+    FILE = "file",
+    ARCHIVE = "archive",
+    CLASS = "class", // only by readDetail
 }
 
 export interface Entry extends Named {

@@ -51,7 +51,8 @@ const wrapEntry = (e: Entry): ScriptEntry => {
     let type: ScriptEntryType = "unspecific";
     switch (e.type) {
         case EntryType.CLASS:
-            type = "class";
+        case EntryType.ARCHIVE:
+            type = e.type;
             break;
     }
 
@@ -65,6 +66,7 @@ const wrapTab = (t: Tab): ScriptTab => {
         case TabType.CODE:
         case TabType.HEX:
         case TabType.FLOW_GRAPH:
+        case TabType.IMAGE:
             type = t.type;
             break;
     }
@@ -107,7 +109,7 @@ const unwrapDisasm = (disasm: ScriptDisassembler): Disassembler => {
         lang: disasm.language as Language,
 
         async run(entry: ClassEntry): Promise<string> {
-            return await disasm.run(await entry.data.bytes());
+            return disasm.run(await entry.data.bytes());
         },
     };
 };
