@@ -10,6 +10,7 @@ export const enum TabType {
     HEX = "hex",
     FLOW_GRAPH = "flow_graph",
     IMAGE = "image",
+    HEAP_DUMP = "heap_dump",
 }
 
 export interface Tab {
@@ -101,25 +102,21 @@ export const clear = () => {
 };
 
 // prettier-ignore
-const binaryExtensions = new Set([
-    "bin", "tar", "gz", "rar", "zip", "7z", "jar", "lzma", "dll", "so", "dylib", "exe", "kotlin_builtins",
-    "kotlin_metadata", "kotlin_module", "nbt", "ogg", "cer", "der", "crt",
-]);
+const extensions = {
+    [TabType.HEX]: [
+        "bin", "tar", "gz", "rar", "zip", "7z", "jar", "lzma", "dll", "so", "dylib", "exe", "kotlin_builtins",
+        "kotlin_metadata", "kotlin_module", "nbt", "ogg", "cer", "der", "crt",
+    ],
+    [TabType.IMAGE]: ["jpg", "jpeg", "gif", "png", "webp"],
+    [TabType.HEAP_DUMP]: ["hprof"],
+};
 
-// prettier-ignore
-const imageExtensions = new Set(["jpg", "jpeg", "gif", "png", "webp"]);
+const typesByExts = new Map(
+    (Object.entries(extensions) as [TabType, string[]][]).flatMap(([k, v]) => v.map((ext) => [ext, k]))
+);
 
 export const detectType = (entry: Entry): TabType => {
-    if (entry.extension) {
-        if (binaryExtensions.has(entry.extension)) {
-            return TabType.HEX;
-        }
-        if (imageExtensions.has(entry.extension)) {
-            return TabType.IMAGE;
-        }
-    }
-
-    return TabType.CODE;
+    return entry.extension ? typesByExts.get(entry.extension) || TabType.CODE : TabType.CODE;
 };
 
 export const isEncodingDependent = (tab: Tab): boolean => {
