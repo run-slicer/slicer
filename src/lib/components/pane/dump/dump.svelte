@@ -1,25 +1,33 @@
 <script lang="ts">
     import { read, ReaderFlags } from "@run-slicer/hprof";
-    import { slurp } from "@run-slicer/hprof/slurp";
+    import { slurp, type Entry as SlurpEntry } from "@run-slicer/hprof/slurp";
     import Loading from "$lib/components/loading.svelte";
     import { Separator } from "$lib/components/ui/separator";
     import type { Tab } from "$lib/tab";
     import type { Entry } from "$lib/workspace";
     import { error } from "$lib/log";
     import { FileQuestion } from "lucide-svelte";
+    import { writable } from "svelte/store";
+    import Table from "./table.svelte";
 
     export let tab: Tab;
     const entry = tab.entry!;
 
     const result = slurp();
+    const entries = writable<SlurpEntry[]>([]);
+
     const readEntry = async (entry: Entry) => {
         try {
-            await read(await entry.data.stream(), result, ReaderFlags.SKIP_VALUES);
+            const stream = await entry.data.stream();
+
+            await read(stream, result, ReaderFlags.SKIP_VALUES);
         } catch (e) {
             error("failed to read heap dump", e);
 
             throw e;
         }
+
+        entries.set(result.entries || []);
     };
 </script>
 
@@ -35,6 +43,9 @@
             </p>
         </div>
         <Separator />
+    </div>
+    <div class="container mx-auto py-10">
+        <Table {entries} />
     </div>
 {:catch e}
     <div class="flex h-full w-full flex-col items-center justify-center">

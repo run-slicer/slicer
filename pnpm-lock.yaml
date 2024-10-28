@@ -54,8 +54,8 @@ importers:
         specifier: 0.1.2-0.152
         version: 0.1.2-0.152
       '@run-slicer/hprof':
-        specifier: ^0.1.1
-        version: 0.1.1
+        specifier: ^0.1.4
+        version: 0.1.4
       '@run-slicer/jasm':
         specifier: 0.2.0-2.6.0
         version: 0.2.0-2.6.0
@@ -531,8 +531,8 @@ packages:
   '@run-slicer/cfr@0.1.2-0.152':
     resolution: {integrity: sha512-pQZzk3UE6c0E4igGRrNXkSvOobQTGd6GlPYZ7MsppciQ4BftUANQy1nHbG31iJM9HRcMHttQTaCYps9nY9qRVg==}
 
-  '@run-slicer/hprof@0.1.1':
-    resolution: {integrity: sha512-IrOdbCXdvIhnf+ARpkxhPEyurQEpML6IMCCpInN6dyDyi79VvqSoX7uvzTR3pNMscMcFHMFVuL5/cTvmwMRzkA==}
+  '@run-slicer/hprof@0.1.4':
+    resolution: {integrity: sha512-KeJuAaKSkzW1Q55wWSUqwYDdyJBsy54W28eRG4RQCqnMnytpudAFcRE94zVdqot7hdrXI1XhlUQcoQdjdvqjlg==}
 
   '@run-slicer/jasm@0.2.0-2.6.0':
     resolution: {integrity: sha512-txWAAm/WEe1/h1usCIHF3MM8SrURfecsJKTwb952Zsfi7QeqgZPrw8+R3indhvF2rBZgi78kom6qpoeKxsAsrg==}
@@ -1828,7 +1828,7 @@ snapshots:
 
   '@run-slicer/cfr@0.1.2-0.152': {}
 
-  '@run-slicer/hprof@0.1.1': {}
+  '@run-slicer/hprof@0.1.4': {}
 
   '@run-slicer/jasm@0.2.0-2.6.0': {}
 
