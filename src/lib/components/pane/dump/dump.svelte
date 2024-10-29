@@ -1,51 +1,44 @@
 <script lang="ts">
-    import { read, ReaderFlags } from "@run-slicer/hprof";
-    import { slurp, type Entry as SlurpEntry } from "@run-slicer/hprof/slurp";
+    import { worker } from "$lib/hprof";
+    import type { SlurpResult } from "$lib/hprof/reader";
     import Loading from "$lib/components/loading.svelte";
     import { Separator } from "$lib/components/ui/separator";
     import type { Tab } from "$lib/tab";
     import type { Entry } from "$lib/workspace";
     import { error } from "$lib/log";
     import { FileQuestion } from "lucide-svelte";
-    import { writable } from "svelte/store";
     import Table from "./table.svelte";
+    import { readable } from "svelte/store";
 
     export let tab: Tab;
     const entry = tab.entry!;
 
-    const result = slurp();
-    const entries = writable<SlurpEntry[]>([]);
-
-    const readEntry = async (entry: Entry) => {
+    const readEntry = async (entry: Entry): Promise<SlurpResult> => {
         try {
-            const stream = await entry.data.stream();
-
-            await read(stream, result, ReaderFlags.SKIP_VALUES);
+            return worker.read(await entry.data.blob());
         } catch (e) {
             error("failed to read heap dump", e);
 
             throw e;
         }
-
-        entries.set(result.entries || []);
     };
 </script>
 
 {#await readEntry(entry)}
     <Loading value="Reading..." />
-{:then _}
+{:then result}
     <div class="flex h-8 min-h-8 w-full flex-col">
         <div class="flex grow flex-row items-center gap-4 bg-background px-2 text-xs">
-            <p>timestamp: <span class="text-muted-foreground">{result.timestamp?.toLocaleString()}</span></p>
+            <p>timestamp: <span class="text-muted-foreground">{result?.timestamp?.toLocaleString()}</span></p>
             <p>
                 identifier size:
-                <span class="text-muted-foreground">{result.idSize} ({(result.idSize || 0) * 8}-bit)</span>
+                <span class="text-muted-foreground">{result?.idSize} ({(result?.idSize || 0) * 8}-bit)</span>
             </p>
         </div>
         <Separator />
     </div>
-    <div class="container mx-auto py-10">
-        <Table {entries} />
+    <div class="relative h-full w-full p-2">
+        <Table entries={readable(result.entries)} />
     </div>
 {:catch e}
     <div class="flex h-full w-full flex-col items-center justify-center">
