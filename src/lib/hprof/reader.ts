@@ -150,18 +150,18 @@ const readClassDumpRec = async (ctx: ReaderContext): Promise<number> => {
     let length = idSize * 7 + 8;
 
     const clsObjId = await readId();
-    await buffer.skip(4);
+    buffer.skip(4);
     const superObjId = await readId();
-    await buffer.skip(idSize * 5);
+    buffer.skip(idSize * 5);
     const instSize = await buffer.getUint32();
 
     const constPoolSize = await buffer.getUint16();
     length += 2;
 
     for (let i = 0; i < constPoolSize; i++) {
-        await buffer.skip(2);
+        buffer.skip(2);
         const size = valueSize(await buffer.getUint8(), idSize);
-        await buffer.skip(size);
+        buffer.skip(size);
 
         length += 3 + size;
     }
@@ -170,16 +170,16 @@ const readClassDumpRec = async (ctx: ReaderContext): Promise<number> => {
     length += 2;
 
     for (let i = 0; i < numStaticFields; i++) {
-        await buffer.skip(idSize);
+        buffer.skip(idSize);
         const size = valueSize(await buffer.getUint8(), idSize);
-        await buffer.skip(size);
+        buffer.skip(size);
 
         length += idSize + 1 + size;
     }
 
     const numInstFields = await buffer.getUint16();
     const size = (1 + idSize) * numInstFields;
-    await buffer.skip(size);
+    buffer.skip(size);
 
     length += 2 + size;
 
@@ -195,10 +195,10 @@ const readClassDumpRec = async (ctx: ReaderContext): Promise<number> => {
 const readInstanceDumpRec = async (ctx: ReaderContext): Promise<number> => {
     const { buffer, idSize, readId } = ctx;
 
-    await buffer.skip(idSize + 4);
+    buffer.skip(idSize + 4);
     const clsObjId = await readId();
     const numBytes = await buffer.getUint32();
-    await buffer.skip(numBytes);
+    buffer.skip(numBytes);
 
     let entry = ctx.instances.get(clsObjId);
     if (!entry) {
@@ -218,10 +218,10 @@ const readInstanceDumpRec = async (ctx: ReaderContext): Promise<number> => {
 const readObjArrayDumpRec = async (ctx: ReaderContext): Promise<number> => {
     const { buffer, idSize, readId } = ctx;
 
-    await buffer.skip(idSize + 4);
+    buffer.skip(idSize + 4);
     const numElems = await buffer.getUint32();
     const arrClsId = await readId();
-    await buffer.skip(idSize * numElems);
+    buffer.skip(idSize * numElems);
 
     let entry = ctx.objArrays.get(arrClsId);
     if (!entry) {
@@ -245,11 +245,11 @@ const readObjArrayDumpRec = async (ctx: ReaderContext): Promise<number> => {
 const readPrimArrayDumpRec = async (ctx: ReaderContext): Promise<number> => {
     const { buffer, idSize } = ctx;
 
-    await buffer.skip(idSize + 4);
+    buffer.skip(idSize + 4);
     const numElems = await buffer.getUint32();
     const elemType = await buffer.getUint8();
     const size = valueSize(elemType, idSize);
-    await buffer.skip(numElems * size);
+    buffer.skip(numElems * size);
 
     let entry = ctx.primArrays.get(elemType);
     if (!entry) {
@@ -284,31 +284,31 @@ const readSubRecord = async (ctx: ReaderContext): Promise<number> => {
         case HeapDumpTag.GC_CLASS_DUMP:
             return 1 + (await readClassDumpRec(ctx));
         case HeapDumpTag.GC_ROOT_UNKNOWN:
-            await buffer.skip(idSize);
+            buffer.skip(idSize);
             return 1 + idSize;
         case HeapDumpTag.GC_ROOT_THREAD_OBJ:
-            await buffer.skip(idSize + 8);
+            buffer.skip(idSize + 8);
             return 1 + idSize + 8;
         case HeapDumpTag.GC_ROOT_JNI_GLOBAL:
-            await buffer.skip(idSize * 2);
+            buffer.skip(idSize * 2);
             return 1 + idSize * 2;
         case HeapDumpTag.GC_ROOT_JNI_LOCAL:
-            await buffer.skip(idSize + 8);
+            buffer.skip(idSize + 8);
             return 1 + idSize + 8;
         case HeapDumpTag.GC_ROOT_JAVA_FRAME:
-            await buffer.skip(idSize + 8);
+            buffer.skip(idSize + 8);
             return 1 + idSize + 8;
         case HeapDumpTag.GC_ROOT_NATIVE_STACK:
-            await buffer.skip(idSize + 4);
+            buffer.skip(idSize + 4);
             return 1 + idSize + 4;
         case HeapDumpTag.GC_ROOT_STICKY_CLASS:
-            await buffer.skip(idSize);
+            buffer.skip(idSize);
             return 1 + idSize;
         case HeapDumpTag.GC_ROOT_THREAD_BLOCK:
-            await buffer.skip(idSize + 4);
+            buffer.skip(idSize + 4);
             return 1 + idSize + 4;
         case HeapDumpTag.GC_ROOT_MONITOR_USED:
-            await buffer.skip(idSize);
+            buffer.skip(idSize);
             return 1 + idSize;
     }
 
@@ -328,10 +328,17 @@ const primDescs: Record<number, string> = {
 
 const decoder = new TextDecoder();
 
-export const read = async (stream: ReadableStream<Uint8Array>): Promise<SlurpResult> => {
-    const buffer = wrap(stream);
+export const read = async (blob: Blob): Promise<SlurpResult> => {
+    console.time("hprof read");
+    const buffer = wrap(blob);
 
-    await buffer.take(0);
+    while (true) {
+        const byte = await buffer.getUint8();
+        if (byte === 0) {
+            // skip until header null terminator
+            break;
+        }
+    }
 
     const idSize = await buffer.getUint32();
     const timestamp = new Date(Number(await buffer.getBigUint64()));
@@ -353,7 +360,7 @@ export const read = async (stream: ReadableStream<Uint8Array>): Promise<SlurpRes
     try {
         while (true) {
             const tag = await buffer.getUint8();
-            await buffer.skip(4);
+            buffer.skip(4);
             const length = await buffer.getUint32();
 
             switch (tag) {
@@ -361,9 +368,9 @@ export const read = async (stream: ReadableStream<Uint8Array>): Promise<SlurpRes
                     strings.set(await readId(), decoder.decode(await buffer.get(length - idSize)));
                     break;
                 case Tag.LOAD_CLASS: {
-                    await buffer.skip(4);
+                    buffer.skip(4);
                     const objId = await readId();
-                    await buffer.skip(4);
+                    buffer.skip(4);
                     const nameId = await readId();
 
                     const value = strings.get(nameId);
@@ -385,7 +392,7 @@ export const read = async (stream: ReadableStream<Uint8Array>): Promise<SlurpRes
                     break;
                 }
                 default:
-                    await buffer.skip(length);
+                    buffer.skip(length);
                     break;
             }
         }
@@ -394,6 +401,9 @@ export const read = async (stream: ReadableStream<Uint8Array>): Promise<SlurpRes
             throw e;
         }
     }
+
+    console.timeEnd("hprof read");
+    console.time("hprof slurp");
 
     strings.clear();
 
@@ -472,7 +482,7 @@ export const read = async (stream: ReadableStream<Uint8Array>): Promise<SlurpRes
     }
     ctx.primArrays.clear();
 
-    await buffer.reader.cancel();
+    console.timeEnd("hprof slurp");
 
     return { idSize, timestamp, entries };
 };

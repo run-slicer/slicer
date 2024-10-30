@@ -1,24 +1,19 @@
-// A streaming DataView abstraction. (c) 2024 zlataovce (github.com/zlataovce)
-// License: Public domain (or MIT if needed). Attribution appreciated.
-// https://gist.github.com/zlataovce/7db8bc7cfe8b7897816495bf2ec3858d
-const DEFAULT_LITTLE_ENDIAN = false;
-const MIN_READ = 1024 * 1024 * 20; // 20 MiB
-const INITIAL_BUF_SIZE = MIN_READ * 1.5; // 30 MiB
+const CHUNK_SIZE = 1024 * 1024 * 10; // 10 MiB
 
 type Awaitable<T> = T | PromiseLike<T>;
 
 export const EOF = new Error("End of stream");
 
 export interface Buffer {
-    reader: ReadableStreamDefaultReader<Uint8Array>;
+    blob: Blob;
     littleEndian?: boolean;
 
     view: DataView;
     offset: number;
+    globalOffset: number;
 
     get(length: number): Awaitable<Uint8Array>;
-    skip(length: number): Awaitable<void>;
-    take(termValue: number): Awaitable<Uint8Array>; // exclusive
+    skip(length: number): void;
     getFloat32(): Awaitable<number>;
     getFloat64(): Awaitable<number>;
     getInt8(): Awaitable<number>;
@@ -31,101 +26,45 @@ export interface Buffer {
     getBigUint64(): Awaitable<bigint>;
 }
 
-const arrayToView = (arr: Uint8Array): DataView => {
-    return new DataView(arr.buffer, arr.byteOffset, arr.byteLength);
-};
-
 const nextChunk = async (buffer: Buffer, length: number) => {
-    const chunks: Uint8Array[] = [];
+    if (buffer.globalOffset >= buffer.blob.size) throw EOF;
 
-    let chunksLength = 0;
-    if (buffer.offset < buffer.view.byteLength) {
-        // unread data
-        chunksLength = buffer.view.byteLength - buffer.offset;
-        chunks.push(new Uint8Array(buffer.view.buffer, buffer.view.byteOffset + buffer.offset, chunksLength));
-    }
+    const baseOffset = buffer.globalOffset - (buffer.view.byteLength - buffer.offset);
+    if (baseOffset + length > buffer.blob.size) throw EOF;
 
-    const toRead = Math.max(length, MIN_READ);
-    while (toRead > chunksLength) {
-        const { done, value } = await buffer.reader.read();
-        if (done) {
-            throw EOF;
-        }
+    buffer.globalOffset = Math.min(buffer.blob.size, baseOffset + Math.max(length, CHUNK_SIZE));
 
-        chunksLength += value.byteLength;
-        chunks.push(value);
-    }
-
-    // try to reuse old buffer
-    let arrayBuf = buffer.view.buffer;
-    if (arrayBuf.byteLength < chunksLength) {
-        arrayBuf = new ArrayBuffer(chunksLength);
-    }
-
-    const combined = new Uint8Array(arrayBuf, 0, chunksLength);
-
-    let offset = 0;
-    for (const chunk of chunks) {
-        combined.set(chunk, offset);
-        offset += chunk.byteLength;
-    }
+    const blob = buffer.blob.slice(baseOffset, buffer.globalOffset);
 
     buffer.offset = 0;
-    buffer.view = arrayToView(combined);
+    buffer.view = new DataView(await blob.arrayBuffer());
 };
 
-export const wrap = (stream: ReadableStream<Uint8Array>, littleEndian: boolean = DEFAULT_LITTLE_ENDIAN): Buffer => {
+export const wrap = (blob: Blob, littleEndian: boolean = false): Buffer => {
     return {
-        reader: stream.getReader(),
+        blob,
         littleEndian,
-        view: new DataView(new ArrayBuffer(INITIAL_BUF_SIZE), 0, 0),
+        view: new DataView(new ArrayBuffer(0)),
         offset: 0,
+        globalOffset: 0,
 
-        _get(length: number, copy: boolean): Uint8Array {
-            const offset = this.view.byteOffset + this.offset;
-            const value = copy
-                ? new Uint8Array(this.view.buffer.slice(offset, offset + length))
-                : new Uint8Array(this.view.buffer, offset, length);
+        _get(length: number): Uint8Array {
+            const value = new Uint8Array(this.view.buffer, this.offset, length);
 
             this.offset += length;
             return value;
         },
 
-        get(length: number, copy: boolean = false): Awaitable<Uint8Array> {
+        get(length: number): Awaitable<Uint8Array> {
             if (this.offset + length > this.view.byteLength) {
-                return nextChunk(this, length).then(() => this._get(length, copy));
+                return nextChunk(this, length).then(() => this._get(length));
             }
 
-            return this._get(length, copy);
+            return this._get(length);
         },
 
-        async _skip(length: number) {
-            while (length > 0) {
-                const available = this.view.byteLength - this.offset;
-                if (available >= length) {
-                    this.offset += length;
-                    return;
-                }
-
-                length -= available;
-
-                const { done, value } = await this.reader.read();
-                if (done) {
-                    throw EOF;
-                }
-
-                this.view = arrayToView(value);
-                this.offset = 0;
-            }
-        },
-
-        skip(length: number): Awaitable<void> {
-            if (this.view.byteLength - this.offset >= length) {
-                this.offset += length;
-                return;
-            }
-
-            return this._skip(length);
+        skip(length: number) {
+            this.offset += length;
         },
 
         _getBigInt64(): bigint {
@@ -266,20 +205,6 @@ export const wrap = (stream: ReadableStream<Uint8Array>, littleEndian: boolean =
             }
 
             return this._getUint8();
-        },
-
-        async take(termValue: number): Promise<Uint8Array> {
-            const result: number[] = [];
-            while (true) {
-                const byte = await this.getUint8();
-                if (byte === termValue) {
-                    break;
-                }
-
-                result.push(byte);
-            }
-
-            return new Uint8Array(result);
         },
     } as any;
 };
