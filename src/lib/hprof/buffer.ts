@@ -1,4 +1,4 @@
-const CHUNK_SIZE = 1024 * 1024 * 10; // 10 MiB
+const CHUNK_SIZE = 1024 * 1024 * 25; // 25 MiB
 
 type Awaitable<T> = T | PromiseLike<T>;
 
