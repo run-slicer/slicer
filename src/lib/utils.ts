@@ -134,7 +134,7 @@ export const timed = async <T>(name: string, run: () => T | Promise<T>): Promise
  *
  * @return Formatted string.
  */
-export const humanSize = (bytes: number, si: boolean = false, dp: number = 1) => {
+export const humanSize = (bytes: number, si: boolean = false, dp: number = 1): string => {
     const thresh = si ? 1000 : 1024;
 
     if (Math.abs(bytes) < thresh) {
@@ -153,4 +153,30 @@ export const humanSize = (bytes: number, si: boolean = false, dp: number = 1) =>
     } while (Math.round(Math.abs(bytes) * r) / r >= thresh && u < units.length - 1);
 
     return bytes.toFixed(dp) + " " + units[u];
+};
+
+const primTypes: Record<string, string> = {
+    B: "byte",
+    C: "char",
+    D: "double",
+    F: "float",
+    I: "int",
+    J: "long",
+    S: "short",
+    Z: "boolean",
+    V: "void",
+};
+
+export const prettyJavaType = (desc: string): string => {
+    if (!desc) {
+        return desc;
+    }
+
+    switch (desc[0]) {
+        case "[":
+            return `${prettyJavaType(desc.substring(1))}[]`;
+        case "L":
+            return desc.substring(1, desc.length - 1).replaceAll("/", ".");
+    }
+    return primTypes[desc] || desc.replaceAll("/", ".");
 };
