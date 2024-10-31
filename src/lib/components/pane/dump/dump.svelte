@@ -37,9 +37,7 @@
         </div>
         <Separator />
     </div>
-    <div class="relative h-full w-full p-2">
-        <Table entries={readable(result.entries)} />
-    </div>
+    <Table class="h-full w-full p-2" entries={readable(result.entries)} />
 {:catch e}
     <div class="flex h-full w-full flex-col items-center justify-center">
         <FileQuestion class="mb-4 animate-bounce text-muted-foreground" size={128} />
