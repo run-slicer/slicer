@@ -6,14 +6,18 @@
     import type { Readable } from "svelte/store";
     import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "$lib/components/ui/table";
     import { Button } from "$lib/components/ui/button";
-    import { ArrowUpDown, ChevronLeft, ChevronRight } from "lucide-svelte";
+    import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight } from "lucide-svelte";
     import { cn } from "$lib/components/utils";
 
     export let entries: Readable<SlurpEntry[]>;
 
     const table = createTable(entries, {
         page: addPagination(),
-        sort: addSortBy(),
+        sort: addSortBy({
+            initialSortKeys: [
+                { id: "totalSize", order: "desc" }, // descending by total size by default
+            ],
+        }),
     });
     const columns = table.createColumns([
         table.column({
@@ -44,6 +48,7 @@
 
     const { headerRows, pageRows, tableAttrs, tableBodyAttrs, pluginStates } = table.createViewModel(columns);
     const { hasNextPage, hasPreviousPage, pageSize, pageIndex } = pluginStates.page;
+    const { sortKeys } = pluginStates.sort;
 </script>
 
 <div>
@@ -59,13 +64,21 @@
                                         <div class="flex flex-row items-center">
                                             <Render of={cell.render()} />
                                             {#if cell.id !== "name"}
+                                                {@const order = $sortKeys.find((k) => k.id === cell.id)?.order}
                                                 <button
                                                     type="button"
                                                     aria-label="Toggle ordering"
                                                     class="ml-2 cursor-pointer hover:text-accent-foreground"
                                                     on:click={props.sort.toggle}
                                                 >
-                                                    <ArrowUpDown size={16} />
+                                                    <svelte:component
+                                                        this={order
+                                                            ? order === "asc"
+                                                                ? ArrowUp
+                                                                : ArrowDown
+                                                            : ArrowUpDown}
+                                                        size={16}
+                                                    />
                                                 </button>
                                             {/if}
                                         </div>
