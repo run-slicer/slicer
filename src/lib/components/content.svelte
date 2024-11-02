@@ -74,7 +74,9 @@
                         </div>
                     </PaneHeader>
                     {#each tabs as tab0 (tab0.id)}
-                        <div class={cn("relative flex h-full w-full flex-col", tab?.id === tab0.id || "hidden")}>
+                        <div
+                            class={cn("relative flex h-full min-h-0 w-full flex-col", tab?.id === tab0.id || "hidden")}
+                        >
                             <MainPane tab={tab0} dirtyFlag={checkDirty(tab0, tab)} {disasms} on:action />
                         </div>
                     {/each}

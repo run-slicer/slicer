@@ -14,7 +14,7 @@
 
     const table = createTable(entries, {
         page: addPagination({
-            initialPageSize: 10, // TODO: figure out flexbox for 15
+            initialPageSize: 20,
         }),
         sort: addSortBy({
             initialSortKeys: [
@@ -68,7 +68,7 @@
     const { filterValue } = pluginStates.filter;
 </script>
 
-<div {...$$restProps} class={cn("flex shrink flex-col", $$restProps.class)}>
+<div {...$$restProps} class={cn("flex flex-col", $$restProps.class)}>
     <div class="flex items-center justify-between pb-2">
         <Input class="max-w-sm" placeholder="Filter classes..." type="text" bind:value={$filterValue} />
         <div class="flex items-center space-x-4">
@@ -93,16 +93,16 @@
             </Button>
         </div>
     </div>
-    <div class="rounded-md border">
+    <div class="no-overflow overflow-y-auto rounded-md border">
         <Table {...$tableAttrs}>
             <TableHeader>
                 {#each $headerRows as headerRow}
                     <Subscribe rowAttrs={headerRow.attrs()}>
-                        <TableRow>
+                        <TableRow class="sticky top-0">
                             {#each headerRow.cells as cell (cell.id)}
                                 {@const order = $sortKeys.find((k) => k.id === cell.id)?.order}
                                 <Subscribe attrs={cell.attrs()} let:attrs props={cell.props()} let:props>
-                                    <TableHead class="whitespace-nowrap" {...attrs}>
+                                    <TableHead class="whitespace-nowrap bg-background" {...attrs}>
                                         <div class="flex flex-row items-center">
                                             <Render of={cell.render()} />
                                             <button
@@ -145,3 +145,10 @@
         </Table>
     </div>
 </div>
+
+<style global>
+    /* unset overflow on table wrapper */
+    .no-overflow :has(> table) {
+        overflow: unset;
+    }
+</style>
