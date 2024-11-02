@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Binary, Code, Download, GitBranchPlus, Image, Trash2 } from "lucide-svelte";
+    import { Binary, Code, Download, Gauge, GitBranchPlus, Image, Trash2 } from "lucide-svelte";
     import { createEventDispatcher } from "svelte";
     import { EntryType } from "$lib/workspace";
     import { TabType } from "$lib/tab";
@@ -48,6 +48,9 @@
                         Flow graph <GitBranchPlus size={16} />
                     </ContextMenuItem>
                 {/if}
+                <ContextMenuItem class="flex justify-between" on:click={() => dispatchOpen(TabType.HEAP_DUMP)}>
+                    Heap dump <Gauge size={16} />
+                </ContextMenuItem>
             </ContextMenuSubContent>
         </ContextMenuSub>
         <ContextMenuSeparator />

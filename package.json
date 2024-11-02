@@ -38,6 +38,7 @@
         "comlink": "^4.4.1",
         "mode-watcher": "^0.4.1",
         "paneforge": "^0.0.6",
+        "svelte-headless-table": "^0.18.2",
         "svelte-sonner": "^0.3.28",
         "tailwind-merge": "^2.5.3",
         "tailwind-variants": "^0.2.1",

@@ -20,5 +20,7 @@
         <Lazy component={() => import("./flow/flow.svelte")} {tab} />
     {:else if tab.type === TabType.IMAGE}
         <Lazy component={() => import("./image/image.svelte")} {tab} />
+    {:else if tab.type === TabType.HEAP_DUMP}
+        <Lazy component={() => import("./dump/dump.svelte")} {tab} />
     {/if}
 {/key}

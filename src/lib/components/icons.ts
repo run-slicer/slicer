@@ -13,6 +13,7 @@ import {
     Sparkles,
     Text,
     TextQuote,
+    FileDigit,
 } from "lucide-svelte";
 import { TabType } from "$lib/tab";
 
@@ -69,6 +70,8 @@ export const fileIcon = (label: string): StyledIcon => {
             case "rar":
             case "lzma":
                 return { icon: FileArchive, classes: [] };
+            case "hprof":
+                return { icon: FileDigit, classes: [] };
             case "properties":
             case "md":
             case "rst":
