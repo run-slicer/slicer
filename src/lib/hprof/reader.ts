@@ -446,7 +446,7 @@ export const read = async (blob: Blob): Promise<SlurpResult> => {
     ctx.instances.clear();
     ctx.classes.clear();
 
-    const arrayHeader = idSize! + 8; // already aligned for both 32- and 64-bit
+    const arrayHeader = idSize + 8; // already aligned for both 32- and 64-bit
 
     // not including the objects' sizes - only the reference sizes
     for (const [id, inst] of ctx.objArrays) {

@@ -9,6 +9,7 @@
     import { FileQuestion } from "lucide-svelte";
     import Table from "./table.svelte";
     import { readable } from "svelte/store";
+    import { humanSize } from "$lib/utils";
 
     export let tab: Tab;
     const entry = tab.entry!;
@@ -29,10 +30,16 @@
 {:then result}
     <div class="flex h-8 min-h-8 w-full flex-col">
         <div class="flex grow flex-row items-center gap-4 bg-background px-2 text-xs">
-            <p>timestamp: <span class="text-muted-foreground">{result?.timestamp?.toLocaleString()}</span></p>
+            <p>timestamp: <span class="text-muted-foreground">{result.timestamp.toLocaleString()}</span></p>
             <p>
                 identifier size:
-                <span class="text-muted-foreground">{result?.idSize} ({(result?.idSize || 0) * 8}-bit)</span>
+                <span class="text-muted-foreground">{result.idSize} ({(result.idSize || 0) * 8}-bit)</span>
+            </p>
+            <p>
+                total size:
+                <span class="text-muted-foreground">
+                    {humanSize(result.entries.reduce((acc, v) => acc + v.totalSize, 0))}
+                </span>
             </p>
         </div>
         <Separator />
