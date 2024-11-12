@@ -8,5 +8,5 @@
 {#await component().then(({ default: C }) => C)}
     <Loading value="Loading..." />
 {:then Component}
-    <Component {...$$restProps} on:* />
+    <Component {...$$restProps} on:action />
 {/await}

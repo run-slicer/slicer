@@ -172,4 +172,4 @@
     };
 </script>
 
-<div bind:this={parent} class="absolute h-full w-full" on:wheel={rescale} />
+<div bind:this={parent} class="absolute h-full w-full" on:wheel={rescale}></div>
