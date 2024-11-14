@@ -8,5 +8,6 @@
 {#await component().then(({ default: C }) => C)}
     <Loading value="Loading..." />
 {:then Component}
+    <!-- TODO: get rid of the event bubble -->
     <Component {...$$restProps} on:action />
 {/await}

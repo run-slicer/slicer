@@ -112,7 +112,7 @@
     <MenubarMenu>
         <MenubarTrigger class="font-bold">slicer</MenubarTrigger>
         <MenubarContent>
-            <MenubarItem on:click={() => (aboutOpen = true)}>About</MenubarItem>
+            <MenubarItem onclick={() => (aboutOpen = true)}>About</MenubarItem>
             <MenubarSeparator />
             <MenubarSub>
                 <MenubarSubTrigger>Theme</MenubarSubTrigger>
@@ -169,18 +169,18 @@
                 <MenubarSubContent class="w-[12rem]">
                     <MenubarItem
                         class="justify-between"
-                        on:click={() => dispatch("action", { type: ActionType.PREFS_LOAD })}
+                        onclick={() => dispatch("action", { type: ActionType.PREFS_LOAD })}
                     >
                         Import <Upload size={16} />
                     </MenubarItem>
                     <MenubarItem
                         class="justify-between"
-                        on:click={() => dispatch("action", { type: ActionType.PREFS_EXPORT })}
+                        onclick={() => dispatch("action", { type: ActionType.PREFS_EXPORT })}
                     >
                         Export <Download size={16} />
                     </MenubarItem>
                     <MenubarSeparator />
-                    <MenubarItem class="justify-between" on:click={() => (prefsClearOpen = true)}>
+                    <MenubarItem class="justify-between" onclick={() => (prefsClearOpen = true)}>
                         Reset <MonitorX size={16} />
                     </MenubarItem>
                 </MenubarSubContent>
@@ -190,18 +190,18 @@
     <MenubarMenu>
         <MenubarTrigger class="relative">File</MenubarTrigger>
         <MenubarContent>
-            <MenubarItem on:click={() => dispatch("action", { type: ActionType.LOAD })}>
+            <MenubarItem onclick={() => dispatch("action", { type: ActionType.LOAD })}>
                 Open <Shortcut key="o" modifier={Modifier.Ctrl} />
             </MenubarItem>
-            <MenubarItem on:click={() => dispatch("action", { type: ActionType.ADD })}>
+            <MenubarItem onclick={() => dispatch("action", { type: ActionType.ADD })}>
                 Add <Shortcut key="o" modifier={Modifier.Ctrl | Modifier.Shift} />
             </MenubarItem>
-            <MenubarItem disabled={entries.length === 0} on:click={() => (clearOpen = true)}>Clear all</MenubarItem>
+            <MenubarItem disabled={entries.length === 0} onclick={() => (clearOpen = true)}>Clear all</MenubarItem>
             <MenubarSeparator />
-            <MenubarItem disabled={!tab?.entry} on:click={() => dispatch("action", { type: ActionType.EXPORT })}>
+            <MenubarItem disabled={!tab?.entry} onclick={() => dispatch("action", { type: ActionType.EXPORT })}>
                 Export <Shortcut key="e" modifier={Modifier.Ctrl} />
             </MenubarItem>
-            <MenubarItem disabled={!tab?.entry} on:click={() => dispatch("action", { type: ActionType.CLOSE })}>
+            <MenubarItem disabled={!tab?.entry} onclick={() => dispatch("action", { type: ActionType.CLOSE })}>
                 Close <Shortcut key="w" modifier={Modifier.Ctrl | Modifier.Alt} />
             </MenubarItem>
             <MenubarSeparator />
@@ -265,7 +265,7 @@
                 inset
                 class="justify-between"
                 disabled={!tab?.entry || tab.entry.type === EntryType.ARCHIVE || tab.type === TabType.CODE}
-                on:click={() => openEntry(TabType.CODE)}
+                onclick={() => openEntry(TabType.CODE)}
             >
                 Code <Code size={16} />
             </MenubarItem>
@@ -273,7 +273,7 @@
                 inset
                 class="justify-between"
                 disabled={!tab?.entry || tab.entry.type === EntryType.ARCHIVE || tab.type === TabType.HEX}
-                on:click={() => openEntry(TabType.HEX)}
+                onclick={() => openEntry(TabType.HEX)}
             >
                 Hexadecimal <Binary size={16} />
             </MenubarItem>
@@ -281,7 +281,7 @@
                 inset
                 class="justify-between"
                 disabled={!tab?.entry || tab.entry.type === EntryType.ARCHIVE || tab.type === TabType.FLOW_GRAPH}
-                on:click={() => openEntry(TabType.FLOW_GRAPH)}
+                onclick={() => openEntry(TabType.FLOW_GRAPH)}
             >
                 Flow graph <GitBranchPlus size={16} />
             </MenubarItem>
@@ -309,10 +309,10 @@
             <MenubarSub>
                 <MenubarSubTrigger>Import</MenubarSubTrigger>
                 <MenubarSubContent class="w-[12rem]">
-                    <MenubarItem class="justify-between" on:click={() => (scriptLoadOpen = true)}>
+                    <MenubarItem class="justify-between" onclick={() => (scriptLoadOpen = true)}>
                         From URL <Globe size={16} />
                     </MenubarItem>
-                    <MenubarItem class="justify-between" on:click={loadClipboardScript}>
+                    <MenubarItem class="justify-between" onclick={loadClipboardScript}>
                         From clipboard <Clipboard size={16} />
                     </MenubarItem>
                 </MenubarSubContent>

@@ -9,7 +9,6 @@
     import {
         ContextMenuContent,
         ContextMenuItem,
-        ContextMenuLabel,
         ContextMenuSeparator,
         ContextMenuSub,
         ContextMenuSubTrigger,
@@ -26,29 +25,32 @@
 </script>
 
 <ContextMenuContent class="min-w-[12rem] max-w-[16rem]">
-    <ContextMenuLabel class="overflow-hidden text-ellipsis text-center">{node.label}</ContextMenuLabel>
+    <!-- TODO: use context menu label -->
+    <div class="overflow-hidden text-ellipsis px-2 py-1.5 text-center text-sm font-semibold text-foreground">
+        {node.label}
+    </div>
     <ContextMenuSeparator />
     {#if node.entry}
         <ContextMenuSub>
             <ContextMenuSubTrigger>Open as</ContextMenuSubTrigger>
             <ContextMenuSubContent class="w-[12rem]">
                 {#if node.entry.type !== EntryType.ARCHIVE}
-                    <ContextMenuItem class="flex justify-between" on:click={() => dispatchOpen(TabType.CODE)}>
+                    <ContextMenuItem class="flex justify-between" onclick={() => dispatchOpen(TabType.CODE)}>
                         Code <Code size={16} />
                     </ContextMenuItem>
                 {/if}
-                <ContextMenuItem class="flex justify-between" on:click={() => dispatchOpen(TabType.HEX)}>
+                <ContextMenuItem class="flex justify-between" onclick={() => dispatchOpen(TabType.HEX)}>
                     Hexadecimal <Binary size={16} />
                 </ContextMenuItem>
-                <ContextMenuItem class="flex justify-between" on:click={() => dispatchOpen(TabType.IMAGE)}>
+                <ContextMenuItem class="flex justify-between" onclick={() => dispatchOpen(TabType.IMAGE)}>
                     Image <Image size={16} />
                 </ContextMenuItem>
                 {#if node.entry.type !== EntryType.ARCHIVE}
-                    <ContextMenuItem class="flex justify-between" on:click={() => dispatchOpen(TabType.FLOW_GRAPH)}>
+                    <ContextMenuItem class="flex justify-between" onclick={() => dispatchOpen(TabType.FLOW_GRAPH)}>
                         Flow graph <GitBranchPlus size={16} />
                     </ContextMenuItem>
                 {/if}
-                <ContextMenuItem class="flex justify-between" on:click={() => dispatchOpen(TabType.HEAP_DUMP)}>
+                <ContextMenuItem class="flex justify-between" onclick={() => dispatchOpen(TabType.HEAP_DUMP)}>
                     Heap dump <Gauge size={16} />
                 </ContextMenuItem>
             </ContextMenuSubContent>
@@ -56,14 +58,14 @@
         <ContextMenuSeparator />
         <ContextMenuItem
             class="flex justify-between"
-            on:click={() => dispatch("action", { type: ActionType.EXPORT, entry: node.entry })}
+            onclick={() => dispatch("action", { type: ActionType.EXPORT, entry: node.entry })}
         >
             Download <Download size={16} />
         </ContextMenuItem>
     {/if}
     <ContextMenuItem
         class="flex justify-between data-[highlighted]:bg-destructive data-[highlighted]:text-destructive-foreground"
-        on:click={() => dispatch("action", { type: ActionType.REMOVE, entries: collectEntries(node) })}
+        onclick={() => dispatch("action", { type: ActionType.REMOVE, entries: collectEntries(node) })}
     >
         Delete <Trash2 size={16} />
     </ContextMenuItem>

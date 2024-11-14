@@ -37,16 +37,12 @@
                     <Button
                         variant="link"
                         class="h-8 p-0"
-                        on:click={() => dispatch("action", { type: ActionType.LOAD })}
+                        onclick={() => dispatch("action", { type: ActionType.LOAD })}
                     >
-                        <Folder class="mr-2 h-4 w-4" /> Open
+                        <Folder /> Open
                     </Button>
-                    <Button
-                        variant="link"
-                        class="h-8 p-0"
-                        on:click={() => dispatch("action", { type: ActionType.ADD })}
-                    >
-                        <FilePlus2 class="mr-2 h-4 w-4" /> Add file
+                    <Button variant="link" class="h-8 p-0" onclick={() => dispatch("action", { type: ActionType.ADD })}>
+                        <FilePlus2 /> Add file
                     </Button>
                 </div>
             </div>

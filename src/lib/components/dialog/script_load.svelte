@@ -36,7 +36,6 @@
         }
 
         open = false;
-
         dispatch("action", { type: ActionType.SCRIPT_ADD, url: value0 });
     };
 </script>
@@ -57,11 +56,11 @@
                 placeholder="https://..."
                 class={cn("col-span-5", !invalid || "border-destructive ring-offset-destructive")}
                 bind:value
-                on:change={() => (invalid = false)}
+                onchange={() => (invalid = false)}
             />
         </div>
         <DialogFooter>
-            <Button type="submit" on:click={loadScript}>Import</Button>
+            <Button type="submit" onclick={loadScript}>Import</Button>
         </DialogFooter>
     </DialogContent>
 </Dialog>

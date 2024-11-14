@@ -20,14 +20,12 @@
 
     const shouldDisasm = entry.type === EntryType.CLASS && tab.type === TabType.CODE;
 
-    const initialDisasm = $toolsDisasm;
-
-    $: disasmProto = { value: initialDisasm, label: initialDisasm };
-
     export let disasms: Disassembler[];
 
-    $: $toolsDisasm = disasmProto.value;
-    $: disasm = disasms.find((d) => d.id === disasmProto.value) || vf;
+    let disasmId = $toolsDisasm;
+    $: $toolsDisasm = disasmId;
+
+    $: disasm = disasms.find((d) => d.id === disasmId) || vf;
 
     $: language = detectLanguage(tab.type, entry, disasm);
 
@@ -49,12 +47,12 @@
     {/await}
     {#if shouldDisasm}
         <div class="absolute bottom-0 right-0 z-20 m-[15px]">
-            <Select bind:selected={disasmProto}>
+            <Select type="single" bind:value={disasmId}>
                 <SelectTrigger class="h-7 text-xs [&_svg]:ml-2 [&_svg]:h-4 [&_svg]:w-4">
                     <span class="mr-2 text-muted-foreground">Disassembler: </span>
                     <span class="tracking-tight">{disasm.name || disasm.id}</span>
                 </SelectTrigger>
-                <SelectContent class="max-h-[240px] w-full overflow-scroll">
+                <SelectContent class="max-h-[240px] w-full overflow-scroll" align="end">
                     {#each disasms as dism}
                         <SelectItem value={dism.id} label={dism.id} class="text-xs tracking-tight">
                             {dism.name || dism.id}

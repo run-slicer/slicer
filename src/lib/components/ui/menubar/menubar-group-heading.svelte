@@ -5,12 +5,15 @@
 	let {
 		ref = $bindable(null),
 		class: className,
+		inset = undefined,
 		...restProps
-	}: MenubarPrimitive.RootProps = $props();
+	}: MenubarPrimitive.GroupHeadingProps & {
+		inset?: boolean;
+	} = $props();
 </script>
 
-<MenubarPrimitive.Root
+<MenubarPrimitive.GroupHeading
 	bind:ref
-	class={cn("bg-background flex h-10 items-center space-x-1 rounded-md border p-1", className)}
+	class={cn("px-2 py-1.5 text-sm font-semibold", inset && "pl-8", className)}
 	{...restProps}
 />

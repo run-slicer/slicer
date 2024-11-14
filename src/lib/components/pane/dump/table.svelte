@@ -78,18 +78,18 @@
             <Button
                 variant="outline"
                 size="icon"
-                on:click={() => ($pageIndex = $pageIndex - 1)}
+                onclick={() => ($pageIndex = $pageIndex - 1)}
                 disabled={!$hasPreviousPage}
             >
-                <ChevronLeft class="h-4 w-4" />
+                <ChevronLeft />
             </Button>
             <Button
                 variant="outline"
                 size="icon"
                 disabled={!$hasNextPage}
-                on:click={() => ($pageIndex = $pageIndex + 1)}
+                onclick={() => ($pageIndex = $pageIndex + 1)}
             >
-                <ChevronRight class="h-4 w-4" />
+                <ChevronRight />
             </Button>
         </div>
     </div>

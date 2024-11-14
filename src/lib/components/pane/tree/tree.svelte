@@ -53,7 +53,7 @@
     let menuData: Node | null = null;
     let deleteData: Entry[] | null = null;
 
-    let triggerElem: HTMLDivElement;
+    let triggerElem: HTMLDivElement | null = null;
 
     const dispatch = createEventDispatcher();
 
@@ -79,7 +79,7 @@
             }
         }}
     >
-        <ContextMenuTrigger bind:el={triggerElem} class="flex h-full w-full">
+        <ContextMenuTrigger bind:ref={triggerElem} class="flex h-full w-full">
             {#if root.nodes && root.nodes.length > 0}
                 <div class="flex w-full flex-col overflow-auto text-nowrap p-2 contain-strict scrollbar-thin">
                     {#each root.nodes as node (node.label)}
@@ -89,15 +89,15 @@
                             on:contextmenu={(e) => {
                                 menuData = e.detail.data;
                                 // replay contextmenu event on trigger
-                                triggerElem.dispatchEvent(e.detail.event);
+                                triggerElem?.dispatchEvent(e.detail.event);
                             }}
                         />
                     {/each}
                 </div>
             {:else}
                 <div class="flex grow items-center justify-center">
-                    <Button variant="outline" size="sm" on:click={() => dispatch("action", { type: ActionType.LOAD })}>
-                        <Plus class="mr-2 h-4 w-4" /> Open
+                    <Button variant="outline" size="sm" onclick={() => dispatch("action", { type: ActionType.LOAD })}>
+                        <Plus /> Open
                     </Button>
                 </div>
             {/if}
