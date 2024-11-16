@@ -10,20 +10,22 @@
         AlertDialogTitle,
     } from "$lib/components/ui/alert-dialog";
     import { buttonVariants } from "$lib/components/ui/button";
-    import { createEventDispatcher } from "svelte";
-    import { ActionType } from "$lib/action";
+    import { type ActionHandler, ActionType, type BulkEntryAction } from "$lib/action";
     import type { Entry } from "$lib/workspace";
 
-    export let entries: Entry[] | null;
+    interface Props {
+        entries: Entry[] | null;
+        onaction?: ActionHandler;
+    }
+
+    let { entries = $bindable(), onaction }: Props = $props();
 
     const handle = (accepted: boolean) => {
         if (accepted) {
-            dispatch("action", { type: ActionType.REMOVE, entries: entries! });
+            onaction?.({ type: ActionType.REMOVE, entries: entries! } as BulkEntryAction);
         }
         entries = null;
     };
-
-    const dispatch = createEventDispatcher();
 </script>
 
 <AlertDialog open={entries !== null}>

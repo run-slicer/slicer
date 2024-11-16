@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
     const tips = [
         `View our documentation at <a href="https://docs.slicer.run" target="_blank" class="text-blue-600 hover:text-blue-700 hover:underline">docs.slicer.run</a>!`,
         `Double-tap <span class="text-xs bg-muted rounded p-1">Shift</span> to view the command palette!`,
@@ -11,14 +11,17 @@
 <script lang="ts">
     import { userPrefersMode } from "mode-watcher";
     import { FilePlus2, Folder, Moon, Settings, Sun } from "lucide-svelte";
-    import { createEventDispatcher } from "svelte";
     import { ToggleGroup, ToggleGroupItem } from "$lib/components/ui/toggle-group";
     import { Button } from "$lib/components/ui/button";
-    import { ActionType } from "$lib/action";
+    import { type ActionHandler, ActionType } from "$lib/action";
 
-    const dispatch = createEventDispatcher();
+    interface Props {
+        onaction?: ActionHandler;
+    }
 
-    let tip = randomTip();
+    let { onaction }: Props = $props();
+
+    let tip = $state(randomTip());
     const handleRevolver = (e: MouseEvent) => {
         // ignore click events coming from links
         if ((e.target as HTMLElement)?.tagName !== "A") {
@@ -34,14 +37,10 @@
             <div>
                 <h2 class="text-lg font-medium text-muted-foreground">Get started</h2>
                 <div class="flex flex-col items-start">
-                    <Button
-                        variant="link"
-                        class="h-8 p-0"
-                        onclick={() => dispatch("action", { type: ActionType.LOAD })}
-                    >
+                    <Button variant="link" class="h-8 p-0" onclick={() => onaction?.({ type: ActionType.LOAD })}>
                         <Folder /> Open
                     </Button>
-                    <Button variant="link" class="h-8 p-0" onclick={() => dispatch("action", { type: ActionType.ADD })}>
+                    <Button variant="link" class="h-8 p-0" onclick={() => onaction?.({ type: ActionType.ADD })}>
                         <FilePlus2 /> Add file
                     </Button>
                 </div>
@@ -62,7 +61,7 @@
             </div>
         </div>
         <div class="flex flex-row items-center justify-between">
-            <button class="cursor-help text-sm" on:click={handleRevolver}>
+            <button class="cursor-help text-sm" onclick={handleRevolver}>
                 <span class="text-base font-medium text-accent-foreground/60">Tip: </span>
                 {@html tip}
             </button>

@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
     import {
         keymap,
         highlightSpecialChars,
@@ -92,48 +92,58 @@
 </script>
 
 <script lang="ts">
-    import { createEventDispatcher, onMount } from "svelte";
+    import { onMount } from "svelte";
     import { mode } from "mode-watcher";
     import type { LanguageSupport } from "@codemirror/language";
     import { EditorView } from "@codemirror/view";
     import { Compartment } from "@codemirror/state";
     import { dark, light } from "./theme";
 
-    export let value: string = "";
-    export let readOnly: boolean = false;
-    export let lang: LanguageSupport | null = null;
-    export let textSize: number = 0.75;
-    export let wrap: boolean = false;
-
     const readOnlyStore = new Compartment();
     const themeStore = new Compartment();
     const langStore = new Compartment();
     const wrapStore = new Compartment();
 
-    export let view: EditorView | null = null;
-    $: view?.dispatch({ effects: readOnlyStore.reconfigure(EditorState.readOnly.of(readOnly)) });
-    $: view?.dispatch({ effects: themeStore.reconfigure($mode === "dark" ? dark : light) });
-    $: view?.dispatch({ effects: langStore.reconfigure(lang || []) });
-    $: view?.dispatch({ effects: wrapStore.reconfigure(wrap ? EditorView.lineWrapping : []) });
+    interface Props {
+        value?: string;
+        readonly?: boolean;
+        lang?: LanguageSupport | null;
+        size?: number;
+        wrap?: boolean;
+        view?: EditorView | null;
+        onchange?: (view: EditorView, state: EditorState) => void;
+    }
 
-    let parent: HTMLDivElement;
+    let {
+        value = $bindable(""),
+        readonly = false,
+        lang = null,
+        size = $bindable(0.75),
+        wrap = false,
+        view = $bindable(null),
+        onchange,
+    }: Props = $props();
 
-    $: {
+    $effect(() => view?.dispatch({ effects: readOnlyStore.reconfigure(EditorState.readOnly.of(readonly)) }));
+    $effect(() => view?.dispatch({ effects: themeStore.reconfigure($mode === "dark" ? dark : light) }));
+    $effect(() => view?.dispatch({ effects: langStore.reconfigure(lang || []) }));
+    $effect(() => view?.dispatch({ effects: wrapStore.reconfigure(wrap ? EditorView.lineWrapping : []) }));
+
+    let parent: HTMLDivElement | undefined = $state();
+    $effect(() => {
         const oldValue = view?.state?.doc?.toString();
         if (oldValue !== value) {
             view?.dispatch({ changes: { from: 0, to: view?.state?.doc?.length || 0, insert: value } });
         }
-    }
+    });
 
-    $: {
+    $effect(() => {
         if (view) {
-            view.scrollDOM.style.fontSize = `${textSize}rem`;
-            view.contentDOM.style.fontSize = `${textSize}rem`;
+            view.scrollDOM.style.fontSize = `${size}rem`;
+            view.contentDOM.style.fontSize = `${size}rem`;
             view.requestMeasure();
         }
-    }
-
-    const dispatch = createEventDispatcher();
+    });
 
     onMount(() => {
         view = new EditorView({
@@ -141,7 +151,7 @@
                 doc: value,
                 extensions: [
                     basicSetup,
-                    readOnlyStore.of(EditorState.readOnly.of(readOnly)),
+                    readOnlyStore.of(EditorState.readOnly.of(readonly)),
                     themeStore.of($mode === "dark" ? dark : light),
                     langStore.of(lang || []),
                     wrapStore.of(wrap ? EditorView.lineWrapping : []),
@@ -153,7 +163,7 @@
                                 value = newValue;
                             }
 
-                            dispatch("change", { view: e.view, state: e.state });
+                            onchange?.(e.view, e.state);
                         }
                     }),
                 ],
@@ -167,9 +177,9 @@
             e.preventDefault();
 
             const toAdd = e.deltaY > 0 ? -0.05 : 0.05;
-            textSize = Math.max(0.25, Math.min(4, textSize + toAdd));
+            size = Math.max(0.25, Math.min(4, size + toAdd));
         }
     };
 </script>
 
-<div bind:this={parent} class="absolute h-full w-full" on:wheel={rescale}></div>
+<div bind:this={parent} class="absolute h-full w-full" onwheel={rescale}></div>

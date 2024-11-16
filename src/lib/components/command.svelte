@@ -8,26 +8,30 @@
     import { cn } from "$lib/components/utils";
     import { VList } from "virtua/svelte";
 
-    export let entries: Entry[];
+    interface Props {
+        entries: Entry[];
+    }
 
-    let open = false;
-    let searchWorkspace = false;
+    let { entries }: Props = $props();
 
-    $: {
+    let open = $state(false);
+    let searchWorkspace = $state(false);
+
+    $effect(() => {
         // reset page on close
         if (!open) {
             searchWorkspace = false;
         }
-    }
+    });
 
-    let search = "";
+    let search = $state("");
     const filter = (entries: Entry[], term: string): Entry[] => {
         return entries
             .filter((e) => e.name.includes(term))
             .sort((a, b) => a.name.length - term.length - (b.name.length - term.length));
     };
 
-    $: filteredEntries = search && searchWorkspace ? filter(entries, search) : entries;
+    let filteredEntries = $derived(search && searchWorkspace ? filter(entries, search) : entries);
 
     let shift = false;
     onMount(() => {
@@ -62,7 +66,8 @@
                         {#snippet children(entry)}
                             <CommandItem class="!py-2.5" onSelect={() => handleClick(entry)}>
                                 {@const { icon, classes } = fileIcon(entry.shortName)}
-                                <svelte:component this={icon} class={classes} />
+                                {@const SvelteComponent = icon}
+                                <SvelteComponent class={classes} />
                                 <span>{entry.name}</span>
                             </CommandItem>
                         {/snippet}

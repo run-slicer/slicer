@@ -1,13 +1,12 @@
 <script lang="ts">
     import { dndzone } from "svelte-dnd-action";
-    import { createEventDispatcher } from "svelte";
     import { writable } from "svelte/store";
     import { ResizableHandle, ResizablePane, ResizablePaneGroup } from "$lib/components/ui/resizable";
     import type { Entry } from "$lib/workspace";
     import { type Tab, checkDirty } from "$lib/tab";
     import { projectOpen, loggingOpen } from "$lib/state";
     import { distractionFree } from "$lib/mode";
-    import { ActionType } from "$lib/action";
+    import { type ActionHandler, ActionType, type TabAction } from "$lib/action";
     import type { LogEntry } from "$lib/log";
     import { cn } from "$lib/components/utils";
     import TreePane from "$lib/components/pane/tree/tree.svelte";
@@ -16,12 +15,20 @@
     import { PaneHeader, PaneHeaderItem } from "$lib/components/pane/header";
     import type { Disassembler } from "$lib/disasm";
 
-    export let tab: Tab | null;
-    export let tabs: Tab[];
+    interface Props {
+        tab: Tab | null;
+        tabs: Tab[];
+        entries: Entry[];
+        logentries: LogEntry[];
+        disasms: Disassembler[];
+        onaction?: ActionHandler;
+    }
+
+    let { tab = $bindable(), tabs, entries, logentries, disasms, onaction }: Props = $props();
 
     // order is kept only here, main store is unordered
     const orderedTabs = writable(tabs);
-    $: {
+    $effect(() => {
         orderedTabs.update((orderedTabs0) => {
             // pop removed tabs
             const updatedTabs = orderedTabs0.filter((e) => tabs.includes(e));
@@ -30,20 +37,15 @@
 
             return updatedTabs;
         });
-    }
+    });
 
-    export let entries: Entry[];
-    export let logEntries: LogEntry[];
-
-    export let disasms: Disassembler[];
-
-    const dispatch = createEventDispatcher();
+    const close = (tab: Tab) => onaction?.({ type: ActionType.CLOSE, tab } as TabAction);
 </script>
 
 <ResizablePaneGroup direction="horizontal" class="grow basis-0">
     <!-- only hide the project pane, because we don't actually want to force a re-render of the tree -->
     <ResizablePane defaultSize={20} class={cn(($projectOpen && !$distractionFree) || "hidden")}>
-        <TreePane {entries} on:action />
+        <TreePane {entries} {onaction} />
     </ResizablePane>
     <ResizableHandle class={cn(($projectOpen && !$distractionFree) || "hidden")} />
     <ResizablePane>
@@ -58,8 +60,8 @@
                                 dropFromOthersDisabled: true,
                                 dropTargetStyle: {},
                             }}
-                            on:consider={(e) => ($orderedTabs = e.detail.items)}
-                            on:finalize={(e) => ($orderedTabs = e.detail.items)}
+                            onconsider={(e) => ($orderedTabs = e.detail.items)}
+                            onfinalize={(e) => ($orderedTabs = e.detail.items)}
                         >
                             {#each $orderedTabs as tab0 (tab0.id)}
                                 <PaneHeaderItem
@@ -67,8 +69,8 @@
                                     active={tab?.id === tab0.id}
                                     icon={tab0.icon}
                                     closeable
-                                    on:click={() => (tab = tab0)}
-                                    on:close={() => dispatch("action", { type: ActionType.CLOSE, tab: tab0 })}
+                                    onclick={() => (tab = tab0)}
+                                    onclose={() => close(tab0)}
                                 />
                             {/each}
                         </div>
@@ -77,7 +79,7 @@
                         <div
                             class={cn("relative flex h-full min-h-0 w-full flex-col", tab?.id === tab0.id || "hidden")}
                         >
-                            <MainPane tab={tab0} dirtyFlag={checkDirty(tab0, tab)} {disasms} on:action />
+                            <MainPane tab={tab0} flag={checkDirty(tab0, tab)} {disasms} {onaction} />
                         </div>
                     {/each}
                 </div>
@@ -85,7 +87,7 @@
             {#if $loggingOpen && !$distractionFree}
                 <ResizableHandle />
                 <ResizablePane defaultSize={20}>
-                    <LoggingPane entries={logEntries} />
+                    <LoggingPane entries={logentries} />
                 </ResizablePane>
             {/if}
         </ResizablePaneGroup>

@@ -11,23 +11,24 @@
     import { Input } from "$lib/components/ui/input";
     import { Button } from "$lib/components/ui/button";
     import { cn } from "$lib/components/utils";
-    import { createEventDispatcher } from "svelte";
-    import { ActionType } from "$lib/action";
+    import { type ActionHandler, ActionType, type ScriptAddAction } from "$lib/action";
 
-    export let open = false;
+    interface Props {
+        open?: boolean;
+        onaction?: ActionHandler;
+    }
 
-    let value = "";
-    $: {
+    let { open = $bindable(false), onaction }: Props = $props();
+
+    let value = $state("");
+    $effect(() => {
         if (!open) {
             // clear after closing
             value = "";
         }
-    }
+    });
 
-    const dispatch = createEventDispatcher();
-
-    let invalid = false;
-
+    let invalid = $state(false);
     const loadScript = async () => {
         const value0 = value.trim();
         if (!value0) {
@@ -36,7 +37,7 @@
         }
 
         open = false;
-        dispatch("action", { type: ActionType.SCRIPT_ADD, url: value0 });
+        onaction?.({ type: ActionType.SCRIPT_ADD, url: value0 } as ScriptAddAction);
     };
 </script>
 

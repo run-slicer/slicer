@@ -1,26 +1,49 @@
-<svelte:options immutable />
-
 <script lang="ts">
-    import Lazy from "$lib/components/lazy.svelte";
+    import Loading from "$lib/components/loading.svelte";
     import { type Tab, TabType } from "$lib/tab";
     import type { Disassembler } from "$lib/disasm";
+    import type { ActionHandler } from "$lib/action";
 
-    export let tab: Tab;
-    export let dirtyFlag: any;
+    interface Props {
+        tab: Tab;
+        flag: any;
+        disasms: Disassembler[];
+        onaction?: ActionHandler;
+    }
 
-    export let disasms: Disassembler[];
+    let { tab, flag, disasms, onaction }: Props = $props();
 </script>
 
-{#key dirtyFlag}
+{#key flag}
     {#if tab.type === TabType.WELCOME}
-        <Lazy component={() => import("./welcome.svelte")} on:action />
+        {#await import("./welcome.svelte")}
+            <Loading value="Loading..." />
+        {:then { default: Welcome }}
+            <Welcome {onaction} />
+        {/await}
     {:else if tab.type === TabType.CODE || tab.type === TabType.HEX}
-        <Lazy component={() => import("./code/code.svelte")} {tab} {disasms} on:action />
+        {#await import("./code/code.svelte")}
+            <Loading value="Loading..." />
+        {:then { default: Code }}
+            <Code {tab} {disasms} {onaction} />
+        {/await}
     {:else if tab.type === TabType.FLOW_GRAPH}
-        <Lazy component={() => import("./flow/flow.svelte")} {tab} />
+        {#await import("./flow/flow.svelte")}
+            <Loading value="Loading..." />
+        {:then { default: Flow }}
+            <Flow {tab} />
+        {/await}
     {:else if tab.type === TabType.IMAGE}
-        <Lazy component={() => import("./image/image.svelte")} {tab} />
+        {#await import("./image/image.svelte")}
+            <Loading value="Loading..." />
+        {:then { default: Image }}
+            <Image {tab} />
+        {/await}
     {:else if tab.type === TabType.HEAP_DUMP}
-        <Lazy component={() => import("./dump/dump.svelte")} {tab} />
+        {#await import("./dump/dump.svelte")}
+            <Loading value="Loading..." />
+        {:then { default: Dump }}
+            <Dump {tab} />
+        {/await}
     {/if}
 {/key}

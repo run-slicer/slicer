@@ -1,27 +1,32 @@
 <script lang="ts">
     import { X } from "lucide-svelte";
-    import { createEventDispatcher } from "svelte";
     import type { StyledIcon } from "$lib/components/icons";
     import { cn } from "$lib/components/utils";
 
-    export let name = "";
-    export let icon: StyledIcon | null = null;
+    interface Props {
+        name?: string;
+        icon?: StyledIcon | null;
+        active?: boolean;
+        closeable?: boolean;
+        onclick?: () => void;
+        onclose?: () => void;
+    }
 
-    export let active = true;
-    export let closeable = false;
+    let { name = "", icon = null, active = true, closeable = false, onclick, onclose }: Props = $props();
 
-    const dispatch = createEventDispatcher();
-    const handleClose = (e: MouseEvent) => {
+    let Icon = $derived(icon?.icon);
+
+    const handleClose = (e: MouseEvent | KeyboardEvent) => {
         e.stopPropagation();
-        dispatch("close");
+        onclose?.();
     };
 
-    let elem: HTMLButtonElement;
-    $: {
+    let elem: HTMLButtonElement | undefined = $state();
+    $effect(() => {
         if (elem && active) {
             elem.scrollIntoView();
         }
-    }
+    });
 </script>
 
 <button
@@ -31,15 +36,22 @@
         !active || "border-t-[1px] border-t-primary bg-background"
     )}
     aria-label={name}
-    on:click
+    {onclick}
 >
     {#if icon}
-        <svelte:component this={icon.icon} size={16} class={cn("mr-1.5 min-w-[16px]", icon.classes)} />
+        <Icon size={16} class={cn("mr-1.5 min-w-[16px]", icon.classes)} />
     {/if}
     <span class="overflow-hidden text-ellipsis whitespace-nowrap break-keep text-sm">{name}</span>
     {#if closeable}
-        <button class="ml-3" aria-label="Close" on:click={handleClose}>
+        <div
+            role="button"
+            tabindex="-1"
+            class="ml-3 cursor-pointer"
+            aria-label="Close"
+            onclick={handleClose}
+            onkeydown={handleClose}
+        >
             <X size={14} class="min-w-[14px] text-muted-foreground/60 hover:text-muted-foreground/80" />
-        </button>
+        </div>
     {/if}
 </button>

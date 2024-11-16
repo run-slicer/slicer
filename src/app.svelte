@@ -14,20 +14,20 @@
     import { root as rootKey } from "$lib/state";
     import { handle } from "$lib/action";
 
-    $: entries0 = Array.from($entries.values());
+    let entries0 = $derived(Array.from($entries.values()));
 </script>
 
 <ModeWatcher themeStorageKey={`${rootKey}.theme`} modeStorageKey={`${rootKey}.mode`} />
 <Loader />
 <Toaster position="top-right" richColors />
-<Menu tab={$currentTab} entries={entries0} scripts={$scripts} on:action={(e) => handle(e.detail)} />
+<Menu tab={$currentTab} entries={entries0} scripts={$scripts} onaction={handle} />
 <Content
     bind:tab={$currentTab}
     tabs={Array.from($tabs.values())}
     entries={entries0}
-    logEntries={$logEntries}
+    logentries={$logEntries}
     disasms={Array.from($disasms.values())}
-    on:action={(e) => handle(e.detail)}
+    onaction={handle}
 />
 <Breadcrumb tab={$currentTab} encoding={$currentEncoding} />
 {#await import("$lib/components/command.svelte") then { default: Command }}

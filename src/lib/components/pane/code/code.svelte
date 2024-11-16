@@ -1,5 +1,3 @@
-<svelte:options immutable />
-
 <script lang="ts">
     import { EntryType } from "$lib/workspace";
     import Loading from "$lib/components/loading.svelte";
@@ -14,24 +12,29 @@
     import type { Disassembler } from "$lib/disasm";
     import { ContextMenu, ContextMenuTrigger } from "$lib/components/ui/context-menu";
     import CodeMenu from "./menu.svelte";
+    import type { ActionHandler } from "$lib/action";
 
-    export let tab: Tab;
-    const entry = tab.entry!;
+    interface Props {
+        tab: Tab;
+        disasms: Disassembler[];
+        onaction?: ActionHandler;
+    }
 
-    const shouldDisasm = entry.type === EntryType.CLASS && tab.type === TabType.CODE;
+    let { tab, disasms, onaction }: Props = $props();
 
-    export let disasms: Disassembler[];
+    const entry = $derived(tab.entry!);
+    const shouldDisasm = $derived(entry.type === EntryType.CLASS && tab.type === TabType.CODE);
 
-    let disasmId = $toolsDisasm;
-    $: $toolsDisasm = disasmId;
+    let disasmId = $state($toolsDisasm);
+    $effect(() => {
+        $toolsDisasm = disasmId;
+    });
 
-    $: disasm = disasms.find((d) => d.id === disasmId) || vf;
-
-    $: language = detectLanguage(tab.type, entry, disasm);
-
-    $: textSize = $editorTextSizeSync
-        ? editorTextSize
-        : writable(get(editorTextSize) /* immediate value, no subscription */);
+    let disasm = $derived(disasms.find((d) => d.id === disasmId) || vf);
+    let language = $derived(detectLanguage(tab.type, entry, disasm));
+    let textSize = $derived(
+        $editorTextSizeSync ? editorTextSize : writable(get(editorTextSize) /* immediate value, no subscription */)
+    );
 </script>
 
 <div class="relative basis-full overflow-hidden scrollbar-thin">
@@ -42,7 +45,7 @@
             <ContextMenuTrigger>
                 <CodeEditor {value} readOnly {lang} bind:textSize={$textSize} wrap={$editorWrap} />
             </ContextMenuTrigger>
-            <CodeMenu {tab} {value} lang={language} on:action />
+            <CodeMenu {tab} {value} lang={language} {onaction} />
         </ContextMenu>
     {/await}
     {#if shouldDisasm}

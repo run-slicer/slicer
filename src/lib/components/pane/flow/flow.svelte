@@ -1,5 +1,3 @@
-<svelte:options immutable />
-
 <script lang="ts">
     import { writable } from "svelte/store";
     import { type ClassEntry, EntryType } from "$lib/workspace";
@@ -12,7 +10,11 @@
     import FlowNode from "./node.svelte";
     import { createComputedGraph } from "./graph";
 
-    export let tab: Tab;
+    interface Props {
+        tab: Tab;
+    }
+
+    let { tab }: Props = $props();
     const entry = tab.entry!;
 
     const node = entry.type === EntryType.CLASS ? (entry as ClassEntry).node : null;
@@ -20,24 +22,24 @@
     const pool = node ? node.pool : [];
     const methods = node ? node.methods : [];
 
-    let member = methods.length > 0 ? methods[0] : null;
+    let member = $state(methods.length > 0 ? methods[0] : null);
 
     const createLabel = (method: Member | null): string => {
         return !method ? "<none>" : `${method.name.decode()}${method.type.decode()}`;
     };
 
-    let method = (member ? methods.indexOf(member) : -1).toString();
-    $: {
+    let method = $state((member ? methods.indexOf(member) : -1).toString());
+    $effect(() => {
         const parsedId = parseInt(method);
         if (parsedId !== -1) {
             member = methods[parsedId];
         }
-    }
+    });
 
-    let draggable = false;
-    let showHandlerEdges = false;
+    let draggable = $state(false);
+    let showHandlerEdges = $state(false);
 
-    $: [nodes, edges] = createComputedGraph(member, pool, showHandlerEdges);
+    let [nodes, edges] = $derived(createComputedGraph(member, pool, showHandlerEdges));
 </script>
 
 <div class="relative h-full w-full">
@@ -63,7 +65,8 @@
                     title="toggle interactivity"
                     aria-label="toggle interactivity"
                 >
-                    <svelte:component this={draggable ? LockOpen : Lock} size={12} class="!fill-none" />
+                    {@const Icon = draggable ? LockOpen : Lock}
+                    <Icon size={12} class="!fill-none" />
                 </ControlButton>
                 <ControlButton
                     class="svelte-flow__controls-interactive"
@@ -71,7 +74,8 @@
                     title="toggle exception handler edges"
                     aria-label="toggle exception handler edges"
                 >
-                    <svelte:component this={showHandlerEdges ? Zap : ZapOff} size={12} class="!fill-none" />
+                    {@const Icon = showHandlerEdges ? Zap : ZapOff}
+                    <Icon size={12} class="!fill-none" />
                 </ControlButton>
             </Controls>
         </SvelteFlow>

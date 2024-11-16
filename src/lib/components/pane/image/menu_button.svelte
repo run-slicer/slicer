@@ -1,11 +1,15 @@
 <script lang="ts">
-    import type { Icon } from "lucide-svelte";
-    import type { ComponentType } from "svelte";
+    import type { Icon } from "$lib/components/icons";
 
-    export let icon: ComponentType<Icon>;
-    export let label: string;
+    interface Props {
+        icon: Icon;
+        label: string;
+        onclick?: (e: MouseEvent) => void;
+    }
+
+    let { icon: IconComponent, label, onclick }: Props = $props();
 </script>
 
-<button title={label} aria-label={label} on:click>
-    <svelte:component this={icon} size={14} class="min-w-[14px] hover:text-muted-foreground" />
+<button title={label} aria-label={label} {onclick}>
+    <IconComponent size={14} class="min-w-[14px] hover:text-muted-foreground" />
 </button>

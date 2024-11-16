@@ -11,8 +11,12 @@
     import { readable } from "svelte/store";
     import { humanSize } from "$lib/utils";
 
-    export let tab: Tab;
-    const entry = tab.entry!;
+    interface Props {
+        tab: Tab;
+    }
+
+    let { tab }: Props = $props();
+    const entry = $derived(tab.entry!);
 
     const readEntry = async (entry: Entry): Promise<SlurpResult> => {
         try {

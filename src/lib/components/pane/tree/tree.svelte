@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
     import type { Entry } from "$lib/workspace";
     import type { Node } from "./";
 
@@ -12,17 +12,16 @@
 </script>
 
 <script lang="ts">
-    import { createEventDispatcher } from "svelte";
     import { Folders, Plus } from "lucide-svelte";
     import { Button } from "$lib/components/ui/button";
     import { ContextMenu, ContextMenuTrigger } from "$lib/components/ui/context-menu";
     import { PaneHeader, PaneHeaderItem } from "$lib/components/pane/header";
     import { DeleteDialog } from "$lib/components/dialog";
-    import { type Action, ActionType, type BulkEntryAction } from "$lib/action";
+    import { type Action, type ActionHandler, ActionType, type BulkEntryAction, type OpenAction } from "$lib/action";
     import TreeNode from "./node.svelte";
     import NodeMenu from "./menu.svelte";
 
-    let root: Node = { label: "<root>", nodes: [] };
+    let root: Node = $state({ label: "<root>", nodes: [] });
     const updateNode = (entry: Entry) => {
         let curr = root;
 
@@ -41,29 +40,31 @@
         curr.entry = entry;
     };
 
-    export let entries: Entry[];
-    $: {
+    interface Props {
+        entries: Entry[];
+        onaction?: ActionHandler;
+    }
+
+    let { entries, onaction }: Props = $props();
+    $effect(() => {
         root.nodes = [];
         entries.forEach(updateNode);
 
         root.nodes.sort((a, b) => +Boolean(b.nodes) - +Boolean(a.nodes)); // non-leaf nodes go first
-        root = root; // force an update
-    }
+    });
 
-    let menuData: Node | null = null;
-    let deleteData: Entry[] | null = null;
+    let menuData: Node | null = $state(null);
+    let deleteData: Entry[] | null = $state(null);
 
-    let triggerElem: HTMLDivElement | null = null;
+    let triggerElem: HTMLDivElement | null = $state(null);
 
-    const dispatch = createEventDispatcher();
-
-    const handle = (e: CustomEvent<Action>) => {
-        const action = e.detail;
+    const open = (data: Node) => onaction?.({ type: ActionType.OPEN, entry: data.entry! } as OpenAction);
+    const handle = (action: Action) => {
         if (action.type === ActionType.REMOVE) {
             // prompt confirmation dialog
             deleteData = (action as BulkEntryAction).entries;
         } else {
-            dispatch("action", action);
+            onaction?.(action);
         }
     };
 </script>
@@ -85,27 +86,27 @@
                     {#each root.nodes as node (node.label)}
                         <TreeNode
                             data={node}
-                            on:open={(e) => dispatch("action", { type: ActionType.OPEN, entry: e.detail.data.entry })}
-                            on:contextmenu={(e) => {
-                                menuData = e.detail.data;
+                            onopen={open}
+                            onmenu={(e, data) => {
+                                menuData = data;
                                 // replay contextmenu event on trigger
-                                triggerElem?.dispatchEvent(e.detail.event);
+                                triggerElem?.dispatchEvent(e);
                             }}
                         />
                     {/each}
                 </div>
             {:else}
                 <div class="flex grow items-center justify-center">
-                    <Button variant="outline" size="sm" onclick={() => dispatch("action", { type: ActionType.LOAD })}>
+                    <Button variant="outline" size="sm" onclick={() => onaction?.({ type: ActionType.LOAD })}>
                         <Plus /> Open
                     </Button>
                 </div>
             {/if}
         </ContextMenuTrigger>
         {#if menuData}
-            <NodeMenu node={menuData} on:action={handle} />
+            <NodeMenu node={menuData} onaction={handle} />
         {/if}
     </ContextMenu>
 </div>
 
-<DeleteDialog bind:entries={deleteData} on:action />
+<DeleteDialog bind:entries={deleteData} {onaction} />

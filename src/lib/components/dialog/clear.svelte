@@ -10,16 +10,18 @@
         AlertDialogTitle,
     } from "$lib/components/ui/alert-dialog";
     import { buttonVariants } from "$lib/components/ui/button";
-    import { createEventDispatcher } from "svelte";
-    import { ActionType } from "$lib/action";
+    import { type ActionHandler, ActionType } from "$lib/action";
 
-    export let open = false;
+    interface Props {
+        open?: boolean;
+        onaction?: ActionHandler;
+    }
+
+    let { open = $bindable(false), onaction }: Props = $props();
     const handle = () => {
         open = false;
-        dispatch("action", { type: ActionType.CLEAR });
+        onaction?.({ type: ActionType.CLEAR });
     };
-
-    const dispatch = createEventDispatcher();
 </script>
 
 <AlertDialog bind:open>

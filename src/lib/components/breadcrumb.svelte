@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
     import type { Entry } from "$lib/workspace";
 
     export const flatten = (entry: Entry): Entry[] => {
@@ -20,8 +20,12 @@
     import type { Encoding } from "$lib/workspace/encoding";
     import { fileIcon } from "$lib/components/icons";
 
-    export let tab: Tab | null;
-    export let encoding: Encoding | null;
+    interface Props {
+        tab: Tab | null;
+        encoding: Encoding | null;
+    }
+
+    let { tab, encoding }: Props = $props();
 </script>
 
 <Separator />
@@ -37,8 +41,8 @@
                         {@const lastPart = y === parts.length - 1}
                         <BreadcrumbItem>
                             {#if lastPart}
-                                {@const icon = fileIcon(entry.data.name)}
-                                <svelte:component this={icon.icon} size={14} class={cn("min-w-[14px]", icon.classes)} />
+                                {@const { icon: FileIcon, classes } = fileIcon(entry.data.name)}
+                                <FileIcon size={14} class={cn("min-w-[14px]", classes)} />
                             {/if}
                             {part}
                         </BreadcrumbItem>

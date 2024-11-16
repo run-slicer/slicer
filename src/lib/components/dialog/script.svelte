@@ -3,7 +3,11 @@
     import { Dialog, DialogHeader, DialogContent, DialogDescription, DialogTitle } from "$lib/components/ui/dialog";
     import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "$lib/components/ui/table";
 
-    export let proto: ProtoScript | null;
+    interface Props {
+        proto: ProtoScript | null;
+    }
+
+    let { proto = $bindable(null) }: Props = $props();
 </script>
 
 <Dialog open={proto !== null}>

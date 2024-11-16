@@ -9,14 +9,22 @@
     import { ScriptState, type ProtoScript } from "$lib/script";
     import ScriptOption from "./option.svelte";
     import { MenubarItem } from "$lib/components/ui/menubar";
-    import { createEventDispatcher } from "svelte";
     import { Info, Trash2 } from "lucide-svelte";
-    import { ActionType } from "$lib/action";
+    import { type ActionHandler, ActionType, type ScriptAction } from "$lib/action";
 
-    export let proto: ProtoScript;
-    const script = proto.script;
+    interface Props {
+        proto: ProtoScript;
+        onopen?: (proto: ProtoScript) => void;
+        ondelete?: (proto: ProtoScript) => void;
+        onaction?: ActionHandler;
+    }
 
-    const dispatch = createEventDispatcher();
+    let { proto, onopen, ondelete, onaction }: Props = $props();
+    const script = $derived(proto.script);
+
+    const handleEnabled = (enabled: boolean) => {
+        onaction?.({ type: enabled ? ActionType.SCRIPT_LOAD : ActionType.SCRIPT_UNLOAD, proto } as ScriptAction);
+    };
 </script>
 
 <MenubarSub>
@@ -25,19 +33,18 @@
         <MenubarCheckboxItem
             checked={proto.state === ScriptState.LOADED}
             disabled={proto.state === ScriptState.FAILED}
-            onCheckedChange={(checked) =>
-                dispatch("action", { type: checked ? ActionType.SCRIPT_LOAD : ActionType.SCRIPT_UNLOAD, proto })}
+            onCheckedChange={handleEnabled}
         >
             Enabled
         </MenubarCheckboxItem>
         <MenubarSeparator />
-        <MenubarItem inset class="justify-between" on:click={() => dispatch("open", { proto })}>
+        <MenubarItem inset class="justify-between" onclick={() => onopen?.(proto)}>
             Info <Info size={16} />
         </MenubarItem>
         <MenubarItem
             inset
             class="justify-between data-[highlighted]:bg-destructive data-[highlighted]:text-destructive-foreground"
-            on:click={() => dispatch("delete", { proto })}
+            onclick={() => ondelete?.(proto)}
         >
             Delete <Trash2 size={16} />
         </MenubarItem>

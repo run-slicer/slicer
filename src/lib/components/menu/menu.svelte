@@ -16,7 +16,7 @@
     import { encodings } from "$lib/workspace/encoding";
     import type { ProtoScript } from "$lib/script";
     import { type Tab, TabType } from "$lib/tab";
-    import { ActionType } from "$lib/action";
+    import { type ActionHandler, ActionType, type OpenAction, type ScriptAddAction } from "$lib/action";
     import { Modifier } from "$lib/shortcut";
     import Shortcut from "./shortcut.svelte";
     import ScriptMenu from "./script/menu.svelte";
@@ -63,26 +63,28 @@
         Sun,
         MonitorX,
     } from "lucide-svelte";
-    import { createEventDispatcher } from "svelte";
     import { toast } from "svelte-sonner";
     import { themes } from "$lib/theme";
 
-    export let tab: Tab | null;
-    export let entries: Entry[];
-    export let scripts: ProtoScript[];
+    interface Props {
+        tab: Tab | null;
+        entries: Entry[];
+        scripts: ProtoScript[];
+        onaction?: ActionHandler;
+    }
 
-    let aboutOpen = false;
-    let clearOpen = false;
-    let prefsClearOpen = false;
+    let { tab, entries, scripts, onaction }: Props = $props();
 
-    let scriptLoadOpen = false;
-    let scriptDeleteOpen: ProtoScript | null = null;
-    let scriptInfoOpen: ProtoScript | null = null;
+    let aboutOpen = $state(false);
+    let clearOpen = $state(false);
+    let prefsClearOpen = $state(false);
 
-    const dispatch = createEventDispatcher();
+    let scriptLoadOpen = $state(false);
+    let scriptDeleteOpen: ProtoScript | null = $state(null);
+    let scriptInfoOpen: ProtoScript | null = $state(null);
 
     const openEntry = (tabType: TabType) => {
-        dispatch("action", { type: ActionType.OPEN, entry: tab?.entry!, tabType });
+        onaction?.({ type: ActionType.OPEN, entry: tab?.entry!, tabType } as OpenAction);
     };
 
     const loadClipboardScript = async () => {
@@ -96,10 +98,10 @@
         try {
             const data = await navigator.clipboard.readText();
 
-            dispatch("action", {
+            onaction?.({
                 type: ActionType.SCRIPT_ADD,
                 url: `data:text/javascript;base64,${window.btoa(data)}`,
-            });
+            } as ScriptAddAction);
         } catch (e) {
             toast.error("Error occurred", {
                 description: `Could not copy from clipboard, access denied.`,
@@ -167,16 +169,10 @@
             <MenubarSub>
                 <MenubarSubTrigger>Preferences</MenubarSubTrigger>
                 <MenubarSubContent class="w-[12rem]">
-                    <MenubarItem
-                        class="justify-between"
-                        onclick={() => dispatch("action", { type: ActionType.PREFS_LOAD })}
-                    >
+                    <MenubarItem class="justify-between" onclick={() => onaction?.({ type: ActionType.PREFS_LOAD })}>
                         Import <Upload size={16} />
                     </MenubarItem>
-                    <MenubarItem
-                        class="justify-between"
-                        onclick={() => dispatch("action", { type: ActionType.PREFS_EXPORT })}
-                    >
+                    <MenubarItem class="justify-between" onclick={() => onaction?.({ type: ActionType.PREFS_EXPORT })}>
                         Export <Download size={16} />
                     </MenubarItem>
                     <MenubarSeparator />
@@ -190,18 +186,18 @@
     <MenubarMenu>
         <MenubarTrigger class="relative">File</MenubarTrigger>
         <MenubarContent>
-            <MenubarItem onclick={() => dispatch("action", { type: ActionType.LOAD })}>
+            <MenubarItem onclick={() => onaction?.({ type: ActionType.LOAD })}>
                 Open <Shortcut key="o" modifier={Modifier.Ctrl} />
             </MenubarItem>
-            <MenubarItem onclick={() => dispatch("action", { type: ActionType.ADD })}>
+            <MenubarItem onclick={() => onaction?.({ type: ActionType.ADD })}>
                 Add <Shortcut key="o" modifier={Modifier.Ctrl | Modifier.Shift} />
             </MenubarItem>
             <MenubarItem disabled={entries.length === 0} onclick={() => (clearOpen = true)}>Clear all</MenubarItem>
             <MenubarSeparator />
-            <MenubarItem disabled={!tab?.entry} onclick={() => dispatch("action", { type: ActionType.EXPORT })}>
+            <MenubarItem disabled={!tab?.entry} onclick={() => onaction?.({ type: ActionType.EXPORT })}>
                 Export <Shortcut key="e" modifier={Modifier.Ctrl} />
             </MenubarItem>
-            <MenubarItem disabled={!tab?.entry} onclick={() => dispatch("action", { type: ActionType.CLOSE })}>
+            <MenubarItem disabled={!tab?.entry} onclick={() => onaction?.({ type: ActionType.CLOSE })}>
                 Close <Shortcut key="w" modifier={Modifier.Ctrl | Modifier.Alt} />
             </MenubarItem>
             <MenubarSeparator />
@@ -322,9 +318,9 @@
                 {#each scripts as proto (proto.id)}
                     <ScriptMenu
                         {proto}
-                        on:action
-                        on:open={(e) => (scriptInfoOpen = e.detail.proto)}
-                        on:delete={(e) => (scriptDeleteOpen = e.detail.proto)}
+                        {onaction}
+                        onopen={(proto) => (scriptInfoOpen = proto)}
+                        ondelete={(proto) => (scriptDeleteOpen = proto)}
                     />
                 {/each}
             {/if}
@@ -333,9 +329,9 @@
 </Menubar>
 <Separator />
 
-<AboutDialog bind:open={aboutOpen} on:action />
-<ScriptDialog bind:proto={scriptInfoOpen} on:action />
-<ScriptLoadDialog bind:open={scriptLoadOpen} on:action />
-<ScriptDeleteDialog bind:proto={scriptDeleteOpen} on:action />
-<ClearDialog bind:open={clearOpen} on:action />
-<PrefsClearDialog bind:open={prefsClearOpen} on:action />
+<AboutDialog bind:open={aboutOpen} />
+<ScriptDialog bind:proto={scriptInfoOpen} />
+<ScriptLoadDialog bind:open={scriptLoadOpen} {onaction} />
+<ScriptDeleteDialog bind:proto={scriptDeleteOpen} {onaction} />
+<ClearDialog bind:open={clearOpen} {onaction} />
+<PrefsClearDialog bind:open={prefsClearOpen} {onaction} />

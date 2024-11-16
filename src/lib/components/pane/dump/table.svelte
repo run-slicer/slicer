@@ -10,7 +10,12 @@
     import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight } from "lucide-svelte";
     import { cn } from "$lib/components/utils";
 
-    export let entries: Readable<SlurpEntry[]>;
+    interface Props {
+        entries: Readable<SlurpEntry[]>;
+        [key: string]: any;
+    }
+
+    let { entries, ...rest }: Props = $props();
 
     const table = createTable(entries, {
         page: addPagination({
@@ -68,7 +73,7 @@
     const { filterValue } = pluginStates.filter;
 </script>
 
-<div {...$$restProps} class={cn("flex flex-col", $$restProps.class)}>
+<div {...rest} class={cn("flex flex-col", rest.class)}>
     <div class="flex items-center justify-between pb-2">
         <Input class="max-w-sm" placeholder="Filter classes..." type="text" bind:value={$filterValue} />
         <div class="flex items-center space-x-4">
@@ -101,23 +106,27 @@
                         <TableRow class="sticky top-0">
                             {#each headerRow.cells as cell (cell.id)}
                                 {@const order = $sortKeys.find((k) => k.id === cell.id)?.order}
-                                <Subscribe attrs={cell.attrs()} let:attrs props={cell.props()} let:props>
-                                    <TableHead class="whitespace-nowrap bg-background" {...attrs}>
-                                        <div class="flex flex-row items-center">
-                                            <Render of={cell.render()} />
-                                            <button
-                                                type="button"
-                                                aria-label="Toggle ordering"
-                                                class="ml-2 cursor-pointer hover:text-accent-foreground"
-                                                on:click={props.sort.toggle}
-                                            >
-                                                <svelte:component
-                                                    this={order ? (order === "asc" ? ArrowUp : ArrowDown) : ArrowUpDown}
-                                                    size={16}
-                                                />
-                                            </button>
-                                        </div>
-                                    </TableHead>
+                                <Subscribe attrs={cell.attrs()} props={cell.props()}>
+                                    {#snippet children({ attrs, props })}
+                                        <TableHead class="whitespace-nowrap bg-background" {...attrs}>
+                                            {@const OrderIcon = order
+                                                ? order === "asc"
+                                                    ? ArrowUp
+                                                    : ArrowDown
+                                                : ArrowUpDown}
+                                            <div class="flex flex-row items-center">
+                                                <Render of={cell.render()} />
+                                                <button
+                                                    type="button"
+                                                    aria-label="Toggle ordering"
+                                                    class="ml-2 cursor-pointer hover:text-accent-foreground"
+                                                    onclick={props.sort.toggle}
+                                                >
+                                                    <OrderIcon size={16} />
+                                                </button>
+                                            </div>
+                                        </TableHead>
+                                    {/snippet}
                                 </Subscribe>
                             {/each}
                         </TableRow>
@@ -126,19 +135,26 @@
             </TableHeader>
             <TableBody {...$tableBodyAttrs}>
                 {#each $pageRows as row (row.id)}
-                    <Subscribe rowAttrs={row.attrs()} let:rowAttrs>
-                        <TableRow {...rowAttrs}>
-                            {#each row.cells as cell (cell.id)}
-                                <Subscribe attrs={cell.attrs()} let:attrs>
-                                    <TableCell
-                                        class={cn("break-anywhere", cell.id !== "name" || "font-mono tracking-tight")}
-                                        {...attrs}
-                                    >
-                                        <Render of={cell.render()} />
-                                    </TableCell>
-                                </Subscribe>
-                            {/each}
-                        </TableRow>
+                    <Subscribe rowAttrs={row.attrs()}>
+                        {#snippet children({ rowAttrs })}
+                            <TableRow {...rowAttrs}>
+                                {#each row.cells as cell (cell.id)}
+                                    <Subscribe attrs={cell.attrs()}>
+                                        {#snippet children({ attrs })}
+                                            <TableCell
+                                                class={cn(
+                                                    "break-anywhere",
+                                                    cell.id !== "name" || "font-mono tracking-tight"
+                                                )}
+                                                {...attrs}
+                                            >
+                                                <Render of={cell.render()} />
+                                            </TableCell>
+                                        {/snippet}
+                                    </Subscribe>
+                                {/each}
+                            </TableRow>
+                        {/snippet}
                     </Subscribe>
                 {/each}
             </TableBody>
@@ -148,7 +164,7 @@
 
 <style global>
     /* unset overflow on table wrapper */
-    .no-overflow :has(> table) {
+    .no-overflow :has(:global(> table)) {
         overflow: unset;
     }
 </style>

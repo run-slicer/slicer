@@ -11,16 +11,18 @@
     } from "$lib/components/ui/alert-dialog";
     import { buttonVariants } from "$lib/components/ui/button";
     import type { ProtoScript } from "$lib/script";
-    import { createEventDispatcher } from "svelte";
-    import { ActionType } from "$lib/action";
+    import { type ActionHandler, ActionType, type ScriptAction } from "$lib/action";
 
-    export let proto: ProtoScript | null;
+    interface Props {
+        proto: ProtoScript | null;
+        onaction?: ActionHandler;
+    }
 
-    const dispatch = createEventDispatcher();
+    let { proto = $bindable(), onaction }: Props = $props();
 
     const handle = async (accepted: boolean) => {
         if (accepted) {
-            dispatch("action", { type: ActionType.SCRIPT_REMOVE, proto });
+            onaction?.({ type: ActionType.SCRIPT_REMOVE, proto } as ScriptAction);
         }
         proto = null;
     };
