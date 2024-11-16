@@ -14,7 +14,9 @@
     import { root as rootKey } from "$lib/state";
     import { handle } from "$lib/action";
 
+    let tabs0 = $derived(Array.from($tabs.values()));
     let entries0 = $derived(Array.from($entries.values()));
+    let disasms0 = $derived(Array.from($disasms.values()));
 </script>
 
 <ModeWatcher themeStorageKey={`${rootKey}.theme`} modeStorageKey={`${rootKey}.mode`} />
@@ -23,10 +25,10 @@
 <Menu tab={$currentTab} entries={entries0} scripts={$scripts} onaction={handle} />
 <Content
     bind:tab={$currentTab}
-    tabs={Array.from($tabs.values())}
+    tabs={tabs0}
     entries={entries0}
     logentries={$logEntries}
-    disasms={Array.from($disasms.values())}
+    disasms={disasms0}
     onaction={handle}
 />
 <Breadcrumb tab={$currentTab} encoding={$currentEncoding} />

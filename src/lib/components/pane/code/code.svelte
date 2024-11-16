@@ -43,7 +43,7 @@
     {:then [lang, value]}
         <ContextMenu>
             <ContextMenuTrigger>
-                <CodeEditor {value} readOnly {lang} bind:textSize={$textSize} wrap={$editorWrap} />
+                <CodeEditor {value} readonly {lang} bind:size={$textSize} wrap={$editorWrap} />
             </ContextMenuTrigger>
             <CodeMenu {tab} {value} lang={language} {onaction} />
         </ContextMenu>

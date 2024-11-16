@@ -105,6 +105,10 @@
     };
 
     let elem: HTMLImageElement | undefined = $state();
+    const handleLoad = (e: Event) => {
+        elem = e.target as HTMLImageElement;
+    };
+
     const createURL = (blob: Blob) => {
         const url = URL.createObjectURL(blob);
         onDestroy(() => URL.revokeObjectURL(url));
@@ -124,7 +128,7 @@
                 <MenuButton icon={ZoomOut} label="Zoom out" onclick={() => rescale((s) => s - 0.5)} />
             </div>
             <div class="text-xs">
-                {elem?.naturalWidth}x{elem?.naturalHeight}
+                {elem?.naturalWidth || 0}x{elem?.naturalHeight || 0}
                 {entry.extension?.toUpperCase() || "image"}
                 <span class="text-muted-foreground">{humanSize(blob.size)}</span>
             </div>
@@ -143,12 +147,11 @@
             onpointerout={handlePointerUp}
         >
             <img
-                bind:this={elem}
                 src={createURL(blob)}
                 alt={entry.shortName}
                 class="pointer-events-none h-[95%] w-[95%] object-contain will-change-transform"
                 style="transform: translate({$normOffsetX}px, {$normOffsetY}px) scale({$normScale});"
-                onload={(/* refresh */) => (elem = elem)}
+                onload={handleLoad}
             />
         </div>
     </div>

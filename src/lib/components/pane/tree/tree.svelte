@@ -21,36 +21,36 @@
     import TreeNode from "./node.svelte";
     import NodeMenu from "./menu.svelte";
 
-    let root: Node = $state({ label: "<root>", nodes: [] });
-    const updateNode = (entry: Entry) => {
-        let curr = root;
-
-        for (const part of entry.name.split("/")) {
-            if (!curr.nodes) curr.nodes = [];
-
-            let next = curr.nodes.find((n) => n.label === part);
-            if (!next) {
-                next = { label: part, parent: curr };
-                curr.nodes.push(next);
-            }
-
-            curr = next;
-        }
-
-        curr.entry = entry;
-    };
-
     interface Props {
         entries: Entry[];
         onaction?: ActionHandler;
     }
 
     let { entries, onaction }: Props = $props();
-    $effect(() => {
-        root.nodes = [];
-        entries.forEach(updateNode);
 
-        root.nodes.sort((a, b) => +Boolean(b.nodes) - +Boolean(a.nodes)); // non-leaf nodes go first
+    let root: Node = $derived.by(() => {
+        const root: Node = { label: "<root>", nodes: [] };
+
+        for (const entry of entries) {
+            let curr = root;
+
+            for (const part of entry.name.split("/")) {
+                if (!curr.nodes) curr.nodes = [];
+
+                let next = curr.nodes.find((n) => n.label === part);
+                if (!next) {
+                    next = { label: part, parent: curr };
+                    curr.nodes.push(next);
+                }
+
+                curr = next;
+            }
+
+            curr.entry = entry;
+        }
+
+        root.nodes?.sort((a, b) => +Boolean(b.nodes) - +Boolean(a.nodes)); // non-leaf nodes go first
+        return root;
     });
 
     let menuData: Node | null = $state(null);
