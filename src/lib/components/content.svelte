@@ -3,7 +3,7 @@
     import { writable } from "svelte/store";
     import { ResizableHandle, ResizablePane, ResizablePaneGroup } from "$lib/components/ui/resizable";
     import type { Entry } from "$lib/workspace";
-    import { type Tab, checkDirty } from "$lib/tab";
+    import type { Tab } from "$lib/tab";
     import { projectOpen, loggingOpen } from "$lib/state";
     import { distractionFree } from "$lib/mode";
     import { type ActionHandler, ActionType, type TabAction } from "$lib/action";
@@ -31,9 +31,9 @@
     $effect(() => {
         orderedTabs.update((orderedTabs0) => {
             // pop removed tabs
-            const updatedTabs = orderedTabs0.filter((e) => tabs.includes(e));
+            const updatedTabs = orderedTabs0.filter((a) => tabs.some((b) => a.id === b.id));
             // now add newly added tabs
-            updatedTabs.push(...tabs.filter((e) => !orderedTabs0.includes(e)));
+            updatedTabs.push(...tabs.filter((b) => !orderedTabs0.some((a) => a.id === b.id)));
 
             return updatedTabs;
         });
@@ -75,11 +75,11 @@
                             {/each}
                         </div>
                     </PaneHeader>
-                    {#each tabs as tab0 (tab0.id)}
+                    {#each tabs as tab0 (tab0)}
                         <div
                             class={cn("relative flex h-full min-h-0 w-full flex-col", tab?.id === tab0.id || "hidden")}
                         >
-                            <MainPane tab={tab0} flag={checkDirty(tab0, tab)} {disasms} {onaction} />
+                            <MainPane tab={tab0} {disasms} {onaction} />
                         </div>
                     {/each}
                 </div>
