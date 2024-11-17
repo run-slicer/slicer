@@ -27,14 +27,8 @@
         data.expanded = expanded;
     });
 
-    let hasNonLeaf = $state(false);
-    $effect(() => {
-        hasNonLeaf = !data.nodes || data.nodes.some((n) => n.nodes);
-        if (data.nodes && hasNonLeaf) {
-            // non-leaf nodes go first
-            data.nodes.sort((a, b) => +Boolean(b.nodes) - +Boolean(a.nodes));
-        }
-    });
+    let hasNonLeaf = $derived(!data.nodes || data.nodes.some((n) => n.nodes));
+    let sortedNodes = $derived(data.nodes?.sort((a, b) => +Boolean(b.nodes) - +Boolean(a.nodes)));
 
     const handleContextMenu = (e: MouseEvent) => {
         e.preventDefault();
@@ -45,7 +39,7 @@
 </script>
 
 <div role="button" tabindex="0" oncontextmenu={handleContextMenu} class="contain-layout contain-style" {...rest}>
-    {#if data.nodes}
+    {#if sortedNodes}
         {@const ExpandedIcon = expanded ? ChevronDown : ChevronRight}
         <button class="highlight flex w-full py-[0.2rem]" onclick={() => (expanded = !expanded)}>
             <ExpandedIcon size={14} class="my-auto mr-1 min-w-[14px] text-muted-foreground" />
@@ -57,7 +51,7 @@
             <span class="text-sm">{data.label}</span>
         </button>
         {#if expanded}
-            {#each data.nodes as node (node.label)}
+            {#each sortedNodes as node (node.label)}
                 <TreeNode
                     data={node}
                     {onopen}
