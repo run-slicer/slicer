@@ -113,15 +113,15 @@
 <Menubar class="window-controls rounded-none border-b border-none px-2 lg:px-4">
     <MenubarMenu>
         <MenubarTrigger class="font-bold">slicer</MenubarTrigger>
-        <MenubarContent>
+        <MenubarContent align="start">
             <MenubarItem onclick={() => (aboutOpen = true)}>About</MenubarItem>
             <MenubarSeparator />
             <MenubarSub>
                 <MenubarSubTrigger>Theme</MenubarSubTrigger>
-                <MenubarSubContent class="w-[12rem]">
+                <MenubarSubContent class="w-[12rem]" align="start">
                     <MenubarSub>
                         <MenubarSubTrigger inset>Color</MenubarSubTrigger>
-                        <MenubarSubContent class="w-[12rem]">
+                        <MenubarSubContent class="w-[12rem]" align="start">
                             <MenubarRadioGroup bind:value={$themeColor}>
                                 {#each themes as theme (theme.name)}
                                     {@const activeColor =
@@ -139,7 +139,7 @@
                     </MenubarSub>
                     <MenubarSub>
                         <MenubarSubTrigger inset>Radius</MenubarSubTrigger>
-                        <MenubarSubContent class="w-[12rem]">
+                        <MenubarSubContent class="w-[12rem]" align="start">
                             <MenubarRadioGroup
                                 value={$themeRadius.toString()}
                                 onValueChange={(v) => ($themeRadius = parseFloat(v || "0.5"))}
@@ -168,7 +168,7 @@
             </MenubarSub>
             <MenubarSub>
                 <MenubarSubTrigger>Preferences</MenubarSubTrigger>
-                <MenubarSubContent class="w-[12rem]">
+                <MenubarSubContent class="w-[12rem]" align="start">
                     <MenubarItem class="justify-between" onclick={() => onaction?.({ type: ActionType.PREFS_LOAD })}>
                         Import <Upload size={16} />
                     </MenubarItem>
@@ -185,7 +185,7 @@
     </MenubarMenu>
     <MenubarMenu>
         <MenubarTrigger class="relative">File</MenubarTrigger>
-        <MenubarContent>
+        <MenubarContent align="start">
             <MenubarItem onclick={() => onaction?.({ type: ActionType.LOAD })}>
                 Open <Shortcut key="o" modifier={Modifier.Ctrl} />
             </MenubarItem>
@@ -203,7 +203,7 @@
             <MenubarSeparator />
             <MenubarSub>
                 <MenubarSubTrigger>ZIP encoding</MenubarSubTrigger>
-                <MenubarSubContent class="w-[12rem]">
+                <MenubarSubContent class="w-[12rem]" align="start">
                     <MenubarRadioGroup bind:value={$workspaceArchiveEncoding}>
                         {#each Object.values(encodings) as encoding}
                             <MenubarRadioItem value={encoding.id} class="justify-between">
@@ -217,10 +217,10 @@
     </MenubarMenu>
     <MenubarMenu>
         <MenubarTrigger class="relative">View</MenubarTrigger>
-        <MenubarContent>
+        <MenubarContent align="start">
             <MenubarSub>
                 <MenubarSubTrigger inset>Mode</MenubarSubTrigger>
-                <MenubarSubContent class="w-[12rem]">
+                <MenubarSubContent class="w-[12rem]" align="start">
                     <MenubarRadioGroup bind:value={$viewMode}>
                         <MenubarRadioItem class="justify-between" value="normal">
                             Normal <Square size={16} />
@@ -239,7 +239,7 @@
             </MenubarSub>
             <MenubarSub>
                 <MenubarSubTrigger inset>Pane</MenubarSubTrigger>
-                <MenubarSubContent class="w-[12rem]">
+                <MenubarSubContent class="w-[12rem]" align="start">
                     <MenubarCheckboxItem
                         class="justify-between"
                         disabled={$distractionFree}
@@ -284,7 +284,7 @@
             <MenubarSeparator />
             <MenubarSub>
                 <MenubarSubTrigger inset>Encoding</MenubarSubTrigger>
-                <MenubarSubContent class="w-[12rem]">
+                <MenubarSubContent class="w-[12rem]" align="start">
                     <MenubarRadioGroup bind:value={$workspaceEncoding}>
                         {#each Object.values(encodings) as encoding}
                             <MenubarRadioItem value={encoding.id} class="justify-between">
@@ -301,10 +301,10 @@
     </MenubarMenu>
     <MenubarMenu>
         <MenubarTrigger class="relative">Scripts</MenubarTrigger>
-        <MenubarContent>
+        <MenubarContent align="start">
             <MenubarSub>
                 <MenubarSubTrigger>Import</MenubarSubTrigger>
-                <MenubarSubContent class="w-[12rem]">
+                <MenubarSubContent class="w-[12rem]" align="start">
                     <MenubarItem class="justify-between" onclick={() => (scriptLoadOpen = true)}>
                         From URL <Globe size={16} />
                     </MenubarItem>
