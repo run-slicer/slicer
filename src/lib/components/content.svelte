@@ -3,7 +3,7 @@
     import { writable } from "svelte/store";
     import { ResizableHandle, ResizablePane, ResizablePaneGroup } from "$lib/components/ui/resizable";
     import type { Entry } from "$lib/workspace";
-    import type { Tab } from "$lib/tab";
+    import { type Tab, updateCurrent } from "$lib/tab";
     import { projectOpen, loggingOpen } from "$lib/state";
     import { distractionFree } from "$lib/mode";
     import { type ActionHandler, ActionType, type TabAction } from "$lib/action";
@@ -69,13 +69,13 @@
                                     active={tab?.id === tab0.id}
                                     icon={tab0.icon}
                                     closeable
-                                    onclick={() => (tab = tab0)}
+                                    onclick={() => updateCurrent(tab0)}
                                     onclose={() => close(tab0)}
                                 />
                             {/each}
                         </div>
                     </PaneHeader>
-                    {#each tabs as tab0 (tab0)}
+                    {#each tabs as tab0 (tab0.internalId)}
                         <div
                             class={cn("relative flex h-full min-h-0 w-full flex-col", tab?.id === tab0.id || "hidden")}
                         >

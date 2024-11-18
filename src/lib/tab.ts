@@ -19,6 +19,9 @@ export interface Tab {
     name: string;
     icon?: StyledIcon;
     entry?: Entry;
+
+    dirty?: boolean;
+    internalId?: any; // used for reactivity keying
 }
 
 const welcomeTab: Tab = {
@@ -42,11 +45,27 @@ current.subscribe((tab) => {
     }
 });
 
+const refreshImmediately = (tab: Tab): Tab => {
+    tab.internalId = undefined;
+    tab.dirty = false;
+
+    return update(tab);
+};
+
+// helper function for making sure a tab is refreshed before it's made active
+export const updateCurrent = (tab: Tab | null) => {
+    current.set(tab?.dirty ? refreshImmediately(tab) : tab);
+};
+
 export const find = (id: string): Tab | null => {
     return get(tabs).get(id) || null;
 };
 
 export const update = (tab: Tab): Tab => {
+    if (!tab.internalId) {
+        tab.internalId = {}; // fill in missing id
+    }
+
     tabs.update(($tabs) => {
         $tabs.set(tab.id, tab);
         return $tabs;
@@ -54,7 +73,15 @@ export const update = (tab: Tab): Tab => {
     return tab;
 };
 
-export const refresh = (tab: Tab): Tab => update({ ...tab });
+export const refresh = (tab: Tab): Tab => {
+    // try immediate update for the current tab
+    if (get(current)?.id === tab.id) {
+        return refreshImmediately(tab);
+    }
+
+    tab.dirty = true;
+    return tab;
+};
 
 export const remove = (id: string) => {
     const tab = get(current);
@@ -63,7 +90,7 @@ export const remove = (id: string) => {
         const nextTab = all.findIndex((t) => t.id === id) - 1;
 
         // open tab before the current one or close entirely if there's none
-        current.set(nextTab < 0 ? null : all[nextTab]);
+        updateCurrent(nextTab < 0 ? null : all[nextTab]);
     }
 
     tabs.update(($tabs) => {
