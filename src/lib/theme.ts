@@ -1,11 +1,16 @@
 import { themeColor, themeRadius } from "$lib/state";
-import { mode } from "mode-watcher";
+import { derived } from "svelte/store";
+
+export interface ThemeVariables {
+    dark: Record<string, string>;
+    light: Record<string, string>;
+}
 
 export interface Theme {
     name: string;
     label?: string;
     activeColor: { light: string; dark: string };
-    cssVars: { light: Record<string, string>; dark: Record<string, string> };
+    cssVars: ThemeVariables;
 }
 
 // https://github.com/huntabyte/shadcn-svelte/blob/main/sites/docs/src/lib/registry/themes.ts
@@ -636,33 +641,21 @@ export const themes: Theme[] = [
     },
 ] as const;
 
+export const theme = derived(themeColor, ($themeColor) => {
+    return themes.find((t) => t.name === $themeColor) || themes[0] /* zinc */;
+});
+
 const themeStyle = document.createElement("style");
 document.head.appendChild(themeStyle);
 
-const apply = (theme: Theme) => {
-    const modes = Object.entries(theme.cssVars).map(([k, v]) => {
+theme.subscribe(($theme) => {
+    const modes = Object.entries($theme.cssVars).map(([k, v]) => {
         const styles = Object.entries(v).map(([x, y]) => `--${x}: ${y}`);
 
         return `${k === "light" ? ":root" : `.${k}`} {${styles.join(";")}}`;
     });
 
     themeStyle.textContent = modes.join("");
-};
-
-const themeMap = new Map<string, Theme>(themes.map((t) => [t.name, t]));
-themeColor.subscribe(($themeColor) => apply(themeMap.get($themeColor) || themes[0] /* zinc */));
+});
 
 themeRadius.subscribe(($themeRadius) => document.documentElement.style.setProperty("--radius", `${$themeRadius}rem`));
-
-// update meta color for PWAs
-
-const updateMeta = () => {
-    const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) {
-        const color = window.getComputedStyle(document.body, null).getPropertyValue("--background");
-        (meta as HTMLMetaElement).content = `hsl(${color})`;
-    }
-};
-
-mode.subscribe(updateMeta);
-themeColor.subscribe(updateMeta);
