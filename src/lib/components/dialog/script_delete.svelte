@@ -9,18 +9,20 @@
         AlertDialogHeader,
         AlertDialogTitle,
     } from "$lib/components/ui/alert-dialog";
-    import { Button } from "$lib/components/ui/button";
+    import { buttonVariants } from "$lib/components/ui/button";
     import type { ProtoScript } from "$lib/script";
-    import { createEventDispatcher } from "svelte";
-    import { ActionType } from "$lib/action";
+    import { type ActionHandler, ActionType, type ScriptAction } from "$lib/action";
 
-    export let proto: ProtoScript | null;
+    interface Props {
+        proto: ProtoScript | null;
+        onaction?: ActionHandler;
+    }
 
-    const dispatch = createEventDispatcher();
+    let { proto = $bindable(), onaction }: Props = $props();
 
     const handle = async (accepted: boolean) => {
         if (accepted) {
-            dispatch("action", { type: ActionType.SCRIPT_REMOVE, proto });
+            onaction?.({ type: ActionType.SCRIPT_REMOVE, proto } as ScriptAction);
         }
         proto = null;
     };
@@ -38,9 +40,9 @@
                 </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-                <AlertDialogCancel on:click={() => handle(false)}>Cancel</AlertDialogCancel>
-                <AlertDialogAction asChild let:builder>
-                    <Button builders={[builder]} variant="destructive" on:click={() => handle(true)}>Delete</Button>
+                <AlertDialogCancel onclick={() => handle(false)}>Cancel</AlertDialogCancel>
+                <AlertDialogAction class={buttonVariants({ variant: "destructive" })} onclick={() => handle(true)}>
+                    Delete
                 </AlertDialogAction>
             </AlertDialogFooter>
         {/if}

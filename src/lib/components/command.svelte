@@ -1,39 +1,37 @@
-<script lang="ts" context="module">
-    export enum Page {
-        SEARCH,
-    }
-</script>
-
 <script lang="ts">
     import { CommandDialog, CommandInput, CommandList, CommandGroup, CommandItem } from "$lib/components/ui/command";
-    import VirtualList from "./list.svelte";
     import { onMount } from "svelte";
     import type { Entry } from "$lib/workspace";
     import { fileIcon } from "$lib/components/icons";
-    import { cn } from "$lib/components/utils";
     import { type EntryAction, ActionType, handle } from "$lib/action";
     import { Search } from "lucide-svelte";
+    import { cn } from "$lib/components/utils";
+    import { VList } from "virtua/svelte";
 
-    export let entries: Entry[];
-
-    let open = false;
-    let page: Page | null = null;
-
-    $: {
-        // reset page on close
-        if (!open) {
-            page = null;
-        }
+    interface Props {
+        entries: Entry[];
     }
 
-    let search = "";
+    let { entries }: Props = $props();
+
+    let open = $state(false);
+    let searchWorkspace = $state(false);
+
+    $effect(() => {
+        // reset page on close
+        if (!open) {
+            searchWorkspace = false;
+        }
+    });
+
+    let search = $state("");
     const filter = (entries: Entry[], term: string): Entry[] => {
         return entries
             .filter((e) => e.name.includes(term))
             .sort((a, b) => a.name.length - term.length - (b.name.length - term.length));
     };
 
-    $: filtered = page === Page.SEARCH && search ? filter(entries, search) : entries;
+    let filteredEntries = $derived(search && searchWorkspace ? filter(entries, search) : entries);
 
     let shift = false;
     onMount(() => {
@@ -58,31 +56,32 @@
     };
 </script>
 
-<CommandDialog bind:open shouldFilter={page !== Page.SEARCH}>
-    <CommandInput bind:value={search} placeholder="Type a command or search..." />
-    <CommandList class={cn(page !== Page.SEARCH || "h-[80vh] max-h-[80vh] [&>div]:contents")}>
-        {#if page === Page.SEARCH}
+<CommandDialog bind:open shouldFilter={!searchWorkspace}>
+    <CommandInput bind:value={search} placeholder={searchWorkspace ? "Search files..." : "Type a command..."} />
+    <CommandList class={cn(!searchWorkspace || "h-[80vh] max-h-[80vh] [&>div]:contents")}>
+        {#if searchWorkspace}
             {#if entries.length > 0}
-                <VirtualList data={filtered} getKey={(e) => e.name} let:item={entry} class="overflow-y-auto p-2">
-                    <CommandItem class="!py-2.5 text-xs" onSelect={() => handleClick(entry)}>
-                        {@const icon = fileIcon(entry.shortName)}
-                        <svelte:component
-                            this={icon.icon}
-                            size={16}
-                            class={cn("mr-2 !w-[16px] min-w-[16px]", icon.classes)}
-                        />
-                        <span>{entry.name}</span>
-                    </CommandItem>
-                </VirtualList>
+                {#key filteredEntries.length}
+                    <VList data={filteredEntries} getKey={(e) => e.name} class="p-2">
+                        {#snippet children(entry)}
+                            <CommandItem class="!py-2.5" onSelect={() => handleClick(entry)}>
+                                {@const { icon, classes } = fileIcon(entry.shortName)}
+                                {@const SvelteComponent = icon}
+                                <SvelteComponent class={classes} />
+                                <span>{entry.name}</span>
+                            </CommandItem>
+                        {/snippet}
+                    </VList>
+                {/key}
             {:else}
                 <p class="py-4 text-center text-sm text-muted-foreground">
                     There's nothing here? Add something to the workspace.
                 </p>
             {/if}
         {:else}
-            <CommandGroup alwaysRender heading="Workspace">
-                <CommandItem alwaysRender value="Search workspace" onSelect={() => (page = Page.SEARCH)}>
-                    <Search class="mr-2" />
+            <CommandGroup forceMount heading="Workspace">
+                <CommandItem forceMount value="Search workspace" onSelect={() => (searchWorkspace = true)}>
+                    <Search />
                     {#if search}
                         <span>Search '{search}' in workspace</span>
                     {:else}

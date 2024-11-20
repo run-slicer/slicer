@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
     import { writable } from "svelte/store";
 
     const label0 = writable<string | null>(null);

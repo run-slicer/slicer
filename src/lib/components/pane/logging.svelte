@@ -4,7 +4,11 @@
     import { Terminal } from "lucide-svelte";
     import type { LogEntry } from "$lib/log";
 
-    export let entries: LogEntry[];
+    interface Props {
+        entries: LogEntry[];
+    }
+
+    let { entries }: Props = $props();
 
     const readEntries = (logs: LogEntry[]): string => {
         let result: string[] = [];
@@ -15,7 +19,7 @@
         return result.join("\n");
     };
 
-    $: value = readEntries(entries);
+    let value = $derived(readEntries(entries));
 </script>
 
 <div class="flex h-full w-full flex-col">
@@ -27,14 +31,14 @@
             <Loading small />
         {:then [{ CodeEditor }, { log }]}
             <CodeEditor
-                readOnly
+                readonly
                 {value}
                 lang={log()}
-                on:change={(e) => {
+                onchange={(view, state) => {
                     // scroll to the last line automatically
-                    const lastLine = e.detail.state.doc.line(e.detail.state.doc.lines);
+                    const lastLine = state.doc.line(state.doc.lines);
 
-                    const { node } = e.detail.view.domAtPos(lastLine.from);
+                    const { node } = view.domAtPos(lastLine.from);
                     node.parentElement?.scrollIntoView({ block: "end" });
                 }}
             />

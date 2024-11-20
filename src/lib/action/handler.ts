@@ -13,6 +13,7 @@ import { get } from "svelte/store";
 import {
     clear as clearTabs,
     current as currentTab,
+    updateCurrent as updateCurrentTab,
     find as findTab,
     remove as removeTab,
     type Tab,
@@ -136,7 +137,7 @@ const open = async (entry: Entry, type: TabType = detectTabType(entry)) => {
         }
     }
 
-    currentTab.set(tab);
+    updateCurrentTab(tab);
 };
 
 const remove = async (entries: Entry[]) => {

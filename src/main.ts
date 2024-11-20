@@ -7,9 +7,8 @@ import "@xyflow/svelte/dist/style.css";
 import "./main.css";
 import App from "./app.svelte";
 import { register as registerShortcuts } from "$lib/shortcut";
+import { mount } from "svelte";
 
 registerShortcuts();
 
-export default new App({
-    target: document.getElementById("app")!,
-});
+export default mount(App, { target: document.getElementById("app")! });

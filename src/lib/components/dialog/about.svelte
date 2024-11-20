@@ -1,9 +1,13 @@
 <script lang="ts">
     import { Dialog, DialogContent } from "$lib/components/ui/dialog";
 
-    export let open = false;
+    interface Props {
+        open?: boolean;
+    }
 
-    let imageId = Math.floor(Math.random() * 4);
+    let { open = $bindable(false) }: Props = $props();
+
+    let imageId = $state(Math.floor(Math.random() * 4));
     const changeImage = () => {
         imageId++;
         if (imageId > 3) {
@@ -22,7 +26,7 @@
             </div>
             <div>
                 <p class="text-2xl">
-                    <button class="mr-1 cursor-help font-semibold" on:click={changeImage}>slicer</button>
+                    <button class="mr-1 cursor-help font-semibold" onclick={changeImage}>slicer</button>
                 </p>
                 <p class="text-sm">
                     <!-- this is ugly, but I don't want a space before the comma -->

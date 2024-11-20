@@ -20,8 +20,8 @@ export interface Tab {
     icon?: StyledIcon;
     entry?: Entry;
 
-    _dirty?: boolean;
-    _dirtyFlag?: any;
+    dirty?: boolean;
+    internalId?: any; // used for reactivity keying
 }
 
 const welcomeTab: Tab = {
@@ -45,11 +45,27 @@ current.subscribe((tab) => {
     }
 });
 
+const refreshImmediately = (tab: Tab): Tab => {
+    tab.internalId = undefined;
+    tab.dirty = false;
+
+    return update(tab);
+};
+
+// helper function for making sure a tab is refreshed before it's made active
+export const updateCurrent = (tab: Tab | null) => {
+    current.set(tab?.dirty ? refreshImmediately(tab) : tab);
+};
+
 export const find = (id: string): Tab | null => {
     return get(tabs).get(id) || null;
 };
 
 export const update = (tab: Tab): Tab => {
+    if (!tab.internalId) {
+        tab.internalId = {}; // fill in missing id
+    }
+
     tabs.update(($tabs) => {
         $tabs.set(tab.id, tab);
         return $tabs;
@@ -58,19 +74,13 @@ export const update = (tab: Tab): Tab => {
 };
 
 export const refresh = (tab: Tab): Tab => {
-    tab._dirty = true;
-    return update(tab);
-};
-
-export const checkDirty = (tab: Tab, current: Tab | null): any => {
-    if (current?.id === tab.id && tab._dirty) {
-        // change the flag only when we're active,
-        // we want to refresh tabs lazily
-        tab._dirty = false;
-        tab._dirtyFlag = {};
+    // try immediate update for the current tab
+    if (get(current)?.id === tab.id) {
+        return refreshImmediately(tab);
     }
 
-    return tab._dirtyFlag;
+    tab.dirty = true;
+    return tab;
 };
 
 export const remove = (id: string) => {
@@ -80,7 +90,7 @@ export const remove = (id: string) => {
         const nextTab = all.findIndex((t) => t.id === id) - 1;
 
         // open tab before the current one or close entirely if there's none
-        current.set(nextTab < 0 ? null : all[nextTab]);
+        updateCurrent(nextTab < 0 ? null : all[nextTab]);
     }
 
     tabs.update(($tabs) => {

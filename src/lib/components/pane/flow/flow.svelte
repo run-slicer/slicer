@@ -1,5 +1,3 @@
-<svelte:options immutable />
-
 <script lang="ts">
     import { writable } from "svelte/store";
     import { type ClassEntry, EntryType } from "$lib/workspace";
@@ -9,11 +7,14 @@
     import { mode } from "mode-watcher";
     import { Background, Controls, SvelteFlow, ControlButton } from "@xyflow/svelte";
     import { Select, SelectContent, SelectItem, SelectTrigger } from "$lib/components/ui/select";
-    import type { Selected } from "bits-ui";
     import FlowNode from "./node.svelte";
     import { createComputedGraph } from "./graph";
 
-    export let tab: Tab;
+    interface Props {
+        tab: Tab;
+    }
+
+    let { tab }: Props = $props();
     const entry = tab.entry!;
 
     const node = entry.type === EntryType.CLASS ? (entry as ClassEntry).node : null;
@@ -21,19 +22,24 @@
     const pool = node ? node.pool : [];
     const methods = node ? node.methods : [];
 
-    let member = methods.length > 0 ? methods[0] : null;
+    let member = $state(methods.length > 0 ? methods[0] : null);
 
     const createLabel = (method: Member | null): string => {
         return !method ? "<none>" : `${method.name.decode()}${method.type.decode()}`;
     };
 
-    let method: Selected<number> = { value: member ? methods.indexOf(member) : -1, label: createLabel(member) };
-    $: member = method.value !== -1 ? methods[method.value] : null;
+    let method = $state((member ? methods.indexOf(member) : -1).toString());
+    $effect(() => {
+        const parsedId = parseInt(method);
+        if (parsedId !== -1) {
+            member = methods[parsedId];
+        }
+    });
 
-    let draggable = false;
-    let showHandlerEdges = false;
+    let draggable = $state(false);
+    let showHandlerEdges = $state(false);
 
-    $: [nodes, edges] = createComputedGraph(member, pool, showHandlerEdges);
+    let [nodes, edges] = $derived(createComputedGraph(member, pool, showHandlerEdges));
 </script>
 
 <div class="relative h-full w-full">
@@ -59,7 +65,8 @@
                     title="toggle interactivity"
                     aria-label="toggle interactivity"
                 >
-                    <svelte:component this={draggable ? LockOpen : Lock} size={12} class="!fill-none" />
+                    {@const Icon = draggable ? LockOpen : Lock}
+                    <Icon size={12} class="!fill-none" />
                 </ControlButton>
                 <ControlButton
                     class="svelte-flow__controls-interactive"
@@ -67,23 +74,24 @@
                     title="toggle exception handler edges"
                     aria-label="toggle exception handler edges"
                 >
-                    <svelte:component this={showHandlerEdges ? Zap : ZapOff} size={12} class="!fill-none" />
+                    {@const Icon = showHandlerEdges ? Zap : ZapOff}
+                    <Icon size={12} class="!fill-none" />
                 </ControlButton>
             </Controls>
         </SvelteFlow>
     {/key}
     <div class="absolute bottom-0 m-[15px] max-w-[425px]">
-        <Select bind:selected={method}>
+        <Select type="single" bind:value={method}>
             <SelectTrigger class="h-7 whitespace-nowrap text-xs [&_svg]:ml-2 [&_svg]:h-4 [&_svg]:w-4">
                 <div class="overflow-hidden text-ellipsis">
                     <span class="mr-2 text-muted-foreground">Method: </span>
-                    <span class="font-mono tracking-tight">{method.label}</span>
+                    <span class="font-mono tracking-tight">{createLabel(member)}</span>
                 </div>
             </SelectTrigger>
-            <SelectContent class="max-h-[240px] w-full overflow-scroll">
+            <SelectContent class="max-h-[240px] w-full overflow-scroll" align="start">
                 {#each methods as mth, i}
                     {@const label = createLabel(mth)}
-                    <SelectItem value={i} {label} class="break-all font-mono text-xs tracking-tight">
+                    <SelectItem value={i.toString()} {label} class="break-all font-mono text-xs tracking-tight">
                         {label}
                     </SelectItem>
                 {/each}

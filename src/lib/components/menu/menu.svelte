@@ -16,7 +16,7 @@
     import { encodings } from "$lib/workspace/encoding";
     import type { ProtoScript } from "$lib/script";
     import { type Tab, TabType } from "$lib/tab";
-    import { ActionType } from "$lib/action";
+    import { type ActionHandler, ActionType, type OpenAction, type ScriptAddAction } from "$lib/action";
     import { Modifier } from "$lib/shortcut";
     import Shortcut from "./shortcut.svelte";
     import ScriptMenu from "./script/menu.svelte";
@@ -63,26 +63,28 @@
         Sun,
         MonitorX,
     } from "lucide-svelte";
-    import { createEventDispatcher } from "svelte";
     import { toast } from "svelte-sonner";
     import { themes } from "$lib/theme";
 
-    export let tab: Tab | null;
-    export let entries: Entry[];
-    export let scripts: ProtoScript[];
+    interface Props {
+        tab: Tab | null;
+        entries: Entry[];
+        scripts: ProtoScript[];
+        onaction?: ActionHandler;
+    }
 
-    let aboutOpen = false;
-    let clearOpen = false;
-    let prefsClearOpen = false;
+    let { tab, entries, scripts, onaction }: Props = $props();
 
-    let scriptLoadOpen = false;
-    let scriptDeleteOpen: ProtoScript | null = null;
-    let scriptInfoOpen: ProtoScript | null = null;
+    let aboutOpen = $state(false);
+    let clearOpen = $state(false);
+    let prefsClearOpen = $state(false);
 
-    const dispatch = createEventDispatcher();
+    let scriptLoadOpen = $state(false);
+    let scriptDeleteOpen: ProtoScript | null = $state(null);
+    let scriptInfoOpen: ProtoScript | null = $state(null);
 
     const openEntry = (tabType: TabType) => {
-        dispatch("action", { type: ActionType.OPEN, entry: tab?.entry!, tabType });
+        onaction?.({ type: ActionType.OPEN, entry: tab?.entry!, tabType } as OpenAction);
     };
 
     const loadClipboardScript = async () => {
@@ -96,10 +98,10 @@
         try {
             const data = await navigator.clipboard.readText();
 
-            dispatch("action", {
+            onaction?.({
                 type: ActionType.SCRIPT_ADD,
                 url: `data:text/javascript;base64,${window.btoa(data)}`,
-            });
+            } as ScriptAddAction);
         } catch (e) {
             toast.error("Error occurred", {
                 description: `Could not copy from clipboard, access denied.`,
@@ -111,15 +113,15 @@
 <Menubar class="window-controls rounded-none border-b border-none px-2 lg:px-4">
     <MenubarMenu>
         <MenubarTrigger class="font-bold">slicer</MenubarTrigger>
-        <MenubarContent>
-            <MenubarItem on:click={() => (aboutOpen = true)}>About</MenubarItem>
+        <MenubarContent align="start">
+            <MenubarItem onclick={() => (aboutOpen = true)}>About</MenubarItem>
             <MenubarSeparator />
             <MenubarSub>
                 <MenubarSubTrigger>Theme</MenubarSubTrigger>
-                <MenubarSubContent class="w-[12rem]">
+                <MenubarSubContent class="w-[12rem]" align="start">
                     <MenubarSub>
                         <MenubarSubTrigger inset>Color</MenubarSubTrigger>
-                        <MenubarSubContent class="w-[12rem]">
+                        <MenubarSubContent class="w-[12rem]" align="start">
                             <MenubarRadioGroup bind:value={$themeColor}>
                                 {#each themes as theme (theme.name)}
                                     {@const activeColor =
@@ -137,7 +139,7 @@
                     </MenubarSub>
                     <MenubarSub>
                         <MenubarSubTrigger inset>Radius</MenubarSubTrigger>
-                        <MenubarSubContent class="w-[12rem]">
+                        <MenubarSubContent class="w-[12rem]" align="start">
                             <MenubarRadioGroup
                                 value={$themeRadius.toString()}
                                 onValueChange={(v) => ($themeRadius = parseFloat(v || "0.5"))}
@@ -166,21 +168,15 @@
             </MenubarSub>
             <MenubarSub>
                 <MenubarSubTrigger>Preferences</MenubarSubTrigger>
-                <MenubarSubContent class="w-[12rem]">
-                    <MenubarItem
-                        class="justify-between"
-                        on:click={() => dispatch("action", { type: ActionType.PREFS_LOAD })}
-                    >
+                <MenubarSubContent class="w-[12rem]" align="start">
+                    <MenubarItem class="justify-between" onclick={() => onaction?.({ type: ActionType.PREFS_LOAD })}>
                         Import <Upload size={16} />
                     </MenubarItem>
-                    <MenubarItem
-                        class="justify-between"
-                        on:click={() => dispatch("action", { type: ActionType.PREFS_EXPORT })}
-                    >
+                    <MenubarItem class="justify-between" onclick={() => onaction?.({ type: ActionType.PREFS_EXPORT })}>
                         Export <Download size={16} />
                     </MenubarItem>
                     <MenubarSeparator />
-                    <MenubarItem class="justify-between" on:click={() => (prefsClearOpen = true)}>
+                    <MenubarItem class="justify-between" onclick={() => (prefsClearOpen = true)}>
                         Reset <MonitorX size={16} />
                     </MenubarItem>
                 </MenubarSubContent>
@@ -189,25 +185,25 @@
     </MenubarMenu>
     <MenubarMenu>
         <MenubarTrigger class="relative">File</MenubarTrigger>
-        <MenubarContent>
-            <MenubarItem on:click={() => dispatch("action", { type: ActionType.LOAD })}>
+        <MenubarContent align="start">
+            <MenubarItem onclick={() => onaction?.({ type: ActionType.LOAD })}>
                 Open <Shortcut key="o" modifier={Modifier.Ctrl} />
             </MenubarItem>
-            <MenubarItem on:click={() => dispatch("action", { type: ActionType.ADD })}>
+            <MenubarItem onclick={() => onaction?.({ type: ActionType.ADD })}>
                 Add <Shortcut key="o" modifier={Modifier.Ctrl | Modifier.Shift} />
             </MenubarItem>
-            <MenubarItem disabled={entries.length === 0} on:click={() => (clearOpen = true)}>Clear all</MenubarItem>
+            <MenubarItem disabled={entries.length === 0} onclick={() => (clearOpen = true)}>Clear all</MenubarItem>
             <MenubarSeparator />
-            <MenubarItem disabled={!tab?.entry} on:click={() => dispatch("action", { type: ActionType.EXPORT })}>
+            <MenubarItem disabled={!tab?.entry} onclick={() => onaction?.({ type: ActionType.EXPORT })}>
                 Export <Shortcut key="e" modifier={Modifier.Ctrl} />
             </MenubarItem>
-            <MenubarItem disabled={!tab?.entry} on:click={() => dispatch("action", { type: ActionType.CLOSE })}>
+            <MenubarItem disabled={!tab?.entry} onclick={() => onaction?.({ type: ActionType.CLOSE })}>
                 Close <Shortcut key="w" modifier={Modifier.Ctrl | Modifier.Alt} />
             </MenubarItem>
             <MenubarSeparator />
             <MenubarSub>
                 <MenubarSubTrigger>ZIP encoding</MenubarSubTrigger>
-                <MenubarSubContent class="w-[12rem]">
+                <MenubarSubContent class="w-[12rem]" align="start">
                     <MenubarRadioGroup bind:value={$workspaceArchiveEncoding}>
                         {#each Object.values(encodings) as encoding}
                             <MenubarRadioItem value={encoding.id} class="justify-between">
@@ -221,10 +217,10 @@
     </MenubarMenu>
     <MenubarMenu>
         <MenubarTrigger class="relative">View</MenubarTrigger>
-        <MenubarContent>
+        <MenubarContent align="start">
             <MenubarSub>
                 <MenubarSubTrigger inset>Mode</MenubarSubTrigger>
-                <MenubarSubContent class="w-[12rem]">
+                <MenubarSubContent class="w-[12rem]" align="start">
                     <MenubarRadioGroup bind:value={$viewMode}>
                         <MenubarRadioItem class="justify-between" value="normal">
                             Normal <Square size={16} />
@@ -243,7 +239,7 @@
             </MenubarSub>
             <MenubarSub>
                 <MenubarSubTrigger inset>Pane</MenubarSubTrigger>
-                <MenubarSubContent class="w-[12rem]">
+                <MenubarSubContent class="w-[12rem]" align="start">
                     <MenubarCheckboxItem
                         class="justify-between"
                         disabled={$distractionFree}
@@ -265,7 +261,7 @@
                 inset
                 class="justify-between"
                 disabled={!tab?.entry || tab.entry.type === EntryType.ARCHIVE || tab.type === TabType.CODE}
-                on:click={() => openEntry(TabType.CODE)}
+                onclick={() => openEntry(TabType.CODE)}
             >
                 Code <Code size={16} />
             </MenubarItem>
@@ -273,7 +269,7 @@
                 inset
                 class="justify-between"
                 disabled={!tab?.entry || tab.entry.type === EntryType.ARCHIVE || tab.type === TabType.HEX}
-                on:click={() => openEntry(TabType.HEX)}
+                onclick={() => openEntry(TabType.HEX)}
             >
                 Hexadecimal <Binary size={16} />
             </MenubarItem>
@@ -281,14 +277,14 @@
                 inset
                 class="justify-between"
                 disabled={!tab?.entry || tab.entry.type === EntryType.ARCHIVE || tab.type === TabType.FLOW_GRAPH}
-                on:click={() => openEntry(TabType.FLOW_GRAPH)}
+                onclick={() => openEntry(TabType.FLOW_GRAPH)}
             >
                 Flow graph <GitBranchPlus size={16} />
             </MenubarItem>
             <MenubarSeparator />
             <MenubarSub>
                 <MenubarSubTrigger inset>Encoding</MenubarSubTrigger>
-                <MenubarSubContent class="w-[12rem]">
+                <MenubarSubContent class="w-[12rem]" align="start">
                     <MenubarRadioGroup bind:value={$workspaceEncoding}>
                         {#each Object.values(encodings) as encoding}
                             <MenubarRadioItem value={encoding.id} class="justify-between">
@@ -305,14 +301,14 @@
     </MenubarMenu>
     <MenubarMenu>
         <MenubarTrigger class="relative">Scripts</MenubarTrigger>
-        <MenubarContent>
+        <MenubarContent align="start">
             <MenubarSub>
                 <MenubarSubTrigger>Import</MenubarSubTrigger>
-                <MenubarSubContent class="w-[12rem]">
-                    <MenubarItem class="justify-between" on:click={() => (scriptLoadOpen = true)}>
+                <MenubarSubContent class="w-[12rem]" align="start">
+                    <MenubarItem class="justify-between" onclick={() => (scriptLoadOpen = true)}>
                         From URL <Globe size={16} />
                     </MenubarItem>
-                    <MenubarItem class="justify-between" on:click={loadClipboardScript}>
+                    <MenubarItem class="justify-between" onclick={loadClipboardScript}>
                         From clipboard <Clipboard size={16} />
                     </MenubarItem>
                 </MenubarSubContent>
@@ -322,9 +318,9 @@
                 {#each scripts as proto (proto.id)}
                     <ScriptMenu
                         {proto}
-                        on:action
-                        on:open={(e) => (scriptInfoOpen = e.detail.proto)}
-                        on:delete={(e) => (scriptDeleteOpen = e.detail.proto)}
+                        {onaction}
+                        onopen={(proto) => (scriptInfoOpen = proto)}
+                        ondelete={(proto) => (scriptDeleteOpen = proto)}
                     />
                 {/each}
             {/if}
@@ -333,9 +329,9 @@
 </Menubar>
 <Separator />
 
-<AboutDialog bind:open={aboutOpen} on:action />
-<ScriptDialog bind:proto={scriptInfoOpen} on:action />
-<ScriptLoadDialog bind:open={scriptLoadOpen} on:action />
-<ScriptDeleteDialog bind:proto={scriptDeleteOpen} on:action />
-<ClearDialog bind:open={clearOpen} on:action />
-<PrefsClearDialog bind:open={prefsClearOpen} on:action />
+<AboutDialog bind:open={aboutOpen} />
+<ScriptDialog bind:proto={scriptInfoOpen} />
+<ScriptLoadDialog bind:open={scriptLoadOpen} {onaction} />
+<ScriptDeleteDialog bind:proto={scriptDeleteOpen} {onaction} />
+<ClearDialog bind:open={clearOpen} {onaction} />
+<PrefsClearDialog bind:open={prefsClearOpen} {onaction} />

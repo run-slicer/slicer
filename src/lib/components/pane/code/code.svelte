@@ -1,5 +1,3 @@
-<svelte:options immutable />
-
 <script lang="ts">
     import { EntryType } from "$lib/workspace";
     import Loading from "$lib/components/loading.svelte";
@@ -14,26 +12,29 @@
     import type { Disassembler } from "$lib/disasm";
     import { ContextMenu, ContextMenuTrigger } from "$lib/components/ui/context-menu";
     import CodeMenu from "./menu.svelte";
+    import type { ActionHandler } from "$lib/action";
 
-    export let tab: Tab;
-    const entry = tab.entry!;
+    interface Props {
+        tab: Tab;
+        disasms: Disassembler[];
+        onaction?: ActionHandler;
+    }
 
-    const shouldDisasm = entry.type === EntryType.CLASS && tab.type === TabType.CODE;
+    let { tab, disasms, onaction }: Props = $props();
 
-    const initialDisasm = $toolsDisasm;
+    const entry = $derived(tab.entry!);
+    const shouldDisasm = $derived(entry.type === EntryType.CLASS && tab.type === TabType.CODE);
 
-    $: disasmProto = { value: initialDisasm, label: initialDisasm };
+    let disasmId = $state($toolsDisasm);
+    $effect(() => {
+        $toolsDisasm = disasmId;
+    });
 
-    export let disasms: Disassembler[];
-
-    $: $toolsDisasm = disasmProto.value;
-    $: disasm = disasms.find((d) => d.id === disasmProto.value) || vf;
-
-    $: language = detectLanguage(tab.type, entry, disasm);
-
-    $: textSize = $editorTextSizeSync
-        ? editorTextSize
-        : writable(get(editorTextSize) /* immediate value, no subscription */);
+    let disasm = $derived(disasms.find((d) => d.id === disasmId) || vf);
+    let language = $derived(detectLanguage(tab.type, entry, disasm));
+    let textSize = $derived(
+        $editorTextSizeSync ? editorTextSize : writable(get(editorTextSize) /* immediate value, no subscription */)
+    );
 </script>
 
 <div class="relative basis-full overflow-hidden scrollbar-thin">
@@ -42,19 +43,19 @@
     {:then [lang, value]}
         <ContextMenu>
             <ContextMenuTrigger>
-                <CodeEditor {value} readOnly {lang} bind:textSize={$textSize} wrap={$editorWrap} />
+                <CodeEditor {value} readonly {lang} bind:size={$textSize} wrap={$editorWrap} />
             </ContextMenuTrigger>
-            <CodeMenu {tab} {value} lang={language} on:action />
+            <CodeMenu {tab} {value} lang={language} {onaction} />
         </ContextMenu>
     {/await}
     {#if shouldDisasm}
         <div class="absolute bottom-0 right-0 z-20 m-[15px]">
-            <Select bind:selected={disasmProto}>
+            <Select type="single" bind:value={disasmId}>
                 <SelectTrigger class="h-7 text-xs [&_svg]:ml-2 [&_svg]:h-4 [&_svg]:w-4">
                     <span class="mr-2 text-muted-foreground">Disassembler: </span>
                     <span class="tracking-tight">{disasm.name || disasm.id}</span>
                 </SelectTrigger>
-                <SelectContent class="max-h-[240px] w-full overflow-scroll">
+                <SelectContent class="max-h-[240px] w-full overflow-scroll" align="end">
                     {#each disasms as dism}
                         <SelectItem value={dism.id} label={dism.id} class="text-xs tracking-tight">
                             {dism.name || dism.id}

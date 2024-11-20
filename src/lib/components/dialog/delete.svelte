@@ -9,21 +9,23 @@
         AlertDialogHeader,
         AlertDialogTitle,
     } from "$lib/components/ui/alert-dialog";
-    import { Button } from "$lib/components/ui/button";
-    import { createEventDispatcher } from "svelte";
-    import { ActionType } from "$lib/action";
+    import { buttonVariants } from "$lib/components/ui/button";
+    import { type ActionHandler, ActionType, type BulkEntryAction } from "$lib/action";
     import type { Entry } from "$lib/workspace";
 
-    export let entries: Entry[] | null;
+    interface Props {
+        entries: Entry[] | null;
+        onaction?: ActionHandler;
+    }
+
+    let { entries = $bindable(), onaction }: Props = $props();
 
     const handle = (accepted: boolean) => {
         if (accepted) {
-            dispatch("action", { type: ActionType.REMOVE, entries: entries! });
+            onaction?.({ type: ActionType.REMOVE, entries: entries! } as BulkEntryAction);
         }
         entries = null;
     };
-
-    const dispatch = createEventDispatcher();
 </script>
 
 <AlertDialog open={entries !== null}>
@@ -45,9 +47,9 @@
                 </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-                <AlertDialogCancel on:click={() => handle(false)}>Cancel</AlertDialogCancel>
-                <AlertDialogAction asChild let:builder>
-                    <Button builders={[builder]} variant="destructive" on:click={() => handle(true)}>Delete</Button>
+                <AlertDialogCancel onclick={() => handle(false)}>Cancel</AlertDialogCancel>
+                <AlertDialogAction class={buttonVariants({ variant: "destructive" })} onclick={() => handle(true)}>
+                    Delete
                 </AlertDialogAction>
             </AlertDialogFooter>
         {/if}

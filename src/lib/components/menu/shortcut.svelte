@@ -2,8 +2,12 @@
     import { MenubarShortcut } from "$lib/components/ui/menubar";
     import { format } from "$lib/shortcut";
 
-    export let key: string;
-    export let modifier: number;
+    interface Props {
+        key: string;
+        modifier: number;
+    }
+
+    let { key, modifier }: Props = $props();
 </script>
 
 <MenubarShortcut>{format(key, modifier)}</MenubarShortcut>

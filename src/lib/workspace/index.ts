@@ -93,7 +93,9 @@ export interface LoadResult {
 const zipExtensions = new Set(["zip", "jar", "war", "ear", "jmod"]);
 
 const load0 = async (entries: Map<string, Entry>, d: Data, parent?: Entry): Promise<LoadResult[]> => {
-    const dupeEntry = entries.get(d.name);
+    const name = parent ? `${parent.name}/${d.name}` : d.name;
+
+    const dupeEntry = entries.get(name);
     if (dupeEntry) {
         return [{ entry: dupeEntry, created: false }];
     }
@@ -101,7 +103,7 @@ const load0 = async (entries: Map<string, Entry>, d: Data, parent?: Entry): Prom
     const results: LoadResult[] = [];
 
     const entry: Entry = {
-        ...parseName(parent ? `${parent.name}/${d.name}` : d.name),
+        ...parseName(name),
         type: EntryType.FILE,
         parent,
         data: d,

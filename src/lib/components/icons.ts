@@ -1,6 +1,6 @@
 import type { ComponentType } from "svelte";
 import {
-    type Icon,
+    type Icon as LucideIcon,
     Binary,
     Braces,
     Code,
@@ -17,8 +17,10 @@ import {
 } from "lucide-svelte";
 import { TabType } from "$lib/tab";
 
+export type Icon = ComponentType<LucideIcon> /* Component<IconProps> */;
+
 export interface StyledIcon {
-    icon: ComponentType<Icon>;
+    icon: Icon;
     classes?: string[];
 }
 

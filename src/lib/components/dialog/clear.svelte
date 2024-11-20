@@ -9,13 +9,19 @@
         AlertDialogHeader,
         AlertDialogTitle,
     } from "$lib/components/ui/alert-dialog";
-    import { Button } from "$lib/components/ui/button";
-    import { createEventDispatcher } from "svelte";
-    import { ActionType } from "$lib/action";
+    import { buttonVariants } from "$lib/components/ui/button";
+    import { type ActionHandler, ActionType } from "$lib/action";
 
-    export let open = false;
+    interface Props {
+        open?: boolean;
+        onaction?: ActionHandler;
+    }
 
-    const dispatch = createEventDispatcher();
+    let { open = $bindable(false), onaction }: Props = $props();
+    const handle = () => {
+        open = false;
+        onaction?.({ type: ActionType.CLEAR });
+    };
 </script>
 
 <AlertDialog bind:open>
@@ -29,12 +35,8 @@
         </AlertDialogHeader>
         <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction asChild let:builder>
-                <Button
-                    builders={[builder]}
-                    variant="destructive"
-                    on:click={() => dispatch("action", { type: ActionType.CLEAR })}>Delete</Button
-                >
+            <AlertDialogAction class={buttonVariants({ variant: "destructive" })} onclick={handle}>
+                Delete
             </AlertDialogAction>
         </AlertDialogFooter>
     </AlertDialogContent>

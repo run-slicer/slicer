@@ -20,6 +20,8 @@ export const enum ActionType {
     PREFS_CLEAR,
 }
 
+export type ActionHandler = (action: Action) => void;
+
 export interface Action {
     type: ActionType;
 }

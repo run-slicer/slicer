@@ -1,4 +1,5 @@
 <script lang="ts">
+    import ScriptOption from "./option.svelte";
     import {
         MenubarItem,
         MenubarCheckboxItem,
@@ -11,23 +12,27 @@
     import type { CheckboxOption, GroupOption, Option, RadioOption } from "@run-slicer/script";
     import type { ProtoScript } from "$lib/script";
 
-    export let inset = false;
-    export let proto: ProtoScript;
-    export let option: Option;
+    interface Props {
+        inset?: boolean;
+        proto: ProtoScript;
+        option: Option;
+    }
 
-    const groupOption = option as GroupOption;
+    let { inset = false, proto, option }: Props = $props();
+
+    const groupOption = $derived(option as GroupOption);
 
     const handleButton = () => {
         proto.context?.dispatchEvent({ type: "option_change", option });
     };
 
-    const checkboxOption = option as CheckboxOption;
+    const checkboxOption = $derived(option as CheckboxOption);
     const handleCheckbox = (checked: boolean | "indeterminate") => {
         checkboxOption.checked = Boolean(checked);
         proto.context?.dispatchEvent({ type: "option_change", option });
     };
 
-    const radioOption = option as RadioOption;
+    const radioOption = $derived(option as RadioOption);
     const handleRadio = (value: string | undefined) => {
         radioOption.selected = value!;
         proto.context?.dispatchEvent({ type: "option_change", option });
@@ -40,12 +45,12 @@
         <MenubarSubTrigger {inset}>{option.label || option.id}</MenubarSubTrigger>
         <MenubarSubContent class="w-[12rem]">
             {#each groupOption.options as subOption (subOption.id)}
-                <svelte:self inset={hasCheckbox} {proto} option={subOption} />
+                <ScriptOption inset={hasCheckbox} {proto} option={subOption} />
             {/each}
         </MenubarSubContent>
     </MenubarSub>
 {:else if option.type === "button"}
-    <MenubarItem {inset} on:click={handleButton}>{option.label || option.id}</MenubarItem>
+    <MenubarItem {inset} onclick={handleButton}>{option.label || option.id}</MenubarItem>
 {:else if option.type === "checkbox"}
     <MenubarCheckboxItem checked={checkboxOption.checked} onCheckedChange={handleCheckbox}>
         {option.label || option.id}

@@ -8,11 +8,14 @@
     import { error } from "$lib/log";
     import { FileQuestion } from "lucide-svelte";
     import Table from "./table.svelte";
-    import { readable } from "svelte/store";
     import { humanSize } from "$lib/utils";
 
-    export let tab: Tab;
-    const entry = tab.entry!;
+    interface Props {
+        tab: Tab;
+    }
+
+    let { tab }: Props = $props();
+    const entry = $derived(tab.entry!);
 
     const readEntry = async (entry: Entry): Promise<SlurpResult> => {
         try {
@@ -44,7 +47,7 @@
         </div>
         <Separator />
     </div>
-    <Table class="h-full min-h-0 w-full p-2" entries={readable(result.entries)} />
+    <Table class="h-full min-h-0 w-full p-2" entries={result.entries} />
 {:catch e}
     <div class="flex h-full w-full flex-col items-center justify-center">
         <FileQuestion class="mb-4 animate-bounce text-muted-foreground" size={128} />
