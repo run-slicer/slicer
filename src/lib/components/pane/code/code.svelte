@@ -37,14 +37,14 @@
         $editorTextSizeSync ? editorTextSize : writable(get(editorTextSize) /* immediate value, no subscription */)
     );
 
-    let loadPromise = $derived(Promise.all([loadLanguage(language), read(tab.type, entry, disasm)]));
+    let readPromise = $derived(read(tab.type, entry, disasm));
     $effect(() => {
-        record(shouldDisasm ? "disassembling" : "reading", entry.name, () => loadPromise);
+        record(shouldDisasm ? "disassembling" : "reading", entry.name, () => readPromise);
     });
 </script>
 
 <div class="relative basis-full overflow-hidden scrollbar-thin">
-    {#await loadPromise}
+    {#await Promise.all([loadLanguage(language), readPromise])}
         <Loading value={shouldDisasm ? "Disassembling..." : "Reading..."} />
     {:then [lang, value]}
         <ContextMenu>
