@@ -187,18 +187,18 @@
         <MenubarTrigger class="relative">File</MenubarTrigger>
         <MenubarContent align="start">
             <MenubarItem onclick={() => onaction?.({ type: ActionType.LOAD })}>
-                Open <Shortcut key="o" modifier={Modifier.Ctrl} />
+                Open <Shortcut key="o" modifier={Modifier.CTRL} />
             </MenubarItem>
             <MenubarItem onclick={() => onaction?.({ type: ActionType.ADD })}>
-                Add <Shortcut key="o" modifier={Modifier.Ctrl | Modifier.Shift} />
+                Add <Shortcut key="o" modifier={Modifier.CTRL | Modifier.SHIFT} />
             </MenubarItem>
             <MenubarItem disabled={entries.length === 0} onclick={() => (clearOpen = true)}>Clear all</MenubarItem>
             <MenubarSeparator />
             <MenubarItem disabled={!tab?.entry} onclick={() => onaction?.({ type: ActionType.EXPORT })}>
-                Export <Shortcut key="e" modifier={Modifier.Ctrl} />
+                Export <Shortcut key="e" modifier={Modifier.CTRL} />
             </MenubarItem>
             <MenubarItem disabled={!tab?.entry} onclick={() => onaction?.({ type: ActionType.CLOSE })}>
-                Close <Shortcut key="w" modifier={Modifier.Ctrl | Modifier.Alt} />
+                Close <Shortcut key="w" modifier={Modifier.CTRL | Modifier.ALT} />
             </MenubarItem>
             <MenubarSeparator />
             <MenubarSub>

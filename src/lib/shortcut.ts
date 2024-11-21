@@ -4,40 +4,53 @@ import { ActionType, handle } from "$lib/action";
 const isMac = /Macintosh|Mac OS|MacIntel|MacPPC|Mac68K/gi.test(navigator.userAgent);
 
 export const enum Modifier {
-    Ctrl = 1 << 0,
-    Shift = 1 << 1,
-    Alt = 1 << 2,
+    CTRL = 1 << 0,
+    SHIFT = 1 << 1,
+    ALT = 1 << 2,
 }
 
-const listen = (key: string, mod: number, callback: (e: KeyboardEvent) => void) => {
+type ShortcutCallback = (e: KeyboardEvent) => void;
+export type DestroyCallback = () => void;
+
+const listen = (key: string, mod: number, callback: ShortcutCallback): DestroyCallback => {
     const checks: ((e: KeyboardEvent) => boolean)[] = [(e) => e.key.toLowerCase() === key];
-    if ((mod & Modifier.Ctrl) !== 0) {
+    if ((mod & Modifier.CTRL) !== 0) {
         checks.push((e) => e.getModifierState(isMac ? "Meta" : "Control"));
     }
-    if ((mod & Modifier.Alt) !== 0) {
+    if ((mod & Modifier.ALT) !== 0) {
         checks.push((e) => e.getModifierState("Alt"));
     }
-    if ((mod & Modifier.Shift) !== 0) {
+    if ((mod & Modifier.SHIFT) !== 0) {
         checks.push((e) => e.getModifierState("Shift"));
     }
 
-    window.addEventListener("keydown", (e) => {
+    const handler: ShortcutCallback = (e) => {
         if (checks.every((check) => check(e))) {
             e.preventDefault();
             e.stopPropagation();
 
             callback(e);
         }
-    });
+    };
+
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
 };
 
-export const register = () => {
+const listenAction = (key: string, mod: number, action: ActionType): DestroyCallback => {
+    return listen(key, mod, () => handle({ type: action }));
+};
+
+export const register = (): DestroyCallback => {
     // order matters, shortcuts with (more) modifiers should be registered earlier
 
-    listen("o", Modifier.Ctrl | Modifier.Shift, () => handle({ type: ActionType.ADD }));
-    listen("o", Modifier.Ctrl, () => handle({ type: ActionType.LOAD }));
-    listen("w", Modifier.Ctrl | Modifier.Alt, () => handle({ type: ActionType.CLOSE }));
-    listen("e", Modifier.Ctrl, () => handle({ type: ActionType.EXPORT }));
+    const callbacks = [
+        listenAction("o", Modifier.CTRL | Modifier.SHIFT, ActionType.ADD),
+        listenAction("o", Modifier.CTRL, ActionType.LOAD),
+        listenAction("w", Modifier.CTRL | Modifier.ALT, ActionType.CLOSE),
+        listenAction("e", Modifier.CTRL, ActionType.EXPORT),
+    ];
+    return () => callbacks.forEach((c) => c());
 };
 
 export const format = (key: string, mod: number): string => {
@@ -46,13 +59,13 @@ export const format = (key: string, mod: number): string => {
     }
 
     let keys: string[] = [];
-    if ((mod & Modifier.Ctrl) !== 0) {
+    if ((mod & Modifier.CTRL) !== 0) {
         keys.push("Ctrl");
     }
-    if ((mod & Modifier.Alt) !== 0) {
+    if ((mod & Modifier.ALT) !== 0) {
         keys.push("Alt");
     }
-    if ((mod & Modifier.Shift) !== 0) {
+    if ((mod & Modifier.SHIFT) !== 0) {
         keys.push("Shift");
     }
 
@@ -62,13 +75,13 @@ export const format = (key: string, mod: number): string => {
 
 const formatMac = (key: string, mod: number): string => {
     let mods = "";
-    if ((mod & Modifier.Alt) !== 0) {
+    if ((mod & Modifier.ALT) !== 0) {
         mods += "\u2325"; // Option
     }
-    if ((mod & Modifier.Shift) !== 0) {
+    if ((mod & Modifier.SHIFT) !== 0) {
         mods += "\u21E7"; // Shift
     }
-    if ((mod & Modifier.Ctrl) !== 0) {
+    if ((mod & Modifier.CTRL) !== 0) {
         mods += "\u2318"; // Cmd
     }
 

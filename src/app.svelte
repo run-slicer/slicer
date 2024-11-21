@@ -14,10 +14,14 @@
     import { root as rootKey } from "$lib/state";
     import { handle } from "$lib/action";
     import { theme } from "$lib/theme";
+    import { register as registerShortcuts } from "$lib/shortcut";
+    import { onMount } from "svelte";
 
     let tabs0 = $derived(Array.from($tabs.values()));
     let entries0 = $derived(Array.from($entries.values()));
     let disasms0 = $derived(Array.from($disasms.values()));
+
+    onMount(registerShortcuts);
 </script>
 
 <ModeWatcher
