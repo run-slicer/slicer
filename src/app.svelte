@@ -1,9 +1,8 @@
 <script lang="ts">
     import { ModeWatcher } from "mode-watcher";
-    import Loader from "$lib/components/loader.svelte";
     import Menu from "$lib/components/menu/menu.svelte";
     import Content from "$lib/components/content.svelte";
-    import Breadcrumb from "$lib/components/breadcrumb.svelte";
+    import Crumb from "$lib/components/crumb/crumb.svelte";
     import { Toaster } from "$lib/components/ui/sonner";
     import { current as currentTab, tabs } from "$lib/tab";
     import { entries } from "$lib/workspace";
@@ -14,11 +13,13 @@
     import { root as rootKey } from "$lib/state";
     import { handle } from "$lib/action";
     import { theme } from "$lib/theme";
+    import { tasks } from "$lib/task";
     import { register as registerShortcuts } from "$lib/shortcut";
     import { onMount } from "svelte";
 
     let tabs0 = $derived(Array.from($tabs.values()));
     let entries0 = $derived(Array.from($entries.values()));
+    let tasks0 = $derived(Array.from($tasks.values()));
     let disasms0 = $derived(Array.from($disasms.values()));
 
     onMount(registerShortcuts);
@@ -32,7 +33,6 @@
         light: `hsl(${$theme.cssVars.light.background})`,
     }}
 />
-<Loader />
 <Toaster position="top-right" richColors />
 <Menu tab={$currentTab} entries={entries0} scripts={$scripts} onaction={handle} />
 <Content
@@ -43,7 +43,7 @@
     disasms={disasms0}
     onaction={handle}
 />
-<Breadcrumb tab={$currentTab} encoding={$currentEncoding} />
+<Crumb tab={$currentTab} tasks={tasks0} encoding={$currentEncoding} />
 {#await import("$lib/components/command.svelte") then { default: Command }}
     <Command entries={entries0} />
 {/await}

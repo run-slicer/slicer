@@ -2,7 +2,6 @@ import { type ClassEntry, type Entry, EntryType } from "$lib/workspace";
 import { memoryData } from "$lib/workspace/data";
 import { disasmSafe, type Disassembler } from "$lib/disasm";
 import { formatHex } from "./hex";
-import { timed } from "$lib/utils";
 import { fromExtension, type Language, toExtension } from "$lib/lang";
 import { TabType } from "$lib/tab";
 
@@ -21,18 +20,14 @@ export const detectLanguage = (tabType: TabType, entry: Entry, disasm: Disassemb
     return entry.extension ? fromExtension(entry.extension) : "plaintext";
 };
 
-export const read = async (tabType: TabType, entry: Entry, disasm: Disassembler): Promise<string> => {
-    const { result } = await timed(`read ${entry.name}`, async () => {
-        if (tabType === TabType.HEX) {
-            return await formatHex(entry.data);
-        } else if (entry.type === EntryType.CLASS) {
-            return await disasmSafe(disasm, entry as ClassEntry);
-        }
+export const read = (tabType: TabType, entry: Entry, disasm: Disassembler): Promise<string> => {
+    if (tabType === TabType.HEX) {
+        return formatHex(entry.data);
+    } else if (entry.type === EntryType.CLASS) {
+        return disasmSafe(disasm, entry as ClassEntry);
+    }
 
-        return await entry.data.text();
-    });
-
-    return result;
+    return entry.data.text();
 };
 
 const replaceExt = (path: string, ext: string): string => {

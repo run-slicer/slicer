@@ -31,6 +31,7 @@
             <Loading small />
         {:then [{ CodeEditor }, { log }]}
             <CodeEditor
+                wrap
                 readonly
                 {value}
                 lang={log()}

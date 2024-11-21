@@ -19,27 +19,30 @@
     import { isEncodingDependent, type Tab } from "$lib/tab";
     import type { Encoding } from "$lib/workspace/encoding";
     import { fileIcon } from "$lib/components/icons";
+    import type { Task } from "$lib/task";
+    import Tasks from "./tasks.svelte";
 
     interface Props {
         tab: Tab | null;
+        tasks: Task[];
         encoding: Encoding | null;
     }
 
-    let { tab, encoding }: Props = $props();
+    let { tab, tasks, encoding }: Props = $props();
 </script>
 
 <Separator />
 <div class="flex h-6 items-center justify-between overflow-x-auto px-2 scrollbar-none">
-    {#if tab?.entry}
-        {@const entries = flatten(tab.entry)}
-        <Breadcrumb>
+    <Breadcrumb>
+        {#if tab?.entry}
+            {@const entries = flatten(tab.entry)}
             <BreadcrumbList class="flex-nowrap text-xs">
                 {#each entries as entry, x}
                     {@const parts = entry.data.name.split("/")}
                     {@const lastEntry = x === entries.length - 1}
                     {#each parts as part, y}
                         {@const lastPart = y === parts.length - 1}
-                        <BreadcrumbItem>
+                        <BreadcrumbItem class="whitespace-nowrap">
                             {#if lastPart}
                                 {@const { icon: FileIcon, classes } = fileIcon(entry.data.name)}
                                 <FileIcon size={14} class={cn("min-w-[14px]", classes)} />
@@ -52,11 +55,15 @@
                     {/each}
                 {/each}
             </BreadcrumbList>
-        </Breadcrumb>
-        {#if encoding && isEncodingDependent(tab)}
-            <div class="text-xs text-muted-foreground">
-                {encoding.label || encoding.id.toUpperCase()}
-            </div>
         {/if}
-    {/if}
+    </Breadcrumb>
+    <div class="flex flex-row text-xs text-muted-foreground">
+        <Tasks {tasks} />
+        {#if tab && encoding && isEncodingDependent(tab)}
+            {#if tasks.length > 0}
+                <span class="px-2 text-muted-foreground/60">|</span>
+            {/if}
+            <span>{encoding.label || encoding.id.toUpperCase()}</span>
+        {/if}
+    </div>
 </div>

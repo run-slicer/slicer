@@ -23,9 +23,8 @@ import {
     detectType as detectTabType,
 } from "$lib/tab";
 import { toast } from "svelte-sonner";
-import { downloadBlob, partition, readFiles, timed } from "$lib/utils";
+import { downloadBlob, partition, readFiles } from "$lib/utils";
 import { tabIcon } from "$lib/components/icons";
-import { loading } from "$lib/components/loader.svelte";
 import { error } from "$lib/log";
 import {
     read as readScript,
@@ -35,6 +34,7 @@ import {
     type ProtoScript,
 } from "$lib/script";
 import { load as loadState, save as saveState, clear as clearState } from "$lib/state";
+import { recordTimed } from "$lib/task";
 
 const load = async () => {
     const files = await readFiles(".jar,.zip", true);
@@ -42,34 +42,36 @@ const load = async () => {
         return;
     }
 
-    await loading("Loading...", async () => {
-        const results = await Promise.all(files.map((f) => timed(`load ${f.name}`, () => loadZip(f))));
+    const results = await Promise.all(
+        files.map((f) => {
+            return recordTimed("loading", f.name, () => loadZip(f));
+        })
+    );
 
-        const time = results.reduce((acc, v) => acc + v.time, 0);
-        const [created, skipped] = partition(
-            results.flatMap((r) => r.result),
-            (r) => r.created
-        );
-        if (skipped.length > 0) {
-            if (skipped.length <= 5) {
-                for (const result of skipped) {
-                    toast.info("Duplicate entry", {
-                        description: `Skipped adding ${result.entry.shortName}, as it is already present in the workspace.`,
-                    });
-                }
-            } else {
-                // don't spam toasts for more than 5 entries
-                toast.info("Duplicate entries", {
-                    description: `Skipped adding ${skipped.length} entries, as they were already present in the workspace.`,
+    const time = results.reduce((acc, v) => acc + v.time, 0);
+    const [created, skipped] = partition(
+        results.flatMap((r) => r.result),
+        (r) => r.created
+    );
+    if (skipped.length > 0) {
+        if (skipped.length <= 5) {
+            for (const result of skipped) {
+                toast.info("Duplicate entry", {
+                    description: `Skipped adding ${result.entry.shortName}, as it is already present in the workspace.`,
                 });
             }
-        }
-        if (created.length > 0) {
-            toast.success("Loaded", {
-                description: `Loaded ${created.length} ${created.length === 1 ? "entry" : "entries"} in ${time}ms.`,
+        } else {
+            // don't spam toasts for more than 5 entries
+            toast.info("Duplicate entries", {
+                description: `Skipped adding ${skipped.length} entries, as they were already present in the workspace.`,
             });
         }
-    });
+    }
+    if (created.length > 0) {
+        toast.success("Loaded", {
+            description: `Loaded ${created.length} ${created.length === 1 ? "entry" : "entries"} in ${time}ms.`,
+        });
+    }
 };
 
 const add = async () => {
@@ -78,34 +80,36 @@ const add = async () => {
         return;
     }
 
-    await loading("Loading...", async () => {
-        const results = await Promise.all(files.map((f) => timed(`add ${f.name}`, () => loadFile(f))));
+    const results = await Promise.all(
+        files.map((f) => {
+            return recordTimed("adding", f.name, () => loadFile(f));
+        })
+    );
 
-        const time = results.reduce((acc, v) => acc + v.time, 0);
-        const [created, skipped] = partition(
-            results.flatMap((r) => r.result),
-            (r) => r.created
-        );
-        if (skipped.length > 0) {
-            if (skipped.length <= 5) {
-                for (const result of skipped) {
-                    toast.info("Duplicate entry", {
-                        description: `Skipped adding ${result.entry.name}, as it is already present in the workspace.`,
-                    });
-                }
-            } else {
-                // don't spam toasts for more than 5 entries
-                toast.info("Duplicate entries", {
-                    description: `Skipped adding ${skipped.length} entries, as they were already present in the workspace.`,
+    const time = results.reduce((acc, v) => acc + v.time, 0);
+    const [created, skipped] = partition(
+        results.flatMap((r) => r.result),
+        (r) => r.created
+    );
+    if (skipped.length > 0) {
+        if (skipped.length <= 5) {
+            for (const result of skipped) {
+                toast.info("Duplicate entry", {
+                    description: `Skipped adding ${result.entry.name}, as it is already present in the workspace.`,
                 });
             }
-        }
-        if (created.length > 0) {
-            toast.success("Added", {
-                description: `Added ${created.length} ${created.length === 1 ? "entry" : "entries"} in ${time}ms.`,
+        } else {
+            // don't spam toasts for more than 5 entries
+            toast.info("Duplicate entries", {
+                description: `Skipped adding ${skipped.length} entries, as they were already present in the workspace.`,
             });
         }
-    });
+    }
+    if (created.length > 0) {
+        toast.success("Added", {
+            description: `Added ${created.length} ${created.length === 1 ? "entry" : "entries"} in ${time}ms.`,
+        });
+    }
 };
 
 const open = async (entry: Entry, type: TabType = detectTabType(entry)) => {

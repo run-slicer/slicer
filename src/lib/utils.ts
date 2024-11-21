@@ -1,7 +1,6 @@
 /* array ops */
 
 import { writable, type Writable } from "svelte/store";
-import { log } from "$lib/log";
 
 export const partition = <T>(arr: T[], func: (e: T) => boolean): [T[], T[]] => {
     const pass: T[] = [],
@@ -104,22 +103,6 @@ export const downloadBlob = (name: string, blob: Blob): Promise<void> => {
     });
 };
 
-/* timing */
-
-export interface TimedResult<T> {
-    result: T;
-    time: number;
-}
-
-export const timed = async <T>(name: string, run: () => T | Promise<T>): Promise<TimedResult<T>> => {
-    const start = Date.now();
-    const result = await run();
-    const time = Date.now() - start;
-
-    log(`${name} took ${time}ms`);
-    return { result, time };
-};
-
 /* formatting */
 
 // https://stackoverflow.com/a/14919494
@@ -179,4 +162,14 @@ export const prettyJavaType = (desc: string): string => {
             return desc.substring(1, desc.length - 1).replaceAll("/", ".");
     }
     return primTypes[desc] || desc.replaceAll("/", ".");
+};
+
+/* strings */
+
+export const truncate = (str: string, n: number, suffix: string = "..."): string => {
+    return str.length > n ? str.substring(0, n - 1) + suffix : str;
+};
+
+export const capitalize = (str: string): string => {
+    return str.charAt(0).toUpperCase() + str.substring(1);
 };

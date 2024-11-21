@@ -13,6 +13,7 @@
     import { ContextMenu, ContextMenuTrigger } from "$lib/components/ui/context-menu";
     import CodeMenu from "./menu.svelte";
     import type { ActionHandler } from "$lib/action";
+    import { record } from "$lib/task";
 
     interface Props {
         tab: Tab;
@@ -35,10 +36,15 @@
     let textSize = $derived(
         $editorTextSizeSync ? editorTextSize : writable(get(editorTextSize) /* immediate value, no subscription */)
     );
+
+    let loadPromise = $derived(Promise.all([loadLanguage(language), read(tab.type, entry, disasm)]));
+    $effect(() => {
+        record(shouldDisasm ? "disassembling" : "reading", entry.name, () => loadPromise);
+    });
 </script>
 
 <div class="relative basis-full overflow-hidden scrollbar-thin">
-    {#await Promise.all([loadLanguage(language), read(tab.type, entry, disasm)])}
+    {#await loadPromise}
         <Loading value={shouldDisasm ? "Disassembling..." : "Reading..."} />
     {:then [lang, value]}
         <ContextMenu>
