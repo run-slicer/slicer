@@ -27,6 +27,9 @@
                 {#each tasks.slice(0, 25) as task (task.id)}
                     <TaskComponent {task} />
                 {/each}
+                {#if tasks.length > 25}
+                    <p class="text-center text-muted-foreground">+ {tasks.length - 25} more</p>
+                {/if}
             </div>
         </PopoverContent>
     </Popover>

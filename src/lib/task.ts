@@ -48,8 +48,8 @@ export const phase = (task: Task): TaskResult => {
     return { task, time };
 };
 
-export const remove = (task: Task, shouldPhase: boolean = false): TaskResult => {
-    const result = shouldPhase ? phase(task) : { task, time: Date.now() - (task.start || 0) };
+export const remove = (task: Task, endPhase: boolean = true): TaskResult => {
+    const result = endPhase ? phase(task) : { task, time: Date.now() - (task.start || 0) };
     tasks.update(($tasks) => {
         $tasks.delete(task.id);
         return $tasks;
