@@ -16,7 +16,13 @@
     import { encodings } from "$lib/workspace/encoding";
     import type { ProtoScript } from "$lib/script";
     import { type Tab, TabType } from "$lib/tab";
-    import { type ActionHandler, ActionType, type OpenAction, type ScriptAddAction } from "$lib/action";
+    import {
+        type ActionHandler,
+        ActionType,
+        type ExportAction,
+        type OpenAction,
+        type ScriptAddAction,
+    } from "$lib/action";
     import { Modifier } from "$lib/shortcut";
     import Shortcut from "./shortcut.svelte";
     import ScriptMenu from "./script/menu.svelte";
@@ -62,18 +68,22 @@
         Moon,
         Sun,
         MonitorX,
+        Coffee,
     } from "lucide-svelte";
     import { toast } from "svelte-sonner";
     import { themes } from "$lib/theme";
+    import type { Disassembler } from "$lib/disasm";
 
     interface Props {
         tab: Tab | null;
         entries: Entry[];
+        classes: Entry[];
         scripts: ProtoScript[];
+        disasms: Disassembler[];
         onaction?: ActionHandler;
     }
 
-    let { tab, entries, scripts, onaction }: Props = $props();
+    let { tab, entries, classes, scripts, disasms, onaction }: Props = $props();
 
     let aboutOpen = $state(false);
     let clearOpen = $state(false);
@@ -85,6 +95,16 @@
 
     const openEntry = (tabType: TabType) => {
         onaction?.({ type: ActionType.OPEN, entry: tab?.entry!, tabType } as OpenAction);
+    };
+
+    const exportEntry = () => {
+        if (tab?.entry) {
+            onaction?.({ type: ActionType.EXPORT, entries: [tab?.entry!] } as ExportAction);
+        }
+    };
+
+    const exportEntries = (disasm?: Disassembler) => {
+        onaction?.({ type: ActionType.EXPORT, entries, disasm } as ExportAction);
     };
 
     const loadClipboardScript = async () => {
@@ -193,12 +213,33 @@
                 Add <Shortcut key="o" modifier={Modifier.CTRL | Modifier.SHIFT} />
             </MenubarItem>
             <MenubarItem disabled={entries.length === 0} onclick={() => (clearOpen = true)}>Clear all</MenubarItem>
+            <MenubarSub>
+                <MenubarSubTrigger disabled={entries.length === 0}>Export all</MenubarSubTrigger>
+                <MenubarSubContent class="w-[12rem]" align="start">
+                    <MenubarItem class="justify-between" onclick={() => exportEntries()}>
+                        Raw <Binary size={16} />
+                    </MenubarItem>
+                    <MenubarSub>
+                        <MenubarSubTrigger disabled={classes.length === 0}>Disassembled</MenubarSubTrigger>
+                        <MenubarSubContent class="w-[12rem]" align="start">
+                            {#each disasms as dism}
+                                <MenubarItem class="justify-between" onclick={() => exportEntries(dism)}>
+                                    {dism.name || dism.id}
+                                    {#if dism.lang === "java"}
+                                        <Coffee size={16} class="text-red-500" />
+                                    {/if}
+                                </MenubarItem>
+                            {/each}
+                        </MenubarSubContent>
+                    </MenubarSub>
+                </MenubarSubContent>
+            </MenubarSub>
             <MenubarSeparator />
-            <MenubarItem disabled={!tab?.entry} onclick={() => onaction?.({ type: ActionType.EXPORT })}>
-                Export <Shortcut key="e" modifier={Modifier.CTRL} />
-            </MenubarItem>
             <MenubarItem disabled={!tab?.entry} onclick={() => onaction?.({ type: ActionType.CLOSE })}>
                 Close <Shortcut key="w" modifier={Modifier.CTRL | Modifier.ALT} />
+            </MenubarItem>
+            <MenubarItem disabled={!tab?.entry} onclick={exportEntry}>
+                Export <Shortcut key="e" modifier={Modifier.CTRL} />
             </MenubarItem>
             <MenubarSeparator />
             <MenubarSub>

@@ -17,7 +17,7 @@
     <Popover>
         <PopoverTrigger class="flex flex-row items-center">
             <LoaderCircle size={12} class="mr-1 animate-spin text-primary" />
-            <span>{capitalize(mainTask.name)}...{tasks.length > 1 ? ` (+ ${tasks.length} more)` : ""}</span>
+            <span>{capitalize(mainTask.name)}...{tasks.length > 1 ? ` (+ ${tasks.length - 1} more)` : ""}</span>
         </PopoverTrigger>
         <PopoverContent class="z-30 flex max-h-64 w-72 flex-col p-0" side="top" align="end" sideOffset={14}>
             <p class="border-b border-b-border px-4 py-2 text-center text-sm font-medium">

@@ -74,6 +74,9 @@ importers:
       '@xyflow/svelte':
         specifier: ^0.1.24
         version: 0.1.24(svelte@5.2.6)
+      client-zip:
+        specifier: ^2.4.6
+        version: 2.4.6
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -712,6 +715,9 @@ packages:
 
   classcat@5.0.5:
     resolution: {integrity: sha512-JhZUT7JFcQy/EzW605k/ktHtncoo9vnyW/2GspNYwFlN1C/WmjuV/xtS04e9SOkL2sTdw0VAZ2UGCcQ9lR6p6w==}
+
+  client-zip@2.4.6:
+    resolution: {integrity: sha512-e7t1u14h/yT0A12qBwFsaus8UZZ8+MCaNAEn/z53mrukLq/LFcKX7TkbntAppGu8he2p8pz9vc5NEGE/h4ohlw==}
 
   clsx@2.1.1:
     resolution: {integrity: sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==}
@@ -1979,6 +1985,8 @@ snapshots:
       readdirp: 4.0.2
 
   classcat@5.0.5: {}
+
+  client-zip@2.4.6: {}
 
   clsx@2.1.1: {}
 

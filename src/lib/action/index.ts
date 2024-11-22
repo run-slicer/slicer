@@ -2,6 +2,7 @@ import type { Entry } from "$lib/workspace";
 import type { Tab, TabType } from "$lib/tab";
 import type { ProtoScript } from "$lib/script";
 import { handle } from "./handler";
+import type { Disassembler } from "$lib/disasm";
 
 export const enum ActionType {
     LOAD,
@@ -27,13 +28,13 @@ export interface Action {
 }
 
 export interface EntryAction extends Action {
-    type: ActionType.OPEN | ActionType.EXPORT;
+    type: ActionType.OPEN;
     entry: Entry;
 }
 
 export interface BulkEntryAction extends Action {
-    type: ActionType.REMOVE;
-    entries: Entry[];
+    type: ActionType.REMOVE | ActionType.EXPORT;
+    entries?: Entry[];
 }
 
 export interface OpenAction extends EntryAction {
@@ -54,6 +55,11 @@ export interface ScriptAddAction extends Action {
 export interface ScriptAction extends Action {
     type: ActionType.SCRIPT_LOAD | ActionType.SCRIPT_UNLOAD | ActionType.SCRIPT_REMOVE;
     proto: ProtoScript;
+}
+
+export interface ExportAction extends BulkEntryAction {
+    type: ActionType.EXPORT;
+    disasm?: Disassembler;
 }
 
 export { handle };

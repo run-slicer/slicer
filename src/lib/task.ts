@@ -1,4 +1,4 @@
-import { type Readable, get, writable } from "svelte/store";
+import { type Writable, get, writable } from "svelte/store";
 import { cyrb53 } from "$lib/utils";
 import { log } from "$lib/log";
 
@@ -7,7 +7,7 @@ export interface Task {
     name: string;
     desc: string;
     start?: number;
-    progress?: Readable<number>; // 0-100
+    progress?: Writable<number>; // 0-100
 }
 
 export interface TaskResult {
@@ -61,6 +61,15 @@ export const recordTimed = async <T>(name: string, desc: string, call: TaskActio
     const { time } = remove(task.id)!;
 
     return { result, time };
+};
+
+export const recordProgress = async <T>(name: string, desc: string, call: TaskAction<T>): Promise<T> => {
+    const task: Task = { id: cyrb53(name + desc).toString(16), name, desc, progress: writable(0) };
+
+    const result = await call(add(task));
+    remove(task.id);
+
+    return result;
 };
 
 export const record = async <T>(name: string, desc: string, call: TaskAction<T>): Promise<T> => {

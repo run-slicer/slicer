@@ -28,6 +28,15 @@ export const groupBy = <K, V>(arr: V[], func: (e: V) => K): Map<K, V[]> => {
     return map;
 };
 
+export const chunk = <T>(arr: T[], size: number): T[][] => {
+    const chunks = [];
+    for (let i = 0; i < arr.length; i += size) {
+        chunks.push(arr.slice(i, i + size));
+    }
+
+    return chunks;
+};
+
 /*
     cyrb53 (c) 2018 bryc (github.com/bryc)
     License: Public domain (or MIT if needed). Attribution appreciated.
@@ -172,4 +181,17 @@ export const truncate = (str: string, n: number, suffix: string = "..."): string
 
 export const capitalize = (str: string): string => {
     return str.charAt(0).toUpperCase() + str.substring(1);
+};
+
+/* dates */
+
+export const timestampFile = (date: Date = new Date()): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // months are 0-based
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
+
+    return `${year}_${month}_${day}-${hours}_${minutes}_${seconds}`;
 };

@@ -35,6 +35,7 @@
         "@tanstack/table-core": "^8.20.5",
         "@uiw/codemirror-theme-github": "^4.23.6",
         "@xyflow/svelte": "^0.1.24",
+        "client-zip": "^2.4.6",
         "clsx": "^2.1.1",
         "comlink": "^4.4.2",
         "tailwind-merge": "^2.5.4",

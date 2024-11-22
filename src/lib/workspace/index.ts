@@ -4,7 +4,7 @@ import type { Zip } from "@run-slicer/zip";
 import { error, warn } from "$lib/log";
 import { rootContext } from "$lib/script";
 import { workspaceArchiveEncoding, workspaceArchiveNested } from "$lib/state";
-import { type Data, type Named, transformData, parseName, fileData, zipData } from "./data";
+import { type Data, type Named, transformData, parseName, fileData, zipData, memoryData } from "./data";
 
 export const enum EntryType {
     FILE = "file",
@@ -65,6 +65,29 @@ export const readDetail = async (entry: Entry): Promise<Entry> => {
     }
 
     return entry;
+};
+
+const replaceExt = (path: string, ext: string): string => {
+    const index = path.lastIndexOf(".");
+    if (index !== -1) {
+        path = path.substring(0, index);
+    }
+
+    return `${path}.${ext}`;
+};
+
+// UTF-8
+const encoder = new TextEncoder();
+const decoder = new TextDecoder();
+
+export const transformEntry = (entry: Entry, ext: string, value: string): Entry => {
+    return {
+        type: EntryType.FILE,
+        name: replaceExt(entry.name, ext),
+        shortName: replaceExt(entry.shortName, ext),
+        extension: ext,
+        data: memoryData(replaceExt(entry.name, ext), encoder.encode(value), decoder),
+    };
 };
 
 export const entries = writable<Map<string, Entry>>(new Map());

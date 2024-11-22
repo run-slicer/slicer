@@ -1,5 +1,6 @@
 <script lang="ts">
     import type { Tab } from "$lib/tab";
+    import { transformEntry } from "$lib/workspace";
     import {
         ContextMenuContent,
         ContextMenuItem,
@@ -8,9 +9,9 @@
         ContextMenuSubTrigger,
     } from "$lib/components/ui/context-menu";
     import { Binary, Code } from "lucide-svelte";
-    import { type ActionHandler, ActionType, type EntryAction } from "$lib/action";
-    import type { Language } from "$lib/lang";
-    import { createTextEntry, isDisassembled } from "./";
+    import { type ActionHandler, ActionType, type ExportAction } from "$lib/action";
+    import { type Language, toExtension } from "$lib/lang";
+    import { isDisassembled } from "./";
 
     interface Props {
         tab: Tab;
@@ -23,9 +24,12 @@
 
     let entry = $derived(tab.entry!);
 
-    const handleRaw = () => onaction?.({ type: ActionType.EXPORT, entry } as EntryAction);
+    const handleRaw = () => onaction?.({ type: ActionType.EXPORT, entries: [entry] } as ExportAction);
     const handleDisasm = () => {
-        onaction?.({ type: ActionType.EXPORT, entry: createTextEntry(entry, lang, value) } as EntryAction);
+        onaction?.({
+            type: ActionType.EXPORT,
+            entries: [transformEntry(entry, toExtension(lang), value)],
+        } as ExportAction);
     };
 </script>
 

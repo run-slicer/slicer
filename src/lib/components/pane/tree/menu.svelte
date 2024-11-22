@@ -6,7 +6,7 @@
         type ActionHandler,
         ActionType,
         type BulkEntryAction,
-        type EntryAction,
+        type ExportAction,
         type OpenAction,
     } from "$lib/action";
     import { collectEntries } from "./tree.svelte";
@@ -30,7 +30,7 @@
     const open = (tabType: TabType) => {
         onaction?.({ type: ActionType.OPEN, entry: node.entry!, tabType } as OpenAction);
     };
-    const export0 = () => onaction?.({ type: ActionType.EXPORT, entry: node.entry } as EntryAction);
+    const export0 = () => onaction?.({ type: ActionType.EXPORT, entries: [node.entry] } as ExportAction);
     const remove = () => onaction?.({ type: ActionType.REMOVE, entries: collectEntries(node) } as BulkEntryAction);
 </script>
 
@@ -67,7 +67,7 @@
         </ContextMenuSub>
         <ContextMenuSeparator />
         <ContextMenuItem class="flex justify-between" onclick={export0}>
-            Download <Download size={16} />
+            Export <Download size={16} />
         </ContextMenuItem>
     {/if}
     <ContextMenuItem

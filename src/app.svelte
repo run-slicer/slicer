@@ -5,7 +5,7 @@
     import Crumb from "$lib/components/crumb/crumb.svelte";
     import { Toaster } from "$lib/components/ui/sonner";
     import { current as currentTab, tabs } from "$lib/tab";
-    import { entries } from "$lib/workspace";
+    import { entries, classes } from "$lib/workspace";
     import { current as currentEncoding } from "$lib/workspace/encoding";
     import { scripts } from "$lib/script";
     import { entries as logEntries } from "$lib/log";
@@ -19,6 +19,7 @@
 
     let tabs0 = $derived(Array.from($tabs.values()));
     let entries0 = $derived(Array.from($entries.values()));
+    let classes0 = $derived(Array.from($classes.values()));
     let tasks0 = $derived(Array.from($tasks.values()));
     let disasms0 = $derived(Array.from($disasms.values()));
 
@@ -34,7 +35,7 @@
     }}
 />
 <Toaster position="top-right" richColors />
-<Menu tab={$currentTab} entries={entries0} scripts={$scripts} onaction={handle} />
+<Menu tab={$currentTab} entries={entries0} classes={classes0} scripts={$scripts} disasms={disasms0} onaction={handle} />
 <Content
     bind:tab={$currentTab}
     tabs={tabs0}

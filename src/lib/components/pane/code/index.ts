@@ -1,8 +1,7 @@
 import { type ClassEntry, type Entry, EntryType } from "$lib/workspace";
-import { memoryData } from "$lib/workspace/data";
-import { disasmSafe, type Disassembler } from "$lib/disasm";
+import { disassemble, type Disassembler } from "$lib/disasm";
 import { formatHex } from "./hex";
-import { fromExtension, type Language, toExtension } from "$lib/lang";
+import { fromExtension, type Language } from "$lib/lang";
 import { TabType } from "$lib/tab";
 
 export const isDisassembled = (tabType: TabType, entry: Entry): boolean => {
@@ -24,33 +23,8 @@ export const read = (tabType: TabType, entry: Entry, disasm: Disassembler): Prom
     if (tabType === TabType.HEX) {
         return formatHex(entry.data);
     } else if (entry.type === EntryType.CLASS) {
-        return disasmSafe(disasm, entry as ClassEntry);
+        return disassemble(entry as ClassEntry, disasm);
     }
 
     return entry.data.text();
-};
-
-const replaceExt = (path: string, ext: string): string => {
-    const index = path.lastIndexOf(".");
-    if (index !== -1) {
-        path = path.substring(0, index);
-    }
-
-    return `${path}.${ext}`;
-};
-
-// UTF-8
-const encoder = new TextEncoder();
-const decoder = new TextDecoder();
-
-export const createTextEntry = (entry: Entry, lang: Language, value: string): Entry => {
-    const ext = toExtension(lang);
-
-    return {
-        type: EntryType.FILE,
-        name: replaceExt(entry.name, ext),
-        shortName: replaceExt(entry.shortName, ext),
-        extension: ext,
-        data: memoryData(replaceExt(entry.data.name, ext), encoder.encode(value), decoder),
-    };
 };

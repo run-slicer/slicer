@@ -1,5 +1,5 @@
-import type { ClassEntry } from "$lib/workspace";
-import type { Language } from "$lib/lang";
+import { type Entry, type ClassEntry, transformEntry } from "$lib/workspace";
+import { type Language, toExtension } from "$lib/lang";
 import { error } from "$lib/log";
 import { get, writable } from "svelte/store";
 import { cfr, jasm, vf } from "./builtin";
@@ -38,12 +38,16 @@ export const remove = (id: string) => {
     });
 };
 
-export const disasmSafe = async (disasm: Disassembler, entry: ClassEntry): Promise<string> => {
+export const disassemble = async (entry: ClassEntry, disasm: Disassembler): Promise<string> => {
     try {
-        return await disasm.run(entry);
+        return disasm.run(entry);
     } catch (e: any) {
         error(`failed to disassemble ${entry.name}`, e);
 
         return `// Failed to disassemble ${entry.name}; disassembler threw error.\n${e.toString().replaceAll(/^/gm, "// ")}`;
     }
+};
+
+export const disassembleEntry = async (entry: ClassEntry, disasm: Disassembler): Promise<Entry> => {
+    return transformEntry(entry, toExtension(disasm.lang || "plaintext"), await disassemble(entry, disasm));
 };

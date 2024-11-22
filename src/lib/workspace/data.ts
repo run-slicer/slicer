@@ -148,3 +148,15 @@ export const transformData = (origin: Data, data: Uint8Array): TransformData => 
 export const unwrapTransform = (data: Data): Data => {
     return "origin" in data ? (data as TransformData).origin : data;
 };
+
+export const download = async (data: Iterable<Data> | AsyncIterable<Data>): Promise<Blob> => {
+    const { downloadZip } = await import("client-zip");
+
+    return downloadZip(
+        (async function* () {
+            for await (const item of data) {
+                yield { name: item.name, input: await item.blob() };
+            }
+        })()
+    ).blob();
+};

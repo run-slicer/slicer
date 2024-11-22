@@ -2,13 +2,22 @@ import {
     type Action,
     ActionType,
     type BulkEntryAction,
-    type EntryAction,
+    type ExportAction,
     type OpenAction,
     type ScriptAction,
     type ScriptAddAction,
     type TabAction,
 } from "./";
-import { clear as clearWs, type Entry, loadFile, loadZip, readDetail, remove as removeWs } from "$lib/workspace";
+import {
+    type ClassEntry,
+    clear as clearWs,
+    type Entry,
+    EntryType,
+    loadFile,
+    loadZip,
+    readDetail,
+    remove as removeWs,
+} from "$lib/workspace";
 import { get } from "svelte/store";
 import {
     clear as clearTabs,
@@ -23,7 +32,7 @@ import {
     detectType as detectTabType,
 } from "$lib/tab";
 import { toast } from "svelte-sonner";
-import { downloadBlob, partition, readFiles } from "$lib/utils";
+import { downloadBlob, partition, readFiles, timestampFile } from "$lib/utils";
 import { tabIcon } from "$lib/components/icons";
 import { error } from "$lib/log";
 import {
@@ -34,7 +43,9 @@ import {
     type ProtoScript,
 } from "$lib/script";
 import { load as loadState, save as saveState, clear as clearState } from "$lib/state";
-import { recordTimed } from "$lib/task";
+import { record, recordTimed, recordProgress } from "$lib/task";
+import { disassembleEntry, type Disassembler } from "$lib/disasm";
+import { download } from "$lib/workspace/data";
 
 const load = async () => {
     const files = await readFiles(".jar,.zip", true);
@@ -159,10 +170,51 @@ const remove = async (entries: Entry[]) => {
     });
 };
 
-const export_ = async (entry: Entry | null = get(currentTab)?.entry || null) => {
-    if (entry) {
-        await downloadBlob(entry.shortName, await entry.data.blob());
+const recordDisasm = (entry: ClassEntry, disasm: Disassembler): Promise<Entry> => {
+    return record("disassembling", entry.name, () => disassembleEntry(entry, disasm));
+};
+
+const export_ = async (entries: Entry[], disasm?: Disassembler) => {
+    switch (entries.length) {
+        case 0: {
+            const entry = get(currentTab)?.entry;
+            if (entry) {
+                return export_([entry], disasm);
+            }
+
+            return;
+        }
+        case 1: {
+            const entry = entries[0];
+
+            return record("exporting", entry.name, async () => {
+                let entry0 = await readDetail(entry);
+                if (entry.type === EntryType.CLASS && disasm) {
+                    entry0 = await recordDisasm(entry as ClassEntry, disasm);
+                }
+
+                return downloadBlob(entry0.shortName, await entry0.data.blob());
+            });
+        }
     }
+
+    return recordProgress("exporting", `${entries.length} entries`, async (task) => {
+        const blob = await download(
+            (async function* () {
+                for (let i = 0; i < entries.length; i++) {
+                    let entry = await readDetail(entries[i]);
+                    if (entry.type === EntryType.CLASS && disasm) {
+                        entry = await recordDisasm(entry as ClassEntry, disasm);
+                    }
+
+                    yield entry.data;
+                    task.progress?.set(Math.ceil(((i + 1) / entries.length) * 100));
+                }
+            })()
+        );
+
+        return downloadBlob(`export-${disasm?.id || "raw"}-${timestampFile()}.zip`, blob);
+    });
 };
 
 const clear = () => {
@@ -206,7 +258,7 @@ const prefsLoad = async () => {
 };
 
 export const prefsExport = async () => {
-    await downloadBlob("slicer.json", new Blob([saveState()], { type: "application/json" }));
+    await downloadBlob(`slicer-${timestampFile()}.json`, new Blob([saveState()], { type: "application/json" }));
     toast.success("Exported", {
         description: `Preferences exported successfully.`,
     });
@@ -230,11 +282,11 @@ export const handle = async (action: Action) => {
         }
         case ActionType.REMOVE: {
             const { entries } = action as BulkEntryAction;
-            return remove(entries);
+            return remove(entries || []);
         }
         case ActionType.EXPORT: {
-            const { entry } = action as EntryAction;
-            return export_(entry);
+            const { entries, disasm } = action as ExportAction;
+            return export_(entries || [], disasm);
         }
         case ActionType.CLOSE: {
             const { tab } = action as TabAction;
