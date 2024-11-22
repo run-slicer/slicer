@@ -219,7 +219,7 @@
         <MenubarTrigger class="relative">View</MenubarTrigger>
         <MenubarContent align="start">
             <MenubarSub>
-                <MenubarSubTrigger inset>Mode</MenubarSubTrigger>
+                <MenubarSubTrigger>Mode</MenubarSubTrigger>
                 <MenubarSubContent class="w-[12rem]" align="start">
                     <MenubarRadioGroup bind:value={$viewMode}>
                         <MenubarRadioItem class="justify-between" value="normal">
@@ -238,7 +238,7 @@
                 </MenubarSubContent>
             </MenubarSub>
             <MenubarSub>
-                <MenubarSubTrigger inset>Pane</MenubarSubTrigger>
+                <MenubarSubTrigger>Pane</MenubarSubTrigger>
                 <MenubarSubContent class="w-[12rem]" align="start">
                     <MenubarCheckboxItem
                         class="justify-between"
@@ -256,9 +256,16 @@
                     </MenubarCheckboxItem>
                 </MenubarSubContent>
             </MenubarSub>
+            <MenubarSub>
+                <MenubarSubTrigger>Editor</MenubarSubTrigger>
+                <MenubarSubContent class="w-[12rem]" align="start">
+                    <MenubarCheckboxItem class="justify-between" bind:checked={$editorWrap}>
+                        Wrap lines <WrapText size={16} />
+                    </MenubarCheckboxItem>
+                </MenubarSubContent>
+            </MenubarSub>
             <MenubarSeparator />
             <MenubarItem
-                inset
                 class="justify-between"
                 disabled={!tab?.entry || tab.entry.type === EntryType.ARCHIVE || tab.type === TabType.CODE}
                 onclick={() => openEntry(TabType.CODE)}
@@ -266,7 +273,6 @@
                 Code <Code size={16} />
             </MenubarItem>
             <MenubarItem
-                inset
                 class="justify-between"
                 disabled={!tab?.entry || tab.entry.type === EntryType.ARCHIVE || tab.type === TabType.HEX}
                 onclick={() => openEntry(TabType.HEX)}
@@ -274,7 +280,6 @@
                 Hexadecimal <Binary size={16} />
             </MenubarItem>
             <MenubarItem
-                inset
                 class="justify-between"
                 disabled={!tab?.entry || tab.entry.type === EntryType.ARCHIVE || tab.type === TabType.FLOW_GRAPH}
                 onclick={() => openEntry(TabType.FLOW_GRAPH)}
@@ -283,7 +288,7 @@
             </MenubarItem>
             <MenubarSeparator />
             <MenubarSub>
-                <MenubarSubTrigger inset>Encoding</MenubarSubTrigger>
+                <MenubarSubTrigger>Encoding</MenubarSubTrigger>
                 <MenubarSubContent class="w-[12rem]" align="start">
                     <MenubarRadioGroup bind:value={$workspaceEncoding}>
                         {#each Object.values(encodings) as encoding}
@@ -294,9 +299,6 @@
                     </MenubarRadioGroup>
                 </MenubarSubContent>
             </MenubarSub>
-            <MenubarCheckboxItem class="justify-between" bind:checked={$editorWrap}>
-                Wrap lines <WrapText size={16} />
-            </MenubarCheckboxItem>
         </MenubarContent>
     </MenubarMenu>
     <MenubarMenu>

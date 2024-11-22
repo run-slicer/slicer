@@ -1,4 +1,4 @@
-import { writable } from "svelte/store";
+import { type Readable, get, writable } from "svelte/store";
 import { cyrb53 } from "$lib/utils";
 import { log } from "$lib/log";
 
@@ -6,22 +6,45 @@ export interface Task {
     id: string;
     name: string;
     desc: string;
+    start?: number;
+    progress?: Readable<number>; // 0-100
+}
+
+export interface TaskResult {
+    task: Task;
+    time: number;
 }
 
 export const tasks = writable(new Map<string, Task>());
 
-const add = (task: Task) => {
+export const add = (task: Task): Task => {
+    if (task.start === undefined) {
+        task.start = Date.now();
+    }
+
     tasks.update(($tasks) => {
         $tasks.set(task.id, task);
         return $tasks;
     });
+
+    return task;
 };
 
-const remove = (id: string) => {
+export const remove = (id: string): TaskResult | null => {
+    const task = get(tasks).get(id);
+    if (!task) {
+        return null;
+    }
+
+    const time = Date.now() - (task.start || 0);
+    log(`task ${task.name} (${task.desc}) took ${time}ms`);
+
     tasks.update(($tasks) => {
         $tasks.delete(id);
         return $tasks;
     });
+
+    return { task, time };
 };
 
 export type TaskAction<T> = (task: Task) => T | PromiseLike<T>;
@@ -34,14 +57,8 @@ export interface TimedResult<T> {
 export const recordTimed = async <T>(name: string, desc: string, call: TaskAction<T>): Promise<TimedResult<T>> => {
     const task: Task = { id: cyrb53(name + desc).toString(16), name, desc };
 
-    add(task);
-    const start = Date.now();
-    const result = await call(task);
-    const end = Date.now();
-    remove(task.id);
-
-    const time = end - start;
-    log(`task ${task.name} (${task.desc}) took ${time}ms`);
+    const result = await call(add(task));
+    const { time } = remove(task.id)!;
 
     return { result, time };
 };
