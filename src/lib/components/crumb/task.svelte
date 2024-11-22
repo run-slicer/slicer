@@ -12,9 +12,9 @@
 </script>
 
 <div class="flex flex-col">
-    <span class="mb-1">{capitalize(name)}...</span>
+    <span class="mb-1">{capitalize($name)}...</span>
     <Progress value={$progress || 100} indeterminate={!progress} class="h-1" />
     {#if $desc}
-        <span class="mt-1 text-muted-foreground">{$desc}</span>
+        <span class="break-anywhere mt-1 text-muted-foreground">{$desc}</span>
     {/if}
 </div>

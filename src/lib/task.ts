@@ -4,7 +4,7 @@ import { log } from "$lib/log";
 
 export interface Task {
     id: string;
-    name: string;
+    name: Writable<string>;
     desc: Writable<string | null>;
     start?: number;
     progress?: Writable<number>; // 0-100
@@ -33,7 +33,7 @@ export const add = (task: Task): Task => {
 export const create = (name: string, desc: string | null, indeterminate: boolean = true): Task => {
     return {
         id: (cyrb53(name + desc) + Math.floor(Math.random() * 65536)).toString(16),
-        name,
+        name: writable(name),
         desc: writable(desc),
         progress: indeterminate ? undefined : writable(0),
     };
@@ -41,7 +41,7 @@ export const create = (name: string, desc: string | null, indeterminate: boolean
 
 export const phase = (task: Task): TaskResult => {
     const time = Date.now() - (task.start || 0);
-    log(`task ${task.name} (${get(task.desc)}) took ${time}ms`);
+    log(`task ${get(task.name)} (${get(task.desc)}) took ${time}ms`);
 
     task.start = Date.now(); // reset
 

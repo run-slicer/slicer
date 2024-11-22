@@ -207,21 +207,26 @@ const export_ = async (entries: Entry[], disasm?: Disassembler) => {
     return recordProgress("exporting", `${entries.length} entries`, async (exportTask) => {
         const blob = await download(
             (async function* () {
-                const task = addTask(createTask("disassembling", null));
+                const task = addTask(createTask("reading", null));
 
                 for (let i = 0; i < entries.length; i++) {
                     let entry = entries[i];
                     task.desc.set(entry.name);
 
-                    entry = await readDetail(entry);
-                    if (entry.type === EntryType.CLASS && disasm) {
-                        entry = await disassembleEntry(entry as ClassEntry, disasm);
+                    // not always accurate, but less expensive to do
+                    task.name.set(entry.extension === "class" ? "disassembling" : "reading");
+
+                    if (disasm) {
+                        entry = await readDetail(entry);
+                        if (entry.type === EntryType.CLASS) {
+                            entry = await disassembleEntry(entry as ClassEntry, disasm);
+                        }
                     }
 
                     phaseTask(task); // finished with entry
 
                     yield entry.data;
-                    exportTask.progress?.set(Math.ceil(((i + 1) / entries.length) * 100));
+                    exportTask.progress?.set(((i + 1) / entries.length) * 100);
                 }
 
                 removeTask(task, false);
