@@ -44,13 +44,13 @@ import {
 } from "$lib/script";
 import { clear as clearState, load as loadState, save as saveState } from "$lib/state";
 import {
+    add as addTask,
+    create as createTask,
+    phase as phaseTask,
     record,
     recordProgress,
     recordTimed,
-    add as addTask,
-    create as createTask,
     remove as removeTask,
-    phase as phaseTask,
 } from "$lib/task";
 import { disassembleEntry, type Disassembler } from "$lib/disasm";
 import { download } from "$lib/workspace/data";
@@ -225,7 +225,11 @@ const export_ = async (entries: Entry[], disasm?: Disassembler) => {
 
                     phaseTask(task); // finished with entry
 
-                    yield entry.data;
+                    // exclude archives that have been expanded
+                    if (entry.type !== EntryType.ARCHIVE || !entries.some((e) => e.parent === entry)) {
+                        yield entry.data;
+                    }
+
                     exportTask.progress?.set(((i + 1) / entries.length) * 100);
                 }
 
