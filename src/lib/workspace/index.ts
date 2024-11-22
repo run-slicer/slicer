@@ -81,12 +81,14 @@ const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 
 export const transformEntry = (entry: Entry, ext: string, value: string): Entry => {
+    const name = replaceExt(entry.name, ext);
+
     return {
         type: EntryType.FILE,
-        name: replaceExt(entry.name, ext),
+        name,
         shortName: replaceExt(entry.shortName, ext),
         extension: ext,
-        data: memoryData(replaceExt(entry.name, ext), encoder.encode(value), decoder),
+        data: memoryData(name, encoder.encode(value), decoder),
     };
 };
 

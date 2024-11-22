@@ -227,7 +227,7 @@ const export_ = async (entries: Entry[], disasm?: Disassembler) => {
 
                     // exclude archives that have been expanded
                     if (entry.type !== EntryType.ARCHIVE || !entries.some((e) => e.parent === entry)) {
-                        yield entry.data;
+                        yield { ...entry.data, name: entry.name };
                     }
 
                     exportTask.progress?.set(((i + 1) / entries.length) * 100);
