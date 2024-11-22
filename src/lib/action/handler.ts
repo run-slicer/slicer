@@ -22,28 +22,36 @@ import { get } from "svelte/store";
 import {
     clear as clearTabs,
     current as currentTab,
-    updateCurrent as updateCurrentTab,
+    detectType as detectTabType,
     find as findTab,
     remove as removeTab,
     type Tab,
     tabs,
     TabType,
     update as updateTab,
-    detectType as detectTabType,
+    updateCurrent as updateCurrentTab,
 } from "$lib/tab";
 import { toast } from "svelte-sonner";
 import { downloadBlob, partition, readFiles, timestampFile } from "$lib/utils";
 import { tabIcon } from "$lib/components/icons";
 import { error } from "$lib/log";
 import {
-    read as readScript,
     load as loadScript,
-    unload as unloadScript,
-    remove as removeScript,
     type ProtoScript,
+    read as readScript,
+    remove as removeScript,
+    unload as unloadScript,
 } from "$lib/script";
-import { load as loadState, save as saveState, clear as clearState } from "$lib/state";
-import { record, recordTimed, recordProgress } from "$lib/task";
+import { clear as clearState, load as loadState, save as saveState } from "$lib/state";
+import {
+    record,
+    recordProgress,
+    recordTimed,
+    add as addTask,
+    create as createTask,
+    remove as removeTask,
+    phase as phaseTask,
+} from "$lib/task";
 import { disassembleEntry, type Disassembler } from "$lib/disasm";
 import { download } from "$lib/workspace/data";
 
@@ -170,10 +178,6 @@ const remove = async (entries: Entry[]) => {
     });
 };
 
-const recordDisasm = (entry: ClassEntry, disasm: Disassembler): Promise<Entry> => {
-    return record("disassembling", entry.name, () => disassembleEntry(entry, disasm));
-};
-
 const export_ = async (entries: Entry[], disasm?: Disassembler) => {
     switch (entries.length) {
         case 0: {
@@ -190,7 +194,9 @@ const export_ = async (entries: Entry[], disasm?: Disassembler) => {
             return record("exporting", entry.name, async () => {
                 let entry0 = await readDetail(entry);
                 if (entry.type === EntryType.CLASS && disasm) {
-                    entry0 = await recordDisasm(entry as ClassEntry, disasm);
+                    entry0 = await record("disassembling", entry.name, () =>
+                        disassembleEntry(entry as ClassEntry, disasm)
+                    );
                 }
 
                 return downloadBlob(entry0.shortName, await entry0.data.blob());
@@ -198,18 +204,27 @@ const export_ = async (entries: Entry[], disasm?: Disassembler) => {
         }
     }
 
-    return recordProgress("exporting", `${entries.length} entries`, async (task) => {
+    return recordProgress("exporting", `${entries.length} entries`, async (exportTask) => {
         const blob = await download(
             (async function* () {
+                const task = addTask(createTask("disassembling", null));
+
                 for (let i = 0; i < entries.length; i++) {
-                    let entry = await readDetail(entries[i]);
+                    let entry = entries[i];
+                    task.desc.set(entry.name);
+
+                    entry = await readDetail(entry);
                     if (entry.type === EntryType.CLASS && disasm) {
-                        entry = await recordDisasm(entry as ClassEntry, disasm);
+                        entry = await disassembleEntry(entry as ClassEntry, disasm);
                     }
 
+                    phaseTask(task); // finished with entry
+
                     yield entry.data;
-                    task.progress?.set(Math.ceil(((i + 1) / entries.length) * 100));
+                    exportTask.progress?.set(Math.ceil(((i + 1) / entries.length) * 100));
                 }
+
+                removeTask(task, false);
             })()
         );
 

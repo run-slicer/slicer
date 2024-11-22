@@ -1,11 +1,11 @@
-import { type Writable, get, writable } from "svelte/store";
+import { get, type Writable, writable } from "svelte/store";
 import { cyrb53 } from "$lib/utils";
 import { log } from "$lib/log";
 
 export interface Task {
     id: string;
     name: string;
-    desc: string;
+    desc: Writable<string | null>;
     start?: number;
     progress?: Writable<number>; // 0-100
 }
@@ -30,21 +30,32 @@ export const add = (task: Task): Task => {
     return task;
 };
 
-export const remove = (id: string): TaskResult | null => {
-    const task = get(tasks).get(id);
-    if (!task) {
-        return null;
-    }
+export const create = (name: string, desc: string | null, indeterminate: boolean = true): Task => {
+    return {
+        id: (cyrb53(name + desc) + Math.floor(Math.random() * 65536)).toString(16),
+        name,
+        desc: writable(desc),
+        progress: indeterminate ? undefined : writable(0),
+    };
+};
 
+export const phase = (task: Task): TaskResult => {
     const time = Date.now() - (task.start || 0);
-    log(`task ${task.name} (${task.desc}) took ${time}ms`);
+    log(`task ${task.name} (${get(task.desc)}) took ${time}ms`);
 
+    task.start = Date.now(); // reset
+
+    return { task, time };
+};
+
+export const remove = (task: Task, shouldPhase: boolean = false): TaskResult => {
+    const result = shouldPhase ? phase(task) : { task, time: Date.now() - (task.start || 0) };
     tasks.update(($tasks) => {
-        $tasks.delete(id);
+        $tasks.delete(task.id);
         return $tasks;
     });
 
-    return { task, time };
+    return result;
 };
 
 export type TaskAction<T> = (task: Task) => T | PromiseLike<T>;
@@ -54,24 +65,28 @@ export interface TimedResult<T> {
     time: number;
 }
 
-export const recordTimed = async <T>(name: string, desc: string, call: TaskAction<T>): Promise<TimedResult<T>> => {
-    const task: Task = { id: cyrb53(name + desc).toString(16), name, desc };
+export const recordTimed = async <T>(
+    name: string,
+    desc: string | null,
+    call: TaskAction<T>
+): Promise<TimedResult<T>> => {
+    const task = create(name, desc);
 
     const result = await call(add(task));
-    const { time } = remove(task.id)!;
+    const { time } = remove(task);
 
     return { result, time };
 };
 
-export const recordProgress = async <T>(name: string, desc: string, call: TaskAction<T>): Promise<T> => {
-    const task: Task = { id: cyrb53(name + desc).toString(16), name, desc, progress: writable(0) };
+export const recordProgress = async <T>(name: string, desc: string | null, call: TaskAction<T>): Promise<T> => {
+    const task = create(name, desc, false);
 
     const result = await call(add(task));
-    remove(task.id);
+    remove(task);
 
     return result;
 };
 
-export const record = async <T>(name: string, desc: string, call: TaskAction<T>): Promise<T> => {
+export const record = async <T>(name: string, desc: string | null, call: TaskAction<T>): Promise<T> => {
     return (await recordTimed(name, desc, call)).result;
 };
