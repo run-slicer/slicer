@@ -31,12 +31,24 @@ const createSource = (classes: Map<string, Entry>, name: string, buf: Uint8Array
 
 type DisassemblyFunc = (entry: ClassEntry) => Promise<string>;
 
-export const createFunc = (worker: Worker): DisassemblyFunc => {
+export const createFunc = (numWorkers: number, workerFunc: () => Worker): DisassemblyFunc => {
+    const workers = new Array<Worker>(numWorkers);
+    for (let i = 0; i < numWorkers; i++) {
+        workers[i] = workerFunc();
+    }
+
+    let currWorker = 0;
     return async (entry) => {
         const { node, data } = entry;
 
         const buf = await data.bytes();
         const name = (node.pool[node.thisClass.name] as UTF8Entry).decode();
+
+        // evenly distribute load
+        const worker = workers[currWorker++];
+        if (currWorker >= workers.length) {
+            currWorker = 0; // wrap around
+        }
 
         const classes0 = get(classes);
         return await worker.run(name, Array.from(classes0.keys()), proxy(createSource(classes0, name, buf)));

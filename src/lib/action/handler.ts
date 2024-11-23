@@ -32,7 +32,7 @@ import {
     updateCurrent as updateCurrentTab,
 } from "$lib/tab";
 import { toast } from "svelte-sonner";
-import { downloadBlob, partition, readFiles, timestampFile } from "$lib/utils";
+import { chunk, downloadBlob, partition, readFiles, timestampFile } from "$lib/utils";
 import { tabIcon } from "$lib/components/icons";
 import { error } from "$lib/log";
 import {
@@ -53,7 +53,7 @@ import {
     remove as removeTask,
 } from "$lib/task";
 import { disassembleEntry, type Disassembler } from "$lib/disasm";
-import { download } from "$lib/workspace/data";
+import { type Data, download } from "$lib/workspace/data";
 
 const load = async () => {
     const files = await readFiles(".jar,.zip", true);
@@ -207,34 +207,47 @@ const export_ = async (entries: Entry[], disasm?: Disassembler) => {
     return recordProgress("exporting", `${entries.length} entries`, async (exportTask) => {
         const blob = await download(
             (async function* () {
-                const task = addTask(createTask("reading", null));
+                const chunks = chunk(entries, Math.ceil(entries.length / (disasm?.concurrency || 1)));
 
-                for (let i = 0; i < entries.length; i++) {
-                    let entry = entries[i];
-                    task.desc.set(entry.name);
+                let count = 0;
+                const promises = await Promise.all(
+                    chunks.map(async (chunk: Entry[]) => {
+                        const task = addTask(createTask("reading", null));
 
-                    // not always accurate, but less expensive to do
-                    task.name.set(entry.extension === "class" ? "disassembling" : "reading");
+                        const results: Data[] = [];
+                        for (let entry of chunk) {
+                            task.desc.set(entry.name);
+                            // not always accurate, but less expensive to do
+                            task.name.set(disasm && entry.extension === "class" ? "disassembling" : "reading");
 
-                    if (disasm) {
-                        entry = await readDetail(entry);
-                        if (entry.type === EntryType.CLASS) {
-                            entry = await disassembleEntry(entry as ClassEntry, disasm);
+                            if (disasm) {
+                                entry = await readDetail(entry);
+                                if (entry.type === EntryType.CLASS) {
+                                    entry = await disassembleEntry(entry as ClassEntry, disasm);
+                                }
+                            }
+
+                            // finished with entry
+                            count++;
+                            phaseTask(task);
+
+                            // exclude archives that have been expanded
+                            if (entry.type !== EntryType.ARCHIVE || !entries.some((e) => e.parent === entry)) {
+                                results.push({ ...entry.data, name: entry.name });
+                            }
+
+                            exportTask.desc.set(`${entries.length} entries (${entries.length - count} remaining)`);
+                            exportTask.progress?.set((count / entries.length) * 100);
                         }
-                    }
 
-                    phaseTask(task); // finished with entry
+                        removeTask(task, false);
+                        return results;
+                    })
+                );
 
-                    // exclude archives that have been expanded
-                    if (entry.type !== EntryType.ARCHIVE || !entries.some((e) => e.parent === entry)) {
-                        yield { ...entry.data, name: entry.name };
-                    }
-
-                    exportTask.desc.set(`${entries.length} entries (${(entries.length - (i + 1))} remaining)`);
-                    exportTask.progress?.set(((i + 1) / entries.length) * 100);
+                for (const data of promises.flat()) {
+                    yield data;
                 }
-
-                removeTask(task, false);
             })()
         );
 

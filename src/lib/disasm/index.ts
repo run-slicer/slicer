@@ -7,7 +7,8 @@ import { cfr, jasm, vf } from "./builtin";
 export interface Disassembler {
     id: string;
     name?: string;
-    lang?: Language;
+    language?: Language;
+    concurrency?: number;
 
     run(entry: ClassEntry): Promise<string>;
 }
@@ -49,5 +50,5 @@ export const disassemble = async (entry: ClassEntry, disasm: Disassembler): Prom
 };
 
 export const disassembleEntry = async (entry: ClassEntry, disasm: Disassembler): Promise<Entry> => {
-    return transformEntry(entry, toExtension(disasm.lang || "plaintext"), await disassemble(entry, disasm));
+    return transformEntry(entry, toExtension(disasm.language || "plaintext"), await disassemble(entry, disasm));
 };

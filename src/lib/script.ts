@@ -83,7 +83,7 @@ const wrapDisasm = (disasm: Disassembler): ScriptDisassembler => {
     return {
         id: disasm.id,
         label: disasm.name,
-        language: disasm.lang,
+        language: disasm.language,
 
         run(data: Uint8Array): Promise<string> {
             // create simulated entry
@@ -106,7 +106,7 @@ const unwrapDisasm = (disasm: ScriptDisassembler): Disassembler => {
     return {
         id: disasm.id,
         name: disasm.label,
-        lang: disasm.language as Language,
+        language: disasm.language as Language,
 
         async run(entry: ClassEntry): Promise<string> {
             return disasm.run(await entry.data.bytes());

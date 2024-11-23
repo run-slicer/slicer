@@ -225,7 +225,7 @@
                             {#each disasms as dism}
                                 <MenubarItem class="justify-between" onclick={() => exportEntries(dism)}>
                                     {dism.name || dism.id}
-                                    {#if dism.lang === "java"}
+                                    {#if dism.language === "java"}
                                         <Coffee size={16} class="text-red-500" />
                                     {/if}
                                 </MenubarItem>

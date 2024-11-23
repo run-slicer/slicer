@@ -13,7 +13,7 @@ export const detectLanguage = (tabType: TabType, entry: Entry, disasm: Disassemb
         return "hex";
     } else if (entry.type === EntryType.CLASS) {
         // disassembled view
-        return disasm.lang || "plaintext";
+        return disasm.language || "plaintext";
     }
 
     return entry.extension ? fromExtension(entry.extension) : "plaintext";

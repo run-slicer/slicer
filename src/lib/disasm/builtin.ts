@@ -8,20 +8,23 @@ import VFWorker from "./worker/vf?worker";
 export const cfr: Disassembler = {
     id: "cfr",
     name: "CFR",
-    lang: "java",
-    run: createFunc(wrap<Worker>(new CFRWorker())),
+    language: "java",
+    concurrency: 5,
+    run: createFunc(5, () => wrap<Worker>(new CFRWorker())),
 };
 
 export const jasm: Disassembler = {
     id: "jasm",
     name: "JASM",
-    lang: "jasm",
-    run: createFunc(wrap<Worker>(new JASMWorker())),
+    language: "jasm",
+    concurrency: 5,
+    run: createFunc(5, () => wrap<Worker>(new JASMWorker())),
 };
 
 export const vf: Disassembler = {
     id: "vf",
     name: "Vineflower",
-    lang: "java",
-    run: createFunc(wrap<Worker>(new VFWorker())),
+    language: "java",
+    concurrency: 5,
+    run: createFunc(5, () => wrap<Worker>(new VFWorker())),
 };
