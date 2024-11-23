@@ -230,6 +230,7 @@ const export_ = async (entries: Entry[], disasm?: Disassembler) => {
                         yield { ...entry.data, name: entry.name };
                     }
 
+                    exportTask.desc.set(`${entries.length} entries (${(entries.length - (i + 1))} remaining)`);
                     exportTask.progress?.set(((i + 1) / entries.length) * 100);
                 }
 
