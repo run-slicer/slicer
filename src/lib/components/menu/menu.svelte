@@ -69,6 +69,8 @@
         Sun,
         MonitorX,
         Coffee,
+        BookOpen,
+        Info,
     } from "lucide-svelte";
     import { toast } from "svelte-sonner";
     import { themes } from "$lib/theme";
@@ -134,7 +136,12 @@
     <MenubarMenu>
         <MenubarTrigger class="font-bold">slicer</MenubarTrigger>
         <MenubarContent align="start">
-            <MenubarItem onclick={() => (aboutOpen = true)}>About</MenubarItem>
+            <MenubarItem class="justify-between" onclick={() => (aboutOpen = true)}>
+                About <Info size={16} />
+            </MenubarItem>
+            <MenubarItem class="justify-between" onclick={() => window.open("https://docs.slicer.run/", "_blank")}>
+                Documentation <BookOpen size={16} />
+            </MenubarItem>
             <MenubarSeparator />
             <MenubarSub>
                 <MenubarSubTrigger>Theme</MenubarSubTrigger>
