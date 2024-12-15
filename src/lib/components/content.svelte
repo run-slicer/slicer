@@ -4,7 +4,7 @@
     import { ResizableHandle, ResizablePane, ResizablePaneGroup } from "$lib/components/ui/resizable";
     import type { Entry } from "$lib/workspace";
     import { type Tab, updateCurrent } from "$lib/tab";
-    import { projectOpen, loggingOpen } from "$lib/state";
+    import { loggingOpen, projectOpen } from "$lib/state";
     import { distractionFree } from "$lib/mode";
     import { type ActionHandler, ActionType, type TabAction } from "$lib/action";
     import type { LogEntry } from "$lib/log";

@@ -1,26 +1,26 @@
 <script lang="ts" module>
     import {
-        keymap,
-        highlightSpecialChars,
-        drawSelection,
-        highlightActiveLine,
-        dropCursor,
-        rectangularSelection,
         crosshairCursor,
-        lineNumbers,
+        drawSelection,
+        dropCursor,
+        highlightActiveLine,
         highlightActiveLineGutter,
+        highlightSpecialChars,
+        keymap,
+        lineNumbers,
+        rectangularSelection,
     } from "@codemirror/view";
-    import { type Extension, EditorState } from "@codemirror/state";
+    import { EditorState, type Extension } from "@codemirror/state";
     import {
-        defaultHighlightStyle,
-        syntaxHighlighting,
-        indentOnInput,
         bracketMatching,
+        defaultHighlightStyle,
         foldGutter,
         foldKeymap,
+        indentOnInput,
+        syntaxHighlighting,
     } from "@codemirror/language";
     import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
-    import { searchKeymap, search, highlightSelectionMatches } from "@codemirror/search";
+    import { highlightSelectionMatches, search, searchKeymap } from "@codemirror/search";
 
     export const basicSetup: Extension = (() => [
         lineNumbers(),

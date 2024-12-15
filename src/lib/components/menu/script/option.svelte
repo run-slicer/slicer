@@ -1,13 +1,13 @@
 <script lang="ts">
     import ScriptOption from "./option.svelte";
     import {
-        MenubarItem,
         MenubarCheckboxItem,
+        MenubarItem,
+        MenubarRadioGroup,
+        MenubarRadioItem,
         MenubarSub,
         MenubarSubContent,
         MenubarSubTrigger,
-        MenubarRadioItem,
-        MenubarRadioGroup,
     } from "$lib/components/ui/menubar";
     import type { CheckboxOption, GroupOption, Option, RadioOption } from "@run-slicer/script";
     import type { ProtoScript } from "$lib/script";

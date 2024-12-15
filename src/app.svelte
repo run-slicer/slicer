@@ -5,7 +5,7 @@
     import Crumb from "$lib/components/crumb/crumb.svelte";
     import { Toaster } from "$lib/components/ui/sonner";
     import { current as currentTab, tabs } from "$lib/tab";
-    import { entries, classes } from "$lib/workspace";
+    import { classes, entries } from "$lib/workspace";
     import { current as currentEncoding } from "$lib/workspace/encoding";
     import { scripts } from "$lib/script";
     import { entries as logEntries } from "$lib/log";

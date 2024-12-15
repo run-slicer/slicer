@@ -1,9 +1,9 @@
 <script lang="ts">
-    import { CommandDialog, CommandInput, CommandList, CommandGroup, CommandItem } from "$lib/components/ui/command";
+    import { CommandDialog, CommandGroup, CommandInput, CommandItem, CommandList } from "$lib/components/ui/command";
     import { onMount } from "svelte";
     import type { Entry } from "$lib/workspace";
     import { fileIcon } from "$lib/components/icons";
-    import { type EntryAction, ActionType, handle } from "$lib/action";
+    import { ActionType, type EntryAction, handle } from "$lib/action";
     import { Search } from "lucide-svelte";
     import { cn } from "$lib/components/utils";
     import { VList } from "virtua/svelte";

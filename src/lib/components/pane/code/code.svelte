@@ -7,7 +7,7 @@
     import { CodeEditor } from "$lib/components/editor";
     import { Select, SelectContent, SelectItem, SelectTrigger } from "$lib/components/ui/select";
     import { vf } from "$lib/disasm/builtin";
-    import { toolsDisasm, editorTextSize, editorTextSizeSync, editorWrap } from "$lib/state";
+    import { editorTextSize, editorTextSizeSync, editorWrap, toolsDisasm } from "$lib/state";
     import { get, writable } from "svelte/store";
     import type { Disassembler } from "$lib/disasm";
     import { ContextMenu, ContextMenuTrigger } from "$lib/components/ui/context-menu";

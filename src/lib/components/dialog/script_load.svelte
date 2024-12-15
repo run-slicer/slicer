@@ -1,11 +1,11 @@
 <script lang="ts">
     import {
         Dialog,
-        DialogHeader,
         DialogContent,
         DialogDescription,
-        DialogTitle,
         DialogFooter,
+        DialogHeader,
+        DialogTitle,
     } from "$lib/components/ui/dialog";
     import { Label } from "$lib/components/ui/label";
     import { Input } from "$lib/components/ui/input";

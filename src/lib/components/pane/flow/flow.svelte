@@ -5,7 +5,7 @@
     import type { Member } from "@run-slicer/asm";
     import { Lock, LockOpen, Zap, ZapOff } from "lucide-svelte";
     import { mode } from "mode-watcher";
-    import { Background, Controls, SvelteFlow, ControlButton } from "@xyflow/svelte";
+    import { Background, ControlButton, Controls, SvelteFlow } from "@xyflow/svelte";
     import { Select, SelectContent, SelectItem, SelectTrigger } from "$lib/components/ui/select";
     import FlowNode from "./node.svelte";
     import { createComputedGraph } from "./graph";

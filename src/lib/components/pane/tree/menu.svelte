@@ -16,8 +16,8 @@
         ContextMenuItem,
         ContextMenuSeparator,
         ContextMenuSub,
-        ContextMenuSubTrigger,
         ContextMenuSubContent,
+        ContextMenuSubTrigger,
     } from "$lib/components/ui/context-menu";
 
     interface Props {
