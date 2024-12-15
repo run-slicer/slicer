@@ -192,14 +192,21 @@ const export_ = async (entries: Entry[], disasm?: Disassembler) => {
             const entry = entries[0];
 
             return record("exporting", entry.name, async () => {
-                let entry0 = await readDetail(entry);
-                if (entry.type === EntryType.CLASS && disasm) {
-                    entry0 = await record("disassembling", entry.name, () =>
-                        disassembleEntry(entry as ClassEntry, disasm)
-                    );
-                }
+                try {
+                    let entry0 = await readDetail(entry);
+                    if (entry.type === EntryType.CLASS && disasm) {
+                        entry0 = await record("disassembling", entry.name, () =>
+                            disassembleEntry(entry as ClassEntry, disasm)
+                        );
+                    }
 
-                return downloadBlob(entry0.shortName, await entry0.data.blob());
+                    return downloadBlob(entry0.shortName, await entry0.data.blob());
+                } catch (e) {
+                    error(`failed to read entry ${entry.name}`, e);
+                    toast.error("Error occurred", {
+                        description: `Could not read entry ${entry.name}, check the console.`,
+                    });
+                }
             });
         }
     }
@@ -220,11 +227,15 @@ const export_ = async (entries: Entry[], disasm?: Disassembler) => {
                             // not always accurate, but less expensive to do
                             task.name.set(disasm && entry.extension === "class" ? "disassembling" : "reading");
 
-                            if (disasm) {
-                                entry = await readDetail(entry);
-                                if (entry.type === EntryType.CLASS) {
-                                    entry = await disassembleEntry(entry as ClassEntry, disasm);
+                            try {
+                                if (disasm) {
+                                    entry = await readDetail(entry);
+                                    if (entry.type === EntryType.CLASS) {
+                                        entry = await disassembleEntry(entry as ClassEntry, disasm);
+                                    }
                                 }
+                            } catch (e) {
+                                error(`failed to read entry ${entry.name}`, e);
                             }
 
                             // finished with entry
@@ -248,7 +259,13 @@ const export_ = async (entries: Entry[], disasm?: Disassembler) => {
                 for (const data of promises.flat()) {
                     yield data;
                 }
-            })()
+            })(),
+            (data, e) => {
+                error(`failed to read entry ${data.name}`, e);
+                toast.error("Error occurred", {
+                    description: `Could not read entry ${data.name}, check the console.`,
+                });
+            }
         );
 
         return downloadBlob(`export-${disasm?.id || "raw"}-${timestampFile()}.zip`, blob);
