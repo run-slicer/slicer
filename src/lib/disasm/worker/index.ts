@@ -1,7 +1,7 @@
 import { type ClassEntry, classes, type Entry, EntryType, readDetail } from "$lib/workspace";
 import type { UTF8Entry } from "@run-slicer/asm/pool";
-import { get } from "svelte/store";
 import { proxy } from "comlink";
+import { get } from "svelte/store";
 
 export interface Worker {
     run(name: string, resources: string[], source: EntrySource): Promise<string>;

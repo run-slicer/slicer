@@ -1,6 +1,6 @@
-import { type Entry, type ClassEntry, transformEntry } from "$lib/workspace";
 import { type Language, toExtension } from "$lib/lang";
 import { error } from "$lib/log";
+import { type ClassEntry, type Entry, transformEntry } from "$lib/workspace";
 import { get, writable } from "svelte/store";
 import { cfr, jasm, vf } from "./builtin";
 

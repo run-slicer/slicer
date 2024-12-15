@@ -1,8 +1,8 @@
-import { type Entry, EntryType } from "$lib/workspace";
-import { get, writable } from "svelte/store";
 import type { StyledIcon } from "$lib/components/icons";
-import { Sparkles } from "lucide-svelte";
 import { workspaceEncoding } from "$lib/state";
+import { type Entry, EntryType } from "$lib/workspace";
+import { Sparkles } from "lucide-svelte";
+import { get, writable } from "svelte/store";
 
 export const enum TabType {
     WELCOME = "welcome",

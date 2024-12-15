@@ -1,5 +1,5 @@
-import { persisted } from "$lib/utils";
 import { error } from "$lib/log";
+import { persisted } from "$lib/utils";
 
 export const root = "slicer.state";
 

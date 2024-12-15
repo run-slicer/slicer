@@ -1,8 +1,8 @@
-import { type ClassEntry, type Entry, EntryType } from "$lib/workspace";
 import { disassemble, type Disassembler } from "$lib/disasm";
-import { formatHex } from "./hex";
 import { fromExtension, type Language } from "$lib/lang";
 import { TabType } from "$lib/tab";
+import { type ClassEntry, type Entry, EntryType } from "$lib/workspace";
+import { formatHex } from "./hex";
 
 export const isDisassembled = (tabType: TabType, entry: Entry): boolean => {
     return tabType === TabType.HEX || entry.type === EntryType.CLASS;

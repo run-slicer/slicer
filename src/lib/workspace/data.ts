@@ -1,5 +1,5 @@
+import type { Entry, Zip } from "@run-slicer/zip";
 import { get } from "svelte/store";
-import type { Zip, Entry } from "@run-slicer/zip";
 import { decoder } from "./encoding";
 
 export interface BlobLike {

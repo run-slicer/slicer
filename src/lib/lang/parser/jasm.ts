@@ -1,4 +1,4 @@
-import { type StreamParser, StreamLanguage, LanguageSupport } from "@codemirror/language";
+import { type StreamParser, LanguageSupport, StreamLanguage } from "@codemirror/language";
 
 interface State {
     braces: boolean[]; // marks whether a block contains a label

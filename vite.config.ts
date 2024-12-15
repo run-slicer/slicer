@@ -1,7 +1,7 @@
-import { defineConfig } from "vite";
-import { resolve } from "path";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
+import { resolve } from "path";
 import { sveltePreprocess } from "svelte-preprocess";
+import { defineConfig } from "vite";
 import sitemap from "vite-plugin-sitemap";
 
 // https://vitejs.dev/config/

@@ -1,10 +1,10 @@
-import { derived, get, writable } from "svelte/store";
-import { type Node, read } from "@run-slicer/asm";
-import type { Zip } from "@run-slicer/zip";
 import { error, warn } from "$lib/log";
 import { rootContext } from "$lib/script";
 import { workspaceArchiveEncoding, workspaceArchiveNested } from "$lib/state";
-import { type Data, type Named, transformData, parseName, fileData, zipData, memoryData } from "./data";
+import { type Node, read } from "@run-slicer/asm";
+import type { Zip } from "@run-slicer/zip";
+import { derived, get, writable } from "svelte/store";
+import { type Data, fileData, memoryData, type Named, parseName, transformData, zipData } from "./data";
 
 export const enum EntryType {
     FILE = "file",

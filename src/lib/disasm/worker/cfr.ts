@@ -1,5 +1,5 @@
-import type { Worker, EntrySource } from "./";
 import { expose } from "comlink";
+import type { EntrySource, Worker } from "./";
 
 expose({
     async run(name: string, _resources: string[], source: EntrySource): Promise<string> {

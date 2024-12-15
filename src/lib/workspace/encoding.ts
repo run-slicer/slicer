@@ -1,5 +1,5 @@
-import { derived } from "svelte/store";
 import { workspaceEncoding } from "$lib/state";
+import { derived } from "svelte/store";
 
 export interface Encoding {
     id: string;

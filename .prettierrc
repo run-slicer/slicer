@@ -3,6 +3,7 @@
     "singleQuote": false,
     "semi": true,
     "trailingComma": "es5",
-    "plugins": ["prettier-plugin-svelte", "prettier-plugin-tailwindcss"],
+    "organizeImportsSkipDestructiveCodeActions": true,
+    "plugins": ["prettier-plugin-organize-imports", "prettier-plugin-svelte", "prettier-plugin-tailwindcss"],
     "overrides": [{ "files": "*.svelte", "options": { "parser": "svelte" } }]
 }

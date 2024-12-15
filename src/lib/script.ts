@@ -1,27 +1,3 @@
-import { toast } from "svelte-sonner";
-import { get, writable } from "svelte/store";
-import { error } from "$lib/log";
-import { scriptingScripts } from "$lib/state";
-import { cyrb53 } from "$lib/utils";
-import type {
-    Disassembler as ScriptDisassembler,
-    DisassemblerContext,
-    EditorContext,
-    Entry as ScriptEntry,
-    EntryType as ScriptEntryType,
-    Event,
-    EventListener,
-    EventMap,
-    EventType,
-    Script,
-    ScriptContext,
-    Tab as ScriptTab,
-    TabType as ScriptTabType,
-} from "@run-slicer/script";
-import { current as currentTab, find as findTab, refresh as refreshTab, type Tab, tabs, TabType } from "$lib/tab";
-import { type ClassEntry, type Entry, EntryType, readDetail } from "$lib/workspace";
-import { DataType, type MemoryData, unwrapTransform } from "$lib/workspace/data";
-import { read as readNode } from "@run-slicer/asm";
 import {
     add as addDisasm,
     all as disasms,
@@ -30,6 +6,30 @@ import {
     remove as removeDisasm,
 } from "$lib/disasm";
 import type { Language } from "$lib/lang";
+import { error } from "$lib/log";
+import { scriptingScripts } from "$lib/state";
+import { current as currentTab, find as findTab, refresh as refreshTab, type Tab, tabs, TabType } from "$lib/tab";
+import { cyrb53 } from "$lib/utils";
+import { type ClassEntry, type Entry, EntryType, readDetail } from "$lib/workspace";
+import { DataType, type MemoryData, unwrapTransform } from "$lib/workspace/data";
+import { read as readNode } from "@run-slicer/asm";
+import type {
+    DisassemblerContext,
+    EditorContext,
+    Event,
+    EventListener,
+    EventMap,
+    EventType,
+    Script,
+    ScriptContext,
+    Disassembler as ScriptDisassembler,
+    Entry as ScriptEntry,
+    EntryType as ScriptEntryType,
+    Tab as ScriptTab,
+    TabType as ScriptTabType,
+} from "@run-slicer/script";
+import { toast } from "svelte-sonner";
+import { get, writable } from "svelte/store";
 
 export const enum ScriptState {
     UNLOADED,

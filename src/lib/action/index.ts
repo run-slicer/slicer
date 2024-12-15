@@ -1,8 +1,8 @@
-import type { Entry } from "$lib/workspace";
-import type { Tab, TabType } from "$lib/tab";
-import type { ProtoScript } from "$lib/script";
-import { handle } from "./handler";
 import type { Disassembler } from "$lib/disasm";
+import type { ProtoScript } from "$lib/script";
+import type { Tab, TabType } from "$lib/tab";
+import type { Entry } from "$lib/workspace";
+import { handle } from "./handler";
 
 export const enum ActionType {
     LOAD,

@@ -1,39 +1,5 @@
-import {
-    type Action,
-    ActionType,
-    type BulkEntryAction,
-    type ExportAction,
-    type OpenAction,
-    type ScriptAction,
-    type ScriptAddAction,
-    type TabAction,
-} from "./";
-import {
-    type ClassEntry,
-    clear as clearWs,
-    type Entry,
-    EntryType,
-    loadFile,
-    loadZip,
-    readDetail,
-    remove as removeWs,
-} from "$lib/workspace";
-import { get } from "svelte/store";
-import {
-    clear as clearTabs,
-    current as currentTab,
-    detectType as detectTabType,
-    find as findTab,
-    remove as removeTab,
-    type Tab,
-    tabs,
-    TabType,
-    update as updateTab,
-    updateCurrent as updateCurrentTab,
-} from "$lib/tab";
-import { toast } from "svelte-sonner";
-import { chunk, downloadBlob, partition, readFiles, timestampFile } from "$lib/utils";
 import { tabIcon } from "$lib/components/icons";
+import { disassembleEntry, type Disassembler } from "$lib/disasm";
 import { error } from "$lib/log";
 import {
     load as loadScript,
@@ -44,6 +10,18 @@ import {
 } from "$lib/script";
 import { clear as clearState, load as loadState, save as saveState } from "$lib/state";
 import {
+    clear as clearTabs,
+    current as currentTab,
+    detectType as detectTabType,
+    find as findTab,
+    remove as removeTab,
+    type Tab,
+    tabs,
+    TabType,
+    updateCurrent as updateCurrentTab,
+    update as updateTab,
+} from "$lib/tab";
+import {
     add as addTask,
     create as createTask,
     phase as phaseTask,
@@ -52,8 +30,30 @@ import {
     recordTimed,
     remove as removeTask,
 } from "$lib/task";
-import { disassembleEntry, type Disassembler } from "$lib/disasm";
+import { chunk, downloadBlob, partition, readFiles, timestampFile } from "$lib/utils";
+import {
+    type ClassEntry,
+    clear as clearWs,
+    type Entry,
+    EntryType,
+    loadFile,
+    loadZip,
+    readDetail,
+    remove as removeWs,
+} from "$lib/workspace";
 import { type Data, download } from "$lib/workspace/data";
+import { toast } from "svelte-sonner";
+import { get } from "svelte/store";
+import {
+    type Action,
+    ActionType,
+    type BulkEntryAction,
+    type ExportAction,
+    type OpenAction,
+    type ScriptAction,
+    type ScriptAddAction,
+    type TabAction,
+} from "./";
 
 const load = async () => {
     const files = await readFiles(".jar,.zip", true);

@@ -1,11 +1,11 @@
-import type { Node, Edge, MarkerType } from "@xyflow/svelte";
+import { graphlib, layout } from "@dagrejs/dagre";
 import type { Member } from "@run-slicer/asm";
-import { type Pool, formatEntry } from "@run-slicer/asm/pool";
-import type { CodeAttribute } from "@run-slicer/asm/attr";
-import { AttributeType } from "@run-slicer/asm/spec";
-import { formatInsn } from "@run-slicer/asm/insn";
 import { type Node as GraphNode, EdgeType, computeGraph } from "@run-slicer/asm/analysis/graph";
-import { layout, graphlib } from "@dagrejs/dagre";
+import type { CodeAttribute } from "@run-slicer/asm/attr";
+import { formatInsn } from "@run-slicer/asm/insn";
+import { type Pool, formatEntry } from "@run-slicer/asm/pool";
+import { AttributeType } from "@run-slicer/asm/spec";
+import type { Edge, MarkerType, Node } from "@xyflow/svelte";
 
 export type NodeData = {
     node: GraphNode;

@@ -1,5 +1,5 @@
-import { read } from "./reader";
-import type { Worker } from "./";
 import { expose } from "comlink";
+import type { Worker } from "./";
+import { read } from "./reader";
 
 expose({ read } satisfies Worker);

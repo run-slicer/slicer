@@ -1,4 +1,4 @@
-import type { ComponentType } from "svelte";
+import { TabType } from "$lib/tab";
 import {
     type Icon as LucideIcon,
     Binary,
@@ -7,15 +7,15 @@ import {
     Coffee,
     File,
     FileArchive,
+    FileDigit,
     FileText,
     GitPullRequest,
     Image,
     Sparkles,
     Text,
     TextQuote,
-    FileDigit,
 } from "lucide-svelte";
-import { TabType } from "$lib/tab";
+import type { ComponentType } from "svelte";
 
 export type Icon = ComponentType<LucideIcon> /* Component<IconProps> */;
 

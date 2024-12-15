@@ -1,5 +1,5 @@
-import { get, writable } from "svelte/store";
 import { loggingMaxEntries } from "$lib/state";
+import { get, writable } from "svelte/store";
 
 export const enum LogLevel {
     INFO = "info",
