@@ -2,7 +2,7 @@ import { type Language, toExtension } from "$lib/lang";
 import { error } from "$lib/log";
 import { type ClassEntry, type Entry, transformEntry } from "$lib/workspace";
 import { get, writable } from "svelte/store";
-import { cfr, jasm, vf } from "./builtin";
+import { cfr, jasm, procyon, vf } from "./builtin";
 
 export interface Disassembler {
     id: string;
@@ -18,6 +18,7 @@ export const all = writable<Map<string, Disassembler>>(
         [jasm.id, jasm],
         [cfr.id, cfr],
         [vf.id, vf],
+        [procyon.id, procyon],
     ])
 );
 

@@ -3,6 +3,7 @@ import type { Disassembler } from "./";
 import { createFunc, type Worker } from "./worker";
 import CFRWorker from "./worker/cfr?worker";
 import JASMWorker from "./worker/jasm?worker";
+import ProcyonWorker from "./worker/procyon?worker";
 import VFWorker from "./worker/vf?worker";
 
 export const cfr: Disassembler = {
@@ -27,4 +28,12 @@ export const vf: Disassembler = {
     language: "java",
     concurrency: 5,
     run: createFunc(5, () => wrap<Worker>(new VFWorker())),
+};
+
+export const procyon: Disassembler = {
+    id: "procyon",
+    name: "Procyon",
+    language: "java",
+    concurrency: 5,
+    run: createFunc(5, () => wrap<Worker>(new ProcyonWorker())),
 };
