@@ -1,8 +1,9 @@
 import { expose } from "comlink";
-import type { EntrySource, Worker } from "./";
+import type { EntrySource } from "../source";
+import type { ClassWorker, MethodWorker } from "./";
 
 expose({
-    async run(name: string, _resources: string[], source: EntrySource): Promise<string> {
+    async class(name: string, _resources: string[], source: EntrySource): Promise<string> {
         const data = await source(name);
         if (!data) {
             return "";
@@ -11,4 +12,13 @@ expose({
         const { disassemble } = await import("@run-slicer/jasm");
         return disassemble(data);
     },
-} satisfies Worker);
+    async method(name: string, signature: string, source: EntrySource): Promise<string> {
+        const data = await source(name);
+        if (!data) {
+            return "";
+        }
+
+        const { disassemble } = await import("@run-slicer/jasm");
+        return disassemble(data, { signature });
+    },
+} satisfies ClassWorker & MethodWorker);

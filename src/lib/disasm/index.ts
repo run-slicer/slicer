@@ -1,6 +1,7 @@
 import { type Language, toExtension } from "$lib/lang";
 import { error } from "$lib/log";
 import { type ClassEntry, type Entry, transformEntry } from "$lib/workspace";
+import type { Member } from "@run-slicer/asm";
 import { get, writable } from "svelte/store";
 import { cfr, jasm, procyon, vf } from "./builtin";
 
@@ -10,7 +11,8 @@ export interface Disassembler {
     language?: Language;
     concurrency?: number;
 
-    run(entry: ClassEntry): Promise<string>;
+    class: (entry: ClassEntry) => Promise<string>;
+    method?: (entry: ClassEntry, method: Member) => Promise<string>;
 }
 
 export const all = writable<Map<string, Disassembler>>(
@@ -42,11 +44,26 @@ export const remove = (id: string) => {
 
 export const disassemble = async (entry: ClassEntry, disasm: Disassembler): Promise<string> => {
     try {
-        return disasm.run(entry);
+        return disasm.class(entry);
     } catch (e: any) {
         error(`failed to disassemble ${entry.name}`, e);
 
         return `// Failed to disassemble ${entry.name}; disassembler threw error.\n${e.toString().replaceAll(/^/gm, "// ")}`;
+    }
+};
+
+export const disassembleMethod = async (entry: ClassEntry, method: Member, disasm: Disassembler): Promise<string> => {
+    try {
+        if (!disasm.method) {
+            throw new Error("Disassembler does not support single-method disassembly");
+        }
+
+        return disasm.method(entry, method);
+    } catch (e: any) {
+        const signature = method.name.decode() + method.type.decode();
+        error(`failed to disassemble ${entry.name}#${signature} method`, e);
+
+        return `// Failed to disassemble ${entry.name}#${signature}; disassembler threw error.\n${e.toString().replaceAll(/^/gm, "// ")}`;
     }
 };
 
