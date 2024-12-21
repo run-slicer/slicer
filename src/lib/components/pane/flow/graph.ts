@@ -2,8 +2,8 @@ import { graphlib, layout } from "@dagrejs/dagre";
 import type { Member } from "@run-slicer/asm";
 import { type Node as GraphNode, EdgeType, computeGraph } from "@run-slicer/asm/analysis/graph";
 import type { CodeAttribute } from "@run-slicer/asm/attr";
-import { formatInsn } from "@run-slicer/asm/insn";
-import { type Pool, formatEntry } from "@run-slicer/asm/pool";
+import { formatInsn, formatEntry } from "@run-slicer/asm/analysis/disasm";
+import type { Pool } from "@run-slicer/asm/pool";
 import { AttributeType } from "@run-slicer/asm/spec";
 import type { Edge, MarkerType, Node } from "@xyflow/svelte";
 
