@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Binary, Code, Download, Gauge, GitBranchPlus, Image, Trash2 } from "lucide-svelte";
+    import { Binary, Code, Download, FileCode2, Gauge, GitBranchPlus, Image, Trash2 } from "lucide-svelte";
     import { EntryType } from "$lib/workspace";
     import { TabType } from "$lib/tab";
     import {
@@ -58,6 +58,9 @@
                 {#if node.entry.type !== EntryType.ARCHIVE}
                     <ContextMenuItem class="flex justify-between" onclick={() => open(TabType.FLOW_GRAPH)}>
                         Flow graph <GitBranchPlus size={16} />
+                    </ContextMenuItem>
+                    <ContextMenuItem class="flex justify-between" onclick={() => open(TabType.CLASS)}>
+                        Class <FileCode2 size={16} />
                     </ContextMenuItem>
                 {/if}
                 <ContextMenuItem class="flex justify-between" onclick={() => open(TabType.HEAP_DUMP)}>

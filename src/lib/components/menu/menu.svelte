@@ -56,6 +56,7 @@
         Code,
         Coffee,
         Download,
+        FileCode2,
         Folders,
         GitBranchPlus,
         Globe,
@@ -333,6 +334,13 @@
                 onclick={() => openEntry(TabType.FLOW_GRAPH)}
             >
                 Flow graph <GitBranchPlus size={16} />
+            </MenubarItem>
+            <MenubarItem
+                class="justify-between"
+                disabled={!tab?.entry || tab.entry.type === EntryType.ARCHIVE || tab.type === TabType.CLASS}
+                onclick={() => openEntry(TabType.CLASS)}
+            >
+                Class <FileCode2 size={16} />
             </MenubarItem>
             <MenubarSeparator />
             <MenubarSub>
