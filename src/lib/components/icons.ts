@@ -7,6 +7,7 @@ import {
     Coffee,
     File,
     FileArchive,
+    FileCode2,
     FileDigit,
     FileText,
     GitPullRequest,
@@ -32,6 +33,8 @@ export const tabIcon = (tabType: TabType, label: string): StyledIcon => {
             return { icon: Binary, classes: ["text-muted-foreground"] };
         case TabType.FLOW_GRAPH:
             return { icon: GitPullRequest, classes: ["text-muted-foreground"] };
+        case TabType.CLASS:
+            return { icon: FileCode2, classes: ["text-red-500"] };
     }
 
     return fileIcon(label);

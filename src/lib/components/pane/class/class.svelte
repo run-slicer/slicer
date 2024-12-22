@@ -2,6 +2,8 @@
     import type { Tab } from "$lib/tab";
     import type { ClassEntry } from "$lib/workspace";
     import { Tabs, TabsList, TabsContent, TabsTrigger } from "$lib/components/ui/tabs";
+    import Pool from "./pool.svelte";
+    import { FileQuestion } from "lucide-svelte";
 
     interface Props {
         tab: Tab;
@@ -12,13 +14,26 @@
     const node = $derived((tab.entry as ClassEntry)?.node);
 </script>
 
-<Tabs value="class" class="w-full p-2">
-    <TabsList class="grid w-full grid-cols-3">
-        <TabsTrigger value="class">Class</TabsTrigger>
-        <TabsTrigger value="fields">Fields</TabsTrigger>
-        <TabsTrigger value="methods">Methods</TabsTrigger>
-    </TabsList>
-    <TabsContent value="class">Class content</TabsContent>
-    <TabsContent value="fields">Fields content</TabsContent>
-    <TabsContent value="methods">Methods content</TabsContent>
-</Tabs>
+{#if node}
+    <Tabs value="class" class="flex h-full w-full flex-col p-2" activationMode="manual">
+        <TabsList class="grid w-full grid-cols-4">
+            <TabsTrigger value="class">Class</TabsTrigger>
+            <TabsTrigger value="constant_pool">Constant pool</TabsTrigger>
+            <TabsTrigger value="fields">Fields</TabsTrigger>
+            <TabsTrigger value="methods">Methods</TabsTrigger>
+        </TabsList>
+        <TabsContent value="class">Class content</TabsContent>
+        <!-- https://github.com/tailwindlabs/tailwindcss/pull/4873#issuecomment-987729814 -->
+        <TabsContent value="constant_pool" class="h-full min-h-0 w-full flex-col [&:not([hidden])]:flex">
+            <Pool {node} />
+        </TabsContent>
+        <TabsContent value="fields">Fields content</TabsContent>
+        <TabsContent value="methods">Methods content</TabsContent>
+    </Tabs>
+{:else}
+    <div class="flex h-full w-full flex-col items-center justify-center">
+        <FileQuestion class="mb-4 animate-bounce text-red-600" size={128} />
+        <p class="mb-1 text-2xl font-semibold">Is the file a class file?</p>
+        <p class="mb-32 text-sm text-muted-foreground">Failed to read ClassFile structures.</p>
+    </div>
+{/if}

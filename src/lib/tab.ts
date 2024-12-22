@@ -1,6 +1,7 @@
 import type { StyledIcon } from "$lib/components/icons";
 import { workspaceEncoding } from "$lib/state";
 import { type Entry, EntryType } from "$lib/workspace";
+import type { Member } from "@run-slicer/asm";
 import { Sparkles } from "lucide-svelte";
 import { get, writable } from "svelte/store";
 
@@ -19,7 +20,9 @@ export interface Tab {
     type: TabType;
     name: string;
     icon?: StyledIcon;
+
     entry?: Entry;
+    member?: Member; // for member-scoped tabs
 
     dirty?: boolean;
     internalId?: any; // used for reactivity keying

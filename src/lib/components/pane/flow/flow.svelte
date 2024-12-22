@@ -22,7 +22,7 @@
     const pool = node ? node.pool : [];
     const methods = node ? node.methods : [];
 
-    let member = $state(methods.length > 0 ? methods[0] : null);
+    let member = $state(tab.member || methods.length > 0 ? methods[0] : null);
 
     const createLabel = (method: Member | null): string => {
         return !method ? "<none>" : `${method.name.decode()}${method.type.decode()}`;
