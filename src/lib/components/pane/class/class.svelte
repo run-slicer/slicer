@@ -2,8 +2,9 @@
     import type { Tab } from "$lib/tab";
     import type { ClassEntry } from "$lib/workspace";
     import { Tabs, TabsList, TabsContent, TabsTrigger } from "$lib/components/ui/tabs";
-    import Pool from "./pool.svelte";
     import { FileQuestion } from "lucide-svelte";
+    import Pool from "./pool.svelte";
+    import Fields from "./fields.svelte";
 
     interface Props {
         tab: Tab;
@@ -27,7 +28,9 @@
         <TabsContent value="constant_pool" class="h-full min-h-0 w-full flex-col [&:not([hidden])]:flex">
             <Pool {node} />
         </TabsContent>
-        <TabsContent value="fields">Fields content</TabsContent>
+        <TabsContent value="fields" class="h-full min-h-0 w-full flex-col [&:not([hidden])]:flex">
+            <Fields {node} />
+        </TabsContent>
         <TabsContent value="methods">Methods content</TabsContent>
     </Tabs>
 {:else}

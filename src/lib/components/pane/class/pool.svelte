@@ -20,19 +20,25 @@
         </TableRow>
     </TableHeader>
     <TableBody>
-        {#each node.pool as entry, i (i)}
-            {#if entry}
-                <TableRow>
-                    <TableCell class="font-medium">{i}</TableCell>
-                    <TableCell>
-                        <span class="font-mono tracking-tight">{ConstantType[entry.type] || "<unknown>"}</span>
-                        ({entry.type})
-                    </TableCell>
-                    <TableCell class="break-anywhere font-mono tracking-tight">
-                        {formatEntry(entry, node.pool)}
-                    </TableCell>
-                </TableRow>
-            {/if}
-        {/each}
+        {#if node.pool.length > 0}
+            {#each node.pool as entry, i (i)}
+                {#if entry}
+                    <TableRow>
+                        <TableCell class="font-medium">{i}</TableCell>
+                        <TableCell>
+                            <span class="font-mono tracking-tight">{ConstantType[entry.type] || "<unknown>"}</span>
+                            ({entry.type})
+                        </TableCell>
+                        <TableCell class="break-anywhere font-mono tracking-tight">
+                            {formatEntry(entry, node.pool)}
+                        </TableCell>
+                    </TableRow>
+                {/if}
+            {/each}
+        {:else}
+            <TableRow>
+                <TableCell colspan={3} class="h-24 text-center">No constant pool entries.</TableCell>
+            </TableRow>
+        {/if}
     </TableBody>
 </Table>
