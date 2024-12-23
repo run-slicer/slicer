@@ -5,6 +5,7 @@
     import { FileQuestion } from "lucide-svelte";
     import Pool from "./pool.svelte";
     import Fields from "./fields.svelte";
+    import Methods from "./methods.svelte";
 
     interface Props {
         tab: Tab;
@@ -16,14 +17,14 @@
 </script>
 
 {#if node}
-    <Tabs value="class" class="flex h-full w-full flex-col p-2" activationMode="manual">
+    <Tabs value="overview" class="flex h-full w-full flex-col p-2">
         <TabsList class="grid w-full grid-cols-4">
-            <TabsTrigger value="class">Class</TabsTrigger>
+            <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="constant_pool">Constant pool</TabsTrigger>
             <TabsTrigger value="fields">Fields</TabsTrigger>
             <TabsTrigger value="methods">Methods</TabsTrigger>
         </TabsList>
-        <TabsContent value="class">Class content</TabsContent>
+        <TabsContent value="overview">Class content</TabsContent>
         <!-- https://github.com/tailwindlabs/tailwindcss/pull/4873#issuecomment-987729814 -->
         <TabsContent value="constant_pool" class="h-full min-h-0 w-full flex-col [&:not([hidden])]:flex">
             <Pool {node} />
@@ -31,7 +32,9 @@
         <TabsContent value="fields" class="h-full min-h-0 w-full flex-col [&:not([hidden])]:flex">
             <Fields {node} />
         </TabsContent>
-        <TabsContent value="methods">Methods content</TabsContent>
+        <TabsContent value="methods" class="h-full min-h-0 w-full flex-col [&:not([hidden])]:flex">
+            <Methods {node} />
+        </TabsContent>
     </Tabs>
 {:else}
     <div class="flex h-full w-full flex-col items-center justify-center">

@@ -15,29 +15,29 @@
         <TableRow>
             <TableHead>Index</TableHead>
             <TableHead>Modifiers</TableHead>
-            <TableHead>Type</TableHead>
             <TableHead>Name</TableHead>
+            <TableHead>Type</TableHead>
         </TableRow>
     </TableHeader>
     <TableBody>
-        {#if node.fields.length > 0}
-            {#each node.fields as field, i (i)}
-                {@const mods = formatMod(field.access, ElementType.FIELD)}
+        {#if node.methods.length > 0}
+            {#each node.methods as method, i (i)}
+                {@const mods = formatMod(method.access, ElementType.METHOD)}
                 <TableRow>
                     <TableCell class="font-medium">{i}</TableCell>
                     <TableCell>
                         <span class="break-anywhere font-mono tracking-tight">
                             {mods || "<none>"}
                         </span>
-                        ({field.access})
+                        ({method.access})
                     </TableCell>
-                    <TableCell class="break-anywhere font-mono tracking-tight">{field.type.decode()}</TableCell>
-                    <TableCell class="break-anywhere font-mono tracking-tight">{field.name.decode()}</TableCell>
+                    <TableCell class="break-anywhere font-mono tracking-tight">{method.name.decode()}</TableCell>
+                    <TableCell class="break-anywhere font-mono tracking-tight">{method.type.decode()}</TableCell>
                 </TableRow>
             {/each}
         {:else}
             <TableRow>
-                <TableCell colspan={4} class="h-24 text-center">No fields.</TableCell>
+                <TableCell colspan={4} class="h-24 text-center">No methods.</TableCell>
             </TableRow>
         {/if}
     </TableBody>
