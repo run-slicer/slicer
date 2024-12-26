@@ -3,7 +3,7 @@ import { error } from "$lib/log";
 import { type ClassEntry, type Entry, transformEntry } from "$lib/workspace";
 import type { Member } from "@run-slicer/asm";
 import { get, writable } from "svelte/store";
-import { cfr, jasm, procyon, vf } from "./builtin";
+import { cfr, jasm, procyon, slicer, vf } from "./builtin";
 
 export interface Disassembler {
     id: string;
@@ -21,6 +21,7 @@ export const all = writable<Map<string, Disassembler>>(
         [cfr.id, cfr],
         [vf.id, vf],
         [procyon.id, procyon],
+        [slicer.id, slicer],
     ])
 );
 

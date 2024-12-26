@@ -1,3 +1,4 @@
+import { disassemble, disassembleMethod } from "@run-slicer/asm/analysis/disasm";
 import { wrap } from "comlink";
 import type { Disassembler } from "./";
 import { createClassFunc, createMethodFunc, type ClassWorker, type MethodWorker } from "./worker";
@@ -37,4 +38,16 @@ export const procyon: Disassembler = {
     language: "java",
     concurrency: 5,
     class: createClassFunc(5, () => wrap<ClassWorker>(new ProcyonWorker())),
+};
+
+export const slicer: Disassembler = {
+    id: "slicer",
+    name: "slicer",
+    language: "java",
+    async class(entry): Promise<string> {
+        return disassemble(entry.node);
+    },
+    async method(entry, method): Promise<string> {
+        return disassembleMethod(entry.node, method);
+    },
 };

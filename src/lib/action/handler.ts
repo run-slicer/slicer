@@ -132,6 +132,10 @@ const add = async () => {
 };
 
 const open = async (entry: Entry, type: TabType = detectTabType(entry)) => {
+    if (entry.type === EntryType.MEMBER && type === TabType.CLASS) {
+        entry = entry.parent!; // unwrap to parent class
+    }
+
     let tab = get(currentTab);
     if (tab?.type === type && tab?.entry?.name === entry.name) {
         return; // already opened
@@ -148,7 +152,7 @@ const open = async (entry: Entry, type: TabType = detectTabType(entry)) => {
                 type,
                 name: entry.shortName,
                 entry: await readDetail(entry),
-                icon: tabIcon(type, entry.shortName),
+                icon: tabIcon(type, entry),
             });
         } catch (e) {
             error(`failed to read entry ${entry.name}`, e);

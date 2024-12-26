@@ -47,6 +47,6 @@
     {#await import("./class/class.svelte")}
         <Loading value="Loading..." />
     {:then { default: Class }}
-        <Class {tab} />
+        <Class {tab} {onaction} />
     {/await}
 {/if}

@@ -6,17 +6,20 @@
     import Pool from "./pool.svelte";
     import Fields from "./fields.svelte";
     import Methods from "./methods.svelte";
+    import type { ActionHandler } from "$lib/action";
 
     interface Props {
         tab: Tab;
+        onaction?: ActionHandler;
     }
 
-    let { tab }: Props = $props();
+    let { tab, onaction }: Props = $props();
 
-    const node = $derived((tab.entry as ClassEntry)?.node);
+    const entry = $derived(tab.entry as ClassEntry | undefined);
+    const node = $derived(entry?.node);
 </script>
 
-{#if node}
+{#if entry && node}
     <Tabs value="overview" class="flex h-full w-full flex-col p-2">
         <TabsList class="grid w-full grid-cols-4">
             <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -33,7 +36,7 @@
             <Fields {node} />
         </TabsContent>
         <TabsContent value="methods" class="h-full min-h-0 w-full flex-col [&:not([hidden])]:flex">
-            <Methods {node} />
+            <Methods {entry} {onaction} />
         </TabsContent>
     </Tabs>
 {:else}

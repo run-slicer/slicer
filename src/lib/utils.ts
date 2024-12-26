@@ -159,18 +159,60 @@ const primTypes: Record<string, string> = {
     V: "void",
 };
 
-export const prettyJavaType = (desc: string): string => {
+export const prettyJavaType = (desc: string, short: boolean = false): string => {
     if (!desc) {
         return desc;
     }
 
     switch (desc[0]) {
         case "[":
-            return `${prettyJavaType(desc.substring(1))}[]`;
-        case "L":
-            return desc.substring(1, desc.length - 1).replaceAll("/", ".");
+            return `${prettyJavaType(desc.substring(1), short)}[]`;
+        case "L": {
+            const type = desc.substring(1, desc.length - 1);
+            if (short) {
+                const index = type.lastIndexOf("/");
+                return index !== -1 ? type.substring(index + 1) : type;
+            }
+
+            return type.replaceAll("/", ".");
+        }
     }
     return primTypes[desc] || desc.replaceAll("/", ".");
+};
+
+export const prettyMethodDesc = (desc: string): string => {
+    const descs = desc.substring(1, desc.lastIndexOf(")")); // ignore return type
+
+    const args: string[] = [];
+    for (let i = 0; i < descs.length; i++) {
+        const char = descs.charAt(i);
+
+        const start = i;
+        switch (char) {
+            case "L": {
+                i = descs.indexOf(";", i);
+                args.push(descs.substring(start, i + 1));
+                break;
+            }
+            case "[": {
+                while (descs.charAt(i) === "[") {
+                    i++;
+                }
+                if (descs.charAt(i) === "L") {
+                    i = descs.indexOf(";", i);
+                }
+
+                args.push(descs.substring(start, i + 1));
+                break;
+            }
+            default: {
+                args.push(char);
+                break;
+            }
+        }
+    }
+
+    return `(${args.map((a) => prettyJavaType(a, true)).join(", ")})`;
 };
 
 /* strings */
