@@ -12,7 +12,7 @@
 </script>
 
 <Table>
-    <TableHeader>
+    <TableHeader class="sticky top-0 shadow-lg z-10 bg-background">
         <TableRow>
             <TableHead>Index</TableHead>
             <TableHead>Type</TableHead>

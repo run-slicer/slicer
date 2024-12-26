@@ -6,6 +6,7 @@
     import Pool from "./pool.svelte";
     import Fields from "./fields.svelte";
     import Methods from "./methods.svelte";
+    import Overview from "./overview.svelte";
     import type { ActionHandler } from "$lib/action";
 
     interface Props {
@@ -27,7 +28,9 @@
             <TabsTrigger value="fields">Fields</TabsTrigger>
             <TabsTrigger value="methods">Methods</TabsTrigger>
         </TabsList>
-        <TabsContent value="overview">Class content</TabsContent>
+        <TabsContent value="overview">
+            <Overview {node} />
+        </TabsContent>
         <!-- https://github.com/tailwindlabs/tailwindcss/pull/4873#issuecomment-987729814 -->
         <TabsContent value="constant_pool" class="h-full min-h-0 w-full flex-col [&:not([hidden])]:flex">
             <Pool {node} />
