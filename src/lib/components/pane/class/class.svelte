@@ -28,10 +28,10 @@
             <TabsTrigger value="fields">Fields</TabsTrigger>
             <TabsTrigger value="methods">Methods</TabsTrigger>
         </TabsList>
-        <TabsContent value="overview">
+        <!-- https://github.com/tailwindlabs/tailwindcss/pull/4873#issuecomment-987729814 -->
+        <TabsContent value="overview" class="h-full min-h-0 w-full flex-col [&:not([hidden])]:flex">
             <Overview {node} />
         </TabsContent>
-        <!-- https://github.com/tailwindlabs/tailwindcss/pull/4873#issuecomment-987729814 -->
         <TabsContent value="constant_pool" class="h-full min-h-0 w-full flex-col [&:not([hidden])]:flex">
             <Pool {node} />
         </TabsContent>
