@@ -1,13 +1,20 @@
 <script lang="ts">
-    import type { Tab } from "$lib/tab";
+    import { type Tab, TabType } from "$lib/tab";
     import type { ClassEntry } from "$lib/workspace";
     import { Tabs, TabsList, TabsContent, TabsTrigger } from "$lib/components/ui/tabs";
-    import { FileQuestion } from "lucide-svelte";
+    import { Code, Ellipsis, FileQuestion, GitBranchPlus } from "lucide-svelte";
     import Pool from "./pool.svelte";
     import Fields from "./fields.svelte";
     import Methods from "./methods.svelte";
     import Overview from "./overview.svelte";
-    import type { ActionHandler } from "$lib/action";
+    import { type ActionHandler, ActionType, type OpenAction } from "$lib/action";
+    import {
+        DropdownMenu,
+        DropdownMenuContent,
+        DropdownMenuItem,
+        DropdownMenuTrigger,
+    } from "$lib/components/ui/dropdown-menu";
+    import { Button } from "$lib/components/ui/button";
 
     interface Props {
         tab: Tab;
@@ -18,16 +25,40 @@
 
     const entry = $derived(tab.entry as ClassEntry | undefined);
     const node = $derived(entry?.node);
+
+    const openEntry = (tabType?: TabType) => {
+        onaction?.({ type: ActionType.OPEN, tabType, entry } as OpenAction);
+    };
 </script>
 
 {#if entry && node}
     <Tabs value="overview" class="flex h-full w-full flex-col p-2">
-        <TabsList class="grid w-full grid-cols-4">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="constant_pool">Constant pool</TabsTrigger>
-            <TabsTrigger value="fields">Fields</TabsTrigger>
-            <TabsTrigger value="methods">Methods</TabsTrigger>
-        </TabsList>
+        <div class="flex flex-row gap-1">
+            <TabsList class="grid w-full grid-cols-4">
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="constant_pool">Constant pool</TabsTrigger>
+                <TabsTrigger value="fields">Fields</TabsTrigger>
+                <TabsTrigger value="methods">Methods</TabsTrigger>
+            </TabsList>
+            <DropdownMenu>
+                <DropdownMenuTrigger>
+                    {#snippet child({ props })}
+                        <Button {...props} variant="secondary" size="icon">
+                            <span class="sr-only">Open menu</span>
+                            <Ellipsis size={16} />
+                        </Button>
+                    {/snippet}
+                </DropdownMenuTrigger>
+                <DropdownMenuContent class="w-[12rem]" align="end">
+                    <DropdownMenuItem class="justify-between" onclick={() => openEntry(TabType.CODE)}>
+                        Disassemble <Code size={16} />
+                    </DropdownMenuItem>
+                    <DropdownMenuItem class="justify-between" onclick={() => openEntry(TabType.FLOW_GRAPH)}>
+                        View flow graph <GitBranchPlus size={16} />
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+        </div>
         <!-- https://github.com/tailwindlabs/tailwindcss/pull/4873#issuecomment-987729814 -->
         <TabsContent value="overview" class="h-full min-h-0 w-full flex-col [&:not([hidden])]:flex">
             <Overview {node} />
