@@ -6,7 +6,7 @@
     import { detectLanguage, read } from "./";
     import { CodeEditor } from "$lib/components/editor";
     import { Select, SelectContent, SelectItem, SelectTrigger } from "$lib/components/ui/select";
-    import { vf } from "$lib/disasm/builtin";
+    import { jasm, vf } from "$lib/disasm/builtin";
     import { editorTextSize, editorTextSizeSync, editorWrap, toolsDisasm } from "$lib/state";
     import { get, writable } from "svelte/store";
     import type { Disassembler } from "$lib/disasm";
@@ -22,16 +22,21 @@
     }
 
     let { tab, disasms, onaction }: Props = $props();
-
     const entry = $derived(tab.entry!);
-    const shouldDisasm = $derived(entry.type === EntryType.CLASS && tab.type === TabType.CODE);
+
+    let usableDisasms = $derived(entry.type === EntryType.MEMBER ? disasms.filter((d) => Boolean(d.method)) : disasms);
+    const shouldDisasm = $derived(
+        tab.type === TabType.CODE && (entry.type === EntryType.CLASS || entry.type === EntryType.MEMBER)
+    );
 
     let disasmId = $state($toolsDisasm);
     $effect(() => {
         $toolsDisasm = disasmId;
     });
 
-    let disasm = $derived(disasms.find((d) => d.id === disasmId) || vf);
+    let disasm = $derived(
+        usableDisasms.find((d) => d.id === disasmId) || (entry.type === EntryType.MEMBER ? jasm : vf)
+    );
     let language = $derived(detectLanguage(tab.type, entry, disasm));
     let textSize = $derived(
         $editorTextSizeSync ? editorTextSize : writable(get(editorTextSize) /* immediate value, no subscription */)
@@ -62,7 +67,7 @@
                     <span class="tracking-tight">{disasm.name || disasm.id}</span>
                 </SelectTrigger>
                 <SelectContent class="max-h-[240px] w-full overflow-scroll" align="end">
-                    {#each disasms as dism}
+                    {#each usableDisasms as dism (dism.id)}
                         <SelectItem value={dism.id} label={dism.id} class="text-xs tracking-tight">
                             {dism.name || dism.id}
                         </SelectItem>

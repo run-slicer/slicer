@@ -18,7 +18,7 @@
     import { cn } from "$lib/components/utils";
     import { isEncodingDependent, type Tab } from "$lib/tab";
     import type { Encoding } from "$lib/workspace/encoding";
-    import { fileIcon } from "$lib/components/icons";
+    import { entryIcon } from "$lib/components/icons";
     import type { Task } from "$lib/task";
     import Tasks from "./tasks.svelte";
 
@@ -44,7 +44,7 @@
                         {@const lastPart = y === parts.length - 1}
                         <BreadcrumbItem class="whitespace-nowrap">
                             {#if lastPart}
-                                {@const { icon: FileIcon, classes } = fileIcon(entry.data.name)}
+                                {@const { icon: FileIcon, classes } = entryIcon(entry)}
                                 <FileIcon size={14} class={cn("min-w-[14px]", classes)} />
                             {/if}
                             {part}

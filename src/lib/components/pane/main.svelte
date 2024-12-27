@@ -43,4 +43,10 @@
     {:then { default: Dump }}
         <Dump {tab} />
     {/await}
+{:else if tab.type === TabType.CLASS}
+    {#await import("./class/class.svelte")}
+        <Loading value="Loading..." />
+    {:then { default: Class }}
+        <Class {tab} {onaction} />
+    {/await}
 {/if}

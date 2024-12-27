@@ -1,6 +1,7 @@
+import { disassemble, disassembleMethod } from "@run-slicer/asm/analysis/disasm";
 import { wrap } from "comlink";
 import type { Disassembler } from "./";
-import { createFunc, type Worker } from "./worker";
+import { createClassFunc, createMethodFunc, type ClassWorker, type MethodWorker } from "./worker";
 import CFRWorker from "./worker/cfr?worker";
 import JASMWorker from "./worker/jasm?worker";
 import ProcyonWorker from "./worker/procyon?worker";
@@ -11,7 +12,7 @@ export const cfr: Disassembler = {
     name: "CFR",
     language: "java",
     concurrency: 5,
-    run: createFunc(5, () => wrap<Worker>(new CFRWorker())),
+    class: createClassFunc(5, () => wrap<ClassWorker>(new CFRWorker())),
 };
 
 export const jasm: Disassembler = {
@@ -19,7 +20,8 @@ export const jasm: Disassembler = {
     name: "JASM",
     language: "jasm",
     concurrency: 5,
-    run: createFunc(5, () => wrap<Worker>(new JASMWorker())),
+    class: createClassFunc(5, () => wrap<ClassWorker>(new JASMWorker())),
+    method: createMethodFunc(5, () => wrap<MethodWorker>(new JASMWorker())),
 };
 
 export const vf: Disassembler = {
@@ -27,7 +29,7 @@ export const vf: Disassembler = {
     name: "Vineflower",
     language: "java",
     concurrency: 5,
-    run: createFunc(5, () => wrap<Worker>(new VFWorker())),
+    class: createClassFunc(5, () => wrap<ClassWorker>(new VFWorker())),
 };
 
 export const procyon: Disassembler = {
@@ -35,5 +37,17 @@ export const procyon: Disassembler = {
     name: "Procyon",
     language: "java",
     concurrency: 5,
-    run: createFunc(5, () => wrap<Worker>(new ProcyonWorker())),
+    class: createClassFunc(5, () => wrap<ClassWorker>(new ProcyonWorker())),
+};
+
+export const slicer: Disassembler = {
+    id: "slicer",
+    name: "slicer",
+    language: "java",
+    async class(entry): Promise<string> {
+        return disassemble(entry.node);
+    },
+    async method(entry, method): Promise<string> {
+        return disassembleMethod(entry.node, method);
+    },
 };

@@ -56,6 +56,7 @@
         Code,
         Coffee,
         Download,
+        FileCode2,
         Folders,
         GitBranchPlus,
         Globe,
@@ -322,7 +323,17 @@
             </MenubarItem>
             <MenubarItem
                 class="justify-between"
-                disabled={!tab?.entry || tab.entry.type === EntryType.ARCHIVE || tab.type === TabType.HEX}
+                disabled={!tab?.entry || tab.entry.type === EntryType.ARCHIVE || tab.type === TabType.CLASS}
+                onclick={() => openEntry(TabType.CLASS)}
+            >
+                Class <FileCode2 size={16} />
+            </MenubarItem>
+            <MenubarItem
+                class="justify-between"
+                disabled={!tab?.entry ||
+                    tab.entry.type === EntryType.ARCHIVE ||
+                    tab.entry.type === EntryType.MEMBER ||
+                    tab.type === TabType.HEX}
                 onclick={() => openEntry(TabType.HEX)}
             >
                 Hexadecimal <Binary size={16} />

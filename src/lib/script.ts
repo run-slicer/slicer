@@ -5,14 +5,16 @@ import {
     find as findDisasm,
     remove as removeDisasm,
 } from "$lib/disasm";
+import { createSource as createClassSource } from "$lib/disasm/source";
 import type { Language } from "$lib/lang";
 import { error } from "$lib/log";
 import { scriptingScripts } from "$lib/state";
 import { current as currentTab, find as findTab, refresh as refreshTab, type Tab, tabs, TabType } from "$lib/tab";
 import { cyrb53 } from "$lib/utils";
-import { type ClassEntry, type Entry, EntryType, readDetail } from "$lib/workspace";
+import { type ClassEntry, classes, type Entry, EntryType, readDetail } from "$lib/workspace";
 import { DataType, type MemoryData, unwrapTransform } from "$lib/workspace/data";
 import { read as readNode } from "@run-slicer/asm";
+import type { UTF8Entry } from "@run-slicer/asm/pool";
 import type {
     DisassemblerContext,
     EditorContext,
@@ -85,9 +87,14 @@ const wrapDisasm = (disasm: Disassembler): ScriptDisassembler => {
         label: disasm.name,
         language: disasm.language,
 
-        run(data: Uint8Array): Promise<string> {
+        async class(name, source): Promise<string> {
+            const data = await source(name);
+            if (!data) {
+                return "";
+            }
+
             // create simulated entry
-            return disasm.run({
+            return disasm.class({
                 type: EntryType.CLASS,
                 name: "",
                 shortName: "",
@@ -99,6 +106,39 @@ const wrapDisasm = (disasm: Disassembler): ScriptDisassembler => {
                 node: readNode(data),
             });
         },
+        method: disasm.method
+            ? async (name, signature, source) => {
+                  const data = await source(name);
+                  if (!data) {
+                      return "";
+                  }
+
+                  const node = readNode(data);
+
+                  const method = node.methods.find((m) => {
+                      return m.name.decode() + m.type.decode() === signature;
+                  });
+                  if (!method) {
+                      return "";
+                  }
+
+                  // create simulated entry
+                  return disasm.method!(
+                      {
+                          type: EntryType.CLASS,
+                          name: "",
+                          shortName: "",
+                          data: {
+                              type: DataType.MEMORY,
+                              name: "",
+                              data,
+                          } as MemoryData,
+                          node,
+                      },
+                      method
+                  );
+              }
+            : undefined,
     };
 };
 
@@ -108,9 +148,27 @@ const unwrapDisasm = (disasm: ScriptDisassembler): Disassembler => {
         name: disasm.label,
         language: disasm.language as Language,
 
-        async run(entry: ClassEntry): Promise<string> {
-            return disasm.run(await entry.data.bytes());
+        async class(entry: ClassEntry): Promise<string> {
+            const { node, data } = entry;
+
+            const buf = await data.bytes();
+            const name = (node.pool[node.thisClass.name] as UTF8Entry).decode();
+
+            const classes0 = get(classes);
+            return disasm.class(name, createClassSource(classes0, name, buf));
         },
+        method: disasm.method
+            ? async (entry, method) => {
+                  const { node, data } = entry;
+
+                  const buf = await data.bytes();
+                  const name = (node.pool[node.thisClass.name] as UTF8Entry).decode();
+                  const signature = method.name.decode() + method.type.decode();
+
+                  const classes0 = get(classes);
+                  return disasm.method!(name, signature, createClassSource(classes0, name, buf));
+              }
+            : undefined,
     };
 };
 

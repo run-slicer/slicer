@@ -1,7 +1,9 @@
 import { error, warn } from "$lib/log";
 import { rootContext } from "$lib/script";
 import { workspaceArchiveEncoding, workspaceArchiveNested } from "$lib/state";
-import { type Node, read } from "@run-slicer/asm";
+import { prettyMethodDesc } from "$lib/utils";
+import { type Member, type Node, read } from "@run-slicer/asm";
+import type { UTF8Entry } from "@run-slicer/asm/pool";
 import type { Zip } from "@run-slicer/zip";
 import { derived, get, writable } from "svelte/store";
 import { type Data, fileData, memoryData, type Named, parseName, transformData, zipData } from "./data";
@@ -10,6 +12,7 @@ export const enum EntryType {
     FILE = "file",
     ARCHIVE = "archive",
     CLASS = "class", // only by readDetail
+    MEMBER = "member",
 }
 
 export interface Entry extends Named {
@@ -24,8 +27,13 @@ export interface ArchiveEntry extends Entry {
 }
 
 export interface ClassEntry extends Entry {
-    type: EntryType.CLASS;
+    type: EntryType.CLASS | EntryType.MEMBER;
     node: Node;
+}
+
+export interface MemberEntry extends ClassEntry {
+    type: EntryType.MEMBER;
+    member: Member;
 }
 
 export const readDetail = async (entry: Entry): Promise<Entry> => {
@@ -89,6 +97,29 @@ export const transformEntry = (entry: Entry, ext: string, value: string): Entry 
         shortName: replaceExt(entry.shortName, ext),
         extension: ext,
         data: memoryData(name, encoder.encode(value), decoder),
+    };
+};
+
+export const memberEntry = (entry: ClassEntry, member: Member): MemberEntry => {
+    const nodeName = (entry.node.pool[entry.node.thisClass.name] as UTF8Entry).decode();
+
+    const memberName = member.name.decode();
+    const memberType = member.type.decode();
+
+    const signature = memberName + prettyMethodDesc(memberType);
+
+    const slashIndex = nodeName.lastIndexOf("/");
+    return {
+        ...entry,
+        type: EntryType.MEMBER,
+        parent: entry,
+        name: `${entry.name}/${memberName}${memberType}`,
+        shortName: `${slashIndex !== -1 ? nodeName.substring(slashIndex + 1) : nodeName}#${signature}`,
+        data: {
+            ...entry.data,
+            name: signature,
+        },
+        member,
     };
 };
 

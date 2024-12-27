@@ -1,16 +1,19 @@
 import { TabType } from "$lib/tab";
+import { type Entry, EntryType } from "$lib/workspace";
 import {
-    type Icon as LucideIcon,
     Binary,
     Braces,
     Code,
     Coffee,
     File,
     FileArchive,
+    FileCode2,
     FileDigit,
     FileText,
     GitPullRequest,
     Image,
+    type Icon as LucideIcon,
+    Parentheses,
     Sparkles,
     Text,
     TextQuote,
@@ -24,7 +27,7 @@ export interface StyledIcon {
     classes?: string[];
 }
 
-export const tabIcon = (tabType: TabType, label: string): StyledIcon => {
+export const tabIcon = (tabType: TabType, entry: Entry): StyledIcon => {
     switch (tabType) {
         case TabType.WELCOME:
             return { icon: Sparkles, classes: ["text-muted-foreground"] };
@@ -32,9 +35,20 @@ export const tabIcon = (tabType: TabType, label: string): StyledIcon => {
             return { icon: Binary, classes: ["text-muted-foreground"] };
         case TabType.FLOW_GRAPH:
             return { icon: GitPullRequest, classes: ["text-muted-foreground"] };
+        case TabType.CLASS:
+            return { icon: FileCode2, classes: ["text-red-500"] };
     }
 
-    return fileIcon(label);
+    return entryIcon(entry);
+};
+
+export const entryIcon = (entry: Entry): StyledIcon => {
+    switch (entry.type) {
+        case EntryType.MEMBER:
+            return { icon: Parentheses, classes: ["text-red-500"] };
+    }
+
+    return fileIcon(entry.name);
 };
 
 export const fileIcon = (label: string): StyledIcon => {
