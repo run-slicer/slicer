@@ -1,4 +1,3 @@
-import { disassemble, disassembleMethod } from "@run-slicer/asm/analysis/disasm";
 import { wrap } from "comlink";
 import type { Disassembler } from "./";
 import { createClassFunc, createMethodFunc, type ClassWorker, type MethodWorker } from "./worker";
@@ -45,9 +44,13 @@ export const slicer: Disassembler = {
     name: "slicer",
     language: "java",
     async class(entry): Promise<string> {
+        const { disassemble } = await import("@run-slicer/asm/analysis/disasm");
+
         return disassemble(entry.node);
     },
     async method(entry, method): Promise<string> {
+        const { disassembleMethod } = await import("@run-slicer/asm/analysis/disasm");
+
         return disassembleMethod(entry.node, method);
     },
 };

@@ -42,7 +42,7 @@ export const createComputedGraph = (method: Member | null, pool: Pool, handlerEd
     const { nodes, edges } = computeGraph(code);
 
     const data: NodeData[] = nodes.map((node) => {
-        const lines = node.insns.map((i) => formatInsn(i, pool));
+        const lines = node.insns.map((i) => formatInsn(i, pool, false));
         const metrics = computeTextSize(lines.reduce((a, b) => (a.length > b.length ? a : b)));
 
         return {
