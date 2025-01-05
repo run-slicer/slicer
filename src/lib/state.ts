@@ -3,13 +3,6 @@ import { persisted } from "$lib/utils";
 
 export const root = "slicer.state";
 
-export const enum ViewMode {
-    NORMAL = "normal",
-    FULL_SCREEN = "full_screen",
-    DISTRACTION_FREE = "distraction_free",
-    ZEN = "zen",
-}
-
 export interface ScriptData {
     url: string;
     load: boolean;
@@ -17,7 +10,6 @@ export interface ScriptData {
 
 export const themeColor = persisted<string>(`${root}.theme.color`, "zinc");
 export const themeRadius = persisted<number>(`${root}.theme.radius`, 0.5);
-export const viewMode = persisted<ViewMode>(`${root}.view.mode`, ViewMode.NORMAL);
 export const workspaceEncoding = persisted<string>(`${root}.workspace.encoding`, "utf-8");
 export const workspaceArchiveNested = persisted<boolean>(`${root}.workspace.archive.nested`, true);
 export const workspaceArchiveEncoding = persisted<string>(`${root}.workspace.archive.encoding`, "utf-8");

@@ -5,7 +5,6 @@
     import type { Entry } from "$lib/workspace";
     import { type Tab, updateCurrent } from "$lib/tab";
     import { loggingOpen, projectOpen } from "$lib/state";
-    import { distractionFree } from "$lib/mode";
     import { type ActionHandler, ActionType, type TabAction } from "$lib/action";
     import type { LogEntry } from "$lib/log";
     import { cn } from "$lib/components/utils";
@@ -44,10 +43,10 @@
 
 <ResizablePaneGroup direction="horizontal" class="grow basis-0">
     <!-- only hide the project pane, because we don't actually want to force a re-render of the tree -->
-    <ResizablePane defaultSize={20} class={cn(($projectOpen && !$distractionFree) || "hidden")}>
+    <ResizablePane defaultSize={20} class={cn($projectOpen || "hidden")}>
         <TreePane {entries} {onaction} />
     </ResizablePane>
-    <ResizableHandle class={cn(($projectOpen && !$distractionFree) || "hidden")} />
+    <ResizableHandle class={cn($projectOpen || "hidden")} />
     <ResizablePane>
         <ResizablePaneGroup direction="vertical">
             <ResizablePane>
@@ -84,7 +83,7 @@
                     {/each}
                 </div>
             </ResizablePane>
-            {#if $loggingOpen && !$distractionFree}
+            {#if $loggingOpen}
                 <ResizableHandle />
                 <ResizablePane defaultSize={20}>
                     <LoggingPane entries={logentries} />

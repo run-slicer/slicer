@@ -7,11 +7,9 @@
         projectOpen,
         themeColor,
         themeRadius,
-        viewMode,
         workspaceArchiveEncoding,
         workspaceEncoding,
     } from "$lib/state";
-    import { distractionFree } from "$lib/mode";
     import { type Entry, EntryType } from "$lib/workspace";
     import { encodings } from "$lib/workspace/encoding";
     import type { ProtoScript } from "$lib/script";
@@ -29,7 +27,6 @@
     import {
         AboutDialog,
         ClearDialog,
-        PrefsClearDialog,
         ScriptDeleteDialog,
         ScriptDialog,
         ScriptLoadDialog,
@@ -55,22 +52,15 @@
         Clipboard,
         Code,
         Coffee,
-        Download,
         FileCode2,
         Folders,
         GitBranchPlus,
         Globe,
         Info,
-        MonitorX,
         Moon,
-        Scan,
         Settings,
-        Square,
-        SquareCode,
-        SquareX,
         Sun,
         Terminal,
-        Upload,
         WrapText,
     } from "lucide-svelte";
     import { toast } from "svelte-sonner";
@@ -90,7 +80,7 @@
 
     let aboutOpen = $state(false);
     let clearOpen = $state(false);
-    let prefsClearOpen = $state(false);
+    // let prefsClearOpen = $state(false);
 
     let scriptLoadOpen = $state(false);
     let scriptDeleteOpen: ProtoScript | null = $state(null);
@@ -194,7 +184,7 @@
                     </MenubarRadioGroup>
                 </MenubarSubContent>
             </MenubarSub>
-            <MenubarSub>
+            <!-- <MenubarSub>
                 <MenubarSubTrigger>Preferences</MenubarSubTrigger>
                 <MenubarSubContent class="w-[12rem]" align="start">
                     <MenubarItem class="justify-between" onclick={() => onaction?.({ type: ActionType.PREFS_LOAD })}>
@@ -208,7 +198,7 @@
                         Reset <MonitorX size={16} />
                     </MenubarItem>
                 </MenubarSubContent>
-            </MenubarSub>
+            </MenubarSub> -->
         </MenubarContent>
     </MenubarMenu>
     <MenubarMenu>
@@ -268,39 +258,12 @@
         <MenubarTrigger class="relative">View</MenubarTrigger>
         <MenubarContent align="start">
             <MenubarSub>
-                <MenubarSubTrigger>Mode</MenubarSubTrigger>
-                <MenubarSubContent class="w-[12rem]" align="start">
-                    <MenubarRadioGroup bind:value={$viewMode}>
-                        <MenubarRadioItem class="justify-between" value="normal">
-                            Normal <Square size={16} />
-                        </MenubarRadioItem>
-                        <MenubarRadioItem class="justify-between" value="full_screen">
-                            Full screen <Scan size={16} />
-                        </MenubarRadioItem>
-                        <MenubarRadioItem class="justify-between" value="distraction_free">
-                            Distraction-free <SquareX size={16} />
-                        </MenubarRadioItem>
-                        <MenubarRadioItem class="justify-between" value="zen">
-                            Zen <SquareCode size={16} />
-                        </MenubarRadioItem>
-                    </MenubarRadioGroup>
-                </MenubarSubContent>
-            </MenubarSub>
-            <MenubarSub>
                 <MenubarSubTrigger>Pane</MenubarSubTrigger>
                 <MenubarSubContent class="w-[12rem]" align="start">
-                    <MenubarCheckboxItem
-                        class="justify-between"
-                        disabled={$distractionFree}
-                        bind:checked={$projectOpen}
-                    >
+                    <MenubarCheckboxItem class="justify-between" bind:checked={$projectOpen}>
                         Project <Folders size={16} />
                     </MenubarCheckboxItem>
-                    <MenubarCheckboxItem
-                        class="justify-between"
-                        disabled={$distractionFree}
-                        bind:checked={$loggingOpen}
-                    >
+                    <MenubarCheckboxItem class="justify-between" bind:checked={$loggingOpen}>
                         Logging <Terminal size={16} />
                     </MenubarCheckboxItem>
                 </MenubarSubContent>
@@ -385,6 +348,13 @@
                     />
                 {/each}
             {/if}
+            <MenubarSeparator />
+            <MenubarItem
+                class="justify-between"
+                onclick={() => window.open("https://docs.slicer.run/script/", "_blank")}
+            >
+                Documentation <BookOpen size={16} />
+            </MenubarItem>
         </MenubarContent>
     </MenubarMenu>
 </Menubar>
@@ -395,4 +365,4 @@
 <ScriptLoadDialog bind:open={scriptLoadOpen} {onaction} />
 <ScriptDeleteDialog bind:proto={scriptDeleteOpen} {onaction} />
 <ClearDialog bind:open={clearOpen} {onaction} />
-<PrefsClearDialog bind:open={prefsClearOpen} {onaction} />
+<!-- <PrefsClearDialog bind:open={prefsClearOpen} {onaction} /> -->
