@@ -62,9 +62,20 @@ const load = async () => {
     }
 
     const results = await Promise.all(
-        files.map((f) => {
-            return recordTimed("loading", f.name, () => loadZip(f));
-        })
+        files.map((f) =>
+            recordTimed("loading", f.name, async () => {
+                try {
+                    return await loadZip(f);
+                } catch (e) {
+                    error(`failed to read zip ${f.name}`, e);
+                    toast.error("Error occurred", {
+                        description: `Could not read ZIP ${f.name}, check the console.`,
+                    });
+                }
+
+                return [];
+            })
+        )
     );
 
     const time = results.reduce((acc, v) => acc + v.time, 0);
@@ -99,11 +110,7 @@ const add = async () => {
         return;
     }
 
-    const results = await Promise.all(
-        files.map((f) => {
-            return recordTimed("adding", f.name, () => loadFile(f));
-        })
-    );
+    const results = await Promise.all(files.map((f) => recordTimed("adding", f.name, () => loadFile(f))));
 
     const time = results.reduce((acc, v) => acc + v.time, 0);
     const [created, skipped] = partition(
