@@ -2,7 +2,7 @@
     import type { Tab } from "$lib/tab";
     import Loading from "$lib/components/loading.svelte";
     import { Separator } from "$lib/components/ui/separator";
-    import { tweened } from "svelte/motion";
+    import { Tween } from "svelte/motion";
     import { cubicOut } from "svelte/easing";
     import { onDestroy } from "svelte";
     import { humanSize } from "$lib/utils";
@@ -18,17 +18,8 @@
 
     const normOptions = { duration: 125, easing: cubicOut };
 
-    let offsetX = $state(0.0);
-    const normOffsetX = tweened<number>(offsetX, normOptions);
-    $effect(() => {
-        normOffsetX.set(offsetX);
-    });
-
-    let offsetY = $state(0.0);
-    const normOffsetY = tweened<number>(offsetY, normOptions);
-    $effect(() => {
-        normOffsetY.set(offsetY);
-    });
+    const offsetX = new Tween(0.0, normOptions);
+    const offsetY = new Tween(0.0, normOptions);
 
     interface Centroid {
         x: number;
@@ -71,8 +62,8 @@
 
         const newCentroid = updatePosition();
         if (newCentroid) {
-            offsetX += newCentroid.x - lastCentroid.x;
-            offsetY += newCentroid.y - lastCentroid.y;
+            offsetX.target += newCentroid.x - lastCentroid.x;
+            offsetY.target += newCentroid.y - lastCentroid.y;
             lastCentroid = newCentroid;
         }
     };
@@ -82,26 +73,21 @@
         lastCentroid = events.size > 0 ? updatePosition() : null;
     };
 
-    let scale = $state(1.0);
-    const normScale = tweened<number>(scale, normOptions);
-    $effect(() => {
-        normScale.set(scale);
-    });
-
+    const scale = new Tween(1.0, normOptions);
     const rescale = (scaler: (old: number) => number) => {
-        const newScale = Math.max(0.5 /* minimum scale */, Math.min(6.0 /* maximum scale */, scaler(scale)));
+        const newScale = Math.max(0.5 /* minimum scale */, Math.min(6.0 /* maximum scale */, scaler(scale.target)));
 
         // normalize position
-        offsetX = (offsetX / scale) * newScale;
-        offsetY = (offsetY / scale) * newScale;
+        offsetX.target = (offsetX.target / scale.target) * newScale;
+        offsetY.target = (offsetY.target / scale.target) * newScale;
 
-        scale = newScale;
+        scale.target = newScale;
     };
 
     const reset = () => {
-        scale = 1.0;
-        offsetX = 0.0;
-        offsetY = 0.0;
+        scale.target = 1.0;
+        offsetX.target = 0.0;
+        offsetY.target = 0.0;
     };
 
     let elem: HTMLImageElement | undefined = $state();
@@ -150,7 +136,7 @@
                 src={createURL(blob)}
                 alt={entry.shortName}
                 class="pointer-events-none h-[95%] w-[95%] object-contain will-change-transform"
-                style="transform: translate({$normOffsetX}px, {$normOffsetY}px) scale({$normScale});"
+                style="transform: translate({offsetX.current}px, {offsetY.current}px) scale({scale.current});"
                 onload={handleLoad}
             />
         </div>

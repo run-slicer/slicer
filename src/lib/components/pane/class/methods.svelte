@@ -1,5 +1,4 @@
 <script lang="ts">
-    import type { Member } from "@run-slicer/asm";
     import { ElementType, formatMod } from "@run-slicer/asm/analysis/disasm";
     import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "$lib/components/ui/table";
     import {
@@ -11,24 +10,16 @@
     import { Code, Ellipsis, GitBranchPlus } from "lucide-svelte";
     import { Button } from "$lib/components/ui/button";
     import { type ClassEntry, memberEntry } from "$lib/workspace";
-    import { type ActionHandler, ActionType, type OpenAction } from "$lib/action";
     import { TabType } from "$lib/tab";
+    import type { EventHandler } from "$lib/event";
 
     interface Props {
         entry: ClassEntry;
-        onaction?: ActionHandler;
+        handler: EventHandler;
     }
 
-    let { entry, onaction }: Props = $props();
+    let { entry, handler }: Props = $props();
     const node = $derived(entry.node);
-
-    const openEntry = (method: Member, tabType?: TabType) => {
-        onaction?.({
-            type: ActionType.OPEN,
-            tabType,
-            entry: memberEntry(entry, method),
-        } as OpenAction);
-    };
 </script>
 
 <Table>
@@ -68,13 +59,13 @@
                             <DropdownMenuContent class="w-[12rem]" align="end">
                                 <DropdownMenuItem
                                     class="justify-between"
-                                    onclick={() => openEntry(method, TabType.CODE)}
+                                    onclick={() => handler.open(memberEntry(entry, method), TabType.CODE)}
                                 >
                                     Disassemble <Code size={16} />
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                     class="justify-between"
-                                    onclick={() => openEntry(method, TabType.FLOW_GRAPH)}
+                                    onclick={() => handler.open(memberEntry(entry, method), TabType.FLOW_GRAPH)}
                                 >
                                     View flow graph <GitBranchPlus size={16} />
                                 </DropdownMenuItem>

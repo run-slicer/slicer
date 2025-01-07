@@ -2,15 +2,7 @@
     import { Binary, Code, Download, FileCode2, Gauge, GitBranchPlus, Image, Trash2 } from "lucide-svelte";
     import { EntryType } from "$lib/workspace";
     import { TabType } from "$lib/tab";
-    import {
-        type ActionHandler,
-        ActionType,
-        type BulkEntryAction,
-        type ExportAction,
-        type OpenAction,
-    } from "$lib/action";
-    import { collectEntries } from "./tree.svelte";
-    import type { Node } from "./";
+    import type { Node } from "./node.svelte";
     import {
         ContextMenuContent,
         ContextMenuItem,
@@ -19,63 +11,62 @@
         ContextMenuSubContent,
         ContextMenuSubTrigger,
     } from "$lib/components/ui/context-menu";
+    import type { EventHandler } from "$lib/event";
 
     interface Props {
         node: Node;
-        onaction?: ActionHandler;
+        ondelete?: (node: Node) => void;
+        handler: EventHandler;
     }
 
-    let { node, onaction }: Props = $props();
-
-    const open = (tabType: TabType) => {
-        onaction?.({ type: ActionType.OPEN, entry: node.entry!, tabType } as OpenAction);
-    };
-    const export0 = () => onaction?.({ type: ActionType.EXPORT, entries: [node.entry] } as ExportAction);
-    const remove = () => onaction?.({ type: ActionType.REMOVE, entries: collectEntries(node) } as BulkEntryAction);
+    let { node, ondelete, handler }: Props = $props();
+    let entry = $derived(node.entry);
 </script>
 
 <ContextMenuContent class="min-w-[12rem] max-w-[16rem]">
-    <!-- TODO: use context menu label -->
     <div class="overflow-hidden text-ellipsis px-2 py-1.5 text-center text-sm font-semibold text-foreground">
         {node.label}
     </div>
     <ContextMenuSeparator />
-    {#if node.entry}
+    {#if entry}
         <ContextMenuSub>
             <ContextMenuSubTrigger>Open as</ContextMenuSubTrigger>
             <ContextMenuSubContent class="w-[12rem]">
-                {#if node.entry.type !== EntryType.ARCHIVE}
-                    <ContextMenuItem class="flex justify-between" onclick={() => open(TabType.CODE)}>
+                {#if entry.type !== EntryType.ARCHIVE}
+                    <ContextMenuItem class="flex justify-between" onclick={() => handler.open(entry, TabType.CODE)}>
                         Code <Code size={16} />
                     </ContextMenuItem>
                 {/if}
-                <ContextMenuItem class="flex justify-between" onclick={() => open(TabType.HEX)}>
+                <ContextMenuItem class="flex justify-between" onclick={() => handler.open(entry, TabType.HEX)}>
                     Hexadecimal <Binary size={16} />
                 </ContextMenuItem>
-                <ContextMenuItem class="flex justify-between" onclick={() => open(TabType.IMAGE)}>
+                <ContextMenuItem class="flex justify-between" onclick={() => handler.open(entry, TabType.IMAGE)}>
                     Image <Image size={16} />
                 </ContextMenuItem>
-                {#if node.entry.type !== EntryType.ARCHIVE}
-                    <ContextMenuItem class="flex justify-between" onclick={() => open(TabType.FLOW_GRAPH)}>
+                {#if entry.type !== EntryType.ARCHIVE}
+                    <ContextMenuItem
+                        class="flex justify-between"
+                        onclick={() => handler.open(entry, TabType.FLOW_GRAPH)}
+                    >
                         Flow graph <GitBranchPlus size={16} />
                     </ContextMenuItem>
-                    <ContextMenuItem class="flex justify-between" onclick={() => open(TabType.CLASS)}>
+                    <ContextMenuItem class="flex justify-between" onclick={() => handler.open(entry, TabType.CLASS)}>
                         Class <FileCode2 size={16} />
                     </ContextMenuItem>
                 {/if}
-                <ContextMenuItem class="flex justify-between" onclick={() => open(TabType.HEAP_DUMP)}>
+                <ContextMenuItem class="flex justify-between" onclick={() => handler.open(entry, TabType.HEAP_DUMP)}>
                     Heap dump <Gauge size={16} />
                 </ContextMenuItem>
             </ContextMenuSubContent>
         </ContextMenuSub>
         <ContextMenuSeparator />
-        <ContextMenuItem class="flex justify-between" onclick={export0}>
+        <ContextMenuItem class="flex justify-between" onclick={() => handler.export([entry])}>
             Export <Download size={16} />
         </ContextMenuItem>
     {/if}
     <ContextMenuItem
         class="flex justify-between data-[highlighted]:bg-destructive data-[highlighted]:text-destructive-foreground"
-        onclick={remove}
+        onclick={() => ondelete?.(node)}
     >
         Delete <Trash2 size={16} />
     </ContextMenuItem>

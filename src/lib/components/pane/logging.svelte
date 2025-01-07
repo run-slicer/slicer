@@ -27,9 +27,9 @@
         <PaneHeaderItem name="Logging" icon={{ icon: Terminal, classes: ["text-muted-foreground"] }} />
     </PaneHeader>
     <div class="relative basis-full overflow-hidden scrollbar-thin">
-        {#await Promise.all([import("$lib/components/editor"), import("$lib/lang/parser/log")])}
+        {#await Promise.all([import("$lib/components/editor/editor.svelte"), import("$lib/lang/parser/log")])}
             <Loading small />
-        {:then [{ CodeEditor }, { log }]}
+        {:then [{ default: CodeEditor }, { log }]}
             <CodeEditor
                 wrap
                 readonly

@@ -7,7 +7,6 @@
     import Fields from "./fields.svelte";
     import Methods from "./methods.svelte";
     import Overview from "./overview.svelte";
-    import { type ActionHandler, ActionType, type OpenAction } from "$lib/action";
     import {
         DropdownMenu,
         DropdownMenuContent,
@@ -15,20 +14,17 @@
         DropdownMenuTrigger,
     } from "$lib/components/ui/dropdown-menu";
     import { Button } from "$lib/components/ui/button";
+    import type { EventHandler } from "$lib/event";
 
     interface Props {
         tab: Tab;
-        onaction?: ActionHandler;
+        handler: EventHandler;
     }
 
-    let { tab, onaction }: Props = $props();
+    let { tab, handler }: Props = $props();
 
     const entry = $derived(tab.entry as ClassEntry | undefined);
     const node = $derived(entry?.node);
-
-    const openEntry = (tabType?: TabType) => {
-        onaction?.({ type: ActionType.OPEN, tabType, entry } as OpenAction);
-    };
 </script>
 
 {#if entry && node}
@@ -50,10 +46,10 @@
                     {/snippet}
                 </DropdownMenuTrigger>
                 <DropdownMenuContent class="w-[12rem]" align="end">
-                    <DropdownMenuItem class="justify-between" onclick={() => openEntry(TabType.CODE)}>
+                    <DropdownMenuItem class="justify-between" onclick={() => handler.open(entry, TabType.CODE)}>
                         Disassemble <Code size={16} />
                     </DropdownMenuItem>
-                    <DropdownMenuItem class="justify-between" onclick={() => openEntry(TabType.FLOW_GRAPH)}>
+                    <DropdownMenuItem class="justify-between" onclick={() => handler.open(entry, TabType.FLOW_GRAPH)}>
                         View flow graph <GitBranchPlus size={16} />
                     </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -70,7 +66,7 @@
             <Fields {node} />
         </TabsContent>
         <TabsContent value="methods" class="h-full min-h-0 w-full flex-col [&:not([hidden])]:flex">
-            <Methods {entry} {onaction} />
+            <Methods {entry} {handler} />
         </TabsContent>
     </Tabs>
 {:else}

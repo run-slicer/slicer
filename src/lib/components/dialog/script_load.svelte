@@ -11,14 +11,14 @@
     import { Input } from "$lib/components/ui/input";
     import { Button } from "$lib/components/ui/button";
     import { cn } from "$lib/components/utils";
-    import { type ActionHandler, ActionType, type ScriptAddAction } from "$lib/action";
+    import type { EventHandler } from "$lib/event";
 
     interface Props {
         open?: boolean;
-        onaction?: ActionHandler;
+        handler: EventHandler;
     }
 
-    let { open = $bindable(false), onaction }: Props = $props();
+    let { open = $bindable(false), handler }: Props = $props();
 
     let value = $state("");
     $effect(() => {
@@ -37,7 +37,7 @@
         }
 
         open = false;
-        onaction?.({ type: ActionType.SCRIPT_ADD, url: value0 } as ScriptAddAction);
+        await handler.addScript(value0);
     };
 </script>
 

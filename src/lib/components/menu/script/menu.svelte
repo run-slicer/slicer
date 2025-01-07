@@ -10,20 +10,24 @@
     import { type ProtoScript, ScriptState } from "$lib/script";
     import ScriptOption from "./option.svelte";
     import { Info, Trash2 } from "lucide-svelte";
-    import { type ActionHandler, ActionType, type ScriptAction } from "$lib/action";
+    import type { EventHandler } from "$lib/event";
 
     interface Props {
         proto: ProtoScript;
         onopen?: (proto: ProtoScript) => void;
         ondelete?: (proto: ProtoScript) => void;
-        onaction?: ActionHandler;
+        handler: EventHandler;
     }
 
-    let { proto, onopen, ondelete, onaction }: Props = $props();
+    let { proto, onopen, ondelete, handler }: Props = $props();
     const script = $derived(proto.script);
 
-    const handleEnabled = (enabled: boolean) => {
-        onaction?.({ type: enabled ? ActionType.SCRIPT_LOAD : ActionType.SCRIPT_UNLOAD, proto } as ScriptAction);
+    const handleEnabled = async (enabled: boolean) => {
+        if (enabled) {
+            await handler.loadScript(proto);
+        } else {
+            await handler.unloadScript(proto);
+        }
     };
 </script>
 

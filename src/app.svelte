@@ -11,9 +11,9 @@
     import { entries as logEntries } from "$lib/log";
     import { all as disasms } from "$lib/disasm";
     import { root as rootKey } from "$lib/state";
-    import { handle } from "$lib/action";
     import { theme } from "$lib/theme";
     import { tasks } from "$lib/task";
+    import { handler } from "$lib/event";
     import { register as registerShortcuts } from "$lib/shortcut";
     import { onMount } from "svelte";
 
@@ -35,16 +35,23 @@
     }}
 />
 <Toaster position="top-right" richColors />
-<Menu tab={$currentTab} entries={entries0} classes={classes0} scripts={$scripts} disasms={disasms0} onaction={handle} />
+<Menu
+    tab={$currentTab}
+    entries={entries0}
+    classes={classes0}
+    scripts={$scripts}
+    disasms={disasms0}
+    handler={$handler}
+/>
 <Content
     bind:tab={$currentTab}
     tabs={tabs0}
     entries={entries0}
     logentries={$logEntries}
     disasms={disasms0}
-    onaction={handle}
+    handler={$handler}
 />
 <Crumb tab={$currentTab} tasks={tasks0} encoding={$currentEncoding} />
 {#await import("$lib/components/command.svelte") then { default: Command }}
-    <Command entries={entries0} />
+    <Command entries={entries0} handler={$handler} />
 {/await}

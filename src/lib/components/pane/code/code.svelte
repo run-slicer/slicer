@@ -4,7 +4,7 @@
     import { type Tab, TabType } from "$lib/tab";
     import { load as loadLanguage } from "$lib/lang";
     import { detectLanguage, read } from "./";
-    import { CodeEditor } from "$lib/components/editor";
+    import CodeEditor from "$lib/components/editor/editor.svelte";
     import { Select, SelectContent, SelectItem, SelectTrigger } from "$lib/components/ui/select";
     import { jasm, vf } from "$lib/disasm/builtin";
     import { editorTextSize, editorTextSizeSync, editorWrap, toolsDisasm } from "$lib/state";
@@ -12,16 +12,16 @@
     import type { Disassembler } from "$lib/disasm";
     import { ContextMenu, ContextMenuTrigger } from "$lib/components/ui/context-menu";
     import CodeMenu from "./menu.svelte";
-    import type { ActionHandler } from "$lib/action";
     import { record } from "$lib/task";
+    import type { EventHandler } from "$lib/event";
 
     interface Props {
         tab: Tab;
         disasms: Disassembler[];
-        onaction?: ActionHandler;
+        handler: EventHandler;
     }
 
-    let { tab, disasms, onaction }: Props = $props();
+    let { tab, disasms, handler }: Props = $props();
     const entry = $derived(tab.entry!);
 
     let usableDisasms = $derived(entry.type === EntryType.MEMBER ? disasms.filter((d) => Boolean(d.method)) : disasms);
@@ -56,7 +56,7 @@
             <ContextMenuTrigger>
                 <CodeEditor {value} readonly {lang} bind:size={$textSize} wrap={$editorWrap} />
             </ContextMenuTrigger>
-            <CodeMenu {tab} {value} lang={language} {onaction} />
+            <CodeMenu {tab} {value} lang={language} {handler} />
         </ContextMenu>
     {/await}
     {#if shouldDisasm}

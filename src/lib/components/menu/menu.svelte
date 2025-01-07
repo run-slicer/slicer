@@ -14,13 +14,6 @@
     import { encodings } from "$lib/workspace/encoding";
     import type { ProtoScript } from "$lib/script";
     import { type Tab, TabType } from "$lib/tab";
-    import {
-        type ActionHandler,
-        ActionType,
-        type ExportAction,
-        type OpenAction,
-        type ScriptAddAction,
-    } from "$lib/action";
     import { Modifier } from "$lib/shortcut";
     import Shortcut from "./shortcut.svelte";
     import ScriptMenu from "./script/menu.svelte";
@@ -63,9 +56,9 @@
         Terminal,
         WrapText,
     } from "lucide-svelte";
-    import { toast } from "svelte-sonner";
     import { themes } from "$lib/theme";
     import type { Disassembler } from "$lib/disasm";
+    import type { EventHandler } from "$lib/event";
 
     interface Props {
         tab: Tab | null;
@@ -73,10 +66,11 @@
         classes: Entry[];
         scripts: ProtoScript[];
         disasms: Disassembler[];
-        onaction?: ActionHandler;
+        handler: EventHandler;
     }
 
-    let { tab, entries, classes, scripts, disasms, onaction }: Props = $props();
+    let { tab, entries, classes, scripts, disasms, handler }: Props = $props();
+    let entry = $derived(tab?.entry);
 
     let aboutOpen = $state(false);
     let clearOpen = $state(false);
@@ -86,41 +80,15 @@
     let scriptDeleteOpen: ProtoScript | null = $state(null);
     let scriptInfoOpen: ProtoScript | null = $state(null);
 
-    const openEntry = (tabType: TabType) => {
-        onaction?.({ type: ActionType.OPEN, entry: tab?.entry!, tabType } as OpenAction);
-    };
+    const openEntry = (tabType: TabType) => handler.open(entry!, tabType);
 
-    const exportEntry = () => {
+    const exportEntry = async () => {
         if (tab?.entry) {
-            onaction?.({ type: ActionType.EXPORT, entries: [tab?.entry!] } as ExportAction);
+            await handler.export([entry!]);
         }
     };
 
-    const exportEntries = (disasm?: Disassembler) => {
-        onaction?.({ type: ActionType.EXPORT, entries, disasm } as ExportAction);
-    };
-
-    const loadClipboardScript = async () => {
-        if (!navigator.clipboard) {
-            toast.error("Error occurred", {
-                description: `Could not copy from clipboard, feature not available.`,
-            });
-            return;
-        }
-
-        try {
-            const data = await navigator.clipboard.readText();
-
-            onaction?.({
-                type: ActionType.SCRIPT_ADD,
-                url: `data:text/javascript;base64,${window.btoa(data)}`,
-            } as ScriptAddAction);
-        } catch (e) {
-            toast.error("Error occurred", {
-                description: `Could not copy from clipboard, access denied.`,
-            });
-        }
-    };
+    const exportEntries = (disasm?: Disassembler) => handler.export(entries, disasm);
 </script>
 
 <Menubar class="window-controls rounded-none border-b border-none px-2 lg:px-4">
@@ -204,10 +172,10 @@
     <MenubarMenu>
         <MenubarTrigger class="relative">File</MenubarTrigger>
         <MenubarContent align="start">
-            <MenubarItem onclick={() => onaction?.({ type: ActionType.LOAD })}>
+            <MenubarItem onclick={() => handler.load()}>
                 Open <Shortcut key="o" modifier={Modifier.CTRL} />
             </MenubarItem>
-            <MenubarItem onclick={() => onaction?.({ type: ActionType.ADD })}>
+            <MenubarItem onclick={() => handler.add()}>
                 Add <Shortcut key="o" modifier={Modifier.CTRL | Modifier.SHIFT} />
             </MenubarItem>
             <MenubarItem disabled={entries.length === 0} onclick={() => (clearOpen = true)}>Clear all</MenubarItem>
@@ -233,7 +201,7 @@
                 </MenubarSubContent>
             </MenubarSub>
             <MenubarSeparator />
-            <MenubarItem disabled={!tab?.entry} onclick={() => onaction?.({ type: ActionType.CLOSE })}>
+            <MenubarItem disabled={!tab?.entry} onclick={() => handler.close()}>
                 Close <Shortcut key="w" modifier={Modifier.CTRL | Modifier.ALT} />
             </MenubarItem>
             <MenubarItem disabled={!tab?.entry} onclick={exportEntry}>
@@ -332,7 +300,7 @@
                     <MenubarItem class="justify-between" onclick={() => (scriptLoadOpen = true)}>
                         From URL <Globe size={16} />
                     </MenubarItem>
-                    <MenubarItem class="justify-between" onclick={loadClipboardScript}>
+                    <MenubarItem class="justify-between" onclick={() => handler.addScript()}>
                         From clipboard <Clipboard size={16} />
                     </MenubarItem>
                 </MenubarSubContent>
@@ -342,7 +310,7 @@
                 {#each scripts as proto (proto.id)}
                     <ScriptMenu
                         {proto}
-                        {onaction}
+                        {handler}
                         onopen={(proto) => (scriptInfoOpen = proto)}
                         ondelete={(proto) => (scriptDeleteOpen = proto)}
                     />
@@ -362,7 +330,7 @@
 
 <AboutDialog bind:open={aboutOpen} />
 <ScriptDialog bind:proto={scriptInfoOpen} />
-<ScriptLoadDialog bind:open={scriptLoadOpen} {onaction} />
-<ScriptDeleteDialog bind:proto={scriptDeleteOpen} {onaction} />
-<ClearDialog bind:open={clearOpen} {onaction} />
-<!-- <PrefsClearDialog bind:open={prefsClearOpen} {onaction} /> -->
+<ScriptLoadDialog bind:open={scriptLoadOpen} {handler} />
+<ScriptDeleteDialog bind:proto={scriptDeleteOpen} {handler} />
+<ClearDialog bind:open={clearOpen} {handler} />
+<!-- <PrefsClearDialog bind:open={prefsClearOpen} {handler} /> -->

@@ -3,16 +3,17 @@
     import { onMount } from "svelte";
     import type { Entry } from "$lib/workspace";
     import { fileIcon } from "$lib/components/icons";
-    import { ActionType, type EntryAction, handle } from "$lib/action";
     import { Search } from "lucide-svelte";
     import { cn } from "$lib/components/utils";
     import { VList } from "virtua/svelte";
+    import type { EventHandler } from "$lib/event";
 
     interface Props {
         entries: Entry[];
+        handler: EventHandler;
     }
 
-    let { entries }: Props = $props();
+    let { entries, handler }: Props = $props();
 
     let open = $state(false);
     let searchWorkspace = $state(false);
@@ -52,7 +53,7 @@
 
     const handleClick = async (entry: Entry) => {
         open = false;
-        await handle({ type: ActionType.OPEN, entry } as EntryAction);
+        await handler.open(entry);
     };
 </script>
 

@@ -5,7 +5,6 @@
     import type { Entry } from "$lib/workspace";
     import { type Tab, updateCurrent } from "$lib/tab";
     import { loggingOpen, projectOpen } from "$lib/state";
-    import { type ActionHandler, ActionType, type TabAction } from "$lib/action";
     import type { LogEntry } from "$lib/log";
     import { cn } from "$lib/components/utils";
     import TreePane from "$lib/components/pane/tree/tree.svelte";
@@ -13,6 +12,7 @@
     import MainPane from "$lib/components/pane/main.svelte";
     import { PaneHeader, PaneHeaderItem } from "$lib/components/pane/header";
     import type { Disassembler } from "$lib/disasm";
+    import type { EventHandler } from "$lib/event";
 
     interface Props {
         tab: Tab | null;
@@ -20,10 +20,10 @@
         entries: Entry[];
         logentries: LogEntry[];
         disasms: Disassembler[];
-        onaction?: ActionHandler;
+        handler: EventHandler;
     }
 
-    let { tab = $bindable(), tabs, entries, logentries, disasms, onaction }: Props = $props();
+    let { tab = $bindable(), tabs, entries, logentries, disasms, handler }: Props = $props();
 
     // order is kept only here, main store is unordered
     const orderedTabs = writable(tabs);
@@ -37,14 +37,12 @@
             return updatedTabs;
         });
     });
-
-    const close = (tab: Tab) => onaction?.({ type: ActionType.CLOSE, tab } as TabAction);
 </script>
 
 <ResizablePaneGroup direction="horizontal" class="grow basis-0">
     <!-- only hide the project pane, because we don't actually want to force a re-render of the tree -->
     <ResizablePane defaultSize={20} class={cn($projectOpen || "hidden")}>
-        <TreePane {entries} {onaction} />
+        <TreePane {entries} {handler} />
     </ResizablePane>
     <ResizableHandle class={cn($projectOpen || "hidden")} />
     <ResizablePane>
@@ -69,7 +67,7 @@
                                     icon={tab0.icon}
                                     closeable
                                     onclick={() => updateCurrent(tab0)}
-                                    onclose={() => close(tab0)}
+                                    onclose={() => handler.close(tab0)}
                                 />
                             {/each}
                         </div>
@@ -78,7 +76,7 @@
                         <div
                             class={cn("relative flex h-full min-h-0 w-full flex-col", tab?.id === tab0.id || "hidden")}
                         >
-                            <MainPane tab={tab0} {disasms} {onaction} />
+                            <MainPane tab={tab0} {disasms} {handler} />
                         </div>
                     {/each}
                 </div>

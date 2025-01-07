@@ -13,13 +13,13 @@
     import { FilePlus2, Folder, Moon, Settings, Sun } from "lucide-svelte";
     import { ToggleGroup, ToggleGroupItem } from "$lib/components/ui/toggle-group";
     import { Button } from "$lib/components/ui/button";
-    import { type ActionHandler, ActionType } from "$lib/action";
+    import type { EventHandler } from "$lib/event";
 
     interface Props {
-        onaction?: ActionHandler;
+        handler: EventHandler;
     }
 
-    let { onaction }: Props = $props();
+    let { handler }: Props = $props();
 
     let tip = $state(randomTip());
     const handleRevolver = (e: MouseEvent) => {
@@ -37,10 +37,10 @@
             <div>
                 <h2 class="text-lg font-medium text-muted-foreground">Get started</h2>
                 <div class="flex flex-col items-start">
-                    <Button variant="link" class="h-8 p-0" onclick={() => onaction?.({ type: ActionType.LOAD })}>
+                    <Button variant="link" class="h-8 p-0" onclick={() => handler.load()}>
                         <Folder /> Open
                     </Button>
-                    <Button variant="link" class="h-8 p-0" onclick={() => onaction?.({ type: ActionType.ADD })}>
+                    <Button variant="link" class="h-8 p-0" onclick={() => handler.add()}>
                         <FilePlus2 /> Add file
                     </Button>
                 </div>

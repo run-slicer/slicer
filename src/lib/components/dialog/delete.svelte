@@ -10,19 +10,19 @@
         AlertDialogTitle,
     } from "$lib/components/ui/alert-dialog";
     import { buttonVariants } from "$lib/components/ui/button";
-    import { type ActionHandler, ActionType, type BulkEntryAction } from "$lib/action";
     import type { Entry } from "$lib/workspace";
+    import type { EventHandler } from "$lib/event";
 
     interface Props {
         entries: Entry[] | null;
-        onaction?: ActionHandler;
+        handler: EventHandler;
     }
 
-    let { entries = $bindable(), onaction }: Props = $props();
+    let { entries = $bindable(), handler }: Props = $props();
 
-    const handle = (accepted: boolean) => {
+    const handle = async (accepted: boolean) => {
         if (accepted) {
-            onaction?.({ type: ActionType.REMOVE, entries: entries! } as BulkEntryAction);
+            await handler.remove(entries!);
         }
         entries = null;
     };

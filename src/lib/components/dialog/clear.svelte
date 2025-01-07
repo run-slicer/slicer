@@ -10,17 +10,17 @@
         AlertDialogTitle,
     } from "$lib/components/ui/alert-dialog";
     import { buttonVariants } from "$lib/components/ui/button";
-    import { type ActionHandler, ActionType } from "$lib/action";
+    import type { EventHandler } from "$lib/event";
 
     interface Props {
         open?: boolean;
-        onaction?: ActionHandler;
+        handler: EventHandler;
     }
 
-    let { open = $bindable(false), onaction }: Props = $props();
-    const handle = () => {
+    let { open = $bindable(false), handler }: Props = $props();
+    const handle = async () => {
         open = false;
-        onaction?.({ type: ActionType.CLEAR });
+        await handler.clear();
     };
 </script>
 

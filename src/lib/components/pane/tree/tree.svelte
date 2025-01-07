@@ -1,6 +1,6 @@
 <script lang="ts" module>
     import type { Entry } from "$lib/workspace";
-    import type { Node } from "./";
+    import type { Node } from "./node.svelte";
 
     export const collectEntries = (node: Node): Entry[] => {
         if (node.nodes) {
@@ -17,16 +17,16 @@
     import { ContextMenu, ContextMenuTrigger } from "$lib/components/ui/context-menu";
     import { PaneHeader, PaneHeaderItem } from "$lib/components/pane/header";
     import { DeleteDialog } from "$lib/components/dialog";
-    import { type Action, type ActionHandler, ActionType, type BulkEntryAction, type OpenAction } from "$lib/action";
     import TreeNode from "./node.svelte";
     import NodeMenu from "./menu.svelte";
+    import type { EventHandler } from "$lib/event";
 
     interface Props {
         entries: Entry[];
-        onaction?: ActionHandler;
+        handler: EventHandler;
     }
 
-    let { entries, onaction }: Props = $props();
+    let { entries, handler }: Props = $props();
 
     let root: Node = $derived.by(() => {
         const root: Node = { label: "<root>", nodes: [] };
@@ -58,15 +58,7 @@
 
     let triggerElem: HTMLDivElement | null = $state(null);
 
-    const open = (data: Node) => onaction?.({ type: ActionType.OPEN, entry: data.entry! } as OpenAction);
-    const handle = (action: Action) => {
-        if (action.type === ActionType.REMOVE) {
-            // prompt confirmation dialog
-            deleteData = (action as BulkEntryAction).entries;
-        } else {
-            onaction?.(action);
-        }
-    };
+    const open = (data: Node) => handler.open(data.entry!);
 </script>
 
 <div class="flex h-full w-full flex-col">
@@ -97,16 +89,16 @@
                 </div>
             {:else}
                 <div class="flex grow items-center justify-center">
-                    <Button variant="outline" size="sm" onclick={() => onaction?.({ type: ActionType.LOAD })}>
+                    <Button variant="outline" size="sm" onclick={() => handler.load()}>
                         <Plus /> Open
                     </Button>
                 </div>
             {/if}
         </ContextMenuTrigger>
         {#if menuData}
-            <NodeMenu node={menuData} onaction={handle} />
+            <NodeMenu node={menuData} ondelete={(node) => (deleteData = collectEntries(node))} {handler} />
         {/if}
     </ContextMenu>
 </div>
 
-<DeleteDialog bind:entries={deleteData} {onaction} />
+<DeleteDialog bind:entries={deleteData} {handler} />

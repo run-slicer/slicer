@@ -147,6 +147,36 @@ export const humanSize = (bytes: number, si: boolean = false, dp: number = 1): s
     return bytes.toFixed(dp) + " " + units[u];
 };
 
+const HEX_ROW_BYTES = 16;
+
+export const formatHex = async (buffer: Uint8Array): Promise<string> => {
+    let result = "";
+    for (let row = 0; row < buffer.length; row += HEX_ROW_BYTES) {
+        result += row.toString(16).padStart(8, "0") + "  "; // address
+
+        // hexadecimal representation
+        for (let col = 0; col < HEX_ROW_BYTES; col++) {
+            if (row + col < buffer.length) {
+                result += buffer[row + col].toString(16).padStart(2, "0") + " ";
+            } else {
+                result += "   "; // pad missing values
+            }
+        }
+        result += " ";
+
+        // ASCII representation
+        for (let col = 0; col < HEX_ROW_BYTES; col++) {
+            if (row + col < buffer.length) {
+                const byte = buffer[row + col];
+                result += byte >= 32 && byte <= 126 ? String.fromCharCode(byte) : ".";
+            }
+        }
+        result += "\n";
+    }
+
+    return result;
+};
+
 const primTypes: Record<string, string> = {
     B: "byte",
     C: "char",

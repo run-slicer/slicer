@@ -1,10 +1,21 @@
+<script lang="ts" module>
+    import type { Entry } from "$lib/workspace";
+
+    export interface Node {
+        label: string;
+        entry?: Entry;
+        parent?: Node;
+        nodes?: Node[];
+        expanded?: boolean;
+    }
+</script>
+
 <script lang="ts">
     import type { HTMLAttributes } from "svelte/elements";
     import TreeNode from "./node.svelte";
     import { ChevronDown, ChevronRight, Folder } from "lucide-svelte";
     import { cn } from "$lib/components/utils";
     import { fileIcon } from "$lib/components/icons";
-    import type { Node } from "./";
 
     interface Props extends HTMLAttributes<HTMLDivElement> {
         data: Node;

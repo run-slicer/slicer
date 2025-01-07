@@ -1,4 +1,5 @@
-import { ActionType, handle } from "$lib/action";
+import { handler } from "$lib/event";
+import { get } from "svelte/store";
 
 // https://stackoverflow.com/questions/38241480/detect-macos-ios-windows-android-and-linux-os-with-js
 const isMac = /Macintosh|Mac OS|MacIntel|MacPPC|Mac68K/gi.test(navigator.userAgent);
@@ -37,18 +38,14 @@ const listen = (key: string, mod: number, callback: ShortcutCallback): DestroyCa
     return () => window.removeEventListener("keydown", handler);
 };
 
-const listenAction = (key: string, mod: number, action: ActionType): DestroyCallback => {
-    return listen(key, mod, () => handle({ type: action }));
-};
-
 export const register = (): DestroyCallback => {
     // order matters, shortcuts with (more) modifiers should be registered earlier
 
     const callbacks = [
-        listenAction("o", Modifier.CTRL | Modifier.SHIFT, ActionType.ADD),
-        listenAction("o", Modifier.CTRL, ActionType.LOAD),
-        listenAction("w", Modifier.CTRL | Modifier.ALT, ActionType.CLOSE),
-        listenAction("e", Modifier.CTRL, ActionType.EXPORT),
+        listen("o", Modifier.CTRL | Modifier.SHIFT, () => get(handler).add()),
+        listen("o", Modifier.CTRL, () => get(handler).load()),
+        listen("w", Modifier.CTRL | Modifier.ALT, () => get(handler).close()),
+        listen("e", Modifier.CTRL, () => get(handler).export()),
     ];
     return () => callbacks.forEach((c) => c());
 };

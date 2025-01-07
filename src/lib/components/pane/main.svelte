@@ -2,28 +2,28 @@
     import Loading from "$lib/components/loading.svelte";
     import { type Tab, TabType } from "$lib/tab";
     import type { Disassembler } from "$lib/disasm";
-    import type { ActionHandler } from "$lib/action";
+    import type { EventHandler } from "$lib/event";
 
     interface Props {
         tab: Tab;
         disasms: Disassembler[];
-        onaction?: ActionHandler;
+        handler: EventHandler;
     }
 
-    let { tab, disasms, onaction }: Props = $props();
+    let { tab, disasms, handler }: Props = $props();
 </script>
 
 {#if tab.type === TabType.WELCOME}
     {#await import("./welcome.svelte")}
         <Loading value="Loading..." />
     {:then { default: Welcome }}
-        <Welcome {onaction} />
+        <Welcome {handler} />
     {/await}
 {:else if tab.type === TabType.CODE || tab.type === TabType.HEX}
     {#await import("./code/code.svelte")}
         <Loading value="Loading..." />
     {:then { default: Code }}
-        <Code {tab} {disasms} {onaction} />
+        <Code {tab} {disasms} {handler} />
     {/await}
 {:else if tab.type === TabType.FLOW_GRAPH}
     {#await import("./flow/flow.svelte")}
@@ -47,6 +47,6 @@
     {#await import("./class/class.svelte")}
         <Loading value="Loading..." />
     {:then { default: Class }}
-        <Class {tab} {onaction} />
+        <Class {tab} {handler} />
     {/await}
 {/if}

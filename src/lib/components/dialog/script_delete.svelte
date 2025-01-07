@@ -11,18 +11,18 @@
     } from "$lib/components/ui/alert-dialog";
     import { buttonVariants } from "$lib/components/ui/button";
     import type { ProtoScript } from "$lib/script";
-    import { type ActionHandler, ActionType, type ScriptAction } from "$lib/action";
+    import type { EventHandler } from "$lib/event";
 
     interface Props {
         proto: ProtoScript | null;
-        onaction?: ActionHandler;
+        handler: EventHandler;
     }
 
-    let { proto = $bindable(), onaction }: Props = $props();
+    let { proto = $bindable(), handler }: Props = $props();
 
     const handle = async (accepted: boolean) => {
         if (accepted) {
-            onaction?.({ type: ActionType.SCRIPT_REMOVE, proto } as ScriptAction);
+            await handler.removeScript(proto!);
         }
         proto = null;
     };
