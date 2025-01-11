@@ -69,7 +69,7 @@
                                 {@const { icon, classes } = fileIcon(entry.shortName)}
                                 {@const SvelteComponent = icon}
                                 <SvelteComponent class={classes} />
-                                <span>{entry.name}</span>
+                                <span class="break-anywhere">{entry.name}</span>
                             </CommandItem>
                         {/snippet}
                     </VList>
