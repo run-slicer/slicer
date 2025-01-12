@@ -59,6 +59,18 @@
     let triggerElem: HTMLDivElement | null = $state(null);
 
     const open = (data: Node) => handler.open(data.entry!);
+
+    const handleDrop = async (e: DragEvent) => {
+        e.preventDefault();
+
+        if (e.dataTransfer) {
+            await handler.add(
+                e.dataTransfer.items
+                    ? [...e.dataTransfer.items].filter((i) => i.kind === "file").map((i) => i.getAsFile()!)
+                    : [...e.dataTransfer.files]
+            );
+        }
+    };
 </script>
 
 <div class="flex h-full w-full flex-col">
@@ -73,27 +85,36 @@
         }}
     >
         <ContextMenuTrigger bind:ref={triggerElem} class="flex h-full w-full">
-            {#if root.nodes && root.nodes.length > 0}
-                <div class="flex w-full flex-col overflow-auto text-nowrap p-2 contain-strict scrollbar-thin">
-                    {#each root.nodes as node (node.label)}
-                        <TreeNode
-                            data={node}
-                            onopen={open}
-                            onmenu={(e, data) => {
-                                menuData = data;
-                                // replay contextmenu event on trigger
-                                triggerElem?.dispatchEvent(e);
-                            }}
-                        />
-                    {/each}
-                </div>
-            {:else}
-                <div class="flex grow items-center justify-center">
-                    <Button variant="outline" size="sm" onclick={() => handler.load()}>
-                        <Plus /> Open
-                    </Button>
-                </div>
-            {/if}
+            <div
+                class="flex h-full w-full"
+                role="presentation"
+                ondrop={handleDrop}
+                ondragover={(e) => e.preventDefault()}
+            >
+                {#if root.nodes && root.nodes.length > 0}
+                    <div class="flex w-full flex-col overflow-auto text-nowrap p-2 contain-strict scrollbar-thin">
+                        {#each root.nodes as node (node.label)}
+                            <TreeNode
+                                data={node}
+                                onopen={open}
+                                onmenu={(e, data) => {
+                                    menuData = data;
+                                    // replay contextmenu event on trigger
+                                    triggerElem?.dispatchEvent(e);
+                                }}
+                            />
+                        {/each}
+                    </div>
+                {:else}
+                    <div class="flex grow flex-col items-center justify-center gap-4">
+                        <Button variant="outline" size="sm" onclick={() => handler.load()}>
+                            <Plus /> Open
+                        </Button>
+                        <span class="text-xs text-muted-foreground">or</span>
+                        <span class="text-sm text-muted-foreground">drag n' drop</span>
+                    </div>
+                {/if}
+            </div>
         </ContextMenuTrigger>
         {#if menuData}
             <NodeMenu node={menuData} ondelete={(node) => (deleteData = collectEntries(node))} {handler} />

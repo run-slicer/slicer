@@ -9,7 +9,7 @@ type Awaitable<T> = T | PromiseLike<T>;
 
 export interface EventHandler {
     load(): Awaitable<void>;
-    add(): Awaitable<void>;
+    add(files?: File[]): Awaitable<void>;
     clear(): Awaitable<void>;
     open(entry: Entry, tabType?: TabType): Awaitable<void>;
     remove(entries: Entry[]): Awaitable<void>;

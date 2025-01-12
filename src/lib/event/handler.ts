@@ -96,8 +96,11 @@ export default {
             });
         }
     },
-    async add(): Promise<void> {
-        const files = await readFiles("", true);
+    async add(files?: File[]): Promise<void> {
+        if (!files) {
+            files = await readFiles("", true);
+        }
+
         if (files.length === 0) {
             return;
         }
