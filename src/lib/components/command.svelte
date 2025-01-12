@@ -66,9 +66,8 @@
                     <VList data={filteredEntries} getKey={(e) => e.name} class="p-2">
                         {#snippet children(entry)}
                             <CommandItem class="!py-2.5" onSelect={() => handleClick(entry)}>
-                                {@const { icon, classes } = fileIcon(entry.shortName)}
-                                {@const SvelteComponent = icon}
-                                <SvelteComponent class={classes} />
+                                {@const { icon: Icon, classes } = fileIcon(entry.shortName)}
+                                <Icon class={classes} />
                                 <span class="break-anywhere">{entry.name}</span>
                             </CommandItem>
                         {/snippet}

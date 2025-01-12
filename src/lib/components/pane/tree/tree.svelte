@@ -111,7 +111,7 @@
                             <Plus /> Open
                         </Button>
                         <span class="text-xs text-muted-foreground">or</span>
-                        <span class="text-sm text-muted-foreground">drag n' drop</span>
+                        <span class="text-sm text-accent-foreground">drag n' drop</span>
                     </div>
                 {/if}
             </div>

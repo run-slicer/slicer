@@ -18,7 +18,7 @@ export const toolsDisasm = persisted<string>(`${root}.tools.disasm`, "vf" /* vf.
 export const loggingOpen = persisted<boolean>(`${root}.logging.open`, false);
 export const loggingMaxEntries = persisted<number>(`${root}.logging.max-entries`, 50);
 export const scriptingScripts = persisted<ScriptData[]>(`${root}.scripting.scripts`, []);
-export const editorWrap = persisted<boolean>(`${root}.editor.wrap`, false);
+export const editorWrap = persisted<boolean>(`${root}.editor.wrap`, true);
 export const editorTextSize = persisted<number>(`${root}.editor.text-size`, 0.75);
 export const editorTextSizeSync = persisted<boolean>(`${root}.editor.text-size.sync`, true);
 

@@ -4,7 +4,6 @@
     import { ResizableHandle, ResizablePane, ResizablePaneGroup } from "$lib/components/ui/resizable";
     import type { Entry } from "$lib/workspace";
     import { type Tab, updateCurrent } from "$lib/tab";
-    import { loggingOpen, projectOpen } from "$lib/state";
     import type { LogEntry } from "$lib/log";
     import { cn } from "$lib/components/utils";
     import TreePane from "$lib/components/pane/tree/tree.svelte";
@@ -18,12 +17,23 @@
         tab: Tab | null;
         tabs: Tab[];
         entries: Entry[];
-        logentries: LogEntry[];
+        logEntries: LogEntry[];
         disasms: Disassembler[];
         handler: EventHandler;
+        projectOpen?: boolean;
+        loggingOpen?: boolean;
     }
 
-    let { tab = $bindable(), tabs, entries, logentries, disasms, handler }: Props = $props();
+    let {
+        tab = $bindable(),
+        tabs,
+        entries,
+        logEntries,
+        disasms,
+        handler,
+        projectOpen = true,
+        loggingOpen = false,
+    }: Props = $props();
 
     // order is kept only here, main store is unordered
     const orderedTabs = writable(tabs);
@@ -41,10 +51,10 @@
 
 <ResizablePaneGroup direction="horizontal" class="grow basis-0">
     <!-- only hide the project pane, because we don't actually want to force a re-render of the tree -->
-    <ResizablePane defaultSize={20} class={cn($projectOpen || "hidden")}>
+    <ResizablePane defaultSize={20} class={cn(projectOpen || "hidden")}>
         <TreePane {entries} {handler} />
     </ResizablePane>
-    <ResizableHandle class={cn($projectOpen || "hidden")} />
+    <ResizableHandle class={cn(projectOpen || "hidden")} />
     <ResizablePane>
         <ResizablePaneGroup direction="vertical">
             <ResizablePane>
@@ -81,10 +91,10 @@
                     {/each}
                 </div>
             </ResizablePane>
-            {#if $loggingOpen}
+            {#if loggingOpen}
                 <ResizableHandle />
                 <ResizablePane defaultSize={20}>
-                    <LoggingPane entries={logentries} />
+                    <LoggingPane entries={logEntries} />
                 </ResizablePane>
             {/if}
         </ResizablePaneGroup>
