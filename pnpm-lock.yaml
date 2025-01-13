@@ -66,8 +66,8 @@ importers:
         specifier: 0.1.2-1.10.1
         version: 0.1.2-1.10.1
       '@run-slicer/zip':
-        specifier: ^0.4.1
-        version: 0.4.1
+        specifier: ^0.5.1
+        version: 0.5.1
       '@tanstack/table-core':
         specifier: ^8.20.5
         version: 8.20.5
@@ -566,8 +566,8 @@ packages:
   '@run-slicer/vf@0.1.2-1.10.1':
     resolution: {integrity: sha512-EuDLNIDllcCeUELAhblG0qHdb+3jZvSghO2p5khwa2gvvymzMOj9QRKxGjvkGLAVJi73etcTNSFfrGb7k9tfXQ==}
 
-  '@run-slicer/zip@0.4.1':
-    resolution: {integrity: sha512-QuzFOViPVtNU34i6CzH1PA18FICKpUUhGo1+L6BsQPFeJ5XmxAtn7navu/9uKVIMhlrkcbhYovJlbdphbIXJmQ==}
+  '@run-slicer/zip@0.5.1':
+    resolution: {integrity: sha512-Z92DZrBkLiapC19BgcLUiRcbckjCBdKjXgThP8yDMBm3d+qYlLqO0Hxv4NPTtH6LsrR7aA8/BU9N8KJIM5TiDg==}
 
   '@svelte-put/shortcut@3.1.1':
     resolution: {integrity: sha512-2L5EYTZXiaKvbEelVkg5znxqvfZGZai3m97+cAiUBhLZwXnGtviTDpHxOoZBsqz41szlfRMcamW/8o0+fbW3ZQ==}
@@ -1042,9 +1042,6 @@ packages:
 
   package-json-from-dist@1.0.1:
     resolution: {integrity: sha512-UEZIS3/by4OC8vL3P2dTXRETpebLI2NiI5vIrjaD/5UtrkFX/tNbwjTSRAGC/+7CAo2pIcBaRgWmcBBHcsaCIw==}
-
-  pako@2.1.0:
-    resolution: {integrity: sha512-w+eufiZ1WuJYgPXbV/PO3NCMEc3xqylkKHzp8bxp1uW4qaSNQUkwmLLEc3kKsfz8lpV1F8Ht3U1Cm+9Srog2ug==}
 
   paneforge@1.0.0-next.1:
     resolution: {integrity: sha512-K28RZ/KLqnZJeuZ7TZNv5C51NrQ3UPggf2sIhIXjTd4brpRZpmCA9C2SL2o4CC0U2Ox75KxUFwEXq2A/iDBuZg==}
@@ -1846,9 +1843,7 @@ snapshots:
 
   '@run-slicer/vf@0.1.2-1.10.1': {}
 
-  '@run-slicer/zip@0.4.1':
-    dependencies:
-      pako: 2.1.0
+  '@run-slicer/zip@0.5.1': {}
 
   '@svelte-put/shortcut@3.1.1(svelte@5.17.3)':
     dependencies:
@@ -2306,8 +2301,6 @@ snapshots:
   object-hash@3.0.0: {}
 
   package-json-from-dist@1.0.1: {}
-
-  pako@2.1.0: {}
 
   paneforge@1.0.0-next.1(svelte@5.17.3):
     dependencies:

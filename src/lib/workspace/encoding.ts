@@ -1,4 +1,4 @@
-import { workspaceEncoding } from "$lib/state";
+import { workspaceArchiveEncoding, workspaceEncoding } from "$lib/state";
 import { derived } from "svelte/store";
 
 export interface Encoding {
@@ -20,3 +20,7 @@ export const current = derived(
 );
 
 export const decoder = derived(workspaceEncoding, ($workspaceEncoding) => new TextDecoder($workspaceEncoding));
+export const archiveDecoder = derived(
+    workspaceArchiveEncoding,
+    ($workspaceArchiveEncoding) => new TextDecoder($workspaceArchiveEncoding)
+);

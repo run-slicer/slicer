@@ -1,12 +1,14 @@
 import { error, warn } from "$lib/log";
 import { rootContext } from "$lib/script";
-import { workspaceArchiveEncoding, workspaceArchiveNested } from "$lib/state";
+import { workspaceArchiveNested } from "$lib/state";
 import { prettyMethodDesc } from "$lib/utils";
+import { decompressor } from "$lib/workspace/compress";
 import { type Member, type Node, read } from "@run-slicer/asm";
 import type { UTF8Entry } from "@run-slicer/asm/pool";
 import type { Zip } from "@run-slicer/zip";
 import { derived, get, writable } from "svelte/store";
 import { type Data, fileData, memoryData, type Named, parseName, transformData, zipData } from "./data";
+import { archiveDecoder } from "./encoding";
 
 export const enum EntryType {
     FILE = "file",
@@ -84,9 +86,8 @@ const replaceExt = (path: string, ext: string): string => {
     return `${path}.${ext}`;
 };
 
-// UTF-8
-const encoder = new TextEncoder();
-const decoder = new TextDecoder();
+const utf8Encoder = new TextEncoder();
+const utf8Decoder = new TextDecoder();
 
 export const transformEntry = (entry: Entry, ext: string, value: string): Entry => {
     const name = replaceExt(entry.name, ext);
@@ -96,7 +97,7 @@ export const transformEntry = (entry: Entry, ext: string, value: string): Entry 
         name,
         shortName: replaceExt(entry.shortName, ext),
         extension: ext,
-        data: memoryData(name, encoder.encode(value), decoder),
+        data: memoryData(name, utf8Encoder.encode(value), utf8Decoder),
     };
 };
 
@@ -176,7 +177,7 @@ const load0 = async (entries: Map<string, Entry>, d: Data, parent?: Entry): Prom
 
             // if we're loading a nested archive, hope it's uncompressed or pretty small
             // if it isn't, then we're loading the entire thing into memory!
-            archiveEntry.archive = await readBlob(await d.blob(), { encoding: get(workspaceArchiveEncoding) });
+            archiveEntry.archive = await readBlob(await d.blob(), { decoder: get(archiveDecoder), decompressor });
             archiveEntry.type = EntryType.ARCHIVE;
 
             // read nested archives
@@ -219,7 +220,7 @@ export const loadFile = async (f: File): Promise<LoadResult[]> => {
 export const loadZip = async (f: File): Promise<LoadResult[]> => {
     const { readBlob } = await import("@run-slicer/zip");
 
-    return load(...(await zipData(await readBlob(f, { encoding: get(workspaceArchiveEncoding) }))));
+    return load(...(await zipData(await readBlob(f, { decoder: get(archiveDecoder), decompressor }))));
 };
 
 export const remove = (entry: Entry) => {
