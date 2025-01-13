@@ -1,6 +1,7 @@
+import { roundRobin } from "$lib/utils";
 import { wrap } from "comlink";
 import type { Disassembler } from "./";
-import { createClassFunc, createMethodFunc, type ClassWorker, type MethodWorker } from "./worker";
+import { createClassFunc, createMethodFunc, type Worker } from "./worker";
 import CFRWorker from "./worker/cfr?worker";
 import JASMWorker from "./worker/jasm?worker";
 import ProcyonWorker from "./worker/procyon?worker";
@@ -11,16 +12,17 @@ export const cfr: Disassembler = {
     name: "CFR",
     language: "java",
     concurrency: 5,
-    class: createClassFunc(5, () => wrap<ClassWorker>(new CFRWorker())),
+    class: createClassFunc(roundRobin(5, () => wrap<Worker>(new CFRWorker()))),
 };
 
+const jasmWorkerSource = roundRobin(5, () => wrap<Worker>(new JASMWorker()));
 export const jasm: Disassembler = {
     id: "jasm",
     name: "JASM",
     language: "jasm",
     concurrency: 5,
-    class: createClassFunc(5, () => wrap<ClassWorker>(new JASMWorker())),
-    method: createMethodFunc(5, () => wrap<MethodWorker>(new JASMWorker())),
+    class: createClassFunc(jasmWorkerSource),
+    method: createMethodFunc(jasmWorkerSource),
 };
 
 export const vf: Disassembler = {
@@ -28,7 +30,7 @@ export const vf: Disassembler = {
     name: "Vineflower",
     language: "java",
     concurrency: 5,
-    class: createClassFunc(5, () => wrap<ClassWorker>(new VFWorker())),
+    class: createClassFunc(roundRobin(5, () => wrap<Worker>(new VFWorker()))),
 };
 
 export const procyon: Disassembler = {
@@ -36,7 +38,7 @@ export const procyon: Disassembler = {
     name: "Procyon",
     language: "java",
     concurrency: 5,
-    class: createClassFunc(5, () => wrap<ClassWorker>(new ProcyonWorker())),
+    class: createClassFunc(roundRobin(5, () => wrap<Worker>(new ProcyonWorker()))),
 };
 
 export const slicer: Disassembler = {

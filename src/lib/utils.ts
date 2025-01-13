@@ -37,6 +37,23 @@ export const chunk = <T>(arr: T[], size: number): T[][] => {
     return chunks;
 };
 
+export const roundRobin = <T>(size: number, func: () => T): (() => T) => {
+    const items = new Array<T>(size);
+    for (let i = 0; i < size; i++) {
+        items[i] = func();
+    }
+
+    let currItem = 0;
+    return () => {
+        const item = items[currItem++];
+        if (currItem >= items.length) {
+            currItem = 0; // wrap around
+        }
+
+        return item;
+    };
+};
+
 /*
     cyrb53 (c) 2018 bryc (github.com/bryc)
     License: Public domain (or MIT if needed). Attribution appreciated.
