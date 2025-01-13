@@ -2,7 +2,6 @@ import { error, warn } from "$lib/log";
 import { rootContext } from "$lib/script";
 import { workspaceArchiveNested } from "$lib/state";
 import { prettyMethodDesc } from "$lib/utils";
-import { decompressor } from "$lib/workspace/compress";
 import { type Member, type Node, read } from "@run-slicer/asm";
 import type { UTF8Entry } from "@run-slicer/asm/pool";
 import type { Zip } from "@run-slicer/zip";
@@ -177,7 +176,7 @@ const load0 = async (entries: Map<string, Entry>, d: Data, parent?: Entry): Prom
 
             // if we're loading a nested archive, hope it's uncompressed or pretty small
             // if it isn't, then we're loading the entire thing into memory!
-            archiveEntry.archive = await readBlob(await d.blob(), { decoder: get(archiveDecoder), decompressor });
+            archiveEntry.archive = await readBlob(await d.blob(), { decoder: get(archiveDecoder) });
             archiveEntry.type = EntryType.ARCHIVE;
 
             // read nested archives
@@ -220,7 +219,7 @@ export const loadFile = async (f: File): Promise<LoadResult[]> => {
 export const loadZip = async (f: File): Promise<LoadResult[]> => {
     const { readBlob } = await import("@run-slicer/zip");
 
-    return load(...(await zipData(await readBlob(f, { decoder: get(archiveDecoder), decompressor }))));
+    return load(...(await zipData(await readBlob(f, { decoder: get(archiveDecoder) }))));
 };
 
 export const remove = (entry: Entry) => {
