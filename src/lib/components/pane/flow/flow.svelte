@@ -27,7 +27,7 @@
     );
 
     const createLabel = (method: Member | null): string => {
-        return !method ? "<none>" : `${method.name.decode()}${method.type.decode()}`;
+        return !method ? "<none>" : `${method.name.string}${method.type.string}`;
     };
 
     let method = $state((member ? methods.indexOf(member) : -1).toString());

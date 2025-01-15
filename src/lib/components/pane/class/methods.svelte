@@ -44,8 +44,8 @@
                         </span>
                         ({method.access})
                     </TableCell>
-                    <TableCell class="break-anywhere font-mono tracking-tight">{method.name.decode()}</TableCell>
-                    <TableCell class="break-anywhere font-mono tracking-tight">{method.type.decode()}</TableCell>
+                    <TableCell class="break-anywhere font-mono tracking-tight">{method.name.string}</TableCell>
+                    <TableCell class="break-anywhere font-mono tracking-tight">{method.type.string}</TableCell>
                     <TableCell>
                         <DropdownMenu>
                             <DropdownMenuTrigger>

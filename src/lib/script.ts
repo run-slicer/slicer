@@ -116,7 +116,7 @@ const wrapDisasm = (disasm: Disassembler): ScriptDisassembler => {
                   const node = readNode(data);
 
                   const method = node.methods.find((m) => {
-                      return m.name.decode() + m.type.decode() === signature;
+                      return m.name.string + m.type.string === signature;
                   });
                   if (!method) {
                       return "";
@@ -152,7 +152,7 @@ const unwrapDisasm = (disasm: ScriptDisassembler): Disassembler => {
             const { node, data } = entry;
 
             const buf = await data.bytes();
-            const name = (node.pool[node.thisClass.name] as UTF8Entry).decode();
+            const name = (node.pool[node.thisClass.name] as UTF8Entry).string;
 
             const classes0 = get(classes);
             return disasm.class(name, createClassSource(classes0, name, buf));
@@ -162,8 +162,8 @@ const unwrapDisasm = (disasm: ScriptDisassembler): Disassembler => {
                   const { node, data } = entry;
 
                   const buf = await data.bytes();
-                  const name = (node.pool[node.thisClass.name] as UTF8Entry).decode();
-                  const signature = method.name.decode() + method.type.decode();
+                  const name = (node.pool[node.thisClass.name] as UTF8Entry).string;
+                  const signature = method.name.string + method.type.string;
 
                   const classes0 = get(classes);
                   return disasm.method!(name, signature, createClassSource(classes0, name, buf));

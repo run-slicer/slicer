@@ -61,7 +61,7 @@ export const disassembleMethod = async (entry: ClassEntry, method: Member, disas
 
         return disasm.method(entry, method);
     } catch (e: any) {
-        const signature = method.name.decode() + method.type.decode();
+        const signature = method.name.string + method.type.string;
         error(`failed to disassemble ${entry.name}#${signature} method`, e);
 
         return `// Failed to disassemble ${entry.name}#${signature}; disassembler threw error.\n${e.toString().replaceAll(/^/gm, "// ")}`;

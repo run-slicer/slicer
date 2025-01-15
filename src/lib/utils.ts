@@ -1,6 +1,6 @@
 /* array ops */
 
-import { writable, type Writable } from "svelte/store";
+import { derived, type Readable, writable, type Writable } from "svelte/store";
 
 export const partition = <T>(arr: T[], func: (e: T) => boolean): [T[], T[]] => {
     const pass: T[] = [],
@@ -86,6 +86,17 @@ export const persisted = <T>(key: string, initialValue: T): Writable<T> => {
         localStorage.setItem(key, JSON.stringify(v));
     });
     return store;
+};
+
+export const debounced = <T>(store: Readable<T>, delay: number): Readable<T> => {
+    let timeoutId: any;
+    return derived(store, ($store, set) => {
+        if (timeoutId) {
+            clearTimeout(timeoutId);
+        }
+
+        timeoutId = setTimeout(() => set($store), delay);
+    });
 };
 
 /* file operations */

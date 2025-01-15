@@ -12,19 +12,19 @@
 
     let { node }: Props = $props();
 
-    const signatureAttr = node.attrs.find((a) => a.name === AttributeType.SIGNATURE);
-    const sourceFileAttr = node.attrs.find((a) => a.name === AttributeType.SOURCE_FILE);
+    const signatureAttr = node.attrs.find((a) => a.name?.string === AttributeType.SIGNATURE);
+    const sourceFileAttr = node.attrs.find((a) => a.name?.string === AttributeType.SOURCE_FILE);
 
     const version = Version[node.major]?.substring(2)?.replaceAll("_", ".") || `${node.major - 44}?`;
-    const name = (node.pool[node.thisClass.name] as UTF8Entry).decode();
+    const name = (node.pool[node.thisClass.name] as UTF8Entry).string;
     const mods = formatMod(
         node.access,
         (node.access & Modifier.INTERFACE) !== 0 ? ElementType.INTERFACE : ElementType.CLASS
     );
-    const superName = node.superClass ? (node.pool[node.superClass.name] as UTF8Entry).decode() : null;
-    const interfaces = node.interfaces.map(({ name }) => (node.pool[name] as UTF8Entry).decode());
-    const signature = (signatureAttr as SignatureAttribute)?.signatureEntry?.decode?.();
-    const sourceFile = (sourceFileAttr as SourceFileAttribute)?.sourceFileEntry?.decode?.();
+    const superName = node.superClass ? (node.pool[node.superClass.name] as UTF8Entry).string : null;
+    const interfaces = node.interfaces.map(({ name }) => (node.pool[name] as UTF8Entry).string);
+    const signature = (signatureAttr as SignatureAttribute)?.signatureEntry?.string;
+    const sourceFile = (sourceFileAttr as SourceFileAttribute)?.sourceFileEntry?.string;
 </script>
 
 <Table>

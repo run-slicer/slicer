@@ -31,8 +31,8 @@
                         </span>
                         ({field.access})
                     </TableCell>
-                    <TableCell class="break-anywhere font-mono tracking-tight">{field.type.decode()}</TableCell>
-                    <TableCell class="break-anywhere font-mono tracking-tight">{field.name.decode()}</TableCell>
+                    <TableCell class="break-anywhere font-mono tracking-tight">{field.type.string}</TableCell>
+                    <TableCell class="break-anywhere font-mono tracking-tight">{field.name.string}</TableCell>
                 </TableRow>
             {/each}
         {:else}

@@ -32,7 +32,7 @@ export const createComputedGraph = (method: Member | null, pool: Pool, handlerEd
         return [[], []]; // no method
     }
 
-    const attr = method.attrs.find((a) => a.name === AttributeType.CODE);
+    const attr = method.attrs.find((a) => a.name?.string === AttributeType.CODE);
     if (!attr) {
         return [[], []]; // no Code attribute
     }

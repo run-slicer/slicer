@@ -12,7 +12,7 @@ import { archiveDecoder } from "./encoding";
 export const enum EntryType {
     FILE = "file",
     ARCHIVE = "archive",
-    CLASS = "class", // only by readDetail
+    CLASS = "class",
     MEMBER = "member",
 }
 
@@ -101,19 +101,16 @@ export const transformEntry = (entry: Entry, ext: string, value: string): Entry 
 };
 
 export const memberEntry = (entry: ClassEntry, member: Member): MemberEntry => {
-    const nodeName = (entry.node.pool[entry.node.thisClass.name] as UTF8Entry).decode();
+    const nodeName = (entry.node.pool[entry.node.thisClass.name] as UTF8Entry).string;
 
-    const memberName = member.name.decode();
-    const memberType = member.type.decode();
-
-    const signature = memberName + prettyMethodDesc(memberType);
+    const signature = member.name.string + prettyMethodDesc(member.type.string);
 
     const slashIndex = nodeName.lastIndexOf("/");
     return {
         ...entry,
         type: EntryType.MEMBER,
         parent: entry,
-        name: `${entry.name}/${memberName}${memberType}`,
+        name: `${entry.name}/${member.name.string}${member.type.string}`,
         shortName: `${slashIndex !== -1 ? nodeName.substring(slashIndex + 1) : nodeName}#${signature}`,
         data: {
             ...entry.data,
@@ -167,8 +164,6 @@ const load0 = async (entries: Map<string, Entry>, d: Data, parent?: Entry): Prom
     results.push({ entry, created: true });
 
     if (entry.extension && zipExtensions.has(entry.extension)) {
-        const shouldExpandNested = get(workspaceArchiveNested);
-
         try {
             const archiveEntry = entry as ArchiveEntry;
 
@@ -179,8 +174,8 @@ const load0 = async (entries: Map<string, Entry>, d: Data, parent?: Entry): Prom
             archiveEntry.archive = await readBlob(await d.blob(), { decoder: get(archiveDecoder) });
             archiveEntry.type = EntryType.ARCHIVE;
 
-            // read nested archives
-            if (shouldExpandNested) {
+            // expand archives into workspace
+            if (get(workspaceArchiveNested)) {
                 for (const zipEntry of await zipData(archiveEntry.archive)) {
                     results.push(...(await load0(entries, zipEntry, entry)));
                 }

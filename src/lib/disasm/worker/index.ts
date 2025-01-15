@@ -18,7 +18,7 @@ export const createClassFunc = (workerFunc: () => Worker): DisassemblyFunc => {
         const { node, data } = entry;
 
         const buf = await data.bytes();
-        const name = (node.pool[node.thisClass.name] as UTF8Entry).decode();
+        const name = (node.pool[node.thisClass.name] as UTF8Entry).string;
 
         const worker = workerFunc();
 
@@ -32,8 +32,8 @@ export const createMethodFunc = (workerFunc: () => Worker): MethodDisassemblyFun
         const { node, data } = entry;
 
         const buf = await data.bytes();
-        const name = (node.pool[node.thisClass.name] as UTF8Entry).decode();
-        const signature = method.name.decode() + method.type.decode();
+        const name = (node.pool[node.thisClass.name] as UTF8Entry).string;
+        const signature = method.name.string + method.type.string;
 
         const worker = workerFunc();
 
