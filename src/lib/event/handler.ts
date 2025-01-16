@@ -37,7 +37,7 @@ import {
     EntryType,
     loadFile,
     loadZip,
-    readDetail,
+    readDeferred,
     remove as removeWs,
 } from "$lib/workspace";
 import { type Data, download } from "$lib/workspace/data";
@@ -152,7 +152,7 @@ export default {
                     id,
                     type: tabType,
                     name: entry.shortName,
-                    entry: await readDetail(entry),
+                    entry: await readDeferred(entry),
                     icon: tabIcon(tabType, entry),
                 });
             } catch (e) {
@@ -196,7 +196,7 @@ export default {
 
             return record("exporting", entry.name, async () => {
                 try {
-                    let entry0 = await readDetail(entry);
+                    let entry0 = await readDeferred(entry);
                     if (entry.type === EntryType.CLASS && disasm) {
                         entry0 = await record("disassembling", entry.name, () =>
                             disassembleEntry(entry as ClassEntry, disasm)
@@ -231,7 +231,7 @@ export default {
 
                                 try {
                                     if (disasm) {
-                                        entry = await readDetail(entry);
+                                        entry = await readDeferred(entry);
                                         if (entry.type === EntryType.CLASS) {
                                             entry = await disassembleEntry(entry as ClassEntry, disasm);
                                         }

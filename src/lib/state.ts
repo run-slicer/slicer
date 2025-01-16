@@ -11,7 +11,6 @@ export interface ScriptData {
 export const themeColor = persisted<string>(`${root}.theme.color`, "zinc");
 export const themeRadius = persisted<number>(`${root}.theme.radius`, 0.5);
 export const workspaceEncoding = persisted<string>(`${root}.workspace.encoding`, "utf-8");
-export const workspaceArchiveNested = persisted<boolean>(`${root}.workspace.archive.nested`, true);
 export const workspaceArchiveEncoding = persisted<string>(`${root}.workspace.archive.encoding`, "utf-8");
 export const projectOpen = persisted<boolean>(`${root}.project.open`, true);
 export const toolsDisasm = persisted<string>(`${root}.tools.disasm`, "vf" /* vf.id ($lib/disasm/builtin) */);

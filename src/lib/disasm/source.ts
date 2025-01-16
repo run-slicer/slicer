@@ -1,4 +1,4 @@
-import { type Entry, EntryType, readDetail } from "$lib/workspace";
+import { type Entry, EntryType, readDeferred } from "$lib/workspace";
 
 export type EntrySource = (name: string) => Promise<Uint8Array | null>;
 
@@ -13,7 +13,7 @@ export const createSource = (classes: Map<string, Entry>, name: string, buf: Uin
             return null;
         }
 
-        entry = await readDetail(entry);
+        entry = await readDeferred(entry);
         if (entry.type !== EntryType.CLASS) {
             return null; // not a class
         }

@@ -11,7 +11,7 @@ import { error } from "$lib/log";
 import { scriptingScripts } from "$lib/state";
 import { current as currentTab, find as findTab, refresh as refreshTab, type Tab, tabs, TabType } from "$lib/tab";
 import { cyrb53 } from "$lib/utils";
-import { type ClassEntry, classes, type Entry, EntryType, readDetail } from "$lib/workspace";
+import { type ClassEntry, classes, type Entry, EntryType, readDeferred } from "$lib/workspace";
 import { DataType, type MemoryData, unwrapTransform } from "$lib/workspace/data";
 import { read as readNode } from "@run-slicer/asm";
 import type { UTF8Entry } from "@run-slicer/asm/pool";
@@ -189,7 +189,7 @@ const editorCtx: EditorContext = {
         if (tab) {
             if (hard && tab.entry) {
                 // script wanted a hard refresh, make sure to trigger a preload event
-                tab.entry = await readDetail({
+                tab.entry = await readDeferred({
                     ...tab.entry,
                     type: EntryType.FILE,
                     // unwrap any transforms, a script may have touched the tab entry

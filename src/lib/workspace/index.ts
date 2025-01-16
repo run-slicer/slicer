@@ -1,6 +1,5 @@
 import { error, warn } from "$lib/log";
 import { rootContext } from "$lib/script";
-import { workspaceArchiveNested } from "$lib/state";
 import { prettyMethodDesc } from "$lib/utils";
 import { type Member, type Node, read } from "@run-slicer/asm";
 import type { UTF8Entry } from "@run-slicer/asm/pool";
@@ -37,35 +36,52 @@ export interface MemberEntry extends ClassEntry {
     member: Member;
 }
 
-export const readDetail = async (entry: Entry): Promise<Entry> => {
-    if (entry.type !== EntryType.FILE) {
-        return entry; // not a generic entry
-    }
-
+const readImmediately = async (entry: Entry): Promise<Entry> => {
     const blob = await entry.data.blob();
-    if (blob.size >= 4) {
-        const view = new DataView(await blob.slice(0, 4).arrayBuffer());
 
-        // detect magic
-        if (view.getUint32(0, false) === 0xcafebabe) {
+    const magic = blob.size >= 4 ? new DataView(await blob.slice(0, 4).arrayBuffer()).getUint32(0, false) : 0;
+    switch (magic) {
+        case 0xcafebabe: {
             // try to read as class
             const buffer = new Uint8Array(await blob.arrayBuffer());
 
             try {
-                const event = await rootContext.dispatchEvent({
-                    type: "preload",
-                    name: entry.name,
-                    data: buffer,
-                });
+                const classEntry = entry as ClassEntry;
 
-                // create transformed data only if a transformation happened
-                const data = event.data !== buffer ? transformData(entry.data, event.data) : entry.data;
+                classEntry.node = read(buffer);
+                classEntry.type = EntryType.CLASS;
+                return classEntry;
+            } catch (e) {
+                error(`failed to read class ${entry.name}`, e);
+            }
+        }
+    }
 
-                return {
+    return entry;
+};
+
+export const readDeferred = async (entry: Entry): Promise<Entry> => {
+    // no earlier analysis available, read the first time
+    if (entry.type === EntryType.FILE) {
+        entry = await readImmediately(entry);
+    }
+
+    // preprocess class file with script
+    if (entry.type === EntryType.CLASS) {
+        const buffer = await entry.data.bytes();
+        const event = await rootContext.dispatchEvent({
+            type: "preload",
+            name: entry.name,
+            data: buffer,
+        });
+
+        // create transformed entry only if a transformation happened
+        if (event.data !== buffer) {
+            try {
+                entry = {
                     ...entry,
-                    type: EntryType.CLASS,
                     node: read(event.data),
-                    data,
+                    data: transformData(entry.data, event.data),
                 } as ClassEntry;
             } catch (e) {
                 error(`failed to read class ${entry.name}`, e);
@@ -155,13 +171,12 @@ const load0 = async (entries: Map<string, Entry>, d: Data, parent?: Entry): Prom
 
     const results: LoadResult[] = [];
 
-    const entry: Entry = {
+    let entry: Entry = {
         ...parseName(name),
         type: EntryType.FILE,
         parent,
         data: d,
     };
-    results.push({ entry, created: true });
 
     if (entry.extension && zipExtensions.has(entry.extension)) {
         try {
@@ -175,16 +190,15 @@ const load0 = async (entries: Map<string, Entry>, d: Data, parent?: Entry): Prom
             archiveEntry.type = EntryType.ARCHIVE;
 
             // expand archives into workspace
-            if (get(workspaceArchiveNested)) {
-                for (const zipEntry of await zipData(archiveEntry.archive)) {
-                    results.push(...(await load0(entries, zipEntry, entry)));
-                }
+            for (const zipEntry of await zipData(archiveEntry.archive)) {
+                results.push(...(await load0(entries, zipEntry, entry)));
             }
         } catch (e) {
             warn(`failed to read archive-like entry ${entry.name}`, e);
         }
     }
 
+    results.push({ entry, created: true });
     return results;
 };
 
