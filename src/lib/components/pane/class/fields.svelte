@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { Node } from "@run-slicer/asm";
-    import { ElementType, formatMod } from "@run-slicer/asm/analysis/disasm";
+    import { ElementType, formatMod, escapeLiteral } from "@run-slicer/asm/analysis/disasm";
     import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "$lib/components/ui/table";
 
     interface Props {
@@ -32,7 +32,7 @@
                         ({field.access})
                     </TableCell>
                     <TableCell class="break-anywhere font-mono tracking-tight">{field.type.string}</TableCell>
-                    <TableCell class="break-anywhere font-mono tracking-tight">{field.name.string}</TableCell>
+                    <TableCell class="break-anywhere font-mono tracking-tight">{escapeLiteral(field.name.string)}</TableCell>
                 </TableRow>
             {/each}
         {:else}

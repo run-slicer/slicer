@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { ElementType, formatMod } from "@run-slicer/asm/analysis/disasm";
+    import { ElementType, formatMod, escapeLiteral } from "@run-slicer/asm/analysis/disasm";
     import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "$lib/components/ui/table";
     import {
         DropdownMenu,
@@ -44,7 +44,7 @@
                         </span>
                         ({method.access})
                     </TableCell>
-                    <TableCell class="break-anywhere font-mono tracking-tight">{method.name.string}</TableCell>
+                    <TableCell class="break-anywhere font-mono tracking-tight">{escapeLiteral(method.name.string)}</TableCell>
                     <TableCell class="break-anywhere font-mono tracking-tight">{method.type.string}</TableCell>
                     <TableCell>
                         <DropdownMenu>
