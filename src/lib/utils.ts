@@ -273,6 +273,14 @@ export const prettyMethodDesc = (desc: string): string => {
     return `(${args.map((a) => prettyJavaType(a, true)).join(", ")})`;
 };
 
+export const prettyError = (e: any): string => {
+    if (e.toString === Object.prototype.toString) {
+        return JSON.stringify(e, null, 2);
+    }
+
+    return e.toString();
+};
+
 /* strings */
 
 export const truncate = (str: string, n: number, suffix: string = "..."): string => {
