@@ -32,7 +32,9 @@
                         ({field.access})
                     </TableCell>
                     <TableCell class="break-anywhere font-mono tracking-tight">{field.type.string}</TableCell>
-                    <TableCell class="break-anywhere font-mono tracking-tight">{escapeLiteral(field.name.string)}</TableCell>
+                    <TableCell class="break-anywhere font-mono tracking-tight">
+                        {escapeLiteral(field.name.string)}
+                    </TableCell>
                 </TableRow>
             {/each}
         {:else}

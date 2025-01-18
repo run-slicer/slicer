@@ -278,6 +278,19 @@ export const prettyError = (e: any): string => {
         return JSON.stringify(e, null, 2);
     }
 
+    const stack = (e as Error).stack;
+    if (stack) {
+        const lines = stack
+            .trim()
+            .split("\n")
+            .map((l) => l.trim());
+
+        if (lines[0] === "Error") {
+            lines.shift();
+        }
+        return e.toString() + "\n" + lines.join("\n").replaceAll(/^/gm, "  ");
+    }
+
     return e.toString();
 };
 

@@ -44,7 +44,9 @@
                         </span>
                         ({method.access})
                     </TableCell>
-                    <TableCell class="break-anywhere font-mono tracking-tight">{escapeLiteral(method.name.string)}</TableCell>
+                    <TableCell class="break-anywhere font-mono tracking-tight">
+                        {escapeLiteral(method.name.string)}
+                    </TableCell>
                     <TableCell class="break-anywhere font-mono tracking-tight">{method.type.string}</TableCell>
                     <TableCell>
                         <DropdownMenu>

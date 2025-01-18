@@ -1,10 +1,10 @@
 import { type Language, toExtension } from "$lib/lang";
 import { error } from "$lib/log";
+import { prettyError } from "$lib/utils";
 import { type ClassEntry, type Entry, transformEntry } from "$lib/workspace";
 import type { Member } from "@run-slicer/asm";
 import { get, writable } from "svelte/store";
 import { cfr, jasm, procyon, slicer, vf } from "./builtin";
-import { prettyError } from "$lib/utils";
 
 export interface Disassembler {
     id: string;

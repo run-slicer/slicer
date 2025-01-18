@@ -12,8 +12,8 @@
 
     let { node }: Props = $props();
 
-    const signatureAttr = node.attrs.find((a) => a.name?.string === AttributeType.SIGNATURE);
-    const sourceFileAttr = node.attrs.find((a) => a.name?.string === AttributeType.SOURCE_FILE);
+    const signatureAttr = node.attrs.find((a) => a.type === AttributeType.SIGNATURE);
+    const sourceFileAttr = node.attrs.find((a) => a.type === AttributeType.SOURCE_FILE);
 
     const version = Version[node.major]?.substring(2)?.replaceAll("_", ".") || `${node.major - 44}?`;
     const name = (node.pool[node.thisClass.name] as UTF8Entry).string;
