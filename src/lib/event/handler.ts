@@ -10,11 +10,12 @@ import {
 } from "$lib/script";
 import {
     clear as clearTabs,
-    current as currentTab,
+    currentPrimary as currentPrimaryTab,
     detectType as detectTabType,
     find as findTab,
     remove as removeTab,
     type Tab,
+    TabPosition,
     tabs,
     TabType,
     updateCurrent as updateCurrentTab,
@@ -137,14 +138,9 @@ export default {
             entry = entry.parent!; // unwrap to parent class
         }
 
-        let tab = get(currentTab);
-        if (tab?.type === tabType && tab?.entry?.name === entry.name) {
-            return; // already opened
-        }
-
         const id = `${tabType}:${entry.name}`;
 
-        tab = findTab(id);
+        let tab = findTab(id);
         if (!tab) {
             // tab doesn't exist, create
             try {
@@ -152,6 +148,8 @@ export default {
                     id,
                     type: tabType,
                     name: entry.shortName,
+                    position: TabPosition.PRIMARY_CENTER,
+                    closeable: true,
                     entry: await readDeferred(entry),
                     icon: tabIcon(tabType, entry),
                 });
@@ -165,7 +163,7 @@ export default {
             }
         }
 
-        updateCurrentTab(tab);
+        updateCurrentTab(tab.position, tab);
     },
     async remove(entries: Entry[]): Promise<void> {
         const names = new Set(entries.map((e) => e.name));
@@ -183,7 +181,7 @@ export default {
     },
     async export(entries?: Entry[], disasm?: Disassembler): Promise<void> {
         if (!entries) {
-            const entry = get(currentTab)?.entry;
+            const entry = get(currentPrimaryTab)?.entry;
             if (!entry) {
                 return;
             }
@@ -277,7 +275,7 @@ export default {
         clearWs();
         clearTabs();
     },
-    close(tab: Tab | undefined = get(currentTab) ?? undefined): void {
+    close(tab: Tab | undefined = get(currentPrimaryTab) ?? undefined): void {
         if (tab) {
             removeTab(tab.id);
         }

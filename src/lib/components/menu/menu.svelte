@@ -1,15 +1,7 @@
 <script lang="ts">
     import { mode, userPrefersMode } from "mode-watcher";
     import { Separator } from "$lib/components/ui/separator";
-    import {
-        editorWrap,
-        loggingOpen,
-        projectOpen,
-        themeColor,
-        themeRadius,
-        workspaceArchiveEncoding,
-        workspaceEncoding,
-    } from "$lib/state";
+    import { editorWrap, themeColor, themeRadius, workspaceArchiveEncoding, workspaceEncoding } from "$lib/state";
     import { type Entry, EntryType } from "$lib/workspace";
     import { encodings } from "$lib/workspace/encoding";
     import type { ProtoScript } from "$lib/script";
@@ -46,14 +38,12 @@
         Code,
         Coffee,
         FileCode2,
-        Folders,
         GitBranchPlus,
         Globe,
         Info,
         Moon,
         Settings,
         Sun,
-        Terminal,
         WrapText,
     } from "lucide-svelte";
     import { themes } from "$lib/theme";
@@ -225,7 +215,7 @@
     <MenubarMenu>
         <MenubarTrigger class="relative">View</MenubarTrigger>
         <MenubarContent align="start">
-            <MenubarSub>
+            <!-- <MenubarSub>
                 <MenubarSubTrigger>Pane</MenubarSubTrigger>
                 <MenubarSubContent class="w-[12rem]" align="start">
                     <MenubarCheckboxItem class="justify-between" bind:checked={$projectOpen}>
@@ -235,7 +225,7 @@
                         Logging <Terminal size={16} />
                     </MenubarCheckboxItem>
                 </MenubarSubContent>
-            </MenubarSub>
+            </MenubarSub> -->
             <MenubarSub>
                 <MenubarSubTrigger>Editor</MenubarSubTrigger>
                 <MenubarSubContent class="w-[12rem]" align="start">

@@ -4,13 +4,13 @@
     import Content from "$lib/components/content.svelte";
     import Crumb from "$lib/components/crumb/crumb.svelte";
     import { Toaster } from "$lib/components/ui/sonner";
-    import { current as currentTab, tabs } from "$lib/tab";
+    import { current as currentTab, currentPrimary as currentPrimaryTab, tabs } from "$lib/tab";
     import { classes, entries } from "$lib/workspace";
     import { current as currentEncoding } from "$lib/workspace/encoding";
     import { scripts } from "$lib/script";
     import { entries as logEntries } from "$lib/log";
     import { all as disasms } from "$lib/disasm";
-    import { root as rootKey, projectOpen, loggingOpen } from "$lib/state";
+    import { root as rootKey } from "$lib/state";
     import { theme } from "$lib/theme";
     import { tasks } from "$lib/task";
     import { handler } from "$lib/event";
@@ -36,7 +36,7 @@
 />
 <Toaster position="top-right" richColors />
 <Menu
-    tab={$currentTab}
+    tab={$currentPrimaryTab}
     entries={entries0}
     classes={classes0}
     scripts={$scripts}
@@ -44,16 +44,14 @@
     handler={$handler}
 />
 <Content
-    bind:tab={$currentTab}
+    bind:current={$currentTab}
     tabs={tabs0}
     entries={entries0}
     logEntries={$logEntries}
     disasms={disasms0}
     handler={$handler}
-    projectOpen={$projectOpen}
-    loggingOpen={$loggingOpen}
 />
-<Crumb tab={$currentTab} tasks={tasks0} encoding={$currentEncoding} />
+<Crumb tab={$currentPrimaryTab} tasks={tasks0} encoding={$currentEncoding} />
 {#await import("$lib/components/command.svelte") then { default: Command }}
     <Command entries={entries0} handler={$handler} />
 {/await}

@@ -12,10 +12,9 @@
 </script>
 
 <script lang="ts">
-    import { Folders, Plus } from "lucide-svelte";
+    import { Plus } from "lucide-svelte";
     import { Button } from "$lib/components/ui/button";
     import { ContextMenu, ContextMenuTrigger } from "$lib/components/ui/context-menu";
-    import { PaneHeader, PaneHeaderItem } from "$lib/components/pane/header";
     import { DeleteDialog } from "$lib/components/dialog";
     import TreeNode from "./node.svelte";
     import NodeMenu from "./menu.svelte";
@@ -73,53 +72,43 @@
     };
 </script>
 
-<div class="flex h-full w-full flex-col">
-    <PaneHeader>
-        <PaneHeaderItem name="Project" icon={{ icon: Folders, classes: ["text-muted-foreground"] }} />
-    </PaneHeader>
-    <ContextMenu
-        onOpenChange={(open) => {
-            if (!open) {
-                menuData = null;
-            }
-        }}
-    >
-        <ContextMenuTrigger bind:ref={triggerElem} class="flex h-full w-full">
-            <div
-                class="flex h-full w-full"
-                role="presentation"
-                ondrop={handleDrop}
-                ondragover={(e) => e.preventDefault()}
-            >
-                {#if root.nodes && root.nodes.length > 0}
-                    <div class="flex w-full flex-col overflow-auto text-nowrap p-2 contain-strict scrollbar-thin">
-                        {#each root.nodes as node (node.label)}
-                            <TreeNode
-                                data={node}
-                                onopen={open}
-                                onmenu={(e, data) => {
-                                    menuData = data;
-                                    // replay contextmenu event on trigger
-                                    triggerElem?.dispatchEvent(e);
-                                }}
-                            />
-                        {/each}
-                    </div>
-                {:else}
-                    <div class="flex grow flex-col items-center justify-center gap-4">
-                        <Button variant="outline" size="sm" onclick={() => handler.load()}>
-                            <Plus /> Open
-                        </Button>
-                        <span class="text-xs text-muted-foreground">or</span>
-                        <span class="text-sm text-accent-foreground">drag n' drop</span>
-                    </div>
-                {/if}
-            </div>
-        </ContextMenuTrigger>
-        {#if menuData}
-            <NodeMenu node={menuData} ondelete={(node) => (deleteData = collectEntries(node))} {handler} />
-        {/if}
-    </ContextMenu>
-</div>
+<ContextMenu
+    onOpenChange={(open) => {
+        if (!open) {
+            menuData = null;
+        }
+    }}
+>
+    <ContextMenuTrigger bind:ref={triggerElem} class="flex h-full w-full">
+        <div class="flex h-full w-full" role="presentation" ondrop={handleDrop} ondragover={(e) => e.preventDefault()}>
+            {#if root.nodes && root.nodes.length > 0}
+                <div class="flex w-full flex-col overflow-auto text-nowrap p-2 contain-strict scrollbar-thin">
+                    {#each root.nodes as node (node.label)}
+                        <TreeNode
+                            data={node}
+                            onopen={open}
+                            onmenu={(e, data) => {
+                                menuData = data;
+                                // replay contextmenu event on trigger
+                                triggerElem?.dispatchEvent(e);
+                            }}
+                        />
+                    {/each}
+                </div>
+            {:else}
+                <div class="flex grow flex-col items-center justify-center gap-4">
+                    <Button variant="outline" size="sm" onclick={() => handler.load()}>
+                        <Plus /> Open
+                    </Button>
+                    <span class="text-xs text-muted-foreground">or</span>
+                    <span class="text-sm text-accent-foreground">drag n' drop</span>
+                </div>
+            {/if}
+        </div>
+    </ContextMenuTrigger>
+    {#if menuData}
+        <NodeMenu node={menuData} ondelete={(node) => (deleteData = collectEntries(node))} {handler} />
+    {/if}
+</ContextMenu>
 
 <DeleteDialog bind:entries={deleteData} {handler} />

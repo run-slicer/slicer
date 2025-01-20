@@ -9,7 +9,14 @@ import { createSource as createClassSource } from "$lib/disasm/source";
 import type { Language } from "$lib/lang";
 import { error } from "$lib/log";
 import { scriptingScripts } from "$lib/state";
-import { current as currentTab, find as findTab, refresh as refreshTab, type Tab, tabs, TabType } from "$lib/tab";
+import {
+    currentPrimary as currentPrimaryTab,
+    find as findTab,
+    refresh as refreshTab,
+    type Tab,
+    tabs,
+    TabType,
+} from "$lib/tab";
 import { cyrb53 } from "$lib/utils";
 import { type ClassEntry, classes, type Entry, EntryType, readDeferred } from "$lib/workspace";
 import { DataType, type MemoryData, unwrapTransform } from "$lib/workspace/data";
@@ -181,7 +188,7 @@ const editorCtx: EditorContext = {
         return tab ? wrapTab(tab) : null;
     },
     current(): ScriptTab | null {
-        const tab = get(currentTab);
+        const tab = get(currentPrimaryTab);
         return tab ? wrapTab(tab) : null;
     },
     async refresh(id: string, hard: boolean) {
