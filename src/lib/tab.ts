@@ -64,16 +64,15 @@ export const tabs = writable<Map<string, Tab>>(
     ])
 );
 
-export const current = writable<Record<TabPosition, Tab | null>>({
-    [TabPosition.PRIMARY_TOP]: null,
-    [TabPosition.PRIMARY_CENTER]: welcomeTab,
-    [TabPosition.PRIMARY_BOTTOM]: null,
-    [TabPosition.SECONDARY_LEFT]: projectTab,
-    [TabPosition.SECONDARY_RIGHT]: null,
-});
+export const current = writable<Map<TabPosition, Tab>>(
+    new Map([
+        [TabPosition.PRIMARY_CENTER, welcomeTab],
+        [TabPosition.SECONDARY_LEFT, projectTab],
+    ])
+);
 
 export const currentPrimary = derived(current, ($current) => {
-    return Object.values($current).find((t) => t?.position === TabPosition.PRIMARY_CENTER) || null;
+    return $current.get(TabPosition.PRIMARY_CENTER) || null;
 });
 
 // set window name based on currently opened tab
@@ -100,17 +99,17 @@ export const updateCurrent = (position: TabPosition, tab: Tab | null) => {
     }
 
     current.update(($current) => {
-        $current[position] = tab;
+        if (tab) {
+            $current.set(position, tab);
+        } else {
+            $current.delete(position);
+        }
         return $current;
     });
 };
 
 export const find = (id: string): Tab | null => {
     return get(tabs).get(id) || null;
-};
-
-export const findCurrent = (id: string): Tab | null => {
-    return Object.values(get(current)).find((t) => t?.id === id) || null;
 };
 
 export const update = (tab: Tab): Tab => {
@@ -127,7 +126,7 @@ export const update = (tab: Tab): Tab => {
 
 export const refresh = (tab: Tab): Tab => {
     // try immediate update for the current tab
-    if (get(current)[tab.position]?.id === tab.id) {
+    if (get(current).get(tab.position)?.id === tab.id) {
         return refreshImmediately(tab);
     }
 
@@ -148,7 +147,9 @@ const openNext = (tab: Tab) => {
 };
 
 export const remove = (id: string) => {
-    const tab = findCurrent(id);
+    const tab = get(current)
+        .values()
+        .find((t) => t.id === id);
     if (tab) {
         openNext(tab);
     }
@@ -162,15 +163,15 @@ export const remove = (id: string) => {
 export const move = (tab: Tab, position: TabPosition) => {
     if (tab.position === position) return;
 
-    tab.position = position;
     current.update(($current) => {
-        for (const tab0 of Object.values($current)) {
-            if (tab0?.id === tab.id) {
+        for (const tab0 of $current.values()) {
+            if (tab0.id === tab.id) {
                 openNext(tab0);
             }
         }
 
-        $current[position] = tab;
+        tab.position = position;
+        $current.set(position, tab);
         return $current;
     });
 
@@ -190,12 +191,12 @@ export const clear = () => {
         return $tabs;
     });
 
-    current.set({
-        [TabPosition.PRIMARY_TOP]: null,
-        [TabPosition.PRIMARY_CENTER]: welcomeTab,
-        [TabPosition.PRIMARY_BOTTOM]: null,
-        [TabPosition.SECONDARY_LEFT]: projectTab,
-        [TabPosition.SECONDARY_RIGHT]: null,
+    current.update(($current) => {
+        $current.clear();
+        $current.set(TabPosition.PRIMARY_CENTER, welcomeTab);
+        $current.set(TabPosition.SECONDARY_LEFT, projectTab);
+
+        return $current;
     });
 };
 

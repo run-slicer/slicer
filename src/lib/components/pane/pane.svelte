@@ -9,7 +9,7 @@
     import type { Snippet } from "svelte";
 
     interface Props {
-        current: Record<TabPosition, Tab | null>;
+        current: Map<TabPosition, Tab>;
         tabs: Tab[];
         size?: number;
         position: TabPosition;
@@ -18,13 +18,11 @@
     }
 
     let { current = $bindable(), tabs, size, position, handler, children }: Props = $props();
-    let positionedTabs = $derived(tabs.filter((t) => t.position === position));
+    let posTabs = $derived(tabs.filter((t) => t.position === position));
 
-    const localTabs = writable(positionedTabs);
+    const localTabs = writable(posTabs);
     $effect(() => {
         localTabs.update((localTabs0) => {
-            const posTabs = tabs.filter((t) => t.position === position);
-
             // pop removed tabs
             const updatedTabs = localTabs0.filter((a) => posTabs.some((b) => a.id === b.id));
             // now add newly added tabs
@@ -44,17 +42,17 @@
                 onconsider={(e) => ($localTabs = e.detail.items)}
                 onfinalize={(e) => {
                     const items = e.detail.items;
-                    $localTabs = items;
-
                     for (const tab of items) {
                         move(tab, position);
                     }
+
+                    $localTabs = items;
                 }}
             >
                 {#each $localTabs as tab0 (tab0.id)}
                     <PaneHeaderItem
                         name={tab0.name}
-                        active={current[position]?.id === tab0.id}
+                        active={current.get(position)?.id === tab0.id}
                         icon={tab0.icon}
                         closeable={tab0.closeable}
                         onclick={() => updateCurrent(position, tab0)}
@@ -63,11 +61,11 @@
                 {/each}
             </div>
         </PaneHeader>
-        {#each positionedTabs as tab0 (tab0.internalId)}
+        {#each posTabs as tab0 (tab0.internalId)}
             <div
                 class={cn(
                     "relative flex h-full min-h-0 w-full flex-col",
-                    current[position]?.id === tab0.id || "hidden"
+                    current.get(position)?.id === tab0.id || "hidden"
                 )}
             >
                 {@render children?.(tab0)}

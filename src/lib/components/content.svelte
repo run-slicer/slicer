@@ -9,7 +9,7 @@
     import type { EventHandler } from "$lib/event";
 
     interface Props {
-        current: Record<TabPosition, Tab | null>;
+        current: Map<TabPosition, Tab>;
         tabs: Tab[];
         entries: Entry[];
         logEntries: LogEntry[];
