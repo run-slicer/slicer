@@ -163,6 +163,9 @@ export const remove = (id: string) => {
 export const move = (tab: Tab, position: TabPosition) => {
     if (tab.position === position) return;
 
+    tab.position = position;
+    tabs.update(($tabs) => $tabs);
+
     current.update(($current) => {
         for (const tab0 of $current.values()) {
             if (tab0.id === tab.id) {
@@ -170,12 +173,9 @@ export const move = (tab: Tab, position: TabPosition) => {
             }
         }
 
-        tab.position = position;
         $current.set(position, tab);
         return $current;
     });
-
-    tabs.update(($tabs) => $tabs);
 };
 
 export const clear = () => {

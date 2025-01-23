@@ -7,17 +7,32 @@
     import { writable } from "svelte/store";
     import type { EventHandler } from "$lib/event";
     import type { Snippet } from "svelte";
+    import { ResizableHandle } from "$lib/components/ui/resizable";
 
     interface Props {
         current: Map<TabPosition, Tab>;
         tabs: Tab[];
         size?: number;
+        hidden?: boolean;
         position: TabPosition;
         handler: EventHandler;
         children?: Snippet<[Tab]>;
+
+        handleBefore?: boolean;
+        handleAfter?: boolean;
     }
 
-    let { current = $bindable(), tabs, size, position, handler, children }: Props = $props();
+    let {
+        current = $bindable(),
+        tabs,
+        size,
+        hidden = $bindable(),
+        position,
+        handler,
+        children,
+        handleBefore,
+        handleAfter,
+    }: Props = $props();
     let posTabs = $derived(tabs.filter((t) => t.position === position));
 
     const localTabs = writable(posTabs);
@@ -33,7 +48,8 @@
     });
 </script>
 
-<ResizablePane defaultSize={size}>
+{#if handleBefore}<ResizableHandle class={cn(!hidden || "hidden")} />{/if}
+<ResizablePane defaultSize={size} class={cn(!hidden || "hidden")}>
     <div class="flex h-full w-full flex-col">
         <PaneHeader>
             <div
@@ -42,11 +58,11 @@
                 onconsider={(e) => ($localTabs = e.detail.items)}
                 onfinalize={(e) => {
                     const items = e.detail.items;
+                    $localTabs = items;
+
                     for (const tab of items) {
                         move(tab, position);
                     }
-
-                    $localTabs = items;
                 }}
             >
                 {#each $localTabs as tab0 (tab0.id)}
@@ -73,3 +89,4 @@
         {/each}
     </div>
 </ResizablePane>
+{#if handleAfter}<ResizableHandle class={cn(!hidden || "hidden")} />{/if}
