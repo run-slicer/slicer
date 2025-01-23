@@ -134,8 +134,8 @@ export const refresh = (tab: Tab): Tab => {
     return tab;
 };
 
-// open tab before the current one or close entirely if there's none
-const openNext = (tab: Tab) => {
+// gets the preceding tab or null if there's only one in position
+const nextTab = (tab: Tab): Tab | null => {
     const all = Array.from(
         get(tabs)
             .values()
@@ -143,15 +143,16 @@ const openNext = (tab: Tab) => {
     );
     const nextTab = all.findIndex((t) => t.id === tab.id) - 1;
 
-    updateCurrent(tab.position, nextTab < 0 ? null : all[nextTab]);
+    return nextTab < 0 ? null : all[nextTab];
 };
 
 export const remove = (id: string) => {
     const tab = get(current)
         .values()
         .find((t) => t.id === id);
+
     if (tab) {
-        openNext(tab);
+        updateCurrent(tab.position, nextTab(tab));
     }
 
     tabs.update(($tabs) => {
@@ -161,15 +162,24 @@ export const remove = (id: string) => {
 };
 
 export const move = (tab: Tab, position: TabPosition) => {
-    if (tab.position === position) return;
+    const oldPos = tab.position;
+    if (oldPos === position) return;
+
+    let next = nextTab(tab);
 
     tab.position = position;
     tabs.update(($tabs) => $tabs);
 
     current.update(($current) => {
-        for (const tab0 of $current.values()) {
-            if (tab0.id === tab.id) {
-                openNext(tab0);
+        if ($current.values().some((t) => t.id === tab.id)) {
+            if (next) {
+                if (next.dirty) {
+                    next = refreshImmediately(next);
+                }
+
+                $current.set(oldPos, next);
+            } else {
+                $current.delete(oldPos);
             }
         }
 
@@ -193,7 +203,10 @@ export const clear = () => {
 
     current.update(($current) => {
         $current.clear();
+
+        welcomeTab.position = TabPosition.PRIMARY_CENTER;
         $current.set(TabPosition.PRIMARY_CENTER, welcomeTab);
+        projectTab.position = TabPosition.SECONDARY_LEFT;
         $current.set(TabPosition.SECONDARY_LEFT, projectTab);
 
         return $current;

@@ -34,6 +34,7 @@
         handleAfter,
     }: Props = $props();
     let posTabs = $derived(tabs.filter((t) => t.position === position));
+    let posCurrent = $derived(current.get(position) || null);
 
     const localTabs = writable(posTabs);
     $effect(() => {
@@ -46,6 +47,15 @@
             return updatedTabs;
         });
     });
+
+    const finalizeMove = (e: CustomEvent<{ items: Tab[] }>) => {
+        const items = e.detail.items;
+        $localTabs = items;
+
+        for (const tab of items) {
+            move(tab, position);
+        }
+    };
 </script>
 
 {#if handleBefore}<ResizableHandle class={cn(!hidden || "hidden")} />{/if}
@@ -56,19 +66,12 @@
                 class="flex w-full"
                 use:dndzone={{ items: $localTabs, dropTargetStyle: {} }}
                 onconsider={(e) => ($localTabs = e.detail.items)}
-                onfinalize={(e) => {
-                    const items = e.detail.items;
-                    $localTabs = items;
-
-                    for (const tab of items) {
-                        move(tab, position);
-                    }
-                }}
+                onfinalize={finalizeMove}
             >
                 {#each $localTabs as tab0 (tab0.id)}
                     <PaneHeaderItem
                         name={tab0.name}
-                        active={current.get(position)?.id === tab0.id}
+                        active={posCurrent?.id === tab0.id}
                         icon={tab0.icon}
                         closeable={tab0.closeable}
                         onclick={() => updateCurrent(position, tab0)}
@@ -78,12 +81,7 @@
             </div>
         </PaneHeader>
         {#each posTabs as tab0 (tab0.internalId)}
-            <div
-                class={cn(
-                    "relative flex h-full min-h-0 w-full flex-col",
-                    current.get(position)?.id === tab0.id || "hidden"
-                )}
-            >
+            <div class={cn("relative flex h-full min-h-0 w-full flex-col", posCurrent?.id === tab0.id || "hidden")}>
                 {@render children?.(tab0)}
             </div>
         {/each}
