@@ -1,7 +1,7 @@
 import type { StyledIcon } from "$lib/components/icons";
 import { workspaceEncoding } from "$lib/state";
 import { type Entry, EntryType } from "$lib/workspace";
-import { Folders, Sparkles } from "lucide-svelte";
+import { Folders, Sparkles, Terminal } from "lucide-svelte";
 import { derived, get, writable } from "svelte/store";
 
 export const enum TabType {
@@ -59,10 +59,22 @@ const projectTab: Tab = {
     internalId: {},
 };
 
+const loggingTab: Tab = {
+    id: `${TabType.LOGGING}:slicer`,
+    type: TabType.LOGGING,
+    name: "Logging",
+    position: TabPosition.PRIMARY_BOTTOM,
+    active: true,
+    closeable: false,
+    icon: { icon: Terminal, classes: ["text-muted-foreground"] },
+    internalId: {},
+};
+
 export const tabs = writable<Map<string, Tab>>(
     new Map([
         [projectTab.id, projectTab],
         [welcomeTab.id, welcomeTab],
+        [loggingTab.id, loggingTab],
     ])
 );
 
@@ -197,6 +209,11 @@ export const clear = () => {
         $tabs.set(projectTab.id, projectTab);
         projectTab.position = TabPosition.SECONDARY_LEFT;
         projectTab.active = true;
+
+        $tabs.set(loggingTab.id, loggingTab);
+        loggingTab.position = TabPosition.PRIMARY_BOTTOM;
+        loggingTab.active = true;
+
         return $tabs;
     });
 };

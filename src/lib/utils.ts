@@ -273,12 +273,8 @@ export const prettyMethodDesc = (desc: string): string => {
     return `(${args.map((a) => prettyJavaType(a, true)).join(", ")})`;
 };
 
-export const prettyError = (e: any): string => {
-    if (e.toString === Object.prototype.toString) {
-        return JSON.stringify(e, null, 2);
-    }
-
-    const stack = (e as Error).stack;
+export const prettyErrorStack = (e: any): string | null => {
+    const stack = (e as Error)?.stack;
     if (stack) {
         const lines = stack
             .trim()
@@ -288,10 +284,19 @@ export const prettyError = (e: any): string => {
         if (lines[0] === "Error") {
             lines.shift();
         }
-        return e.toString() + "\n" + lines.join("\n").replaceAll(/^/gm, "  ");
+        return lines.join("\n").replaceAll(/^/gm, "  ");
     }
 
-    return e.toString();
+    return null;
+};
+
+export const prettyError = (e: any): string => {
+    if (e.toString === Object.prototype.toString) {
+        return JSON.stringify(e, null, 2);
+    }
+
+    const stack = prettyErrorStack(e);
+    return e.toString() + (stack ? "\n" + stack : "");
 };
 
 /* strings */
