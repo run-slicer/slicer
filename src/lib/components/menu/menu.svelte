@@ -317,9 +317,9 @@
         </MenubarMenu>
     </div>
     <div class="flex flex-row">
-        <PaneButton bind:open={$paneSecondaryLeft} position={TabPosition.SECONDARY_LEFT} />
-        <PaneButton bind:open={$paneSecondaryRight} position={TabPosition.SECONDARY_RIGHT} />
-        <PaneButton bind:open={$panePrimaryBottom} position={TabPosition.PRIMARY_BOTTOM} />
+        <PaneButton bind:open={$paneSecondaryLeft} title="Left pane" position={TabPosition.SECONDARY_LEFT} />
+        <PaneButton bind:open={$paneSecondaryRight} title="Right pane" position={TabPosition.SECONDARY_RIGHT} />
+        <PaneButton bind:open={$panePrimaryBottom} title="Bottom pane" position={TabPosition.PRIMARY_BOTTOM} />
     </div>
 </Menubar>
 <Separator />
