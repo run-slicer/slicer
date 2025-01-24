@@ -28,8 +28,12 @@ const log0 = (level: LogLevel, message: string, error?: any) => {
 
     logFunc(message);
     if (error) {
-        // log error separately
         logFunc(error);
+
+        const errorMsg = error.toString();
+        if (message !== errorMsg) {
+            message += ` (${errorMsg})`;
+        }
     }
 
     message = message.replaceAll("\n", " ");
