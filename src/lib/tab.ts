@@ -17,7 +17,6 @@ export const enum TabType {
 }
 
 export const enum TabPosition {
-    PRIMARY_TOP,
     PRIMARY_CENTER,
     PRIMARY_BOTTOM,
     SECONDARY_LEFT,
@@ -29,6 +28,7 @@ export interface Tab {
     type: TabType;
     name: string;
     position: TabPosition;
+    active?: boolean;
     closeable: boolean;
     icon?: StyledIcon;
     entry?: Entry;
@@ -42,6 +42,7 @@ const welcomeTab: Tab = {
     type: TabType.WELCOME,
     name: "Welcome",
     position: TabPosition.PRIMARY_CENTER,
+    active: true,
     closeable: true,
     icon: { icon: Sparkles, classes: ["text-muted-foreground"] },
     internalId: {},
@@ -52,6 +53,7 @@ const projectTab: Tab = {
     type: TabType.PROJECT,
     name: "Project",
     position: TabPosition.SECONDARY_LEFT,
+    active: true,
     closeable: false,
     icon: { icon: Folders, classes: ["text-muted-foreground"] },
     internalId: {},
@@ -64,24 +66,17 @@ export const tabs = writable<Map<string, Tab>>(
     ])
 );
 
-export const current = writable<Map<TabPosition, Tab>>(
-    new Map([
-        [TabPosition.PRIMARY_CENTER, welcomeTab],
-        [TabPosition.SECONDARY_LEFT, projectTab],
-    ])
-);
-
-export const currentPrimary = derived(current, ($current) => {
-    return $current.get(TabPosition.PRIMARY_CENTER) || null;
+export const current = derived(tabs, ($tabs) => {
+    return $tabs.values().find((t) => t.active && t.position === TabPosition.PRIMARY_CENTER) || null;
 });
 
 // set window name based on currently opened tab
-currentPrimary.subscribe(($currentPrimary) => {
+current.subscribe(($current) => {
     // PWAs don't need the app name reiterated
     if (window.matchMedia("not (display-mode: browser)").matches) {
-        document.title = $currentPrimary ? $currentPrimary.name : "slicer";
+        document.title = $current ? $current.name : "slicer";
     } else {
-        document.title = $currentPrimary ? `${$currentPrimary.name} | slicer` : "slicer";
+        document.title = $current ? `${$current.name} | slicer` : "slicer";
     }
 });
 
@@ -98,13 +93,17 @@ export const updateCurrent = (position: TabPosition, tab: Tab | null) => {
         tab = refreshImmediately(tab);
     }
 
-    current.update(($current) => {
-        if (tab) {
-            $current.set(position, tab);
-        } else {
-            $current.delete(position);
+    tabs.update(($tabs) => {
+        for (const tab0 of $tabs.values()) {
+            if (tab0.id === tab?.id) {
+                tab0.position = position;
+                tab0.active = true;
+            } else if (tab0.active && tab0.position === position) {
+                tab0.active = false;
+            }
         }
-        return $current;
+
+        return $tabs;
     });
 };
 
@@ -126,7 +125,7 @@ export const update = (tab: Tab): Tab => {
 
 export const refresh = (tab: Tab): Tab => {
     // try immediate update for the current tab
-    if (get(current).get(tab.position)?.id === tab.id) {
+    if (tab.active) {
         return refreshImmediately(tab);
     }
 
@@ -141,50 +140,45 @@ const nextTab = (tab: Tab): Tab | null => {
             .values()
             .filter((t) => t.position === tab.position)
     );
-    const nextTab = all.findIndex((t) => t.id === tab.id) - 1;
+    const tabIndex = all.findIndex((t) => t.id === tab.id);
+    const nextTab = all.length > 1 ? (tabIndex > 0 ? tabIndex - 1 : all.length - 1) : -1;
 
     return nextTab < 0 ? null : all[nextTab];
 };
 
-export const remove = (id: string) => {
-    const tab = get(current)
-        .values()
-        .find((t) => t.id === id);
-
-    if (tab) {
-        updateCurrent(tab.position, nextTab(tab));
-    }
+export const remove = (tab: Tab) => {
+    updateCurrent(tab.position, nextTab(tab));
 
     tabs.update(($tabs) => {
-        $tabs.delete(id);
+        $tabs.delete(tab.id);
         return $tabs;
     });
 };
 
 export const move = (tab: Tab, position: TabPosition) => {
-    const oldPos = tab.position;
-    if (oldPos === position) return;
+    if (tab.position === position) return;
+    if (tab.active) {
+        updateCurrent(tab.position, nextTab(tab));
+    }
 
-    let next = nextTab(tab);
-
+    tab.active =
+        tab.active ||
+        !get(tabs)
+            .values()
+            .some((t) => t.position === position);
     tab.position = position;
-    tabs.update(($tabs) => $tabs);
 
-    current.update(($current) => {
-        if ($current.values().some((t) => t.id === tab.id)) {
-            if (next) {
-                if (next.dirty) {
-                    next = refreshImmediately(next);
+    tabs.update(($tabs) => {
+        // deactivate clashing tabs
+        if (tab.active) {
+            for (const tab0 of $tabs.values()) {
+                if (tab0.id !== tab.id && tab0.active && tab0.position === position) {
+                    tab0.active = false;
                 }
-
-                $current.set(oldPos, next);
-            } else {
-                $current.delete(oldPos);
             }
         }
 
-        $current.set(position, tab);
-        return $current;
+        return $tabs;
     });
 };
 
@@ -196,20 +190,14 @@ export const clear = () => {
             }
         }
 
-        // reopen welcome tab
         $tabs.set(welcomeTab.id, welcomeTab);
-        return $tabs;
-    });
-
-    current.update(($current) => {
-        $current.clear();
-
         welcomeTab.position = TabPosition.PRIMARY_CENTER;
-        $current.set(TabPosition.PRIMARY_CENTER, welcomeTab);
-        projectTab.position = TabPosition.SECONDARY_LEFT;
-        $current.set(TabPosition.SECONDARY_LEFT, projectTab);
+        welcomeTab.active = true;
 
-        return $current;
+        $tabs.set(projectTab.id, projectTab);
+        projectTab.position = TabPosition.SECONDARY_LEFT;
+        projectTab.active = true;
+        return $tabs;
     });
 };
 

@@ -2,9 +2,7 @@
     import { mode, userPrefersMode } from "mode-watcher";
     import { Separator } from "$lib/components/ui/separator";
     import {
-        editorWrap,
         panePrimaryBottom,
-        panePrimaryTop,
         paneSecondaryLeft,
         paneSecondaryRight,
         themeColor,
@@ -28,7 +26,6 @@
     } from "$lib/components/dialog";
     import {
         Menubar,
-        MenubarCheckboxItem,
         MenubarContent,
         MenubarItem,
         MenubarMenu,
@@ -54,7 +51,6 @@
         Moon,
         Settings,
         Sun,
-        WrapText,
     } from "lucide-svelte";
     import { themes } from "$lib/theme";
     import type { Disassembler } from "$lib/disasm";
@@ -237,16 +233,8 @@
                             Logging <Terminal size={16} />
                         </MenubarCheckboxItem>
                     </MenubarSubContent>
-                </MenubarSub> -->
-                <MenubarSub>
-                    <MenubarSubTrigger>Editor</MenubarSubTrigger>
-                    <MenubarSubContent class="w-[12rem]" align="start">
-                        <MenubarCheckboxItem class="justify-between" bind:checked={$editorWrap}>
-                            Wrap lines <WrapText size={16} />
-                        </MenubarCheckboxItem>
-                    </MenubarSubContent>
                 </MenubarSub>
-                <MenubarSeparator />
+                <MenubarSeparator /> -->
                 <MenubarItem
                     class="justify-between"
                     disabled={!tab?.entry || tab.entry.type === EntryType.ARCHIVE || tab.type === TabType.CODE}
@@ -329,10 +317,9 @@
         </MenubarMenu>
     </div>
     <div class="flex flex-row">
-        <PaneButton bind:open={$panePrimaryTop} position={TabPosition.PRIMARY_TOP} />
-        <PaneButton bind:open={$panePrimaryBottom} position={TabPosition.PRIMARY_BOTTOM} />
         <PaneButton bind:open={$paneSecondaryLeft} position={TabPosition.SECONDARY_LEFT} />
         <PaneButton bind:open={$paneSecondaryRight} position={TabPosition.SECONDARY_RIGHT} />
+        <PaneButton bind:open={$panePrimaryBottom} position={TabPosition.PRIMARY_BOTTOM} />
     </div>
 </Menubar>
 <Separator />

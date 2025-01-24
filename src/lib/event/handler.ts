@@ -10,7 +10,7 @@ import {
 } from "$lib/script";
 import {
     clear as clearTabs,
-    currentPrimary as currentPrimaryTab,
+    current as currentTab,
     detectType as detectTabType,
     find as findTab,
     remove as removeTab,
@@ -171,7 +171,7 @@ export default {
         entries.forEach(removeWs);
         for (const tab of get(tabs).values()) {
             if (tab.entry && names.has(tab.entry.name)) {
-                removeTab(tab.id);
+                removeTab(tab);
             }
         }
 
@@ -181,7 +181,7 @@ export default {
     },
     async export(entries?: Entry[], disasm?: Disassembler): Promise<void> {
         if (!entries) {
-            const entry = get(currentPrimaryTab)?.entry;
+            const entry = get(currentTab)?.entry;
             if (!entry) {
                 return;
             }
@@ -275,9 +275,9 @@ export default {
         clearWs();
         clearTabs();
     },
-    close(tab: Tab | undefined = get(currentPrimaryTab) ?? undefined): void {
+    close(tab: Tab | undefined = get(currentTab) ?? undefined): void {
         if (tab) {
-            removeTab(tab.id);
+            removeTab(tab);
         }
     },
     async addScript(url?: string): Promise<void> {

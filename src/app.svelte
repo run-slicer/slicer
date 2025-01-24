@@ -4,7 +4,7 @@
     import Content from "$lib/components/content.svelte";
     import Crumb from "$lib/components/crumb/crumb.svelte";
     import { Toaster } from "$lib/components/ui/sonner";
-    import { current as currentTab, currentPrimary as currentPrimaryTab, tabs } from "$lib/tab";
+    import { current as currentTab, tabs } from "$lib/tab";
     import { classes, entries } from "$lib/workspace";
     import { current as currentEncoding } from "$lib/workspace/encoding";
     import { scripts } from "$lib/script";
@@ -36,22 +36,15 @@
 />
 <Toaster position="top-right" richColors />
 <Menu
-    tab={$currentPrimaryTab}
+    tab={$currentTab}
     entries={entries0}
     classes={classes0}
     scripts={$scripts}
     disasms={disasms0}
     handler={$handler}
 />
-<Content
-    bind:current={$currentTab}
-    tabs={tabs0}
-    entries={entries0}
-    logEntries={$logEntries}
-    disasms={disasms0}
-    handler={$handler}
-/>
-<Crumb tab={$currentPrimaryTab} tasks={tasks0} encoding={$currentEncoding} />
+<Content tabs={tabs0} entries={entries0} logEntries={$logEntries} disasms={disasms0} handler={$handler} />
+<Crumb tab={$currentTab} tasks={tasks0} encoding={$currentEncoding} />
 {#await import("$lib/components/command.svelte") then { default: Command }}
     <Command entries={entries0} handler={$handler} />
 {/await}

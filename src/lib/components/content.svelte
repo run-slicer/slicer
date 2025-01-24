@@ -7,10 +7,9 @@
     import MainPane from "$lib/components/pane/main.svelte";
     import type { Disassembler } from "$lib/disasm";
     import type { EventHandler } from "$lib/event";
-    import { panePrimaryTop, panePrimaryBottom, paneSecondaryLeft, paneSecondaryRight } from "$lib/state";
+    import { panePrimaryBottom, paneSecondaryLeft, paneSecondaryRight } from "$lib/state";
 
     interface Props {
-        current: Map<TabPosition, Tab>;
         tabs: Tab[];
         entries: Entry[];
         logEntries: LogEntry[];
@@ -18,31 +17,17 @@
         handler: EventHandler;
     }
 
-    let { current = $bindable(), tabs, entries, logEntries, disasms, handler }: Props = $props();
+    let { tabs, entries, logEntries, disasms, handler }: Props = $props();
 </script>
 
-<ResizablePaneGroup direction="horizontal" class="grow basis-0" autoSaveId="content-horizontal">
-    <Pane
-        size={20}
-        position={TabPosition.SECONDARY_LEFT}
-        handleAfter
-        hidden={!$paneSecondaryLeft}
-        bind:current
-        {tabs}
-        {handler}
-    >
-        {#snippet children(tab)}
-            <MainPane {tab} {entries} {logEntries} {disasms} {handler} />
-        {/snippet}
-    </Pane>
+<ResizablePaneGroup direction="vertical" class="grow basis-0" autoSaveId="content-vertical">
     <ResizablePane>
-        <ResizablePaneGroup direction="vertical" autoSaveId="content-vertical">
+        <ResizablePaneGroup direction="horizontal" class="grow basis-0" autoSaveId="content-horizontal">
             <Pane
                 size={20}
-                position={TabPosition.PRIMARY_TOP}
+                position={TabPosition.SECONDARY_LEFT}
                 handleAfter
-                hidden={!$panePrimaryTop}
-                bind:current
+                hidden={!$paneSecondaryLeft}
                 {tabs}
                 {handler}
             >
@@ -50,17 +35,16 @@
                     <MainPane {tab} {entries} {logEntries} {disasms} {handler} />
                 {/snippet}
             </Pane>
-            <Pane position={TabPosition.PRIMARY_CENTER} bind:current {tabs} {handler}>
+            <Pane position={TabPosition.PRIMARY_CENTER} {tabs} {handler}>
                 {#snippet children(tab)}
                     <MainPane {tab} {entries} {logEntries} {disasms} {handler} />
                 {/snippet}
             </Pane>
             <Pane
                 size={20}
-                position={TabPosition.PRIMARY_BOTTOM}
+                position={TabPosition.SECONDARY_RIGHT}
                 handleBefore
-                hidden={!$panePrimaryBottom}
-                bind:current
+                hidden={!$paneSecondaryRight}
                 {tabs}
                 {handler}
             >
@@ -70,15 +54,7 @@
             </Pane>
         </ResizablePaneGroup>
     </ResizablePane>
-    <Pane
-        size={20}
-        position={TabPosition.SECONDARY_RIGHT}
-        handleBefore
-        hidden={!$paneSecondaryRight}
-        bind:current
-        {tabs}
-        {handler}
-    >
+    <Pane size={20} position={TabPosition.PRIMARY_BOTTOM} handleBefore hidden={!$panePrimaryBottom} {tabs} {handler}>
         {#snippet children(tab)}
             <MainPane {tab} {entries} {logEntries} {disasms} {handler} />
         {/snippet}
