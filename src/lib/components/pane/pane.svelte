@@ -73,11 +73,20 @@
                 {/each}
             </div>
         </PaneHeader>
-        {#each posTabs as tab0 (tab0.internalId)}
-            <div class={cn("relative flex h-full min-h-0 w-full flex-col", posCurrent?.id === tab0.id || "hidden")}>
-                {@render children?.(tab0)}
+        {#if posTabs.length > 0}
+            {#each posTabs as tab0 (tab0.internalId)}
+                <div class={cn("relative flex h-full min-h-0 w-full flex-col", posCurrent?.id === tab0.id || "hidden")}>
+                    {@render children?.(tab0)}
+                </div>
+            {/each}
+        {:else}
+            <div class="flex h-full w-full flex-col justify-center gap-4 text-center">
+                <span class="text-sm">Nothing here...</span>
+                <span class="text-xs text-muted-foreground">
+                    Move tabs here for even more<br />text on your screen!
+                </span>
             </div>
-        {/each}
+        {/if}
     </div>
 </ResizablePane>
 {#if handleAfter}<ResizableHandle class={cn(!hidden || "hidden")} />{/if}

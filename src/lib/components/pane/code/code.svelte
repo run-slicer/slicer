@@ -71,7 +71,7 @@
                     <span class="mr-2 text-muted-foreground">Disassembler: </span>
                     <span class="tracking-tight">{disasm.name || disasm.id}</span>
                 </SelectTrigger>
-                <SelectContent class="max-h-[240px] w-full overflow-scroll" align="end">
+                <SelectContent class="max-h-[240px] w-full overflow-scroll" side="top" align="end">
                     {#each usableDisasms as dism (dism.id)}
                         <SelectItem value={dism.id} label={dism.id} class="text-xs tracking-tight">
                             {dism.name || dism.id}
