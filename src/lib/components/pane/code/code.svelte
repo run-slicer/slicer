@@ -24,6 +24,11 @@
     let { tab, disasms, handler }: Props = $props();
     const entry = $derived(tab.entry!);
 
+    let wrap = $state(get(editorWrap));
+    $effect(() => {
+        $editorWrap = wrap;
+    });
+
     let usableDisasms = $derived(entry.type === EntryType.MEMBER ? disasms.filter((d) => Boolean(d.method)) : disasms);
     const shouldDisasm = $derived(
         tab.type === TabType.CODE && (entry.type === EntryType.CLASS || entry.type === EntryType.MEMBER)
@@ -54,9 +59,9 @@
     {:then [lang, value]}
         <ContextMenu>
             <ContextMenuTrigger>
-                <CodeEditor {value} readonly {lang} bind:size={$textSize} wrap={$editorWrap} />
+                <CodeEditor {value} readonly {lang} bind:size={$textSize} {wrap} />
             </ContextMenuTrigger>
-            <CodeMenu {tab} {value} lang={language} {handler} />
+            <CodeMenu {tab} {value} lang={language} {handler} bind:wrap bind:sizeSync={$editorTextSizeSync} />
         </ContextMenu>
     {/await}
     {#if shouldDisasm}
@@ -66,7 +71,7 @@
                     <span class="mr-2 text-muted-foreground">Disassembler: </span>
                     <span class="tracking-tight">{disasm.name || disasm.id}</span>
                 </SelectTrigger>
-                <SelectContent class="max-h-[240px] w-full overflow-scroll" align="end">
+                <SelectContent class="max-h-[240px] w-full overflow-scroll" side="top" align="end">
                     {#each usableDisasms as dism (dism.id)}
                         <SelectItem value={dism.id} label={dism.id} class="text-xs tracking-tight">
                             {dism.name || dism.id}

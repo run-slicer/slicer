@@ -4,11 +4,14 @@
     import {
         ContextMenuContent,
         ContextMenuItem,
+        ContextMenuCheckboxItem,
         ContextMenuSub,
         ContextMenuSubContent,
         ContextMenuSubTrigger,
+        ContextMenuSeparator,
     } from "$lib/components/ui/context-menu";
-    import { Binary, Code } from "lucide-svelte";
+    import ContextMenuLabel from "$lib/components/menu_label.svelte";
+    import { Binary, CaseSensitive, Code, WrapText } from "lucide-svelte";
     import { type Language, toExtension } from "$lib/lang";
     import { isDisassembled } from "./";
     import type { EventHandler } from "$lib/event";
@@ -17,16 +20,29 @@
         tab: Tab;
         lang: Language;
         value: string;
+        wrap: boolean;
+        sizeSync: boolean;
         handler: EventHandler;
     }
 
-    let { tab, lang, value, handler }: Props = $props();
+    let { tab, lang, value, handler, wrap = $bindable(), sizeSync = $bindable() }: Props = $props();
     let entry = $derived(tab.entry!);
 </script>
 
 <ContextMenuContent class="w-[12rem]">
+    <ContextMenuLabel inset>Editor</ContextMenuLabel>
+    <ContextMenuSeparator />
+    <ContextMenuCheckboxItem class="justify-between" bind:checked={wrap}>
+        Wrap lines <WrapText size={16} />
+    </ContextMenuCheckboxItem>
+    <ContextMenuCheckboxItem class="justify-between" bind:checked={sizeSync}>
+        Lock zoom <CaseSensitive size={16} />
+    </ContextMenuCheckboxItem>
+    <ContextMenuSeparator />
+    <ContextMenuLabel inset>File</ContextMenuLabel>
+    <ContextMenuSeparator />
     <ContextMenuSub>
-        <ContextMenuSubTrigger>Export</ContextMenuSubTrigger>
+        <ContextMenuSubTrigger inset>Export</ContextMenuSubTrigger>
         <ContextMenuSubContent class="w-[12rem]">
             <ContextMenuItem class="flex justify-between" onclick={() => handler.export([entry])}>
                 Raw <Binary size={16} />

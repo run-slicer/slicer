@@ -60,7 +60,7 @@
                 </ToggleGroup>
             </div>
         </div>
-        <div class="flex flex-row items-center justify-between">
+        <div class="flex flex-row items-center justify-between gap-2">
             <button class="cursor-help text-sm" onclick={handleRevolver}>
                 <span class="text-base font-medium text-accent-foreground/60">Tip: </span>
                 {@html tip}

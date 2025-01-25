@@ -12,14 +12,16 @@ export const themeColor = persisted<string>(`${root}.theme.color`, "zinc");
 export const themeRadius = persisted<number>(`${root}.theme.radius`, 0.5);
 export const workspaceEncoding = persisted<string>(`${root}.workspace.encoding`, "utf-8");
 export const workspaceArchiveEncoding = persisted<string>(`${root}.workspace.archive.encoding`, "utf-8");
-export const projectOpen = persisted<boolean>(`${root}.project.open`, true);
 export const toolsDisasm = persisted<string>(`${root}.tools.disasm`, "vf" /* vf.id ($lib/disasm/builtin) */);
-export const loggingOpen = persisted<boolean>(`${root}.logging.open`, false);
-export const loggingMaxEntries = persisted<number>(`${root}.logging.max-entries`, 50);
+export const loggingMaxEntries = persisted<number>(`${root}.logging.max-entries`, 150);
 export const scriptingScripts = persisted<ScriptData[]>(`${root}.scripting.scripts`, []);
 export const editorWrap = persisted<boolean>(`${root}.editor.wrap`, true);
 export const editorTextSize = persisted<number>(`${root}.editor.text-size`, 0.75);
 export const editorTextSizeSync = persisted<boolean>(`${root}.editor.text-size.sync`, true);
+
+export const panePrimaryBottom = persisted<boolean>(`${root}.pane.primary.bottom`, false);
+export const paneSecondaryLeft = persisted<boolean>(`${root}.pane.secondary.left`, true);
+export const paneSecondaryRight = persisted<boolean>(`${root}.pane.secondary.right`, false);
 
 export const load = (data: string): boolean => {
     try {

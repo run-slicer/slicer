@@ -72,7 +72,7 @@
             {/each}
         {/if}
     {:else}
-        <button class="highlight flex w-full py-[0.2rem]" onclick={() => onopen?.(data)}>
+        <button class="highlight flex w-full py-[0.2rem]" ondblclick={() => onopen?.(data)}>
             <FileIcon size={16} class={cn("my-auto mr-1 min-w-[16px]", classes)} />
             <span class="text-sm">{data.label}</span>
         </button>

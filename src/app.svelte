@@ -10,7 +10,7 @@
     import { scripts } from "$lib/script";
     import { entries as logEntries } from "$lib/log";
     import { all as disasms } from "$lib/disasm";
-    import { root as rootKey, projectOpen, loggingOpen } from "$lib/state";
+    import { root as rootKey } from "$lib/state";
     import { theme } from "$lib/theme";
     import { tasks } from "$lib/task";
     import { handler } from "$lib/event";
@@ -43,16 +43,7 @@
     disasms={disasms0}
     handler={$handler}
 />
-<Content
-    bind:tab={$currentTab}
-    tabs={tabs0}
-    entries={entries0}
-    logEntries={$logEntries}
-    disasms={disasms0}
-    handler={$handler}
-    projectOpen={$projectOpen}
-    loggingOpen={$loggingOpen}
-/>
+<Content tabs={tabs0} entries={entries0} logEntries={$logEntries} disasms={disasms0} handler={$handler} />
 <Crumb tab={$currentTab} tasks={tasks0} encoding={$currentEncoding} />
 {#await import("$lib/components/command.svelte") then { default: Command }}
     <Command entries={entries0} handler={$handler} />

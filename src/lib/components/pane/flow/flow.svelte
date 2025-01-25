@@ -91,7 +91,7 @@
                         <span class="font-mono tracking-tight">{createLabel(member)}</span>
                     </div>
                 </SelectTrigger>
-                <SelectContent class="max-h-[240px] w-full overflow-scroll" align="start">
+                <SelectContent class="max-h-[240px] w-full overflow-scroll" side="top" align="start">
                     {#each methods as mth, i}
                         {@const label = createLabel(mth)}
                         <SelectItem value={i.toString()} {label} class="break-all font-mono text-xs tracking-tight">

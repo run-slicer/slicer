@@ -1,10 +1,12 @@
 import type { StyledIcon } from "$lib/components/icons";
 import { workspaceEncoding } from "$lib/state";
 import { type Entry, EntryType } from "$lib/workspace";
-import { Sparkles } from "lucide-svelte";
-import { get, writable } from "svelte/store";
+import { Folders, Sparkles } from "lucide-svelte";
+import { derived, get, writable } from "svelte/store";
 
 export const enum TabType {
+    PROJECT = "project",
+    LOGGING = "logging",
     WELCOME = "welcome",
     CODE = "code",
     HEX = "hex",
@@ -14,10 +16,20 @@ export const enum TabType {
     HEAP_DUMP = "heap_dump",
 }
 
+export const enum TabPosition {
+    PRIMARY_CENTER,
+    PRIMARY_BOTTOM,
+    SECONDARY_LEFT,
+    SECONDARY_RIGHT,
+}
+
 export interface Tab {
     id: string;
     type: TabType;
     name: string;
+    position: TabPosition;
+    active?: boolean;
+    closeable: boolean;
     icon?: StyledIcon;
     entry?: Entry;
 
@@ -29,20 +41,42 @@ const welcomeTab: Tab = {
     id: `${TabType.WELCOME}:slicer`,
     type: TabType.WELCOME,
     name: "Welcome",
+    position: TabPosition.PRIMARY_CENTER,
+    active: true,
+    closeable: true,
     icon: { icon: Sparkles, classes: ["text-muted-foreground"] },
+    internalId: {},
 };
 
-export const tabs = writable<Map<string, Tab>>(new Map([[welcomeTab.id, welcomeTab]]));
+const projectTab: Tab = {
+    id: `${TabType.PROJECT}:slicer`,
+    type: TabType.PROJECT,
+    name: "Project",
+    position: TabPosition.SECONDARY_LEFT,
+    active: true,
+    closeable: true,
+    icon: { icon: Folders, classes: ["text-muted-foreground"] },
+    internalId: {},
+};
 
-export const current = writable<Tab | null>(welcomeTab);
+export const tabs = writable<Map<string, Tab>>(
+    new Map([
+        [projectTab.id, projectTab],
+        [welcomeTab.id, welcomeTab],
+    ])
+);
+
+export const current = derived(tabs, ($tabs) => {
+    return $tabs.values().find((t) => t.active && t.position === TabPosition.PRIMARY_CENTER) || null;
+});
 
 // set window name based on currently opened tab
-current.subscribe((tab) => {
+current.subscribe(($current) => {
     // PWAs don't need the app name reiterated
     if (window.matchMedia("not (display-mode: browser)").matches) {
-        document.title = tab ? tab.name : "slicer";
+        document.title = $current ? $current.name : "slicer";
     } else {
-        document.title = tab ? `${tab.name} | slicer` : "slicer";
+        document.title = $current ? `${$current.name} | slicer` : "slicer";
     }
 });
 
@@ -54,8 +88,23 @@ const refreshImmediately = (tab: Tab): Tab => {
 };
 
 // helper function for making sure a tab is refreshed before it's made active
-export const updateCurrent = (tab: Tab | null) => {
-    current.set(tab?.dirty ? refreshImmediately(tab) : tab);
+export const updateCurrent = (position: TabPosition, tab: Tab | null) => {
+    if (tab?.dirty) {
+        tab = refreshImmediately(tab);
+    }
+
+    tabs.update(($tabs) => {
+        for (const tab0 of $tabs.values()) {
+            if (tab0.id === tab?.id) {
+                tab0.position = position;
+                tab0.active = true;
+            } else if (tab0.active && tab0.position === position) {
+                tab0.active = false;
+            }
+        }
+
+        return $tabs;
+    });
 };
 
 export const find = (id: string): Tab | null => {
@@ -76,7 +125,7 @@ export const update = (tab: Tab): Tab => {
 
 export const refresh = (tab: Tab): Tab => {
     // try immediate update for the current tab
-    if (get(current)?.id === tab.id) {
+    if (tab.active) {
         return refreshImmediately(tab);
     }
 
@@ -84,32 +133,59 @@ export const refresh = (tab: Tab): Tab => {
     return tab;
 };
 
-export const remove = (id: string) => {
-    const tab = get(current);
-    if (tab?.id === id) {
-        const all = Array.from(get(tabs).values());
-        const nextTab = all.findIndex((t) => t.id === id) - 1;
+// gets the preceding tab or null if there's only one in position
+const nextTab = (tab: Tab): Tab | null => {
+    const all = Array.from(
+        get(tabs)
+            .values()
+            .filter((t) => t.position === tab.position)
+    );
+    const tabIndex = all.findIndex((t) => t.id === tab.id);
+    const nextTab = all.length > 1 ? (tabIndex > 0 ? tabIndex - 1 : all.length - 1) : -1;
 
-        // open tab before the current one or close entirely if there's none
-        updateCurrent(nextTab < 0 ? null : all[nextTab]);
-    }
+    return nextTab < 0 ? null : all[nextTab];
+};
+
+export const remove = (tab: Tab) => {
+    updateCurrent(tab.position, nextTab(tab));
 
     tabs.update(($tabs) => {
-        $tabs.delete(id);
+        $tabs.delete(tab.id);
+        return $tabs;
+    });
+};
+
+export const move = (tab: Tab, position: TabPosition) => {
+    if (tab.position === position) return;
+    if (tab.active) {
+        updateCurrent(tab.position, nextTab(tab));
+    }
+
+    tab.active = true;
+    tab.position = position;
+
+    tabs.update(($tabs) => {
+        // deactivate clashing tabs
+        for (const tab0 of $tabs.values()) {
+            if (tab0.id !== tab.id && tab0.position === position) {
+                tab0.active = false;
+            }
+        }
+
         return $tabs;
     });
 };
 
 export const clear = () => {
     tabs.update(($tabs) => {
-        $tabs.clear();
+        for (const tab of $tabs.values()) {
+            if (tab.entry) {
+                $tabs.delete(tab.id);
+            }
+        }
 
-        // reopen welcome tab
-        $tabs.set(welcomeTab.id, welcomeTab);
         return $tabs;
     });
-
-    current.set(welcomeTab);
 };
 
 // prettier-ignore

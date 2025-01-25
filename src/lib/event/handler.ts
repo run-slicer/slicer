@@ -1,4 +1,4 @@
-import { tabIcon } from "$lib/components/icons";
+import { type Icon, tabIcon } from "$lib/components/icons";
 import { disassembleEntry, type Disassembler } from "$lib/disasm";
 import { error } from "$lib/log";
 import {
@@ -13,8 +13,10 @@ import {
     current as currentTab,
     detectType as detectTabType,
     find as findTab,
+    move as moveTab,
     remove as removeTab,
     type Tab,
+    TabPosition,
     tabs,
     TabType,
     updateCurrent as updateCurrentTab,
@@ -137,14 +139,9 @@ export default {
             entry = entry.parent!; // unwrap to parent class
         }
 
-        let tab = get(currentTab);
-        if (tab?.type === tabType && tab?.entry?.name === entry.name) {
-            return; // already opened
-        }
-
         const id = `${tabType}:${entry.name}`;
 
-        tab = findTab(id);
+        let tab = findTab(id);
         if (!tab) {
             // tab doesn't exist, create
             try {
@@ -152,6 +149,8 @@ export default {
                     id,
                     type: tabType,
                     name: entry.shortName,
+                    position: TabPosition.PRIMARY_CENTER,
+                    closeable: true,
                     entry: await readDeferred(entry),
                     icon: tabIcon(tabType, entry),
                 });
@@ -165,7 +164,26 @@ export default {
             }
         }
 
-        updateCurrentTab(tab);
+        updateCurrentTab(tab.position, tab);
+    },
+    async openRaw(tabType: TabType, name: string, icon: Icon, position: TabPosition): Promise<void> {
+        let tab = get(tabs)
+            .values()
+            .find((t) => t.type === tabType);
+        if (tab) {
+            moveTab(tab, position);
+        } else {
+            tab = updateTab({
+                id: `${tabType}:slicer`,
+                type: tabType,
+                name,
+                position,
+                closeable: true,
+                icon: { icon, classes: ["text-muted-foreground"] },
+            });
+
+            updateCurrentTab(tab.position, tab);
+        }
     },
     async remove(entries: Entry[]): Promise<void> {
         const names = new Set(entries.map((e) => e.name));
@@ -173,7 +191,7 @@ export default {
         entries.forEach(removeWs);
         for (const tab of get(tabs).values()) {
             if (tab.entry && names.has(tab.entry.name)) {
-                removeTab(tab.id);
+                removeTab(tab);
             }
         }
 
@@ -279,7 +297,7 @@ export default {
     },
     close(tab: Tab | undefined = get(currentTab) ?? undefined): void {
         if (tab) {
-            removeTab(tab.id);
+            removeTab(tab);
         }
     },
     async addScript(url?: string): Promise<void> {
