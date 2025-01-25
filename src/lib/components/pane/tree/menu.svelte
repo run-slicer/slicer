@@ -11,6 +11,7 @@
         ContextMenuSubContent,
         ContextMenuSubTrigger,
     } from "$lib/components/ui/context-menu";
+    import ContextMenuLabel from "$lib/components/menu_label.svelte";
     import type { EventHandler } from "$lib/event";
 
     interface Props {
@@ -24,9 +25,7 @@
 </script>
 
 <ContextMenuContent class="min-w-[12rem] max-w-[16rem]">
-    <div class="overflow-hidden text-ellipsis px-2 py-1.5 text-center text-sm font-semibold text-foreground">
-        {node.label}
-    </div>
+    <ContextMenuLabel center>{node.label}</ContextMenuLabel>
     <ContextMenuSeparator />
     {#if entry}
         <ContextMenuSub>

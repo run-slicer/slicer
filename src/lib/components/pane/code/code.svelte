@@ -61,7 +61,7 @@
             <ContextMenuTrigger>
                 <CodeEditor {value} readonly {lang} bind:size={$textSize} {wrap} />
             </ContextMenuTrigger>
-            <CodeMenu {tab} {value} lang={language} {handler} bind:wrap />
+            <CodeMenu {tab} {value} lang={language} {handler} bind:wrap bind:sizeSync={$editorTextSizeSync} />
         </ContextMenu>
     {/await}
     {#if shouldDisasm}

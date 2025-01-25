@@ -1,7 +1,7 @@
 import type { StyledIcon } from "$lib/components/icons";
 import { workspaceEncoding } from "$lib/state";
 import { type Entry, EntryType } from "$lib/workspace";
-import { Folders, Sparkles, Terminal } from "lucide-svelte";
+import { Folders, Sparkles } from "lucide-svelte";
 import { derived, get, writable } from "svelte/store";
 
 export const enum TabType {
@@ -59,22 +59,10 @@ const projectTab: Tab = {
     internalId: {},
 };
 
-const loggingTab: Tab = {
-    id: `${TabType.LOGGING}:slicer`,
-    type: TabType.LOGGING,
-    name: "Logging",
-    position: TabPosition.PRIMARY_BOTTOM,
-    active: true,
-    closeable: true,
-    icon: { icon: Terminal, classes: ["text-muted-foreground"] },
-    internalId: {},
-};
-
 export const tabs = writable<Map<string, Tab>>(
     new Map([
         [projectTab.id, projectTab],
         [welcomeTab.id, welcomeTab],
-        [loggingTab.id, loggingTab],
     ])
 );
 
@@ -173,20 +161,14 @@ export const move = (tab: Tab, position: TabPosition) => {
         updateCurrent(tab.position, nextTab(tab));
     }
 
-    tab.active =
-        tab.active ||
-        !get(tabs)
-            .values()
-            .some((t) => t.position === position);
+    tab.active = true;
     tab.position = position;
 
     tabs.update(($tabs) => {
         // deactivate clashing tabs
-        if (tab.active) {
-            for (const tab0 of $tabs.values()) {
-                if (tab0.id !== tab.id && tab0.active && tab0.position === position) {
-                    tab0.active = false;
-                }
+        for (const tab0 of $tabs.values()) {
+            if (tab0.id !== tab.id && tab0.position === position) {
+                tab0.active = false;
             }
         }
 
