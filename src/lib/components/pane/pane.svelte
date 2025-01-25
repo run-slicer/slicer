@@ -106,7 +106,7 @@
             <PaneMenu offset align="end" {position} {handler}>
                 {#snippet children(props)}
                     <div
-                        class="flex h-8 min-h-8 w-8 min-w-8 cursor-pointer items-center justify-center bg-muted/60 text-primary/60"
+                        class="flex h-8 min-h-8 w-8 min-w-8 cursor-pointer items-center justify-center text-primary/60"
                         {...props}
                     >
                         <Plus size={18} />
