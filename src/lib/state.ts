@@ -18,6 +18,7 @@ export const scriptingScripts = persisted<ScriptData[]>(`${root}.scripting.scrip
 export const editorWrap = persisted<boolean>(`${root}.editor.wrap`, true);
 export const editorTextSize = persisted<number>(`${root}.editor.text-size`, 0.75);
 export const editorTextSizeSync = persisted<boolean>(`${root}.editor.text-size.sync`, true);
+export const analysisBackground = persisted<boolean>(`${root}.analysis.background`, true);
 
 export const panePrimaryBottom = persisted<boolean>(`${root}.pane.primary.bottom`, false);
 export const paneSecondaryLeft = persisted<boolean>(`${root}.pane.secondary.left`, true);

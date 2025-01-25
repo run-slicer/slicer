@@ -26,7 +26,7 @@
         "@dagrejs/dagre": "^1.1.4",
         "@fontsource/geist-mono": "^5.1.1",
         "@fontsource/geist-sans": "^5.1.0",
-        "@run-slicer/asm": "^0.11.1",
+        "@run-slicer/asm": "^0.12.2",
         "@run-slicer/cfr": "0.1.3-0.152",
         "@run-slicer/jasm": "0.3.1-0783630ca2",
         "@run-slicer/procyon": "0.1.1-0.6.0",

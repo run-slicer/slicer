@@ -2,6 +2,7 @@
     import { mode, userPrefersMode } from "mode-watcher";
     import { Separator } from "$lib/components/ui/separator";
     import {
+        analysisBackground,
         panePrimaryBottom,
         paneSecondaryLeft,
         paneSecondaryRight,
@@ -26,6 +27,7 @@
     } from "$lib/components/dialog";
     import {
         Menubar,
+        MenubarCheckboxItem,
         MenubarContent,
         MenubarItem,
         MenubarMenu,
@@ -49,6 +51,7 @@
         Globe,
         Info,
         Moon,
+        SendToBack,
         Settings,
         Sun,
     } from "lucide-svelte";
@@ -279,6 +282,14 @@
                         </MenubarRadioGroup>
                     </MenubarSubContent>
                 </MenubarSub>
+            </MenubarContent>
+        </MenubarMenu>
+        <MenubarMenu>
+            <MenubarTrigger class="relative">Analysis</MenubarTrigger>
+            <MenubarContent align="start">
+                <MenubarCheckboxItem class="justify-between" bind:checked={$analysisBackground}>
+                    Background <SendToBack size={16} />
+                </MenubarCheckboxItem>
             </MenubarContent>
         </MenubarMenu>
         <MenubarMenu>

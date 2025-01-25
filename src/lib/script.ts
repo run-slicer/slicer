@@ -104,6 +104,7 @@ const wrapDisasm = (disasm: Disassembler): ScriptDisassembler => {
                     data,
                 } as MemoryData,
                 node: readNode(data),
+                full: true,
             });
         },
         method: disasm.method
@@ -134,6 +135,7 @@ const wrapDisasm = (disasm: Disassembler): ScriptDisassembler => {
                               data,
                           } as MemoryData,
                           node,
+                          full: true,
                       },
                       method
                   );

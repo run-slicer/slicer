@@ -288,6 +288,7 @@ export default {
                 }
             );
 
+            exportTask.desc.set(`${entries.length} entries`);
             return downloadBlob(`export-${disasm?.id || "raw"}-${timestampFile()}.zip`, blob);
         });
     },

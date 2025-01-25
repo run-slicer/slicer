@@ -41,7 +41,8 @@ export const create = (name: string, desc: string | null, indeterminate: boolean
 
 export const phase = (task: Task): TaskResult => {
     const time = Date.now() - (task.start || 0);
-    log(`task ${get(task.name)} (${get(task.desc)}) took ${time}ms`);
+    const desc = get(task.desc);
+    log(`task ${get(task.name)}${desc ? ` (${desc})` : ""} took ${time}ms`);
 
     task.start = Date.now(); // reset
 

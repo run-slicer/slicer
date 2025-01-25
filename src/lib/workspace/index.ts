@@ -5,6 +5,7 @@ import { type Member, type Node, read } from "@run-slicer/asm";
 import type { UTF8Entry } from "@run-slicer/asm/pool";
 import type { Zip } from "@run-slicer/zip";
 import { derived, get, writable } from "svelte/store";
+import { analyzeBackground, schedule as scheduleAnalysis } from "./analysis";
 import { type Data, fileData, memoryData, type Named, parseName, transformData, zipData } from "./data";
 import { archiveDecoder } from "./encoding";
 
@@ -29,6 +30,7 @@ export interface ArchiveEntry extends Entry {
 export interface ClassEntry extends Entry {
     type: EntryType.CLASS | EntryType.MEMBER;
     node: Node;
+    full: boolean;
 }
 
 export interface MemberEntry extends ClassEntry {
@@ -36,12 +38,12 @@ export interface MemberEntry extends ClassEntry {
     member: Member;
 }
 
-const readImmediately = async (entry: Entry): Promise<Entry> => {
+export const readDeferred = async (entry: Entry): Promise<Entry> => {
     const blob = await entry.data.blob();
-
-    const magic = blob.size >= 4 ? new DataView(await blob.slice(0, 4).arrayBuffer()).getUint32(0, false) : 0;
-    switch (magic) {
-        case 0xcafebabe: {
+    if (entry.type === EntryType.FILE || (entry.type === EntryType.CLASS && !(entry as ClassEntry).full)) {
+        // no earlier complete analysis available, (re-)read
+        const magic = blob.size >= 4 ? new DataView(await blob.slice(0, 4).arrayBuffer()).getUint32(0, false) : 0;
+        if (magic === 0xcafebabe) {
             // try to read as class
             const buffer = new Uint8Array(await blob.arrayBuffer());
 
@@ -49,26 +51,17 @@ const readImmediately = async (entry: Entry): Promise<Entry> => {
                 const classEntry = entry as ClassEntry;
 
                 classEntry.node = read(buffer);
+                classEntry.full = true;
                 classEntry.type = EntryType.CLASS;
-                return classEntry;
             } catch (e) {
                 error(`failed to read class ${entry.name}`, e);
             }
         }
     }
 
-    return entry;
-};
-
-export const readDeferred = async (entry: Entry): Promise<Entry> => {
-    // no earlier analysis available, read the first time
-    if (entry.type === EntryType.FILE) {
-        entry = await readImmediately(entry);
-    }
-
     // preprocess class file with script
     if (entry.type === EntryType.CLASS) {
-        const buffer = await entry.data.bytes();
+        const buffer = new Uint8Array(await blob.arrayBuffer());
         const event = await rootContext.dispatchEvent({
             type: "preload",
             name: entry.name,
@@ -82,6 +75,7 @@ export const readDeferred = async (entry: Entry): Promise<Entry> => {
                     ...entry,
                     node: read(event.data),
                     data: transformData(entry.data, event.data),
+                    full: true,
                 } as ClassEntry;
             } catch (e) {
                 error(`failed to read class ${entry.name}`, e);
@@ -196,6 +190,8 @@ const load0 = async (entries: Map<string, Entry>, d: Data, parent?: Entry): Prom
         } catch (e) {
             warn(`failed to read archive-like entry ${entry.name}`, e);
         }
+    } else {
+        scheduleAnalysis(entry);
     }
 
     results.push({ entry, created: true });
@@ -218,6 +214,7 @@ export const load = async (...d: Data[]): Promise<LoadResult[]> => {
         });
     }
 
+    analyzeBackground().then();
     return results;
 };
 
