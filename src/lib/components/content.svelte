@@ -54,7 +54,7 @@
             </Pane>
         </ResizablePaneGroup>
     </ResizablePane>
-    <Pane size={20} position={TabPosition.PRIMARY_BOTTOM} handleBefore hidden={!$panePrimaryBottom} {tabs} {handler}>
+    <Pane size={30} position={TabPosition.PRIMARY_BOTTOM} handleBefore hidden={!$panePrimaryBottom} {tabs} {handler}>
         {#snippet children(tab)}
             <MainPane {tab} {entries} {logEntries} {disasms} {handler} />
         {/snippet}
