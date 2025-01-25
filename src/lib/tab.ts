@@ -54,7 +54,7 @@ const projectTab: Tab = {
     name: "Project",
     position: TabPosition.SECONDARY_LEFT,
     active: true,
-    closeable: false,
+    closeable: true,
     icon: { icon: Folders, classes: ["text-muted-foreground"] },
     internalId: {},
 };
@@ -65,7 +65,7 @@ const loggingTab: Tab = {
     name: "Logging",
     position: TabPosition.PRIMARY_BOTTOM,
     active: true,
-    closeable: false,
+    closeable: true,
     icon: { icon: Terminal, classes: ["text-muted-foreground"] },
     internalId: {},
 };
@@ -197,22 +197,10 @@ export const move = (tab: Tab, position: TabPosition) => {
 export const clear = () => {
     tabs.update(($tabs) => {
         for (const tab of $tabs.values()) {
-            if (tab.closeable) {
+            if (tab.entry) {
                 $tabs.delete(tab.id);
             }
         }
-
-        $tabs.set(welcomeTab.id, welcomeTab);
-        welcomeTab.position = TabPosition.PRIMARY_CENTER;
-        welcomeTab.active = true;
-
-        $tabs.set(projectTab.id, projectTab);
-        projectTab.position = TabPosition.SECONDARY_LEFT;
-        projectTab.active = true;
-
-        $tabs.set(loggingTab.id, loggingTab);
-        loggingTab.position = TabPosition.PRIMARY_BOTTOM;
-        loggingTab.active = true;
 
         return $tabs;
     });

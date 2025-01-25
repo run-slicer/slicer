@@ -1,7 +1,7 @@
 <script lang="ts" module>
     import { TabPosition } from "$lib/tab";
-    import type { Icon } from "$lib/components/icons";
     import {
+        InspectionPanel,
         PanelBottom,
         PanelBottomDashed,
         PanelLeft,
@@ -9,18 +9,19 @@
         PanelRight,
         PanelRightDashed,
     } from "lucide-svelte";
+    import type { Icon } from "$lib/components/icons";
 
     export const pickIcon = (pos: TabPosition, open: boolean): Icon => {
         switch (pos) {
             case TabPosition.PRIMARY_BOTTOM:
                 return open ? PanelBottom : PanelBottomDashed;
+            case TabPosition.PRIMARY_CENTER:
+                return InspectionPanel;
             case TabPosition.SECONDARY_LEFT:
                 return open ? PanelLeft : PanelLeftDashed;
             case TabPosition.SECONDARY_RIGHT:
                 return open ? PanelRight : PanelRightDashed;
         }
-
-        throw new Error("Invalid tab position");
     };
 </script>
 
@@ -33,6 +34,8 @@
     import type { EventHandler } from "$lib/event";
     import { type Snippet, untrack } from "svelte";
     import { ResizableHandle } from "$lib/components/ui/resizable";
+    import PaneMenu from "./pane_menu.svelte";
+    import { Plus } from "lucide-svelte";
 
     interface Props {
         tabs: Tab[];
@@ -100,6 +103,16 @@
                     />
                 {/each}
             </div>
+            <PaneMenu offset align="end" {position} {handler}>
+                {#snippet children(props)}
+                    <div
+                        class="flex h-8 min-h-8 w-8 min-w-8 cursor-pointer items-center justify-center bg-muted/60 text-primary/60"
+                        {...props}
+                    >
+                        <Plus size={18} />
+                    </div>
+                {/snippet}
+            </PaneMenu>
         </PaneHeader>
         {#if posTabs.length > 0}
             {#each posTabs as tab0 (tab0.internalId)}
@@ -109,10 +122,13 @@
             {/each}
         {:else}
             <div class="flex h-full w-full items-center justify-center">
-                <div class="h-1/4 w-2/3">
-                    <Icon size={24} class="mb-4" />
-                    <p class="mb-0.5 text-lg">Nothing here...</p>
-                    <p class="text-sm text-muted-foreground">Open a new tab or move an existing one here.</p>
+                <div class="flex w-2/3 flex-col justify-center gap-6">
+                    <div>
+                        <Icon size={24} class="mb-4" />
+                        <p class="mb-0.5 text-lg">Nothing here...</p>
+                        <p class="text-sm text-muted-foreground">Open a new tab or move an existing one here.</p>
+                    </div>
+                    <PaneMenu align="start" {position} {handler} />
                 </div>
             </div>
         {/if}
