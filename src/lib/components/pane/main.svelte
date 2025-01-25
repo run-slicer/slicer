@@ -16,7 +16,7 @@
 
     let { tab, entries, logEntries, disasms, handler }: Props = $props();
 
-    let center = $derived(tab.position === TabPosition.SECONDARY_LEFT || tab.position === TabPosition.SECONDARY_RIGHT);
+    let center = $derived(tab.position !== TabPosition.PRIMARY_CENTER);
 </script>
 
 {#if tab.type === TabType.PROJECT}
