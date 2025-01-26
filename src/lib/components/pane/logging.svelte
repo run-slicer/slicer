@@ -27,20 +27,18 @@
 </script>
 
 <div class="relative basis-full overflow-hidden scrollbar-thin">
-    {#await Promise.all([import("$lib/components/editor/editor.svelte"), import("$lib/lang/parser/log")])}
+    {#await Promise.all([import("$lib/components/editor/editor.svelte"), import("@codemirror/view"), import("$lib/lang/parser/log")])}
         <Loading center />
-    {:then [{ default: CodeEditor }, { log }]}
+    {:then [{ default: CodeEditor }, { EditorView }, { log }]}
         <CodeEditor
             wrap
             readonly
             {value}
             lang={log()}
-            onchange={(view, state) => {
+            onchange={(view) => {
                 // scroll to the last line automatically
-                const lastLine = state.doc.line(state.doc.lines);
-
-                const { node } = view.domAtPos(lastLine.from);
-                node.parentElement?.scrollIntoView({ block: "end" });
+                const lastLine = view.state.doc.line(view.state.doc.lines);
+                view.dispatch({ effects: [EditorView.scrollIntoView(lastLine.from)] });
             }}
         />
     {/await}

@@ -72,7 +72,7 @@
             {/if}
         {/snippet}
     </PopoverTrigger>
-    <PopoverContent {align} class={cn("w-[200px] p-0", !offset || `m${align === "end" ? "r" : "l"}-1`)}>
+    <PopoverContent {align} class={cn("w-[200px] p-0", !offset || "mr-1")}>
         <Command>
             <CommandInput placeholder="Search tab..." />
             <CommandList>

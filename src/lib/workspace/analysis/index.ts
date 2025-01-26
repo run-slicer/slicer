@@ -8,7 +8,9 @@ import { type ClassEntry, type Entry, EntryType } from "../";
 import type { Worker as AnalysisWorker } from "./worker";
 import Worker from "./worker?worker";
 
-const canAnalyze = (entry: Entry): boolean => entry.extension === "class";
+const canAnalyze = (entry: Entry): boolean => {
+    return entry.type === EntryType.FILE && entry.extension === "class";
+};
 
 const worker = wrap<AnalysisWorker>(new Worker());
 export const analyze = async (entry: Entry) => {
@@ -32,15 +34,11 @@ export const analyze = async (entry: Entry) => {
 
 let queue: Entry[] = [];
 
-export const schedule = (entry: Entry) => {
-    if (canAnalyze(entry)) {
-        queue.push(entry);
-    }
-};
+export const schedule = (entry: Entry) => queue.push(entry);
 
 export const analyzeBackground = async () => {
     // snapshot queue
-    const $queue = queue;
+    const $queue = queue.filter(canAnalyze);
     queue = [];
 
     if (!get(analysisBackground) || $queue.length === 0) return;

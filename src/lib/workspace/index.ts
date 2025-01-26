@@ -1,5 +1,6 @@
 import { error, warn } from "$lib/log";
 import { rootContext } from "$lib/script";
+import { analysisBackground } from "$lib/state";
 import { prettyMethodDesc } from "$lib/utils";
 import { type Member, type Node, read } from "@run-slicer/asm";
 import type { UTF8Entry } from "@run-slicer/asm/pool";
@@ -131,6 +132,17 @@ export const memberEntry = (entry: ClassEntry, member: Member): MemberEntry => {
 };
 
 export const entries = writable<Map<string, Entry>>(new Map());
+
+// background analysis state updated, reanalyze
+analysisBackground.subscribe(($analysisBackground) => {
+    if ($analysisBackground) {
+        for (const entry of get(entries).values()) {
+            scheduleAnalysis(entry);
+        }
+
+        analyzeBackground().then();
+    }
+});
 
 // ask user for confirmation if there are entries in the workspace
 const unloadHandler = (e: BeforeUnloadEvent) => e.preventDefault();

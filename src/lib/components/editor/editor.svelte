@@ -111,7 +111,7 @@
         size?: number;
         wrap?: boolean;
         view?: EditorView | null;
-        onchange?: (view: EditorView, state: EditorState) => void;
+        onchange?: (view: EditorView) => void;
     }
 
     let {
@@ -163,13 +163,14 @@
                                 value = newValue;
                             }
 
-                            onchange?.(e.view, e.state);
+                            onchange?.(e.view);
                         }
                     }),
                 ],
             }),
             parent,
         });
+        onchange?.(view); // initial value update
     });
 
     const rescale = (e: WheelEvent) => {
