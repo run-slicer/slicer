@@ -1,11 +1,10 @@
 <script lang="ts">
-    import { writable } from "svelte/store";
     import { type ClassEntry, EntryType, type MemberEntry } from "$lib/workspace";
     import type { Tab } from "$lib/tab";
     import type { Member } from "@run-slicer/asm";
     import { Lock, LockOpen, Zap, ZapOff } from "lucide-svelte";
     import { mode } from "mode-watcher";
-    import { Background, ControlButton, Controls, SvelteFlow } from "@xyflow/svelte";
+    import { Background, BackgroundVariant, ControlButton, Controls, SvelteFlow } from "@xyflow/svelte";
     import { Select, SelectContent, SelectItem, SelectTrigger } from "$lib/components/ui/select";
     import FlowNode from "./node.svelte";
     import { createComputedGraph } from "./graph";
@@ -45,43 +44,42 @@
 </script>
 
 <div class="relative h-full w-full">
-    {#key [member, showHandlerEdges]}
-        <SvelteFlow
-            nodes={writable(nodes)}
-            edges={writable(edges)}
-            fitView
-            minZoom={0}
-            colorMode={$mode || "system"}
-            bind:nodesDraggable={draggable}
-            nodesConnectable={false}
-            elementsSelectable={false}
-            proOptions={{ hideAttribution: true }}
-            nodeTypes={{ block: FlowNode }}
-        >
-            <Background />
-            <Controls showLock={false} position="bottom-right">
-                <!-- override interactivity control: we only want it to toggle draggability -->
-                <ControlButton
-                    class="svelte-flow__controls-interactive"
-                    on:click={() => (draggable = !draggable)}
-                    title="toggle interactivity"
-                    aria-label="toggle interactivity"
-                >
-                    {@const Icon = draggable ? LockOpen : Lock}
-                    <Icon size={12} class="!fill-none" />
-                </ControlButton>
-                <ControlButton
-                    class="svelte-flow__controls-interactive"
-                    on:click={() => (showHandlerEdges = !showHandlerEdges)}
-                    title="toggle exception handler edges"
-                    aria-label="toggle exception handler edges"
-                >
-                    {@const Icon = showHandlerEdges ? Zap : ZapOff}
-                    <Icon size={12} class="!fill-none" />
-                </ControlButton>
-            </Controls>
-        </SvelteFlow>
-    {/key}
+    <SvelteFlow
+        id={tab.id}
+        {nodes}
+        {edges}
+        fitView
+        minZoom={0}
+        colorMode={$mode || "system"}
+        nodesDraggable={draggable}
+        nodesConnectable={false}
+        elementsSelectable={false}
+        proOptions={{ hideAttribution: false /* ??? */ }}
+        nodeTypes={{ block: FlowNode }}
+    >
+        <Background variant={BackgroundVariant.Dots} />
+        <Controls showLock={false} position="bottom-right">
+            <!-- override interactivity control: we only want it to toggle draggability -->
+            <ControlButton
+                class="svelte-flow__controls-interactive"
+                onclick={() => (draggable = !draggable)}
+                title="toggle interactivity"
+                aria-label="toggle interactivity"
+            >
+                {@const Icon = draggable ? LockOpen : Lock}
+                <Icon size={12} class="!fill-none" />
+            </ControlButton>
+            <ControlButton
+                class="svelte-flow__controls-interactive"
+                onclick={() => (showHandlerEdges = !showHandlerEdges)}
+                title="toggle exception handler edges"
+                aria-label="toggle exception handler edges"
+            >
+                {@const Icon = showHandlerEdges ? Zap : ZapOff}
+                <Icon size={12} class="!fill-none" />
+            </ControlButton>
+        </Controls>
+    </SvelteFlow>
     {#if entry.type !== EntryType.MEMBER}
         <div class="absolute bottom-0 m-[15px] max-w-[425px]">
             <Select type="single" bind:value={method}>
