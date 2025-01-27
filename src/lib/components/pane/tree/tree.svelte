@@ -3,11 +3,12 @@
     import type { Node } from "./node.svelte";
 
     export const collectEntries = (node: Node): Entry[] => {
+        const entries = node.entry ? [node.entry] : [];
         if (node.nodes) {
-            return node.nodes.flatMap(collectEntries);
+            entries.push(...node.nodes.flatMap(collectEntries));
         }
 
-        return node.entry ? [node.entry] : [];
+        return entries;
     };
 </script>
 
