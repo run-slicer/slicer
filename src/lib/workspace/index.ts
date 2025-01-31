@@ -1,12 +1,12 @@
-import { error, warn } from "$lib/log";
+import { warn } from "$lib/log";
 import { rootContext } from "$lib/script";
 import { analysisBackground } from "$lib/state";
 import { prettyMethodDesc } from "$lib/utils";
-import { type Member, type Node, read } from "@run-slicer/asm";
+import type { Member, Node } from "@run-slicer/asm";
 import type { UTF8Entry } from "@run-slicer/asm/pool";
 import type { Zip } from "@run-slicer/zip";
 import { derived, get, writable } from "svelte/store";
-import { analyzeBackground, schedule as scheduleAnalysis } from "./analysis";
+import { AnalysisState, analyze, analyzeBackground, schedule as scheduleAnalysis } from "./analysis";
 import { type Data, fileData, memoryData, type Named, parseName, transformData, zipData } from "./data";
 import { archiveDecoder } from "./encoding";
 
@@ -21,6 +21,7 @@ export interface Entry extends Named {
     type: EntryType;
     parent?: Entry;
     data: Data;
+    state: AnalysisState;
 }
 
 export interface ArchiveEntry extends Entry {
@@ -31,7 +32,6 @@ export interface ArchiveEntry extends Entry {
 export interface ClassEntry extends Entry {
     type: EntryType.CLASS | EntryType.MEMBER;
     node: Node;
-    full: boolean;
 }
 
 export interface MemberEntry extends ClassEntry {
@@ -40,29 +40,11 @@ export interface MemberEntry extends ClassEntry {
 }
 
 export const readDeferred = async (entry: Entry): Promise<Entry> => {
-    const blob = await entry.data.blob();
-    if (entry.type === EntryType.FILE || (entry.type === EntryType.CLASS && !(entry as ClassEntry).full)) {
-        // no earlier complete analysis available, (re-)read
-        const magic = blob.size >= 4 ? new DataView(await blob.slice(0, 4).arrayBuffer()).getUint32(0, false) : 0;
-        if (magic === 0xcafebabe) {
-            // try to read as class
-            const buffer = new Uint8Array(await blob.arrayBuffer());
-
-            try {
-                const classEntry = entry as ClassEntry;
-
-                classEntry.node = read(buffer);
-                classEntry.full = true;
-                classEntry.type = EntryType.CLASS;
-            } catch (e) {
-                error(`failed to read class ${entry.name}`, e);
-            }
-        }
-    }
+    await analyze(entry, AnalysisState.FULL);
 
     // preprocess class file with script
     if (entry.type === EntryType.CLASS) {
-        const buffer = new Uint8Array(await blob.arrayBuffer());
+        const buffer = await entry.data.bytes();
         const event = await rootContext.dispatchEvent({
             type: "preload",
             name: entry.name,
@@ -71,16 +53,9 @@ export const readDeferred = async (entry: Entry): Promise<Entry> => {
 
         // create transformed entry only if a transformation happened
         if (event.data !== buffer) {
-            try {
-                entry = {
-                    ...entry,
-                    node: read(event.data),
-                    data: transformData(entry.data, event.data),
-                    full: true,
-                } as ClassEntry;
-            } catch (e) {
-                error(`failed to read class ${entry.name}`, e);
-            }
+            entry = { ...entry, data: transformData(entry.data, event.data), state: AnalysisState.NONE };
+
+            await analyze(entry, AnalysisState.FULL);
         }
     }
 
@@ -108,6 +83,7 @@ export const transformEntry = (entry: Entry, ext: string, value: string): Entry 
         shortName: replaceExt(entry.shortName, ext),
         extension: ext,
         data: memoryData(name, utf8Encoder.encode(value), utf8Decoder),
+        state: AnalysisState.NONE,
     };
 };
 
@@ -182,6 +158,7 @@ const load0 = async (entries: Map<string, Entry>, d: Data, parent?: Entry): Prom
         type: EntryType.FILE,
         parent,
         data: d,
+        state: AnalysisState.NONE,
     };
 
     if (entry.extension && zipExtensions.has(entry.extension)) {
@@ -193,6 +170,7 @@ const load0 = async (entries: Map<string, Entry>, d: Data, parent?: Entry): Prom
             // if we're loading a nested archive, hope it's uncompressed or pretty small
             // if it isn't, then we're loading the entire thing into memory!
             archiveEntry.archive = await readBlob(await d.blob(), { decoder: get(archiveDecoder) });
+            archiveEntry.state = AnalysisState.FULL;
             archiveEntry.type = EntryType.ARCHIVE;
 
             // expand archives into workspace

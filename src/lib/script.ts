@@ -7,13 +7,13 @@ import {
 } from "$lib/disasm";
 import { createSource as createClassSource } from "$lib/disasm/source";
 import type { Language } from "$lib/lang";
-import { error } from "$lib/log";
+import { error, warn } from "$lib/log";
 import { scriptingScripts } from "$lib/state";
 import { current as currentTab, find as findTab, refresh as refreshTab, type Tab, tabs, TabType } from "$lib/tab";
 import { cyrb53 } from "$lib/utils";
 import { type ClassEntry, classes, type Entry, EntryType, readDeferred } from "$lib/workspace";
+import { AnalysisState, analyze } from "$lib/workspace/analysis";
 import { DataType, type MemoryData, unwrapTransform } from "$lib/workspace/data";
-import { read as readNode } from "@run-slicer/asm";
 import type { UTF8Entry } from "@run-slicer/asm/pool";
 import type {
     DisassemblerContext,
@@ -94,8 +94,8 @@ const wrapDisasm = (disasm: Disassembler): ScriptDisassembler => {
             }
 
             // create simulated entry
-            return disasm.class({
-                type: EntryType.CLASS,
+            let entry: Entry = {
+                type: EntryType.FILE,
                 name: "",
                 shortName: "",
                 data: {
@@ -103,9 +103,16 @@ const wrapDisasm = (disasm: Disassembler): ScriptDisassembler => {
                     name: "",
                     data,
                 } as MemoryData,
-                node: readNode(data),
-                full: true,
-            });
+                state: AnalysisState.NONE,
+            };
+
+            await analyze(entry, AnalysisState.FULL);
+            if (entry.type !== EntryType.CLASS) {
+                warn(`tried to disassemble non-class (disassembler id: ${disasm.id})`);
+                return "";
+            }
+
+            return disasm.class(entry as ClassEntry);
         },
         method: disasm.method
             ? async (name, signature, source) => {
@@ -114,31 +121,34 @@ const wrapDisasm = (disasm: Disassembler): ScriptDisassembler => {
                       return "";
                   }
 
-                  const node = readNode(data);
+                  // create simulated entry
+                  let entry: Entry = {
+                      type: EntryType.FILE,
+                      name: "",
+                      shortName: "",
+                      data: {
+                          type: DataType.MEMORY,
+                          name: "",
+                          data,
+                      } as MemoryData,
+                      state: AnalysisState.NONE,
+                  };
 
-                  const method = node.methods.find((m) => {
+                  await analyze(entry, AnalysisState.FULL);
+                  if (entry.type !== EntryType.CLASS) {
+                      warn(`tried to disassemble non-class (disassembler id: ${disasm.id})`);
+                      return "";
+                  }
+
+                  const classEntry = entry as ClassEntry;
+                  const method = classEntry.node.methods.find((m) => {
                       return m.name.string + m.type.string === signature;
                   });
                   if (!method) {
                       return "";
                   }
 
-                  // create simulated entry
-                  return disasm.method!(
-                      {
-                          type: EntryType.CLASS,
-                          name: "",
-                          shortName: "",
-                          data: {
-                              type: DataType.MEMORY,
-                              name: "",
-                              data,
-                          } as MemoryData,
-                          node,
-                          full: true,
-                      },
-                      method
-                  );
+                  return disasm.method!(classEntry, method);
               }
             : undefined,
     };
