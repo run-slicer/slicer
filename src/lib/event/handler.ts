@@ -43,6 +43,7 @@ import {
     remove as removeWs,
 } from "$lib/workspace";
 import { type Data, download } from "$lib/workspace/data";
+import { Channel } from "queueable";
 import { toast } from "svelte-sonner";
 import { get } from "svelte/store";
 import type { EventHandler } from "./";
@@ -232,61 +233,52 @@ export default {
         }
 
         return recordProgress("exporting", `${entries.length} entries`, async (exportTask) => {
-            const blob = await download(
-                (async function* () {
-                    const chunks = chunk(entries, Math.ceil(entries.length / (disasm?.concurrency || 1)));
+            const channel = new Channel<Data>();
+            const chunks = chunk(entries, Math.ceil(entries.length / (disasm?.concurrency || 1)));
 
-                    let count = 0;
-                    const promises = await Promise.all(
-                        chunks.map(async (chunk: Entry[]) => {
-                            const task = addTask(createTask("reading", null));
+            let count = 0;
+            const promises = chunks.map(async (chunk) => {
+                const task = addTask(createTask("reading", null));
 
-                            const results: Data[] = [];
-                            for (let entry of chunk) {
-                                task.desc.set(entry.name);
-                                // not always accurate, but less expensive to do
-                                task.name.set(disasm && entry.extension === "class" ? "disassembling" : "reading");
+                for (let entry of chunk) {
+                    task.desc.set(entry.name);
+                    // not always accurate, but less expensive to do
+                    task.name.set(disasm && entry.extension === "class" ? "disassembling" : "reading");
 
-                                try {
-                                    if (disasm) {
-                                        entry = await readDeferred(entry);
-                                        if (entry.type === EntryType.CLASS) {
-                                            entry = await disassembleEntry(entry as ClassEntry, disasm);
-                                        }
-                                    }
-                                } catch (e) {
-                                    error(`failed to read entry ${entry.name}`, e);
-                                }
-
-                                // finished with entry
-                                count++;
-                                phaseTask(task);
-
-                                // exclude archives that have been expanded
-                                if (entry.type !== EntryType.ARCHIVE || !entries.some((e) => e.parent === entry)) {
-                                    results.push({ ...entry.data, name: entry.name });
-                                }
-
-                                exportTask.desc.set(`${entries.length} entries (${entries.length - count} remaining)`);
-                                exportTask.progress?.set((count / entries.length) * 100);
+                    try {
+                        if (disasm) {
+                            entry = await readDeferred(entry);
+                            if (entry.type === EntryType.CLASS) {
+                                entry = await disassembleEntry(entry as ClassEntry, disasm);
                             }
-
-                            removeTask(task, false);
-                            return results;
-                        })
-                    );
-
-                    for (const data of promises.flat()) {
-                        yield data;
+                        }
+                    } catch (e) {
+                        error(`failed to read entry ${entry.name}`, e);
                     }
-                })(),
-                (data, e) => {
-                    error(`failed to read entry ${data.name}`, e);
-                    toast.error("Error occurred", {
-                        description: `Could not read entry ${data.name}, check the console.`,
-                    });
+
+                    // finished with entry
+                    count++;
+                    phaseTask(task);
+
+                    // exclude archives that have been expanded
+                    if (entry.type !== EntryType.ARCHIVE || !entries.some((e) => e.parent === entry)) {
+                        await channel.push({ ...entry.data, name: entry.name });
+                    }
+
+                    exportTask.desc.set(`${entries.length} entries (${entries.length - count} remaining)`);
+                    exportTask.progress?.set((count / entries.length) * 100);
                 }
-            );
+
+                removeTask(task, false);
+            });
+
+            Promise.all(promises).finally(() => channel.return());
+            const blob = await download(channel, (data, e) => {
+                error(`failed to read entry ${data.name}`, e);
+                toast.error("Error occurred", {
+                    description: `Could not read entry ${data.name}, check the console.`,
+                });
+            });
 
             exportTask.desc.set(`${entries.length} entries`);
             return downloadBlob(`export-${disasm?.id || "raw"}-${timestampFile()}.zip`, blob);
