@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { ChevronsUpDown, Folders, Sparkles, Terminal } from "lucide-svelte";
+    import { ChevronsUpDown } from "lucide-svelte";
     import {
         Command,
         CommandEmpty,
@@ -11,8 +11,7 @@
     import { Popover, PopoverContent, PopoverTrigger } from "$lib/components/ui/popover";
     import { Button } from "$lib/components/ui/button";
     import type { EventHandler } from "$lib/event";
-    import { type TabPosition, TabType } from "$lib/tab";
-    import type { Icon } from "$lib/components/icons";
+    import { type TabPosition, tabDefs } from "$lib/tab";
     import type { Snippet } from "svelte";
     import { cn } from "$lib/components/utils";
 
@@ -25,30 +24,6 @@
     }
 
     let { position, align, offset, handler, children }: Props = $props();
-
-    interface TabDefinition {
-        id: TabType;
-        name: string;
-        icon: Icon;
-    }
-
-    const defs: TabDefinition[] = [
-        {
-            id: TabType.PROJECT,
-            name: "Project",
-            icon: Folders,
-        },
-        {
-            id: TabType.LOGGING,
-            name: "Logging",
-            icon: Terminal,
-        },
-        {
-            id: TabType.WELCOME,
-            name: "Welcome",
-            icon: Sparkles,
-        },
-    ];
 
     let open = $state(false);
     let triggerRef = $state<HTMLButtonElement>(null!);
@@ -78,13 +53,13 @@
             <CommandList>
                 <CommandEmpty>No tab found.</CommandEmpty>
                 <CommandGroup>
-                    {#each defs as def}
+                    {#each tabDefs as def}
                         {@const Icon = def.icon}
                         <CommandItem
-                            value={def.id}
+                            value={def.type}
                             onSelect={async () => {
                                 open = false;
-                                await handler.openRaw(def.id, def.name, def.icon, position);
+                                await handler.openUnscoped(def, position);
                             }}
                         >
                             <Icon />

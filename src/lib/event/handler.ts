@@ -1,4 +1,4 @@
-import { type Icon, tabIcon } from "$lib/components/icons";
+import { tabIcon } from "$lib/components/icons";
 import { disassembleEntry, type Disassembler } from "$lib/disasm";
 import { error } from "$lib/log";
 import {
@@ -16,6 +16,7 @@ import {
     move as moveTab,
     remove as removeTab,
     type Tab,
+    type TabDefinition,
     TabPosition,
     tabs,
     TabType,
@@ -167,20 +168,21 @@ export default {
 
         updateCurrentTab(tab.position, tab);
     },
-    async openRaw(tabType: TabType, name: string, icon: Icon, position: TabPosition): Promise<void> {
+    async openUnscoped(def: TabDefinition, position: TabPosition): Promise<void> {
         let tab = get(tabs)
             .values()
-            .find((t) => t.type === tabType);
+            .find((t) => t.type === def.type);
+
         if (tab) {
             moveTab(tab, position);
         } else {
             tab = updateTab({
-                id: `${tabType}:slicer`,
-                type: tabType,
-                name,
+                id: `${def.type}:slicer`,
+                type: def.type,
+                name: def.name,
                 position,
                 closeable: true,
-                icon: { icon, classes: ["text-muted-foreground"] },
+                icon: { icon: def.icon, classes: ["text-muted-foreground"] },
             });
 
             updateCurrentTab(tab.position, tab);

@@ -3,6 +3,7 @@
     import Menu from "$lib/components/menu/menu.svelte";
     import Content from "$lib/components/content.svelte";
     import Crumb from "$lib/components/crumb/crumb.svelte";
+    import Command from "$lib/components/command.svelte";
     import { Toaster } from "$lib/components/ui/sonner";
     import { current as currentTab, tabs } from "$lib/tab";
     import { classes, entries } from "$lib/workspace";
@@ -45,6 +46,4 @@
 />
 <Content tabs={tabs0} entries={entries0} logEntries={$logEntries} disasms={disasms0} handler={$handler} />
 <Crumb tab={$currentTab} tasks={tasks0} encoding={$currentEncoding} />
-{#await import("$lib/components/command.svelte") then { default: Command }}
-    <Command entries={entries0} handler={$handler} />
-{/await}
+<Command entries={entries0} handler={$handler} />

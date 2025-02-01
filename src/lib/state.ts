@@ -1,4 +1,5 @@
 import { error } from "$lib/log";
+import type { TabPosition, TabType } from "$lib/tab";
 import { persisted } from "$lib/utils";
 
 export const root = "slicer.state";
@@ -6,6 +7,12 @@ export const root = "slicer.state";
 export interface ScriptData {
     url: string;
     load: boolean;
+}
+
+export interface OpenedPane {
+    type: TabType;
+    position: TabPosition;
+    active: boolean;
 }
 
 export const themeColor = persisted<string>(`${root}.theme.color`, "zinc");
@@ -23,6 +30,10 @@ export const analysisBackground = persisted<boolean>(`${root}.analysis.backgroun
 export const panePrimaryBottom = persisted<boolean>(`${root}.pane.primary.bottom`, false);
 export const paneSecondaryLeft = persisted<boolean>(`${root}.pane.secondary.left`, true);
 export const paneSecondaryRight = persisted<boolean>(`${root}.pane.secondary.right`, false);
+export const paneOpened = persisted<OpenedPane[]>(`${root}.pane.opened`, [
+    { type: "project" as TabType, position: "secondary_left" as TabPosition, active: true },
+    { type: "welcome" as TabType, position: "primary_center" as TabPosition, active: true },
+]);
 
 export const load = (data: string): boolean => {
     try {

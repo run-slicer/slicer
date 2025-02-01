@@ -1,7 +1,7 @@
-import type { StyledIcon } from "$lib/components/icons";
-import { workspaceEncoding } from "$lib/state";
+import type { Icon, StyledIcon } from "$lib/components/icons";
+import { paneOpened, workspaceEncoding } from "$lib/state";
 import { type Entry, EntryType } from "$lib/workspace";
-import { Folders, Sparkles } from "lucide-svelte";
+import { Folders, Sparkles, Terminal } from "lucide-svelte";
 import { derived, get, writable } from "svelte/store";
 
 export const enum TabType {
@@ -17,10 +17,10 @@ export const enum TabType {
 }
 
 export const enum TabPosition {
-    PRIMARY_CENTER,
-    PRIMARY_BOTTOM,
-    SECONDARY_LEFT,
-    SECONDARY_RIGHT,
+    PRIMARY_CENTER = "primary_center",
+    PRIMARY_BOTTOM = "primary_bottom",
+    SECONDARY_LEFT = "secondary_left",
+    SECONDARY_RIGHT = "secondary_right",
 }
 
 export interface Tab {
@@ -37,34 +37,57 @@ export interface Tab {
     internalId?: any; // used for reactivity keying
 }
 
-const welcomeTab: Tab = {
-    id: `${TabType.WELCOME}:slicer`,
-    type: TabType.WELCOME,
-    name: "Welcome",
-    position: TabPosition.PRIMARY_CENTER,
-    active: true,
-    closeable: true,
-    icon: { icon: Sparkles, classes: ["text-muted-foreground"] },
-    internalId: {},
-};
+export interface TabDefinition {
+    type: TabType;
+    name: string;
+    icon: Icon;
+}
 
-const projectTab: Tab = {
-    id: `${TabType.PROJECT}:slicer`,
-    type: TabType.PROJECT,
-    name: "Project",
-    position: TabPosition.SECONDARY_LEFT,
-    active: true,
-    closeable: true,
-    icon: { icon: Folders, classes: ["text-muted-foreground"] },
-    internalId: {},
-};
+export const tabDefs: TabDefinition[] = [
+    {
+        type: TabType.PROJECT,
+        name: "Project",
+        icon: Folders,
+    },
+    {
+        type: TabType.LOGGING,
+        name: "Logging",
+        icon: Terminal,
+    },
+    {
+        type: TabType.WELCOME,
+        name: "Welcome",
+        icon: Sparkles,
+    },
+];
 
 export const tabs = writable<Map<string, Tab>>(
-    new Map([
-        [projectTab.id, projectTab],
-        [welcomeTab.id, welcomeTab],
-    ])
+    new Map(
+        get(paneOpened)
+            .map((pane) => ({ pane, def: tabDefs.find((d) => d.type === pane.type)! }))
+            .map(({ pane, def }) => [
+                `${def.type}:slicer`,
+                {
+                    id: `${def.type}:slicer`,
+                    type: def.type,
+                    name: def.name,
+                    position: pane.position,
+                    active: pane.active,
+                    closeable: true,
+                    icon: { icon: def.icon, classes: ["text-muted-foreground"] },
+                    internalId: {},
+                },
+            ])
+    )
 );
+
+tabs.subscribe(($tabs) => {
+    paneOpened.set(
+        Array.from($tabs.values())
+            .filter((t) => tabDefs.some((d) => d.type === t.type))
+            .map((t) => ({ type: t.type, position: t.position, active: Boolean(t.active) }))
+    );
+});
 
 export const current = derived(tabs, ($tabs) => {
     return $tabs.values().find((t) => t.active && t.position === TabPosition.PRIMARY_CENTER) || null;
