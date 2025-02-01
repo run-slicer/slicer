@@ -27,7 +27,7 @@ const computeTextSize = (text: string): TextMetrics => {
     return context.measureText(text);
 };
 
-export const createComputedGraph = (method: Member | null, pool: Pool, handlerEdges: boolean): [Node[], Edge[]] => {
+export const createComputedGraph = (method: Member | null, pool: Pool, withExcHandlers: boolean): [Node[], Edge[]] => {
     if (!method) {
         return [[], []]; // no method
     }
@@ -40,6 +40,17 @@ export const createComputedGraph = (method: Member | null, pool: Pool, handlerEd
     const code = attr as CodeAttribute;
 
     const { nodes, edges } = computeGraph(code);
+
+    const excEdges = (withExcHandlers ? nodes : []).flatMap((node) => {
+        return code.exceptionTable
+            .filter((e) => node.offset >= e.startPC && node.insns[node.insns.length - 1].offset < e.endPC)
+            .map((e) => ({
+                source: node.offset,
+                target: e.handlerPC,
+                // https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-4.html#jvms-4.7.3 (exception_table[] -> catch_type)
+                catchType: e.catchType === 0 ? "*" : formatEntry(pool[e.catchType]!, pool),
+            }));
+    });
 
     const data: NodeData[] = nodes.map((node) => {
         const lines = node.insns.map((i) => formatInsn(i, pool, false));
@@ -64,7 +75,7 @@ export const createComputedGraph = (method: Member | null, pool: Pool, handlerEd
         });
     });
 
-    edges.forEach((edge) => {
+    [...edges, ...excEdges].forEach((edge) => {
         graph.setEdge(`${edge.source}`, `${edge.target}`);
     });
 
@@ -87,7 +98,6 @@ export const createComputedGraph = (method: Member | null, pool: Pool, handlerEd
             };
         }),
         [
-            // jumps and immediate edges
             ...edges.map((edge) => {
                 let label: string | undefined = undefined;
                 switch (edge.type) {
@@ -114,23 +124,17 @@ export const createComputedGraph = (method: Member | null, pool: Pool, handlerEd
                     },
                 };
             }),
-            // exception handlers
-            ...(handlerEdges ? nodes : []).flatMap((node) => {
-                return code.exceptionTable
-                    .filter((e) => node.offset >= e.startPC && node.insns[node.insns.length - 1].offset < e.endPC)
-                    .map((e) => ({
-                        id: `edge-exc-${node.offset}-${e.handlerPC}`,
-                        type: "smoothstep",
-                        style: "stroke: hsl(var(--destructive));",
-                        // https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-4.html#jvms-4.7.3 (exception_table[] -> catch_type)
-                        label: e.catchType === 0 ? "*" : formatEntry(pool[e.catchType]!, pool),
-                        source: `${node.offset}`,
-                        target: `${e.handlerPC}`,
-                        markerEnd: {
-                            type: "arrowclosed" as MarkerType /* skip non-type import */,
-                        },
-                    }));
-            }),
+            ...excEdges.map((edge) => ({
+                id: `edge-exc-${edge.source}-${edge.target}`,
+                type: "smoothstep",
+                style: "stroke: hsl(var(--destructive));",
+                label: edge.catchType,
+                source: `${edge.source}`,
+                target: `${edge.target}`,
+                markerEnd: {
+                    type: "arrowclosed" as MarkerType /* skip non-type import */,
+                },
+            })),
         ],
     ];
 };

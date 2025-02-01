@@ -2,12 +2,13 @@
     import { type ClassEntry, EntryType, type MemberEntry } from "$lib/workspace";
     import type { Tab } from "$lib/tab";
     import type { Member } from "@run-slicer/asm";
-    import { Lock, LockOpen, Zap, ZapOff } from "lucide-svelte";
+    import { SendToBack, BringToFront, Lock, LockOpen, Zap, ZapOff } from "lucide-svelte";
     import { mode } from "mode-watcher";
     import { Background, BackgroundVariant, ControlButton, Controls, SvelteFlow } from "@xyflow/svelte";
     import { Select, SelectContent, SelectItem, SelectTrigger } from "$lib/components/ui/select";
     import FlowNode from "./node.svelte";
     import { createComputedGraph } from "./graph";
+    import { cn } from "$lib/components/utils";
 
     interface Props {
         tab: Tab;
@@ -39,11 +40,12 @@
 
     let draggable = $state(false);
     let showHandlerEdges = $state(false);
+    let edgesFront = $state(true);
 
     let [nodes, edges] = $derived(createComputedGraph(member, pool, showHandlerEdges));
 </script>
 
-<div class="relative h-full w-full">
+<div class={cn("relative h-full w-full", edgesFront && "edges-front")}>
     <SvelteFlow
         id={tab.id}
         {nodes}
@@ -76,6 +78,15 @@
                 aria-label="toggle exception handler edges"
             >
                 {@const Icon = showHandlerEdges ? Zap : ZapOff}
+                <Icon size={12} class="!fill-none" />
+            </ControlButton>
+            <ControlButton
+                class="svelte-flow__controls-interactive"
+                onclick={() => (edgesFront = !edgesFront)}
+                title="bring edges to front/back"
+                aria-label="bring edges to front/back"
+            >
+                {@const Icon = edgesFront ? SendToBack : BringToFront}
                 <Icon size={12} class="!fill-none" />
             </ControlButton>
         </Controls>
