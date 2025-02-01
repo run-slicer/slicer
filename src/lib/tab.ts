@@ -4,7 +4,7 @@ import { type Entry, EntryType } from "$lib/workspace";
 import { Folders, Sparkles, Terminal } from "lucide-svelte";
 import { derived, get, writable } from "svelte/store";
 
-export const enum TabType {
+export enum TabType {
     PROJECT = "project",
     LOGGING = "logging",
     WELCOME = "welcome",
@@ -16,7 +16,7 @@ export const enum TabType {
     HEAP_DUMP = "heap_dump",
 }
 
-export const enum TabPosition {
+export enum TabPosition {
     PRIMARY_CENTER = "primary_center",
     PRIMARY_BOTTOM = "primary_bottom",
     SECONDARY_LEFT = "secondary_left",
@@ -43,6 +43,7 @@ export interface TabDefinition {
     icon: Icon;
 }
 
+// unscoped tab definitions
 export const tabDefs: TabDefinition[] = [
     {
         type: TabType.PROJECT,
@@ -61,10 +62,12 @@ export const tabDefs: TabDefinition[] = [
     },
 ];
 
+const typedDefs = new Map(tabDefs.map((d) => [d.type, d]));
+
 export const tabs = writable<Map<string, Tab>>(
     new Map(
         get(paneOpened)
-            .map((pane) => ({ pane, def: tabDefs.find((d) => d.type === pane.type)! }))
+            .map((pane) => ({ pane, def: typedDefs.get(pane.type)! }))
             .map(({ pane, def }) => [
                 `${def.type}:slicer`,
                 {
@@ -81,12 +84,21 @@ export const tabs = writable<Map<string, Tab>>(
     )
 );
 
+// save opened unscoped tabs' position for returning sessions
 tabs.subscribe(($tabs) => {
-    paneOpened.set(
-        Array.from($tabs.values())
-            .filter((t) => tabDefs.some((d) => d.type === t.type))
-            .map((t) => ({ type: t.type, position: t.position, active: Boolean(t.active) }))
-    );
+    const candidates = Array.from($tabs.values())
+        .filter((t) => typedDefs.has(t.type))
+        .map((t) => ({ type: t.type, position: t.position, active: Boolean(t.active) }));
+
+    for (const pos of Object.values(TabPosition)) {
+        const posCan = candidates.filter((t) => t.position === pos);
+        if (posCan.length > 0 && !posCan.some((t) => t.active)) {
+            // no active tab for position, make the last one active
+            posCan[posCan.length - 1]!.active = true;
+        }
+    }
+
+    paneOpened.set(candidates);
 });
 
 export const current = derived(tabs, ($tabs) => {
