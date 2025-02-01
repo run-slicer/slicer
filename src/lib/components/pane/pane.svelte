@@ -34,7 +34,7 @@
     import type { EventHandler } from "$lib/event";
     import { type Snippet, untrack } from "svelte";
     import { ResizableHandle } from "$lib/components/ui/resizable";
-    import PaneMenu from "./pane_menu.svelte";
+    import PaneMenu from "./menu.svelte";
     import { Plus } from "lucide-svelte";
 
     interface Props {

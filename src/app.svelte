@@ -25,6 +25,14 @@
     let disasms0 = $derived(Array.from($disasms.values()));
 
     onMount(registerShortcuts);
+
+    // ignore default context menu
+    onMount(() => {
+        const handler = (e: Event) => e.preventDefault();
+
+        window.addEventListener("contextmenu", handler);
+        return () => window.removeEventListener("contextmenu", handler);
+    });
 </script>
 
 <ModeWatcher
