@@ -90,6 +90,11 @@ tabs.subscribe(($tabs) => {
         .filter((t) => typedDefs.has(t.type))
         .map((t) => ({ type: t.type, position: t.position, active: Boolean(t.active) }));
 
+    // re-add Welcome tab, if not present
+    if (!candidates.some((t) => t.type === TabType.WELCOME)) {
+        candidates.unshift({ type: TabType.WELCOME, position: TabPosition.PRIMARY_CENTER, active: false });
+    }
+
     for (const pos of Object.values(TabPosition)) {
         const posCan = candidates.filter((t) => t.position === pos);
         if (posCan.length > 0 && !posCan.some((t) => t.active)) {

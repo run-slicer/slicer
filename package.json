@@ -49,7 +49,7 @@
         "@sveltejs/vite-plugin-svelte": "^5.0.3",
         "@tailwindcss/typography": "^0.5.16",
         "@tsconfig/svelte": "^5.0.4",
-        "@types/node": "^22.12.0",
+        "@types/node": "^22.13.0",
         "autoprefixer": "^10.4.20",
         "bits-ui": "1.0.0-next.82",
         "lucide-svelte": "^0.474.0",
@@ -62,7 +62,7 @@
         "prettier-plugin-tailwindcss": "^0.6.11",
         "svelte": "^5.19.6",
         "svelte-check": "^4.1.4",
-        "svelte-dnd-action": "^0.9.56",
+        "svelte-dnd-action": "^0.9.57",
         "svelte-preprocess": "^6.0.3",
         "svelte-sonner": "^0.3.28",
         "tailwindcss": "^3.4.17",
@@ -71,5 +71,5 @@
         "vite": "^6.0.11",
         "vite-plugin-sitemap": "^0.7.1"
     },
-    "packageManager": "pnpm@9.15.0+sha512.76e2379760a4328ec4415815bcd6628dee727af3779aaa4c914e3944156c4299921a89f976381ee107d41f12cfa4b66681ca9c718f0668fa0831ed4c6d8ba56c"
+    "packageManager": "pnpm@9.15.4+sha512.b2dc20e2fc72b3e18848459b37359a32064663e5627a51e4c74b2c29dd8e8e0491483c3abb40789cfd578bf362fb6ba8261b05f0387d76792ed6e23ea3b1b6a0"
 }
