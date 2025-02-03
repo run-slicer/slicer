@@ -1,7 +1,7 @@
 <script lang="ts">
     import { EntryType } from "$lib/workspace";
     import Loading from "$lib/components/loading.svelte";
-    import { type Tab, TabType } from "$lib/tab";
+    import { TabType } from "$lib/tab";
     import { load as loadLanguage } from "$lib/lang";
     import { detectLanguage, read } from "./";
     import CodeEditor from "$lib/components/editor/editor.svelte";
@@ -9,19 +9,12 @@
     import { jasm, vf } from "$lib/disasm/builtin";
     import { editorTextSize, editorTextSizeSync, editorWrap, toolsDisasm } from "$lib/state";
     import { get, writable } from "svelte/store";
-    import type { Disassembler } from "$lib/disasm";
     import { ContextMenu, ContextMenuTrigger } from "$lib/components/ui/context-menu";
     import CodeMenu from "./menu.svelte";
     import { record } from "$lib/task";
-    import type { EventHandler } from "$lib/event";
+    import type { PaneProps } from "$lib/components/pane";
 
-    interface Props {
-        tab: Tab;
-        disasms: Disassembler[];
-        handler: EventHandler;
-    }
-
-    let { tab, disasms, handler }: Props = $props();
+    let { tab, disasms, handler }: PaneProps = $props();
     const entry = $derived(tab.entry!);
 
     let wrap = $state(get(editorWrap));

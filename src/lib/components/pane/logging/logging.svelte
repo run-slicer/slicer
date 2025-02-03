@@ -2,12 +2,9 @@
     import Loading from "$lib/components/loading.svelte";
     import type { LogEntry } from "$lib/log";
     import { prettyErrorStack } from "$lib/utils";
+    import type { PaneProps } from "$lib/components/pane";
 
-    interface Props {
-        entries: LogEntry[];
-    }
-
-    let { entries }: Props = $props();
+    let { logEntries }: PaneProps = $props();
 
     const readEntries = (logs: LogEntry[]): string => {
         let result: string[] = [];
@@ -23,7 +20,7 @@
         return result.join("\n");
     };
 
-    let value = $derived(readEntries(entries));
+    let value = $derived(readEntries(logEntries));
 </script>
 
 <div class="relative basis-full overflow-hidden scrollbar-thin">

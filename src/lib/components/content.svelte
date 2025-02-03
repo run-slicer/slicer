@@ -3,8 +3,7 @@
     import type { Entry } from "$lib/workspace";
     import { type Tab, TabPosition } from "$lib/tab";
     import type { LogEntry } from "$lib/log";
-    import Pane from "$lib/components/pane/pane.svelte";
-    import MainPane from "$lib/components/pane/main.svelte";
+    import { Pane, RootPane } from "$lib/components/pane";
     import type { Disassembler } from "$lib/disasm";
     import type { EventHandler } from "$lib/event";
     import { panePrimaryBottom, paneSecondaryLeft, paneSecondaryRight } from "$lib/state";
@@ -32,12 +31,12 @@
                 {handler}
             >
                 {#snippet children(tab)}
-                    <MainPane {tab} {entries} {logEntries} {disasms} {handler} />
+                    <RootPane {tab} {entries} {logEntries} {disasms} {handler} />
                 {/snippet}
             </Pane>
             <Pane position={TabPosition.PRIMARY_CENTER} {tabs} {handler}>
                 {#snippet children(tab)}
-                    <MainPane {tab} {entries} {logEntries} {disasms} {handler} />
+                    <RootPane {tab} {entries} {logEntries} {disasms} {handler} />
                 {/snippet}
             </Pane>
             <Pane
@@ -49,14 +48,14 @@
                 {handler}
             >
                 {#snippet children(tab)}
-                    <MainPane {tab} {entries} {logEntries} {disasms} {handler} />
+                    <RootPane {tab} {entries} {logEntries} {disasms} {handler} />
                 {/snippet}
             </Pane>
         </ResizablePaneGroup>
     </ResizablePane>
     <Pane size={30} position={TabPosition.PRIMARY_BOTTOM} handleBefore hidden={!$panePrimaryBottom} {tabs} {handler}>
         {#snippet children(tab)}
-            <MainPane {tab} {entries} {logEntries} {disasms} {handler} />
+            <RootPane {tab} {entries} {logEntries} {disasms} {handler} />
         {/snippet}
     </Pane>
 </ResizablePaneGroup>

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { type Tab, TabType } from "$lib/tab";
+    import { TabType } from "$lib/tab";
     import type { ClassEntry } from "$lib/workspace";
     import { Tabs, TabsList, TabsContent, TabsTrigger } from "$lib/components/ui/tabs";
     import { Code, Ellipsis, FileQuestion, GitBranchPlus } from "lucide-svelte";
@@ -14,14 +14,9 @@
         DropdownMenuTrigger,
     } from "$lib/components/ui/dropdown-menu";
     import { Button } from "$lib/components/ui/button";
-    import type { EventHandler } from "$lib/event";
+    import type { PaneProps } from "$lib/components/pane";
 
-    interface Props {
-        tab: Tab;
-        handler: EventHandler;
-    }
-
-    let { tab, handler }: Props = $props();
+    let { tab, handler }: PaneProps = $props();
 
     const entry = $derived(tab.entry as ClassEntry | undefined);
     const node = $derived(entry?.node);

@@ -1,5 +1,4 @@
 <script lang="ts">
-    import type { Tab } from "$lib/tab";
     import Loading from "$lib/components/loading.svelte";
     import { Separator } from "$lib/components/ui/separator";
     import { Tween } from "svelte/motion";
@@ -8,12 +7,9 @@
     import { humanSize } from "$lib/utils";
     import { Fullscreen, ZoomIn, ZoomOut } from "lucide-svelte";
     import MenuButton from "./menu_button.svelte";
+    import type { PaneProps } from "$lib/components/pane";
 
-    interface Props {
-        tab: Tab;
-    }
-
-    let { tab }: Props = $props();
+    let { tab }: PaneProps = $props();
     const entry = $derived(tab.entry!);
 
     const normOptions = { duration: 125, easing: cubicOut };

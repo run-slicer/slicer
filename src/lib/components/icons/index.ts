@@ -1,4 +1,4 @@
-import { TabType } from "$lib/tab";
+import { TabPosition, TabType } from "$lib/tab";
 import { type Entry, EntryType } from "$lib/workspace";
 import {
     Binary,
@@ -12,13 +12,21 @@ import {
     FileText,
     GitPullRequest,
     Image,
+    InspectionPanel,
     type Icon as LucideIcon,
+    PanelBottom,
+    PanelBottomDashed,
+    PanelLeft,
+    PanelLeftDashed,
+    PanelRight,
+    PanelRightDashed,
     Parentheses,
     Sparkles,
     Text,
     TextQuote,
 } from "lucide-svelte";
 import type { ComponentType } from "svelte";
+import GitHub from "./github.svelte";
 
 export type Icon = ComponentType<LucideIcon> /* Component<IconProps> */;
 
@@ -100,3 +108,18 @@ export const fileIcon = (label: string): StyledIcon => {
 
     return { icon: File, classes: [] };
 };
+
+export const paneIcon = (pos: TabPosition, open: boolean): Icon => {
+    switch (pos) {
+        case TabPosition.PRIMARY_BOTTOM:
+            return open ? PanelBottom : PanelBottomDashed;
+        case TabPosition.PRIMARY_CENTER:
+            return InspectionPanel;
+        case TabPosition.SECONDARY_LEFT:
+            return open ? PanelLeft : PanelLeftDashed;
+        case TabPosition.SECONDARY_RIGHT:
+            return open ? PanelRight : PanelRightDashed;
+    }
+};
+
+export { GitHub };

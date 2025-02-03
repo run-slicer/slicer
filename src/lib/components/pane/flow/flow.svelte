@@ -1,6 +1,5 @@
 <script lang="ts">
     import { type ClassEntry, EntryType, type MemberEntry } from "$lib/workspace";
-    import type { Tab } from "$lib/tab";
     import type { Member } from "@run-slicer/asm";
     import { SendToBack, BringToFront, Lock, LockOpen, Zap, ZapOff } from "lucide-svelte";
     import { mode } from "mode-watcher";
@@ -9,12 +8,9 @@
     import FlowNode from "./node.svelte";
     import { createComputedGraph } from "./graph";
     import { cn } from "$lib/components/utils";
+    import type { PaneProps } from "$lib/components/pane";
 
-    interface Props {
-        tab: Tab;
-    }
-
-    let { tab }: Props = $props();
+    let { tab }: PaneProps = $props();
     const entry = tab.entry!;
 
     const node = "node" in entry ? (entry as ClassEntry).node : null;

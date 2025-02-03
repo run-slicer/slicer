@@ -63,7 +63,6 @@
         "svelte": "^5.19.6",
         "svelte-check": "^4.1.4",
         "svelte-dnd-action": "^0.9.57",
-        "svelte-preprocess": "^6.0.3",
         "svelte-sonner": "^0.3.28",
         "tailwindcss": "^3.4.17",
         "tslib": "^2.8.1",

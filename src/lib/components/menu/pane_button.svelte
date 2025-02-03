@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { pickIcon } from "$lib/components/pane/pane.svelte";
     import { Button } from "$lib/components/ui/button";
     import type { TabPosition } from "$lib/tab";
+    import { paneIcon } from "$lib/components/icons";
 
     interface Props {
         title?: string;
@@ -11,7 +11,7 @@
 
     let { title, open = $bindable(), position }: Props = $props();
 
-    let Icon = $derived(pickIcon(position, !open /* invert to display close icon when open */));
+    let Icon = $derived(paneIcon(position, !open /* invert to display close icon when open */));
 </script>
 
 <Button variant="ghost" size="icon" {title} class="h-8 w-8" onclick={() => (open = !open)}>

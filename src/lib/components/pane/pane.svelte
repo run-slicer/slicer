@@ -1,41 +1,15 @@
-<script lang="ts" module>
-    import { TabPosition } from "$lib/tab";
-    import {
-        InspectionPanel,
-        PanelBottom,
-        PanelBottomDashed,
-        PanelLeft,
-        PanelLeftDashed,
-        PanelRight,
-        PanelRightDashed,
-    } from "lucide-svelte";
-    import type { Icon } from "$lib/components/icons";
-
-    export const pickIcon = (pos: TabPosition, open: boolean): Icon => {
-        switch (pos) {
-            case TabPosition.PRIMARY_BOTTOM:
-                return open ? PanelBottom : PanelBottomDashed;
-            case TabPosition.PRIMARY_CENTER:
-                return InspectionPanel;
-            case TabPosition.SECONDARY_LEFT:
-                return open ? PanelLeft : PanelLeftDashed;
-            case TabPosition.SECONDARY_RIGHT:
-                return open ? PanelRight : PanelRightDashed;
-        }
-    };
-</script>
-
 <script lang="ts">
-    import { move, type Tab, updateCurrent } from "$lib/tab";
+    import { move, type Tab, type TabPosition, updateCurrent } from "$lib/tab";
     import { cn } from "$lib/components/utils";
     import { ResizablePane } from "$lib/components/ui/resizable";
-    import { PaneHeader, PaneHeaderItem } from "$lib/components/pane/header";
+    import { PaneHeader, PaneHeaderItem } from "./header";
     import { dndzone } from "svelte-dnd-action";
     import type { EventHandler } from "$lib/event";
     import { type Snippet, untrack } from "svelte";
     import { ResizableHandle } from "$lib/components/ui/resizable";
     import PaneMenu from "./menu.svelte";
     import { Plus } from "lucide-svelte";
+    import { paneIcon } from "$lib/components/icons";
 
     interface Props {
         tabs: Tab[];
@@ -74,7 +48,7 @@
         }
     };
 
-    let Icon = $derived(pickIcon(position, false));
+    let Icon = $derived(paneIcon(position, false));
 </script>
 
 {#if handleBefore}<ResizableHandle class={cn(!hidden || "hidden")} />{/if}

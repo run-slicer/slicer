@@ -19,14 +19,9 @@
     import { DeleteDialog } from "$lib/components/dialog";
     import TreeNode from "./node.svelte";
     import NodeMenu from "./menu.svelte";
-    import type { EventHandler } from "$lib/event";
+    import type { PaneProps } from "$lib/components/pane";
 
-    interface Props {
-        entries: Entry[];
-        handler: EventHandler;
-    }
-
-    let { entries, handler }: Props = $props();
+    let { entries, handler }: PaneProps = $props();
 
     let root: Node = $derived.by(() => {
         const root: Node = { label: "<root>", nodes: [] };

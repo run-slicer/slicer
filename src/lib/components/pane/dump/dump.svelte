@@ -3,18 +3,14 @@
     import type { SlurpResult } from "$lib/hprof/reader";
     import Loading from "$lib/components/loading.svelte";
     import { Separator } from "$lib/components/ui/separator";
-    import type { Tab } from "$lib/tab";
     import type { Entry } from "$lib/workspace";
     import { error } from "$lib/log";
     import { FileQuestion } from "lucide-svelte";
     import Table from "./table.svelte";
     import { humanSize } from "$lib/utils";
+    import type { PaneProps } from "$lib/components/pane";
 
-    interface Props {
-        tab: Tab;
-    }
-
-    let { tab }: Props = $props();
+    let { tab }: PaneProps = $props();
     const entry = $derived(tab.entry!);
 
     const readEntry = async (entry: Entry): Promise<SlurpResult> => {
