@@ -23,4 +23,5 @@ export default defineConfig({
     worker: {
         format: "es",
     },
+    envPrefix: "CF_PAGES_", // expose Pages env variables
 });
