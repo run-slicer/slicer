@@ -91,7 +91,7 @@
         @apply h-full overflow-hidden bg-background text-foreground;
     }
     #app {
-        @apply flex min-h-full flex-col overflow-hidden;
+        @apply flex h-full w-full flex-col overflow-hidden;
     }
 }
 

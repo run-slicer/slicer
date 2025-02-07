@@ -95,7 +95,7 @@
                 </div>
             {/each}
         {:else}
-            <div class="flex h-full w-full items-center justify-center">
+            <div class="flex h-full w-full items-center justify-center overflow-y-auto">
                 <div class="flex w-2/3 flex-col justify-center gap-6">
                     <div>
                         <Icon size={24} class="mb-4" />

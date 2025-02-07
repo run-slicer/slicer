@@ -27,8 +27,8 @@
     };
 </script>
 
-<div class="m-24 h-full">
-    <h1 class="mb-8 text-4xl font-semibold">Welcome</h1>
+<div class="flex h-full flex-col overflow-y-auto p-24 pb-6">
+    <h1 class="pb-8 text-4xl font-semibold">Welcome</h1>
     <div class="flex h-full flex-col justify-between">
         <div class="flex max-w-lg flex-row flex-wrap justify-between gap-4">
             <div>
@@ -43,7 +43,7 @@
                 </div>
             </div>
             <div>
-                <h2 class="mb-2 text-lg font-medium text-muted-foreground">Customize</h2>
+                <h2 class="pb-2 text-lg font-medium text-muted-foreground">Customize</h2>
                 <ToggleGroup class="justify-start" type="single" bind:value={$userPrefersMode}>
                     <ToggleGroupItem value="system" aria-label="Toggle system-preferred theme">
                         <Settings class="h-4 w-4" />
@@ -57,7 +57,7 @@
                 </ToggleGroup>
             </div>
         </div>
-        <div class="flex flex-row items-center justify-between gap-2">
+        <div class="flex flex-row items-center justify-between gap-2 pt-8">
             <button class="cursor-help text-sm" onclick={handleRevolver}>
                 <span class="text-base font-medium text-accent-foreground/60">Tip: </span>
                 {@html tip}
