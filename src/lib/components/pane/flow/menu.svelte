@@ -35,16 +35,17 @@
 
     const flow = $derived(useSvelteFlow());
 
+    const padding = 128;
     const exportImage = async (type: "svg" | "png") => {
         const bounds = flow.getNodesBounds(flow.getNodes());
 
-        const viewport = getViewportForBounds(bounds, bounds.width + 64, bounds.height + 64, 0, 2.0, 0);
+        const viewport = getViewportForBounds(bounds, bounds.width + padding, bounds.height + padding, 0, 2.0, 0);
         const domNode = parentElem?.querySelector<HTMLElement>(".svelte-flow__viewport")!;
 
         if (viewport && domNode) {
             const dataUrl = await (type === "svg" ? toSvg : toPng)(domNode, {
-                width: bounds.width + 64,
-                height: bounds.height + 64,
+                width: bounds.width + padding,
+                height: bounds.height + padding,
                 style: {
                     margin: `-${viewport.y}px -${viewport.x}px`,
                     transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,

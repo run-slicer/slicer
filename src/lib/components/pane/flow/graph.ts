@@ -1,4 +1,3 @@
-import { graphlib, layout } from "@dagrejs/dagre";
 import type { Member } from "@run-slicer/asm";
 import { formatEntry, formatInsn } from "@run-slicer/asm/analysis/disasm";
 import { type Node as GraphNode, EdgeType, computeGraph } from "@run-slicer/asm/analysis/graph";
@@ -6,6 +5,7 @@ import type { CodeAttribute } from "@run-slicer/asm/attr";
 import type { Pool } from "@run-slicer/asm/pool";
 import { AttributeType } from "@run-slicer/asm/spec";
 import type { Edge, MarkerType, Node } from "@xyflow/svelte";
+import ELK, { type ElkNode } from "elkjs/lib/elk-api";
 
 export type NodeData = {
     node: GraphNode;
@@ -14,20 +14,34 @@ export type NodeData = {
     height: number;
 };
 
-const bodyStyle = window.getComputedStyle(document.body, null);
-const getBodyStyle = (prop: string): string => bodyStyle.getPropertyValue(prop);
-
-const bodyFont = `${getBodyStyle("font-weight")} ${getBodyStyle("font-size")} ${getBodyStyle("font-family")}`;
+const monoFont = `400 12px / 18px "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace`;
 
 const canvas = document.createElement("canvas");
 const computeTextSize = (text: string): TextMetrics => {
     const context = canvas.getContext("2d")!;
-    context.font = bodyFont;
+    context.font = monoFont;
 
     return context.measureText(text);
 };
 
-export const createComputedGraph = (method: Member | null, pool: Pool, withExcHandlers: boolean): [Node[], Edge[]] => {
+const elk = new ELK({
+    defaultLayoutOptions: {
+        "elk.algorithm": "layered",
+        "elk.direction": "DOWN",
+        "elk.spacing.nodeNode": "80",
+        "elk.layered.spacing.nodeNodeBetweenLayers": "80",
+        "elk.portAlignment.default": "CENTER",
+        "elk.portConstraints": "FIXED_SIDE",
+        "elk.edgeRouting": "ORTHOGONAL",
+    },
+    workerFactory: () => new Worker(new URL("elkjs/lib/elk-worker.js", import.meta.url)),
+});
+
+export const createComputedGraph = async (
+    method: Member | null,
+    pool: Pool,
+    withExcHandlers: boolean
+): Promise<[Node[], Edge[]]> => {
     if (!method) {
         return [[], []]; // no method
     }
@@ -59,42 +73,41 @@ export const createComputedGraph = (method: Member | null, pool: Pool, withExcHa
         return {
             node,
             lines,
-            width: metrics.width,
-            height: (metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent) * lines.length,
+            width: metrics.width + 24,
+            height: (metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent) * lines.length * 1.125 + 24,
         };
     });
 
-    const graph = new graphlib.Graph();
-    graph.setGraph({ rankdir: "TB", nodesep: 150, edgesep: 100, ranksep: 100, ranker: "longest-path" });
-    graph.setDefaultEdgeLabel(() => ({}));
+    const graph: ElkNode = {
+        id: "root",
+        children: data.map((d) => ({
+            id: `${d.node.offset}`,
+            width: d.width,
+            height: d.height,
+        })),
+        edges: [...edges, ...excEdges].map((e) => ({
+            id: `${e.source}-${e.target}`,
+            sources: [`${e.source}`],
+            targets: [`${e.target}`],
+            labels: [{ text: "placeholder" } /* ELK doesn't need to know the content */],
+        })),
+    };
 
-    data.forEach((nodeData) => {
-        graph.setNode(`${nodeData.node.offset}`, {
-            width: nodeData.width,
-            height: nodeData.height,
-        });
-    });
-
-    [...edges, ...excEdges].forEach((edge) => {
-        graph.setEdge(`${edge.source}`, `${edge.target}`);
-    });
-
-    layout(graph);
-
+    const layout = await elk.layout(graph);
     return [
-        data.map((nodeData) => {
-            const positionedNode = graph.node(`${nodeData.node.offset}`);
+        data.map((d) => {
+            const elkNode = layout.children?.find((n) => n.id === `${d.node.offset}`);
 
             return {
-                id: `${nodeData.node.offset}`,
-                type: "block",
-                data: nodeData,
+                id: `${d.node.offset}`,
+                type: "elk-node",
+                data: d,
                 position: {
-                    x: positionedNode.x - nodeData.width / 2,
-                    y: positionedNode.y - nodeData.height / 2,
+                    x: elkNode?.x ?? 0,
+                    y: elkNode?.y ?? 0,
                 },
                 // highlight entrypoint node
-                style: nodeData.node.offset === 0 ? "border: 1px solid hsl(var(--primary));" : undefined,
+                style: d.node.offset === 0 ? "border: 1px solid hsl(var(--primary));" : undefined,
             };
         }),
         [
@@ -113,8 +126,8 @@ export const createComputedGraph = (method: Member | null, pool: Pool, withExcHa
                 }
 
                 return {
-                    id: `edge-${edge.source}-${edge.target}`,
-                    type: "smoothstep",
+                    id: `${edge.source}-${edge.target}`,
+                    type: "elk-edge",
                     label,
                     source: `${edge.source}`,
                     target: `${edge.target}`,
@@ -122,11 +135,15 @@ export const createComputedGraph = (method: Member | null, pool: Pool, withExcHa
                     markerEnd: {
                         type: "arrowclosed" as MarkerType /* skip non-type import */,
                     },
+                    data: layout.edges?.find((e) => e.id === `${edge.source}-${edge.target}`)! as unknown as Record<
+                        string,
+                        unknown
+                    >,
                 };
             }),
             ...excEdges.map((edge) => ({
-                id: `edge-exc-${edge.source}-${edge.target}`,
-                type: "smoothstep",
+                id: `${edge.source}-${edge.target}`,
+                type: "elk-edge",
                 style: "stroke: hsl(var(--destructive));",
                 label: edge.catchType,
                 source: `${edge.source}`,
@@ -134,6 +151,10 @@ export const createComputedGraph = (method: Member | null, pool: Pool, withExcHa
                 markerEnd: {
                     type: "arrowclosed" as MarkerType /* skip non-type import */,
                 },
+                data: layout.edges?.find((e) => e.id === `${edge.source}-${edge.target}`)! as unknown as Record<
+                    string,
+                    unknown
+                >,
             })),
         ],
     ];

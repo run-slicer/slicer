@@ -118,7 +118,7 @@
 .svelte-flow__edge-label {
     border-radius: 5px;
 }
-.svelte-flow__node-block {
+.svelte-flow__node-elk-node {
     padding: 10px;
     border-radius: var(--xy-node-border-radius, var(--xy-node-border-radius-default));
     font-size: 12px;

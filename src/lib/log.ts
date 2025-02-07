@@ -36,15 +36,19 @@ const log0 = (level: LogLevel, message: string, error?: any) => {
         }
     }
 
-    message = message.replaceAll("\n", " ");
-    entries.update(($entries) => {
-        $entries.push({ level, message, error });
-        if ($entries.length > get(loggingMaxEntries)) {
-            $entries.shift(); // pop first
-        }
+    try {
+        message = message.replaceAll("\n", " ");
+        entries.update(($entries) => {
+            $entries.push({ level, message, error });
+            if ($entries.length > get(loggingMaxEntries)) {
+                $entries.shift(); // pop first
+            }
 
-        return $entries;
-    });
+            return $entries;
+        });
+    } catch (e) {
+        // Svelte reactivity error?
+    }
 };
 
 const jsLog = (level: LogLevel, data: any[]) => {
