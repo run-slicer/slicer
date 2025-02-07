@@ -63,6 +63,7 @@
                         fitView
                         minZoom={0}
                         colorMode={$mode || "system"}
+                        nodesDraggable={false}
                         nodesConnectable={false}
                         elementsSelectable={false}
                         proOptions={{ hideAttribution: false /* ??? */ }}
