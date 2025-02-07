@@ -3,9 +3,18 @@
     import type { Member } from "@run-slicer/asm";
     import { SendToBack, BringToFront, Lock, LockOpen, Zap, ZapOff } from "lucide-svelte";
     import { mode } from "mode-watcher";
-    import { Background, BackgroundVariant, ControlButton, Controls, SvelteFlow } from "@xyflow/svelte";
+    import {
+        Background,
+        BackgroundVariant,
+        ControlButton,
+        Controls,
+        SvelteFlow,
+        SvelteFlowProvider,
+    } from "@xyflow/svelte";
     import { Select, SelectContent, SelectItem, SelectTrigger } from "$lib/components/ui/select";
+    import { ContextMenu, ContextMenuTrigger } from "$lib/components/ui/context-menu";
     import FlowNode from "./node.svelte";
+    import FlowMenu from "./menu.svelte";
     import { createComputedGraph } from "./graph";
     import { cn } from "$lib/components/utils";
     import type { PaneProps } from "$lib/components/pane";
@@ -34,6 +43,8 @@
         }
     });
 
+    let parentElem: HTMLElement | undefined = $state();
+
     let draggable = $state(false);
     let showHandlerEdges = $state(false);
     let edgesFront = $state(true);
@@ -41,52 +52,59 @@
     let [nodes, edges] = $derived(createComputedGraph(member, pool, showHandlerEdges));
 </script>
 
-<div class={cn("relative h-full w-full", edgesFront && "edges-front")}>
-    <SvelteFlow
-        id={tab.id}
-        {nodes}
-        {edges}
-        fitView
-        minZoom={0}
-        colorMode={$mode || "system"}
-        nodesDraggable={draggable}
-        nodesConnectable={false}
-        elementsSelectable={false}
-        proOptions={{ hideAttribution: false /* ??? */ }}
-        nodeTypes={{ block: FlowNode }}
-    >
-        <Background variant={BackgroundVariant.Dots} />
-        <Controls showLock={false} position="bottom-right">
-            <!-- override interactivity control: we only want it to toggle draggability -->
-            <ControlButton
-                class="svelte-flow__controls-interactive"
-                onclick={() => (draggable = !draggable)}
-                title="toggle interactivity"
-                aria-label="toggle interactivity"
-            >
-                {@const Icon = draggable ? LockOpen : Lock}
-                <Icon size={12} class="!fill-none" />
-            </ControlButton>
-            <ControlButton
-                class="svelte-flow__controls-interactive"
-                onclick={() => (showHandlerEdges = !showHandlerEdges)}
-                title="toggle exception handler edges"
-                aria-label="toggle exception handler edges"
-            >
-                {@const Icon = showHandlerEdges ? Zap : ZapOff}
-                <Icon size={12} class="!fill-none" />
-            </ControlButton>
-            <ControlButton
-                class="svelte-flow__controls-interactive"
-                onclick={() => (edgesFront = !edgesFront)}
-                title="bring edges to front/back"
-                aria-label="bring edges to front/back"
-            >
-                {@const Icon = edgesFront ? SendToBack : BringToFront}
-                <Icon size={12} class="!fill-none" />
-            </ControlButton>
-        </Controls>
-    </SvelteFlow>
+<div class="relative h-full w-full" bind:this={parentElem}>
+    <SvelteFlowProvider>
+        <ContextMenu>
+            <ContextMenuTrigger class={cn("h-full w-full", edgesFront && "edges-front")}>
+                <SvelteFlow
+                    id={tab.id}
+                    {nodes}
+                    {edges}
+                    fitView
+                    minZoom={0}
+                    colorMode={$mode || "system"}
+                    nodesDraggable={draggable}
+                    nodesConnectable={false}
+                    elementsSelectable={false}
+                    proOptions={{ hideAttribution: false /* ??? */ }}
+                    nodeTypes={{ block: FlowNode }}
+                >
+                    <Background variant={BackgroundVariant.Dots} />
+                    <Controls showLock={false} position="bottom-right">
+                        <!-- override interactivity control: we only want it to toggle draggability -->
+                        <ControlButton
+                            class="svelte-flow__controls-interactive"
+                            onclick={() => (draggable = !draggable)}
+                            title="toggle interactivity"
+                            aria-label="toggle interactivity"
+                        >
+                            {@const Icon = draggable ? LockOpen : Lock}
+                            <Icon size={12} class="!fill-none" />
+                        </ControlButton>
+                        <ControlButton
+                            class="svelte-flow__controls-interactive"
+                            onclick={() => (showHandlerEdges = !showHandlerEdges)}
+                            title="toggle exception handler edges"
+                            aria-label="toggle exception handler edges"
+                        >
+                            {@const Icon = showHandlerEdges ? Zap : ZapOff}
+                            <Icon size={12} class="!fill-none" />
+                        </ControlButton>
+                        <ControlButton
+                            class="svelte-flow__controls-interactive"
+                            onclick={() => (edgesFront = !edgesFront)}
+                            title="bring edges to front/back"
+                            aria-label="bring edges to front/back"
+                        >
+                            {@const Icon = edgesFront ? SendToBack : BringToFront}
+                            <Icon size={12} class="!fill-none" />
+                        </ControlButton>
+                    </Controls>
+                </SvelteFlow>
+            </ContextMenuTrigger>
+            <FlowMenu {parentElem} {node} {member} />
+        </ContextMenu>
+    </SvelteFlowProvider>
     {#if entry.type !== EntryType.MEMBER}
         <div class="absolute bottom-0 m-[15px] max-w-[425px]">
             <Select type="single" bind:value={method}>

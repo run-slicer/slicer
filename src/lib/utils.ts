@@ -119,6 +119,16 @@ export const readFiles = (pattern: string, multiple: boolean): Promise<File[]> =
     });
 };
 
+export const downloadUrl = (name: string, url: string) => {
+    const link = document.createElement("a");
+    link.style.display = "none";
+    link.href = url;
+    link.download = name;
+
+    link.click();
+    link.remove();
+};
+
 export const downloadBlob = (name: string, blob: Blob): Promise<void> => {
     return new Promise<void>((resolve) => {
         const url = URL.createObjectURL(blob);

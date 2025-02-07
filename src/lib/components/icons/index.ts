@@ -3,7 +3,7 @@ import { type Entry, EntryType } from "$lib/workspace";
 import {
     Binary,
     Braces,
-    Code,
+    CodeXml,
     Coffee,
     File,
     FileArchive,
@@ -79,7 +79,7 @@ export const fileIcon = (label: string): StyledIcon => {
             case "xhtml":
             case "mhtml":
             case "htm":
-                return { icon: Code, classes: ["text-green-600"] };
+                return { icon: CodeXml, classes: ["text-green-600"] };
             case "yaml":
             case "yml":
                 return { icon: TextQuote, classes: ["text-green-500"] };
