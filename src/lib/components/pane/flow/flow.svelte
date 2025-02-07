@@ -1,7 +1,7 @@
 <script lang="ts">
     import { type ClassEntry, EntryType, type MemberEntry } from "$lib/workspace";
     import type { Member } from "@run-slicer/asm";
-    import { SendToBack, BringToFront, Lock, LockOpen, Zap, ZapOff } from "lucide-svelte";
+    import { Zap, ZapOff } from "lucide-svelte";
     import { mode } from "mode-watcher";
     import {
         Background,
@@ -18,7 +18,6 @@
     import FlowEdge from "./edge.svelte";
     import FlowMenu from "./menu.svelte";
     import { createComputedGraph } from "./graph";
-    import { cn } from "$lib/components/utils";
     import type { PaneProps } from "$lib/components/pane";
 
     let { tab }: PaneProps = $props();
@@ -47,15 +46,13 @@
 
     let parentElem: HTMLElement | undefined = $state();
 
-    let draggable = $state(false);
     let showHandlerEdges = $state(false);
-    let edgesFront = $state(true);
 </script>
 
 <div class="relative h-full w-full" bind:this={parentElem}>
     <SvelteFlowProvider>
         <ContextMenu>
-            <ContextMenuTrigger class={cn("h-full w-full", edgesFront && "edges-front")}>
+            <ContextMenuTrigger class="h-full w-full">
                 {#await createComputedGraph(member, pool, showHandlerEdges)}
                     <Loading value="Computing graph..." />
                 {:then [nodes, edges]}
@@ -66,7 +63,6 @@
                         fitView
                         minZoom={0}
                         colorMode={$mode || "system"}
-                        nodesDraggable={draggable}
                         nodesConnectable={false}
                         elementsSelectable={false}
                         proOptions={{ hideAttribution: false /* ??? */ }}
@@ -75,16 +71,6 @@
                     >
                         <Background variant={BackgroundVariant.Dots} />
                         <Controls showLock={false} position="bottom-right">
-                            <!-- override interactivity control: we only want it to toggle draggability -->
-                            <ControlButton
-                                class="svelte-flow__controls-interactive"
-                                onclick={() => (draggable = !draggable)}
-                                title="toggle interactivity"
-                                aria-label="toggle interactivity"
-                            >
-                                {@const Icon = draggable ? LockOpen : Lock}
-                                <Icon size={12} class="!fill-none" />
-                            </ControlButton>
                             <ControlButton
                                 class="svelte-flow__controls-interactive"
                                 onclick={() => (showHandlerEdges = !showHandlerEdges)}
@@ -92,15 +78,6 @@
                                 aria-label="toggle exception handler edges"
                             >
                                 {@const Icon = showHandlerEdges ? Zap : ZapOff}
-                                <Icon size={12} class="!fill-none" />
-                            </ControlButton>
-                            <ControlButton
-                                class="svelte-flow__controls-interactive"
-                                onclick={() => (edgesFront = !edgesFront)}
-                                title="bring edges to front/back"
-                                aria-label="bring edges to front/back"
-                            >
-                                {@const Icon = edgesFront ? SendToBack : BringToFront}
                                 <Icon size={12} class="!fill-none" />
                             </ControlButton>
                         </Controls>

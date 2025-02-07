@@ -111,10 +111,6 @@
     background-color: transparent;
     border: none;
 }
-.edges-front .svelte-flow__edges,
-.edges-front .svelte-flow__edgelabel-renderer {
-    z-index: 20;
-}
 .svelte-flow__edge-label {
     border-radius: 5px;
 }
