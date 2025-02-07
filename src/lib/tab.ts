@@ -107,7 +107,7 @@ tabs.subscribe(($tabs) => {
 });
 
 export const current = derived(tabs, ($tabs) => {
-    return $tabs.values().find((t) => t.active && t.position === TabPosition.PRIMARY_CENTER) || null;
+    return Array.from($tabs.values()).find((t) => t.active && t.position === TabPosition.PRIMARY_CENTER) || null;
 });
 
 // set window name based on currently opened tab
@@ -175,11 +175,7 @@ export const refresh = (tab: Tab): Tab => {
 
 // gets the preceding tab or null if there's only one in position
 const nextTab = (tab: Tab): Tab | null => {
-    const all = Array.from(
-        get(tabs)
-            .values()
-            .filter((t) => t.position === tab.position)
-    );
+    const all = Array.from(get(tabs).values()).filter((t) => t.position === tab.position);
     const tabIndex = all.findIndex((t) => t.id === tab.id);
     const nextTab = all.length > 1 ? (tabIndex > 0 ? tabIndex - 1 : all.length - 1) : -1;
 

@@ -169,9 +169,7 @@ export default {
         updateCurrentTab(tab.position, tab);
     },
     async openUnscoped(def: TabDefinition, position: TabPosition): Promise<void> {
-        let tab = get(tabs)
-            .values()
-            .find((t) => t.type === def.type);
+        let tab = Array.from(get(tabs).values()).find((t) => t.type === def.type);
 
         if (tab) {
             moveTab(tab, position);
