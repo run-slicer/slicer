@@ -206,6 +206,7 @@ const editorCtx: EditorContext = {
                     type: EntryType.FILE,
                     // unwrap any transforms, a script may have touched the tab entry
                     data: unwrapTransform(tab.entry.data),
+                    state: AnalysisState.NONE,
                 });
             }
 
