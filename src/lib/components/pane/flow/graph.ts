@@ -28,11 +28,20 @@ const elk = new ELK({
     defaultLayoutOptions: {
         "elk.algorithm": "layered",
         "elk.direction": "DOWN",
-        "elk.spacing.nodeNode": "80",
-        "elk.layered.spacing.nodeNodeBetweenLayers": "80",
         "elk.portAlignment.default": "CENTER",
         "elk.portConstraints": "FIXED_SIDE",
         "elk.edgeRouting": "ORTHOGONAL",
+        "elk.layered.layering.strategy": "LONGEST_PATH_SOURCE",
+        "elk.layered.considerModelOrder.strategy": "PREFER_NODES",
+        "elk.layered.cycleBreaking.strategy": "MODEL_ORDER",
+        "elk.layered.crossingMinimization.semiInteractive": "true",
+        // spacing
+        "elk.spacing.nodeNode": "60",
+        "elk.spacing.edgeEdge": "40",
+        "elk.spacing.edgeNode": "40",
+        "elk.layered.spacing.nodeNodeBetweenLayers": "60",
+        "elk.layered.spacing.edgeEdgeBetweenLayers": "40",
+        "elk.layered.spacing.edgeNodeBetweenLayers": "40",
     },
     workerFactory: () => new Worker(new URL("elkjs/lib/elk-worker.js", import.meta.url)),
 });
