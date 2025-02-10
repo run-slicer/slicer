@@ -67,7 +67,7 @@ export const createComputedGraph = async (
     });
 
     const data: NodeData[] = nodes.map((node) => {
-        const lines = node.insns.map((i) => formatInsn(i, pool, false));
+        const lines = node.insns.map((i) => formatInsn(code, i, pool, false));
         const metrics = computeTextSize(lines.reduce((a, b) => (a.length > b.length ? a : b)));
 
         return {
@@ -122,6 +122,9 @@ export const createComputedGraph = async (
                         break;
                     case EdgeType.SWITCH_DEFAULT:
                         label = "default";
+                        break;
+                    case EdgeType.SWITCH_BRANCH:
+                        label = edge.value!.toString();
                         break;
                 }
 
