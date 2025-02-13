@@ -45,8 +45,8 @@ importers:
         specifier: ^5.1.0
         version: 5.1.0
       '@run-slicer/asm':
-        specifier: ^0.13.2
-        version: 0.13.2
+        specifier: ^0.13.3
+        version: 0.13.3
       '@run-slicer/cfr':
         specifier: 0.1.3-0.152
         version: 0.1.3-0.152
@@ -541,8 +541,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@run-slicer/asm@0.13.2':
-    resolution: {integrity: sha512-Eh28P6Inlekq2jsd51Gz66WSAlyKeBtR413DTWqVxM7D1zm1kKvNpI8uZN1LXt3Ubet20B1lrExGzQ1TKJGpLQ==}
+  '@run-slicer/asm@0.13.3':
+    resolution: {integrity: sha512-DWDMM7LNgYEfGrs3s8kHeKAYrrSNWFCQX0RlxbsrJA8Zx3/QN/QXSPbB1MZC5vJuzqj+rAb6J9YsiE7SqYl65A==}
 
   '@run-slicer/cfr@0.1.3-0.152':
     resolution: {integrity: sha512-4PV8fdkqqOAbio+T3iDG1QUqPBNskI6LFgdzCK/M5rU34YrcCLDjycNkxHH3TyRZy1RIwxUIEL82/PAMHGxtfw==}
@@ -1782,7 +1782,7 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.34.6':
     optional: true
 
-  '@run-slicer/asm@0.13.2': {}
+  '@run-slicer/asm@0.13.3': {}
 
   '@run-slicer/cfr@0.1.3-0.152': {}
 
