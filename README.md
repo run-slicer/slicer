@@ -9,10 +9,12 @@ A modern Java reverse engineering tool for the web.
 - disassembly and decompilation of Java class files
     - CFR, JASM, Vineflower, Procyon, ...
 - bytecode control flow visualization via a [CFG](https://en.wikipedia.org/wiki/Control-flow_graph)
+    - exportable to a PNG/SVG!
 - low-level tabular view of a class file
 - heap dump reading and summarization
 - simple hexadecimal viewer for binary files
 - a simple JS scripting API for doing various things
+- multi-pane workspace for viewing multiple files at once
 - [shadcn/ui](https://ui.shadcn.com/) design and theming support
 
 ## Installation
