@@ -1,5 +1,5 @@
 import type { Icon, StyledIcon } from "$lib/components/icons";
-import { paneOpened, workspaceEncoding } from "$lib/state";
+import { panes, workspaceEncoding } from "$lib/state";
 import { type Entry, EntryType } from "$lib/workspace";
 import { Folders, Search, Sparkles, Terminal } from "lucide-svelte";
 import { derived, get, writable } from "svelte/store";
@@ -72,16 +72,16 @@ const typedDefs = new Map(tabDefs.map((d) => [d.type, d]));
 
 export const tabs = writable<Map<string, Tab>>(
     new Map(
-        get(paneOpened)
-            .map((pane) => ({ pane, def: typedDefs.get(pane.type)! }))
-            .map(({ pane, def }) => [
+        get(panes)
+            .flatMap(({ position, tabs }) => tabs.map((tab) => ({ position, tab, def: typedDefs.get(tab.type)! })))
+            .map(({ position, tab, def }) => [
                 `${def.type}:slicer`,
                 {
                     id: `${def.type}:slicer`,
                     type: def.type,
                     name: def.name,
-                    position: pane.position,
-                    active: pane.active,
+                    position,
+                    active: tab.active,
                     closeable: true,
                     icon: { icon: def.icon, classes: ["text-muted-foreground"] },
                     internalId: {},
@@ -101,15 +101,18 @@ tabs.subscribe(($tabs) => {
         candidates.unshift({ type: TabType.WELCOME, position: TabPosition.PRIMARY_CENTER, active: false });
     }
 
-    for (const pos of Object.values(TabPosition)) {
-        const posCan = candidates.filter((t) => t.position === pos);
-        if (posCan.length > 0 && !posCan.some((t) => t.active)) {
-            // no active tab for position, make the last one active
-            posCan[posCan.length - 1]!.active = true;
-        }
-    }
+    panes.update(($panes) => {
+        return Object.values(TabPosition).map((pos) => {
+            const data = $panes.find((p) => p.position === pos) || { position: pos, tabs: [], open: false };
+            data.tabs = candidates.filter((t) => t.position === pos).map(({ type, active }) => ({ type, active }));
 
-    paneOpened.set(candidates);
+            if (data.tabs.length > 0 && !data.tabs.some((t) => t.active)) {
+                // no active tab for position, make the last one active
+                data.tabs[data.tabs.length - 1]!.active = true;
+            }
+            return data;
+        });
+    });
 });
 
 export const current = derived(tabs, ($tabs) => {

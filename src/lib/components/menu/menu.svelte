@@ -3,9 +3,7 @@
     import { Separator } from "$lib/components/ui/separator";
     import {
         analysisBackground,
-        panePrimaryBottom,
-        paneSecondaryLeft,
-        paneSecondaryRight,
+        type PaneData,
         themeColor,
         themeRadius,
         workspaceArchiveEncoding,
@@ -61,6 +59,7 @@
     import PaneButton from "./pane_button.svelte";
 
     interface Props {
+        panes: PaneData[];
         tab: Tab | null;
         entries: Entry[];
         classes: Entry[];
@@ -69,12 +68,16 @@
         handler: EventHandler;
     }
 
-    let { tab, entries, classes, scripts, disasms, handler }: Props = $props();
+    let { panes = $bindable(), tab, entries, classes, scripts, disasms, handler }: Props = $props();
+
+    let primaryBottom = $derived(panes.find((p) => p.position === TabPosition.PRIMARY_BOTTOM));
+    let secondaryLeft = $derived(panes.find((p) => p.position === TabPosition.SECONDARY_LEFT));
+    let secondaryRight = $derived(panes.find((p) => p.position === TabPosition.SECONDARY_RIGHT));
+
     let entry = $derived(tab?.entry);
 
     let aboutOpen = $state(false);
     let clearOpen = $state(false);
-    // let prefsClearOpen = $state(false);
 
     let scriptLoadOpen = $state(false);
     let scriptDeleteOpen: ProtoScript | null = $state(null);
@@ -153,21 +156,6 @@
                         </MenubarRadioGroup>
                     </MenubarSubContent>
                 </MenubarSub>
-                <!-- <MenubarSub>
-                    <MenubarSubTrigger>Preferences</MenubarSubTrigger>
-                    <MenubarSubContent class="w-[12rem]" align="start">
-                        <MenubarItem class="justify-between" onclick={() => onaction?.({ type: ActionType.PREFS_LOAD })}>
-                            Import <Upload size={16} />
-                        </MenubarItem>
-                        <MenubarItem class="justify-between" onclick={() => onaction?.({ type: ActionType.PREFS_EXPORT })}>
-                            Export <Download size={16} />
-                        </MenubarItem>
-                        <MenubarSeparator />
-                        <MenubarItem class="justify-between" onclick={() => (prefsClearOpen = true)}>
-                            Reset <MonitorX size={16} />
-                        </MenubarItem>
-                    </MenubarSubContent>
-                </MenubarSub> -->
             </MenubarContent>
         </MenubarMenu>
         <MenubarMenu>
@@ -226,18 +214,6 @@
         <MenubarMenu>
             <MenubarTrigger class="relative">View</MenubarTrigger>
             <MenubarContent align="start">
-                <!-- <MenubarSub>
-                    <MenubarSubTrigger>Pane</MenubarSubTrigger>
-                    <MenubarSubContent class="w-[12rem]" align="start">
-                        <MenubarCheckboxItem class="justify-between" bind:checked={$projectOpen}>
-                            Project <Folders size={16} />
-                        </MenubarCheckboxItem>
-                        <MenubarCheckboxItem class="justify-between" bind:checked={$loggingOpen}>
-                            Logging <Terminal size={16} />
-                        </MenubarCheckboxItem>
-                    </MenubarSubContent>
-                </MenubarSub>
-                <MenubarSeparator /> -->
                 <MenubarItem
                     class="justify-between"
                     disabled={!tab?.entry || tab.entry.type === EntryType.ARCHIVE || tab.type === TabType.CODE}
@@ -328,9 +304,9 @@
         </MenubarMenu>
     </div>
     <div class="flex flex-row">
-        <PaneButton bind:open={$paneSecondaryLeft} title="Left pane" position={TabPosition.SECONDARY_LEFT} />
-        <PaneButton bind:open={$paneSecondaryRight} title="Right pane" position={TabPosition.SECONDARY_RIGHT} />
-        <PaneButton bind:open={$panePrimaryBottom} title="Bottom pane" position={TabPosition.PRIMARY_BOTTOM} />
+        <PaneButton open={Boolean(secondaryLeft?.open)} title="Left pane" position={TabPosition.SECONDARY_LEFT} />
+        <PaneButton open={Boolean(secondaryRight?.open)} title="Right pane" position={TabPosition.SECONDARY_RIGHT} />
+        <PaneButton open={Boolean(primaryBottom?.open)} title="Bottom pane" position={TabPosition.PRIMARY_BOTTOM} />
     </div>
 </Menubar>
 <Separator />
@@ -340,4 +316,3 @@
 <ScriptLoadDialog bind:open={scriptLoadOpen} {handler} />
 <ScriptDeleteDialog bind:proto={scriptDeleteOpen} {handler} />
 <ClearDialog bind:open={clearOpen} {handler} />
-<!-- <PrefsClearDialog bind:open={prefsClearOpen} {handler} /> -->
