@@ -19,6 +19,7 @@
     import FlowMenu from "./menu.svelte";
     import { createComputedGraph } from "./graph";
     import type { PaneProps } from "$lib/components/pane";
+    import { cyrb53 } from "$lib/utils";
 
     let { tab }: PaneProps = $props();
     const entry = tab.entry!;
@@ -57,7 +58,7 @@
                     <Loading value="Computing graph..." />
                 {:then [nodes, edges]}
                     <SvelteFlow
-                        id={tab.id}
+                        id={cyrb53(tab.id).toString(16)}
                         {nodes}
                         {edges}
                         fitView
