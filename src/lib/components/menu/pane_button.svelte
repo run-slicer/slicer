@@ -5,7 +5,7 @@
 
     interface Props {
         title?: string;
-        open: boolean;
+        open?: boolean;
         position: TabPosition;
         onchange?: (value: boolean) => void;
     }

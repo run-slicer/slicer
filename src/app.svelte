@@ -53,6 +53,13 @@
     disasms={disasms0}
     handler={$handler}
 />
-<Content panes={$panes} tabs={tabs0} entries={entries0} logEntries={$logEntries} disasms={disasms0} handler={$handler} />
+<Content
+    panes={$panes}
+    tabs={tabs0}
+    entries={entries0}
+    logEntries={$logEntries}
+    disasms={disasms0}
+    handler={$handler}
+/>
 <Crumb tab={$currentTab} tasks={tasks0} encoding={$currentEncoding} />
 <Command entries={entries0} handler={$handler} />

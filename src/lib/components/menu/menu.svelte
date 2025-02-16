@@ -70,6 +70,17 @@
 
     let { panes = $bindable(), tab, entries, classes, scripts, disasms, handler }: Props = $props();
 
+    const updatePane = (position: TabPosition, open: boolean) => {
+        let pane = panes.find((p) => p.position === position);
+        if (!pane) {
+            pane = { position, tabs: [], open };
+            panes.push(pane);
+        }
+
+        pane.open = open;
+        panes = panes; // force update
+    };
+
     let primaryBottom = $derived(panes.find((p) => p.position === TabPosition.PRIMARY_BOTTOM));
     let secondaryLeft = $derived(panes.find((p) => p.position === TabPosition.SECONDARY_LEFT));
     let secondaryRight = $derived(panes.find((p) => p.position === TabPosition.SECONDARY_RIGHT));
@@ -304,9 +315,24 @@
         </MenubarMenu>
     </div>
     <div class="flex flex-row">
-        <PaneButton open={Boolean(secondaryLeft?.open)} title="Left pane" position={TabPosition.SECONDARY_LEFT} />
-        <PaneButton open={Boolean(secondaryRight?.open)} title="Right pane" position={TabPosition.SECONDARY_RIGHT} />
-        <PaneButton open={Boolean(primaryBottom?.open)} title="Bottom pane" position={TabPosition.PRIMARY_BOTTOM} />
+        <PaneButton
+            open={secondaryLeft?.open}
+            title="Left pane"
+            position={TabPosition.SECONDARY_LEFT}
+            onchange={(open) => updatePane(TabPosition.SECONDARY_LEFT, open)}
+        />
+        <PaneButton
+            open={secondaryRight?.open}
+            title="Right pane"
+            position={TabPosition.SECONDARY_RIGHT}
+            onchange={(open) => updatePane(TabPosition.SECONDARY_RIGHT, open)}
+        />
+        <PaneButton
+            open={primaryBottom?.open}
+            title="Bottom pane"
+            position={TabPosition.PRIMARY_BOTTOM}
+            onchange={(open) => updatePane(TabPosition.PRIMARY_BOTTOM, open)}
+        />
     </div>
 </Menubar>
 <Separator />
