@@ -6,6 +6,7 @@
     export const imports: Record<TabType, () => Promise<{ default: Component<PaneProps> }>> = {
         [TabType.PROJECT]: () => import("./tree/tree.svelte"),
         [TabType.LOGGING]: () => import("./logging/logging.svelte"),
+        [TabType.CONSOLE]: () => import("./console/console.svelte"),
         [TabType.WELCOME]: () => import("./welcome/welcome.svelte"),
         [TabType.CODE]: () => import("./code/code.svelte"),
         [TabType.HEX]: () => import("./code/code.svelte"),

@@ -309,6 +309,45 @@ export const prettyError = (e: any): string => {
     return e.toString() + (stack ? "\n" + stack : "");
 };
 
+// https://stackoverflow.com/a/9382383
+const decycle = (obj: any, stack: any[] = []): any => {
+    if (!obj || typeof obj !== "object") {
+        return obj;
+    }
+
+    if (stack.includes(obj)) {
+        return null;
+    }
+
+    const s = stack.concat([obj]);
+    return Array.isArray(obj)
+        ? obj.map((x) => decycle(x, s))
+        : Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, decycle(v, s)]));
+};
+
+// https://gist.github.com/cowboy/3749767
+export const prettyObject = (o: any): string => {
+    const fns: Function[] = [];
+    const json = JSON.stringify(
+        decycle(o),
+        (_, v) => {
+            if (typeof v === "function") {
+                fns.push(v);
+                return "____FUNCTION____";
+            } else if (v === undefined) {
+                return "____UNDEFINED____";
+            }
+
+            return v;
+        },
+        2
+    );
+
+    return json
+        .replace(/"____FUNCTION____"/g, () => fns.shift()!.toString().replaceAll(/\n\s*/g, " "))
+        .replace(/"____UNDEFINED____"/g, () => "undefined");
+};
+
 /* strings */
 
 export const truncate = (str: string, n: number, suffix: string = "..."): string => {

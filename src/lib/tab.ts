@@ -1,12 +1,13 @@
 import type { Icon, StyledIcon } from "$lib/components/icons";
 import { panes, workspaceEncoding } from "$lib/state";
 import { type Entry, EntryType } from "$lib/workspace";
-import { Folders, Sparkles, Terminal } from "lucide-svelte";
+import { Folders, ScrollText, Sparkles, Terminal } from "lucide-svelte";
 import { derived, get, writable } from "svelte/store";
 
 export enum TabType {
     PROJECT = "project",
     LOGGING = "logging",
+    CONSOLE = "console",
     WELCOME = "welcome",
     CODE = "code",
     HEX = "hex",
@@ -53,12 +54,17 @@ export const tabDefs: TabDefinition[] = [
     {
         type: TabType.LOGGING,
         name: "Logging",
-        icon: Terminal,
+        icon: ScrollText,
     },
     {
         type: TabType.WELCOME,
         name: "Welcome",
         icon: Sparkles,
+    },
+    {
+        type: TabType.CONSOLE,
+        name: "Console",
+        icon: Terminal,
     },
 ];
 
