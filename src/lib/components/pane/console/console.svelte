@@ -21,22 +21,40 @@
     const evaluate = evalContext();
 
     let value = $state("");
+
     let results: Result[] = $state([]);
-    const handleEnter = (e: KeyboardEvent) => {
+    let currentResult = $state(-1);
+
+    const handleKeyDown = (e: KeyboardEvent) => {
         if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
 
             results.push(evaluate(value));
             resultsElem!.scrollTo({ top: resultsElem!.scrollHeight });
 
-            value = ""; // reset input
+            value = "";
+            currentResult = -1;
+        } else if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+            const delta = e.key === "ArrowUp" ? -1 : 1;
+
+            const newResult = (currentResult === -1 ? results.length : currentResult) + delta;
+            if (newResult === results.length) {
+                value = "";
+                currentResult = -1;
+            } else if (newResult >= 0 && newResult < results.length) {
+                e.preventDefault();
+                value = results[newResult].expr;
+                currentResult = newResult;
+            }
         }
     };
 
-    const handleResize = (e: Event) => {
+    const handleInput = (e: Event) => {
         const target = e.currentTarget as HTMLTextAreaElement;
         target.style.height = "auto";
         target.style.height = `${target.scrollHeight}px`;
+
+        currentResult = -1;
     };
 </script>
 
@@ -51,8 +69,9 @@
         <textarea
             bind:value
             class="min-h-10 w-full resize-none overflow-hidden bg-background font-mono text-xs focus-visible:outline-none"
-            onkeydown={handleEnter}
-            oninput={handleResize}
+            spellcheck="false"
+            onkeydown={handleKeyDown}
+            oninput={handleInput}
         ></textarea>
     </div>
 </div>
