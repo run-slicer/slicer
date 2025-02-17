@@ -9,9 +9,14 @@ export interface ScriptData {
     load: boolean;
 }
 
-export interface OpenedPane {
-    type: TabType;
+export interface PaneData {
     position: TabPosition;
+    tabs: TabData[];
+    open: boolean;
+}
+
+export interface TabData {
+    type: TabType;
     active: boolean;
 }
 
@@ -27,12 +32,9 @@ export const editorTextSize = persisted<number>(`${root}.editor.text-size`, 0.75
 export const editorTextSizeSync = persisted<boolean>(`${root}.editor.text-size.sync`, true);
 export const analysisBackground = persisted<boolean>(`${root}.analysis.background`, true);
 
-export const panePrimaryBottom = persisted<boolean>(`${root}.pane.primary.bottom`, false);
-export const paneSecondaryLeft = persisted<boolean>(`${root}.pane.secondary.left`, true);
-export const paneSecondaryRight = persisted<boolean>(`${root}.pane.secondary.right`, false);
-export const paneOpened = persisted<OpenedPane[]>(`${root}.pane.opened`, [
-    { type: "project" as TabType, position: "secondary_left" as TabPosition, active: true },
-    { type: "welcome" as TabType, position: "primary_center" as TabPosition, active: true },
+export const panes = persisted<PaneData[]>(`${root}.panes`, [
+    { position: "primary_center" as TabPosition, tabs: [{ type: "welcome" as TabType, active: true }], open: true },
+    { position: "secondary_left" as TabPosition, tabs: [{ type: "project" as TabType, active: true }], open: true },
 ]);
 
 export const load = (data: string): boolean => {

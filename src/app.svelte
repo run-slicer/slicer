@@ -11,7 +11,7 @@
     import { scripts } from "$lib/script";
     import { entries as logEntries } from "$lib/log";
     import { all as disasms } from "$lib/disasm";
-    import { root as rootKey } from "$lib/state";
+    import { root as rootKey, panes } from "$lib/state";
     import { theme } from "$lib/theme";
     import { tasks } from "$lib/task";
     import { handler } from "$lib/event";
@@ -45,6 +45,7 @@
 />
 <Toaster position="top-right" richColors />
 <Menu
+    bind:panes={$panes}
     tab={$currentTab}
     entries={entries0}
     classes={classes0}
@@ -52,6 +53,13 @@
     disasms={disasms0}
     handler={$handler}
 />
-<Content tabs={tabs0} entries={entries0} logEntries={$logEntries} disasms={disasms0} handler={$handler} />
+<Content
+    panes={$panes}
+    tabs={tabs0}
+    entries={entries0}
+    logEntries={$logEntries}
+    disasms={disasms0}
+    handler={$handler}
+/>
 <Crumb tab={$currentTab} tasks={tasks0} encoding={$currentEncoding} />
 <Command entries={entries0} handler={$handler} />
