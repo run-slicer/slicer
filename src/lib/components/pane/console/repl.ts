@@ -11,9 +11,13 @@ type Evaluator = (expr: string) => Result;
 export const evalContext = (): Evaluator => {
     "use strict";
 
-    // expose script context to eval
-    // noinspection JSUnusedLocalSymbols
-    const context = rootContext;
+    // expose script context
+    Object.defineProperty(globalThis, "context", {
+        value: rootContext,
+        enumerable: false,
+        configurable: true,
+        writable: false,
+    });
 
     // noinspection ES6ConvertVarToLetConst
     var __EVAL = (expr: string) => eval(`void (__EVAL = ${__EVAL.toString()}); ${expr}`);
