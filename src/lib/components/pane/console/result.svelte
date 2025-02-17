@@ -20,12 +20,12 @@
         error && "bg-destructive/60"
     )}
 >
-    <div class="flex flex-row">
+    <div class="break-anywhere flex flex-row whitespace-pre-wrap">
         <ChevronsRight class="mr-2 size-4 min-w-4" />
-        <span class="whitespace-pre-wrap">{result.expr}</span>
+        <span>{result.expr}</span>
     </div>
-    <div class={cn("flex flex-row", error || "text-muted-foreground")}>
+    <div class={cn("break-anywhere flex flex-row whitespace-pre-wrap", error || "text-muted-foreground")}>
         <Icon class="mr-2 size-4 min-w-4" />
-        <span class="whitespace-pre-wrap">{error ? prettyError(result.value) : prettyObject(result.value)}</span>
+        <span>{error ? prettyError(result.value) : prettyObject(result.value)}</span>
     </div>
 </div>
