@@ -218,9 +218,9 @@ export const loadZip = async (f: File): Promise<LoadResult[]> => {
     return load(...(await zipData(await readBlob(f, { decoder: get(archiveDecoder) }))));
 };
 
-export const remove = (entry: Entry) => {
+export const remove = (name: string) => {
     entries.update(($entries) => {
-        $entries.delete(entry.name);
+        $entries.delete(name);
         return $entries;
     });
 };

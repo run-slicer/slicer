@@ -1,6 +1,7 @@
-import type { Icon, StyledIcon } from "$lib/components/icons";
+import { type Icon, type StyledIcon, tabIcon } from "$lib/components/icons";
+import { error } from "$lib/log";
 import { panes, workspaceEncoding } from "$lib/state";
-import { type Entry, EntryType } from "$lib/workspace";
+import { type Entry, EntryType, readDeferred } from "$lib/workspace";
 import { Box, Folders, ScrollText, Sparkles } from "lucide-svelte";
 import { derived, get, writable } from "svelte/store";
 
@@ -234,6 +235,21 @@ export const clear = () => {
     });
 };
 
+// utilities below
+
+export const isEncodingDependent = (tab: Tab): boolean => {
+    return tab.type === TabType.CODE && tab.entry?.type !== EntryType.CLASS /* not disassembled */;
+};
+
+// soft-refresh code tabs on encoding change
+workspaceEncoding.subscribe(() => {
+    for (const tab of get(tabs).values()) {
+        if (isEncodingDependent(tab)) {
+            refresh(tab);
+        }
+    }
+});
+
 // prettier-ignore
 const extensions = {
     [TabType.HEX]: [
@@ -252,15 +268,54 @@ export const detectType = (entry: Entry): TabType => {
     return entry.extension ? typesByExts.get(entry.extension) || TabType.CODE : TabType.CODE;
 };
 
-export const isEncodingDependent = (tab: Tab): boolean => {
-    return tab.type === TabType.CODE && tab.entry?.type !== EntryType.CLASS /* not disassembled */;
-};
+export const open = async (entry: Entry, type: TabType = detectType(entry)): Promise<Tab> => {
+    if (entry.type === EntryType.MEMBER && type === TabType.CLASS) {
+        entry = entry.parent!; // unwrap to parent class
+    }
 
-// soft-refresh code tabs on encoding change
-workspaceEncoding.subscribe(() => {
-    for (const tab of get(tabs).values()) {
-        if (isEncodingDependent(tab)) {
-            refresh(tab);
+    const id = `${type}:${entry.name}`;
+
+    let tab = find(id);
+    if (!tab) {
+        // tab doesn't exist, create
+        try {
+            tab = update({
+                id,
+                type,
+                name: entry.shortName,
+                position: TabPosition.PRIMARY_CENTER,
+                closeable: true,
+                entry: await readDeferred(entry),
+                icon: tabIcon(type, entry),
+            });
+        } catch (e) {
+            error(`failed to read entry ${entry.name}`, e);
+
+            throw e; // rethrow
         }
     }
-});
+
+    updateCurrent(tab.position, tab);
+    return tab;
+};
+
+export const openUnscoped = (def: TabDefinition, position: TabPosition): Tab => {
+    let tab = Array.from(get(tabs).values()).find((t) => t.type === def.type);
+
+    if (tab) {
+        move(tab, position);
+    } else {
+        tab = update({
+            id: `${def.type}:slicer`,
+            type: def.type,
+            name: def.name,
+            position,
+            closeable: true,
+            icon: { icon: def.icon, classes: ["text-muted-foreground"] },
+        });
+
+        updateCurrent(tab.position, tab);
+    }
+
+    return tab;
+};

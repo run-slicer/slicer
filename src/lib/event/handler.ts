@@ -1,4 +1,3 @@
-import { tabIcon } from "$lib/components/icons";
 import { disassembleEntry, type Disassembler } from "$lib/disasm";
 import { error } from "$lib/log";
 import {
@@ -12,16 +11,14 @@ import {
     clear as clearTabs,
     current as currentTab,
     detectType as detectTabType,
-    find as findTab,
-    move as moveTab,
+    open as openTab,
+    openUnscoped as openUnscopedTab,
     remove as removeTab,
     type Tab,
     type TabDefinition,
     TabPosition,
     tabs,
     TabType,
-    updateCurrent as updateCurrentTab,
-    update as updateTab,
 } from "$lib/tab";
 import {
     add as addTask,
@@ -137,59 +134,21 @@ export default {
         }
     },
     async open(entry: Entry, tabType: TabType = detectTabType(entry)): Promise<void> {
-        if (entry.type === EntryType.MEMBER && tabType === TabType.CLASS) {
-            entry = entry.parent!; // unwrap to parent class
-        }
-
-        const id = `${tabType}:${entry.name}`;
-
-        let tab = findTab(id);
-        if (!tab) {
-            // tab doesn't exist, create
-            try {
-                tab = updateTab({
-                    id,
-                    type: tabType,
-                    name: entry.shortName,
-                    position: TabPosition.PRIMARY_CENTER,
-                    closeable: true,
-                    entry: await readDeferred(entry),
-                    icon: tabIcon(tabType, entry),
-                });
-            } catch (e) {
-                error(`failed to read entry ${entry.name}`, e);
-
-                toast.error("Error occurred", {
-                    description: `Could not read ${entry.name}, check the console.`,
-                });
-                return;
-            }
-        }
-
-        updateCurrentTab(tab.position, tab);
-    },
-    async openUnscoped(def: TabDefinition, position: TabPosition): Promise<void> {
-        let tab = Array.from(get(tabs).values()).find((t) => t.type === def.type);
-
-        if (tab) {
-            moveTab(tab, position);
-        } else {
-            tab = updateTab({
-                id: `${def.type}:slicer`,
-                type: def.type,
-                name: def.name,
-                position,
-                closeable: true,
-                icon: { icon: def.icon, classes: ["text-muted-foreground"] },
+        try {
+            await openTab(entry, tabType);
+        } catch (e) {
+            toast.error("Error occurred", {
+                description: `Could not read ${entry.name}, check the console.`,
             });
-
-            updateCurrentTab(tab.position, tab);
         }
+    },
+    openUnscoped(def: TabDefinition, position: TabPosition): void {
+        openUnscopedTab(def, position);
     },
     async remove(entries: Entry[]): Promise<void> {
         const names = new Set(entries.map((e) => e.name));
 
-        entries.forEach(removeWs);
+        entries.forEach((e) => removeWs(e.name));
         for (const tab of get(tabs).values()) {
             if (tab.entry && names.has(tab.entry.name)) {
                 removeTab(tab);

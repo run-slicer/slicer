@@ -9,11 +9,32 @@ import { createSource as createClassSource } from "$lib/disasm/source";
 import type { Language } from "$lib/lang";
 import { error, warn } from "$lib/log";
 import { scriptingScripts } from "$lib/state";
-import { current as currentTab, find as findTab, refresh as refreshTab, type Tab, tabs, TabType } from "$lib/tab";
+import {
+    current as currentTab,
+    find as findTab,
+    open as openTab,
+    openUnscoped as openUnscopedTab,
+    refresh as refreshTab,
+    type Tab,
+    tabDefs,
+    TabPosition,
+    tabs,
+    TabType,
+} from "$lib/tab";
 import { cyrb53 } from "$lib/utils";
-import { type ClassEntry, classes, type Entry, EntryType, readDeferred } from "$lib/workspace";
+import {
+    type ClassEntry,
+    classes,
+    clear as clearWs,
+    entries,
+    type Entry,
+    EntryType,
+    load as loadEntry,
+    readDeferred,
+    remove as removeEntry,
+} from "$lib/workspace";
 import { AnalysisState, analyze } from "$lib/workspace/analysis";
-import { DataType, type MemoryData, unwrapTransform } from "$lib/workspace/data";
+import { DataType, memoryBlobData, memoryData, type MemoryData, unwrapTransform } from "$lib/workspace/data";
 import type { UTF8Entry } from "@run-slicer/asm/pool";
 import type {
     DisassemblerContext,
@@ -26,9 +47,8 @@ import type {
     ScriptContext,
     Disassembler as ScriptDisassembler,
     Entry as ScriptEntry,
-    EntryType as ScriptEntryType,
     Tab as ScriptTab,
-    TabType as ScriptTabType,
+    WorkspaceContext,
 } from "@run-slicer/script";
 import { toast } from "svelte-sonner";
 import { get, writable } from "svelte/store";
@@ -50,39 +70,42 @@ export interface ProtoScript {
 export const scripts = writable<ProtoScript[]>([]);
 
 const wrapEntry = (e: Entry): ScriptEntry => {
-    let type: ScriptEntryType = "unspecific";
-    switch (e.type) {
-        case EntryType.CLASS:
-        case EntryType.ARCHIVE:
-            type = e.type;
-            break;
+    return {
+        _entry: e,
+        type: e.type,
+        name: e.name,
+        bytes(): Promise<Uint8Array> {
+            return e.data.bytes();
+        },
+        blob(): Promise<Blob> {
+            return e.data.blob();
+        },
+    } as ScriptEntry;
+};
+
+const unwrapEntry = (e: ScriptEntry): Entry => {
+    const entry = (e as any)._entry;
+    if (entry) {
+        return entry;
     }
 
-    return { type, name: e.name };
+    throw new Error("Could not unwrap script entry");
 };
 
 const wrapTab = (t: Tab): ScriptTab => {
-    let type: ScriptTabType = "unspecific";
-    switch (t.type) {
-        case TabType.WELCOME:
-        case TabType.CODE:
-        case TabType.HEX:
-        case TabType.FLOW_GRAPH:
-        case TabType.IMAGE:
-            type = t.type;
-            break;
-    }
-
     return {
-        type,
+        type: t.type,
         id: t.id,
         label: t.name,
+        position: t.position,
+        active: Boolean(t.active),
         entry: t.entry ? wrapEntry(t.entry) : null,
     };
 };
 
 const wrapDisasm = (disasm: Disassembler): ScriptDisassembler => {
     return {
+        _disasm: disasm,
         id: disasm.id,
         label: disasm.name,
         language: disasm.language,
@@ -108,7 +131,7 @@ const wrapDisasm = (disasm: Disassembler): ScriptDisassembler => {
 
             await analyze(entry, AnalysisState.FULL);
             if (entry.type !== EntryType.CLASS) {
-                warn(`tried to disassemble non-class (disassembler id: ${disasm.id})`);
+                warn(`script tried to disassemble non-class (disassembler id: ${disasm.id})`);
                 return "";
             }
 
@@ -136,7 +159,7 @@ const wrapDisasm = (disasm: Disassembler): ScriptDisassembler => {
 
                   await analyze(entry, AnalysisState.FULL);
                   if (entry.type !== EntryType.CLASS) {
-                      warn(`tried to disassemble non-class (disassembler id: ${disasm.id})`);
+                      warn(`script tried to disassemble non-class (disassembler id: ${disasm.id})`);
                       return "";
                   }
 
@@ -151,10 +174,15 @@ const wrapDisasm = (disasm: Disassembler): ScriptDisassembler => {
                   return disasm.method!(classEntry, method);
               }
             : undefined,
-    };
+    } as ScriptDisassembler;
 };
 
 const unwrapDisasm = (disasm: ScriptDisassembler): Disassembler => {
+    const wrapped = (disasm as any)._disasm;
+    if (wrapped) {
+        return wrapped;
+    }
+
     return {
         id: disasm.id,
         name: disasm.label,
@@ -196,7 +224,7 @@ const editorCtx: EditorContext = {
         const tab = get(currentTab);
         return tab ? wrapTab(tab) : null;
     },
-    async refresh(id: string, hard: boolean) {
+    async refresh(id: string, hard?: boolean) {
         const tab = findTab(id);
         if (tab) {
             if (hard && tab.entry) {
@@ -212,6 +240,30 @@ const editorCtx: EditorContext = {
 
             refreshTab(tab);
         }
+    },
+    async add(type: string, entry?: ScriptEntry): Promise<ScriptTab> {
+        const e = entry ? unwrapEntry(entry) : null;
+        if (e) {
+            const tabType = Object.keys(TabType).includes(type) ? (type as TabType) : undefined;
+            if (!tabType) {
+                warn("script wanted an invalid tab type, detecting a valid one for entry");
+            }
+
+            return wrapTab(await openTab(e, tabType));
+        }
+
+        const def = tabDefs.find((d) => d.type === type);
+        if (def) {
+            return wrapTab(openUnscopedTab(def, TabPosition.PRIMARY_CENTER));
+        }
+
+        throw new Error("Invalid tab type");
+    },
+    remove(id: string) {
+        removeEntry(id);
+    },
+    clear() {
+        clearWs();
     },
 };
 
@@ -231,6 +283,27 @@ const disasmCtx: DisassemblerContext = {
     },
 };
 
+const workspaceCtx: WorkspaceContext = {
+    entries(): ScriptEntry[] {
+        return Array.from(get(entries).values()).map(wrapEntry);
+    },
+    find(name: string): ScriptEntry | null {
+        const entry = get(entries).get(name);
+        return entry ? wrapEntry(entry) : null;
+    },
+    async add(name: string, data: Uint8Array | Blob): Promise<ScriptEntry> {
+        const results = await loadEntry(data instanceof Blob ? memoryBlobData(name, data) : memoryData(name, data));
+
+        return wrapEntry(results.pop()!.entry);
+    },
+    remove(id: string) {
+        removeEntry(id);
+    },
+    clear() {
+        clearWs();
+    },
+};
+
 const createContext = (script: Script, parent: ScriptContext | null): ScriptContext => {
     const scriptListeners = new Map<EventType, EventListener<any>[]>();
 
@@ -239,6 +312,7 @@ const createContext = (script: Script, parent: ScriptContext | null): ScriptCont
         parent,
         editor: editorCtx,
         disasm: disasmCtx,
+        workspace: workspaceCtx,
         addEventListener<K extends EventType>(type: K, listener: EventListener<EventMap[K]>) {
             let listeners = scriptListeners.get(type);
             if (!listeners) {

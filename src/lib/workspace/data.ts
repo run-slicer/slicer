@@ -107,7 +107,7 @@ export const zipData = async (zip: Zip): Promise<ZipData[]> => {
 
 export interface MemoryData extends Data {
     type: DataType.MEMORY;
-    data: Uint8Array;
+    data: Uint8Array | Blob;
 }
 
 export const memoryData = (name: string, data: Uint8Array, dataDecoder: TextDecoder = get(decoder)): MemoryData => {
@@ -133,6 +133,26 @@ export const memoryData = (name: string, data: Uint8Array, dataDecoder: TextDeco
         },
         blob(): Promise<Blob> {
             return Promise.resolve(new Blob([data]));
+        },
+    };
+};
+
+export const memoryBlobData = (name: string, data: Blob, dataDecoder: TextDecoder = get(decoder)): MemoryData => {
+    return {
+        type: DataType.MEMORY,
+        name,
+        data,
+        stream(): Promise<ReadableStream<Uint8Array>> {
+            return Promise.resolve(data.stream());
+        },
+        bytes(): Promise<Uint8Array> {
+            return data.bytes();
+        },
+        async text(): Promise<string> {
+            return dataDecoder.decode(await this.bytes());
+        },
+        blob(): Promise<Blob> {
+            return Promise.resolve(data);
         },
     };
 };
