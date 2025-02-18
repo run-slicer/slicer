@@ -1,13 +1,13 @@
 import type { Icon, StyledIcon } from "$lib/components/icons";
 import { panes, workspaceEncoding } from "$lib/state";
 import { type Entry, EntryType } from "$lib/workspace";
-import { Folders, ScrollText, Sparkles, Terminal } from "lucide-svelte";
+import { Box, Folders, ScrollText, Sparkles } from "lucide-svelte";
 import { derived, get, writable } from "svelte/store";
 
 export enum TabType {
     PROJECT = "project",
     LOGGING = "logging",
-    CONSOLE = "console",
+    PLAYGROUND = "playground",
     WELCOME = "welcome",
     CODE = "code",
     HEX = "hex",
@@ -62,9 +62,9 @@ export const tabDefs: TabDefinition[] = [
         icon: Sparkles,
     },
     {
-        type: TabType.CONSOLE,
-        name: "Console",
-        icon: Terminal,
+        type: TabType.PLAYGROUND,
+        name: "Playground",
+        icon: Box,
     },
 ];
 
@@ -73,17 +73,18 @@ const typedDefs = new Map(tabDefs.map((d) => [d.type, d]));
 export const tabs = writable<Map<string, Tab>>(
     new Map(
         get(panes)
-            .flatMap(({ position, tabs }) => tabs.map((tab) => ({ position, tab, def: typedDefs.get(tab.type)! })))
+            .flatMap(({ position, tabs }) => tabs.map((tab) => ({ position, tab, def: typedDefs.get(tab.type) })))
+            .filter(({ def }) => def !== undefined)
             .map(({ position, tab, def }) => [
-                `${def.type}:slicer`,
+                `${def!.type}:slicer`,
                 {
-                    id: `${def.type}:slicer`,
-                    type: def.type,
-                    name: def.name,
+                    id: `${def!.type}:slicer`,
+                    type: def!.type,
+                    name: def!.name,
                     position,
                     active: tab.active,
                     closeable: true,
-                    icon: { icon: def.icon, classes: ["text-muted-foreground"] },
+                    icon: { icon: def!.icon, classes: ["text-muted-foreground"] },
                     internalId: {},
                 },
             ])
