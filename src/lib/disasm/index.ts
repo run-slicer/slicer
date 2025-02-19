@@ -11,6 +11,7 @@ export interface Disassembler {
     name?: string;
     language?: Language;
     concurrency?: number;
+    options?: Record<string, string>;
 
     class: (entry: ClassEntry) => Promise<string>;
     method?: (entry: ClassEntry, method: Member) => Promise<string>;

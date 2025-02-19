@@ -1,20 +1,30 @@
-import { type ClassEntry, classes } from "$lib/workspace";
-import type { Member } from "@run-slicer/asm";
+import type { Disassembler } from "$lib/disasm";
+import { roundRobin } from "$lib/utils";
+import { classes } from "$lib/workspace";
 import type { UTF8Entry } from "@run-slicer/asm/pool";
 import { proxy } from "comlink";
 import { get } from "svelte/store";
 import { type EntrySource, createSource } from "../source";
 
 export interface Worker {
-    class(name: string, resources: string[], source: EntrySource): Promise<string>;
-    method(name: string, signature: string, source: EntrySource): Promise<string>;
+    class(name: string, resources: string[], source: EntrySource, options?: Record<string, string>): Promise<string>;
+    method(name: string, signature: string, source: EntrySource, options?: Record<string, string>): Promise<string>;
 }
 
-type DisassemblyFunc = (entry: ClassEntry) => Promise<string>;
-type MethodDisassemblyFunc = (entry: ClassEntry, method: Member) => Promise<string>;
+export const createFromWorker = (
+    disasm: Partial<Disassembler>,
+    workerFunc: () => Worker,
+    method: boolean
+): Disassembler => {
+    if ((disasm.concurrency ?? 1) > 1) {
+        workerFunc = roundRobin(disasm.concurrency!, workerFunc);
+    } else {
+        // use only one worker
+        const worker = workerFunc();
+        workerFunc = () => worker;
+    }
 
-export const createClassFunc = (workerFunc: () => Worker): DisassemblyFunc => {
-    return async (entry) => {
+    disasm.class = async (entry) => {
         const { node, data } = entry;
 
         const buf = await data.bytes();
@@ -23,21 +33,27 @@ export const createClassFunc = (workerFunc: () => Worker): DisassemblyFunc => {
         const worker = workerFunc();
 
         const classes0 = get(classes);
-        return await worker.class(name, Array.from(classes0.keys()), proxy(createSource(classes0, name, buf)));
+        return await worker.class(
+            name,
+            Array.from(classes0.keys()),
+            proxy(createSource(classes0, name, buf)),
+            disasm.options
+        );
     };
-};
+    if (method) {
+        disasm.method = async (entry, method) => {
+            const { node, data } = entry;
 
-export const createMethodFunc = (workerFunc: () => Worker): MethodDisassemblyFunc => {
-    return async (entry, method) => {
-        const { node, data } = entry;
+            const buf = await data.bytes();
+            const name = (node.pool[node.thisClass.name] as UTF8Entry).string;
+            const signature = method.name.string + method.type.string;
 
-        const buf = await data.bytes();
-        const name = (node.pool[node.thisClass.name] as UTF8Entry).string;
-        const signature = method.name.string + method.type.string;
+            const worker = workerFunc();
 
-        const worker = workerFunc();
+            const classes0 = get(classes);
+            return await worker.method(name, signature, proxy(createSource(classes0, name, buf)), disasm.options);
+        };
+    }
 
-        const classes0 = get(classes);
-        return await worker.method(name, signature, proxy(createSource(classes0, name, buf)));
-    };
+    return disasm as Disassembler;
 };

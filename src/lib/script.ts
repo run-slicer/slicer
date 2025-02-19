@@ -72,7 +72,9 @@ export const scripts = writable<ProtoScript[]>([]);
 const wrapEntry = (e: Entry): ScriptEntry => {
     return {
         _entry: e,
-        type: e.type,
+        get type() {
+            return e.type;
+        },
         name: e.name,
         bytes(): Promise<Uint8Array> {
             return e.data.bytes();
@@ -97,8 +99,12 @@ const wrapTab = (t: Tab): ScriptTab => {
         type: t.type,
         id: t.id,
         label: t.name,
-        position: t.position,
-        active: Boolean(t.active),
+        get position() {
+            return t.position;
+        },
+        get active() {
+            return Boolean(t.active);
+        },
         entry: t.entry ? wrapEntry(t.entry) : null,
     };
 };
@@ -109,6 +115,12 @@ const wrapDisasm = (disasm: Disassembler): ScriptDisassembler => {
         id: disasm.id,
         label: disasm.name,
         language: disasm.language,
+        get options() {
+            return disasm.options;
+        },
+        set options(options) {
+            disasm.options = options;
+        },
 
         async class(name, source): Promise<string> {
             const data = await source(name);
@@ -187,6 +199,12 @@ const unwrapDisasm = (disasm: ScriptDisassembler): Disassembler => {
         id: disasm.id,
         name: disasm.label,
         language: disasm.language as Language,
+        get options() {
+            return disasm.options;
+        },
+        set options(options) {
+            disasm.options = options;
+        },
 
         async class(entry: ClassEntry): Promise<string> {
             const { node, data } = entry;
