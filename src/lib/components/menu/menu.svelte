@@ -81,9 +81,9 @@
         panes = panes; // force update
     };
 
-    let primaryBottom = $derived(panes.find((p) => p.position === TabPosition.PRIMARY_BOTTOM));
-    let secondaryLeft = $derived(panes.find((p) => p.position === TabPosition.SECONDARY_LEFT));
-    let secondaryRight = $derived(panes.find((p) => p.position === TabPosition.SECONDARY_RIGHT));
+    let primaryBottom = $derived({ current: panes.find((p) => p.position === TabPosition.PRIMARY_BOTTOM) });
+    let secondaryLeft = $derived({ current: panes.find((p) => p.position === TabPosition.SECONDARY_LEFT) });
+    let secondaryRight = $derived({ current: panes.find((p) => p.position === TabPosition.SECONDARY_RIGHT) });
 
     let entry = $derived(tab?.entry);
 
@@ -316,19 +316,19 @@
     </div>
     <div class="flex flex-row">
         <PaneButton
-            open={secondaryLeft?.open}
+            open={secondaryLeft.current?.open}
             title="Left pane"
             position={TabPosition.SECONDARY_LEFT}
             onchange={(open) => updatePane(TabPosition.SECONDARY_LEFT, open)}
         />
         <PaneButton
-            open={secondaryRight?.open}
+            open={secondaryRight.current?.open}
             title="Right pane"
             position={TabPosition.SECONDARY_RIGHT}
             onchange={(open) => updatePane(TabPosition.SECONDARY_RIGHT, open)}
         />
         <PaneButton
-            open={primaryBottom?.open}
+            open={primaryBottom.current?.open}
             title="Bottom pane"
             position={TabPosition.PRIMARY_BOTTOM}
             onchange={(open) => updatePane(TabPosition.PRIMARY_BOTTOM, open)}

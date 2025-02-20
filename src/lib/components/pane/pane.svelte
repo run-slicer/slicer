@@ -23,7 +23,7 @@
         handleAfter?: boolean;
     }
 
-    let { tabs, size, hidden = $bindable(), position, handler, children, handleBefore, handleAfter }: Props = $props();
+    let { tabs, size, hidden, position, handler, children, handleBefore, handleAfter }: Props = $props();
     let posTabs = $derived(tabs.filter((t) => t.position === position));
     let posCurrent = $derived(posTabs.find((t) => t.active));
 
@@ -51,8 +51,8 @@
     let Icon = $derived(paneIcon(position, false));
 </script>
 
-{#if handleBefore}<ResizableHandle class={cn(!hidden || "hidden")} />{/if}
-<ResizablePane defaultSize={size} class={cn(!hidden || "hidden")}>
+{#if handleBefore}<ResizableHandle class={cn(hidden && "hidden")} />{/if}
+<ResizablePane defaultSize={size} class={cn(hidden && "hidden")}>
     <div class="flex h-full w-full flex-col">
         <PaneHeader>
             <div
@@ -108,4 +108,4 @@
         {/if}
     </div>
 </ResizablePane>
-{#if handleAfter}<ResizableHandle class={cn(!hidden || "hidden")} />{/if}
+{#if handleAfter}<ResizableHandle class={cn(hidden && "hidden")} />{/if}
