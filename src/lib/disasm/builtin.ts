@@ -1,9 +1,10 @@
 import { wrap } from "comlink";
 import type { Disassembler } from "./";
-import { createFromWorker, type Worker } from "./worker";
+import { createFromWorker, createInternalFromWorker, type InternalWorker, type Worker } from "./worker";
 import CFRWorker from "./worker/cfr?worker";
 import JASMWorker from "./worker/jasm?worker";
 import ProcyonWorker from "./worker/procyon?worker";
+import SlicerWorker from "./worker/slicer?worker";
 import VFWorker from "./worker/vf?worker";
 
 export const cfr: Disassembler = createFromWorker(
@@ -50,18 +51,13 @@ export const procyon: Disassembler = createFromWorker(
     false
 );
 
-export const slicer: Disassembler = {
-    id: "slicer",
-    name: "slicer",
-    language: "java",
-    async class(entry): Promise<string> {
-        const { disassemble } = await import("@run-slicer/asm/analysis/disasm");
-
-        return disassemble(entry.node);
+export const slicer: Disassembler = createInternalFromWorker(
+    {
+        id: "slicer",
+        name: "slicer",
+        language: "java",
+        concurrency: 5,
     },
-    async method(entry, method): Promise<string> {
-        const { disassembleMethod } = await import("@run-slicer/asm/analysis/disasm");
-
-        return disassembleMethod(entry.node, method);
-    },
-};
+    () => wrap<InternalWorker>(new SlicerWorker()),
+    true
+);
