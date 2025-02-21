@@ -7,6 +7,7 @@
         [TabType.PROJECT]: () => import("./tree/tree.svelte"),
         [TabType.LOGGING]: () => import("./logging/logging.svelte"),
         [TabType.PLAYGROUND]: () => import("./playground/playground.svelte"),
+        [TabType.SEARCH]: () => import("./search/search.svelte"),
         [TabType.WELCOME]: () => import("./welcome/welcome.svelte"),
         [TabType.CODE]: () => import("./code/code.svelte"),
         [TabType.HEX]: () => import("./code/code.svelte"),
