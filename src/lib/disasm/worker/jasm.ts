@@ -1,34 +1,29 @@
+import type { DisassemblyConfig } from "@run-slicer/jasm";
 import { expose } from "comlink";
 import type { EntrySource } from "../source";
-import type { Worker } from "./";
+import type { Options, Worker } from "./";
+
+const convertOpts = (options?: Options): DisassemblyConfig => ({
+    indent: options?.indent,
+});
 
 expose({
-    async class(
-        name: string,
-        _resources: string[],
-        source: EntrySource,
-        _options?: Record<string, string>
-    ): Promise<string> {
+    async class(name: string, _resources: string[], source: EntrySource, options?: Options): Promise<string> {
         const data = await source(name);
         if (!data) {
             return "";
         }
 
         const { disassemble } = await import("@run-slicer/jasm");
-        return disassemble(data);
+        return disassemble(data, convertOpts(options));
     },
-    async method(
-        name: string,
-        signature: string,
-        source: EntrySource,
-        _options?: Record<string, string>
-    ): Promise<string> {
+    async method(name: string, signature: string, source: EntrySource, options?: Options): Promise<string> {
         const data = await source(name);
         if (!data) {
             return "";
         }
 
         const { disassemble } = await import("@run-slicer/jasm");
-        return disassemble(data, { signature });
+        return disassemble(data, { ...convertOpts(options), signature });
     },
 } satisfies Worker);
