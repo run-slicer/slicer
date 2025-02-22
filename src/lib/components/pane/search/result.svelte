@@ -2,6 +2,7 @@
     import type { SearchResult } from "$lib/workspace/analysis";
     import type { EventHandler } from "$lib/event";
     import { memberEntry } from "$lib/workspace";
+    import { TabType } from "$lib/tab";
 
     interface Props {
         result: SearchResult;
@@ -12,9 +13,10 @@
 
     const handleOpen = () =>
         handler.open(
-            result.member?.type?.string?.[0] === "(" /* method */
+            result.member?.type?.string?.charAt(0) === "(" /* method */
                 ? memberEntry(result.entry, result.member)
-                : result.entry
+                : result.entry,
+            TabType.CODE
         );
 </script>
 
@@ -26,5 +28,5 @@
     onkeydown={handleOpen}
 >
     <span class="break-anywhere font-mono">{result.value}</span>
-    <span class="pl-2 text-muted-foreground">{result.entry.shortName}</span>
+    <span class="pl-2 text-muted-foreground" title={result.entry.name}>{result.entry.shortName}</span>
 </div>

@@ -1,4 +1,5 @@
 import { handler } from "$lib/event";
+import { tabDefs, TabPosition, TabType, updatePane } from "$lib/tab";
 import { get } from "svelte/store";
 
 // https://stackoverflow.com/questions/38241480/detect-macos-ios-windows-android-and-linux-os-with-js
@@ -46,6 +47,10 @@ export const register = (): DestroyCallback => {
         listen("o", Modifier.CTRL, () => get(handler).load()),
         listen("w", Modifier.CTRL | Modifier.ALT, () => get(handler).close()),
         listen("e", Modifier.CTRL, () => get(handler).export()),
+        listen("f", Modifier.CTRL | Modifier.SHIFT, () => {
+            updatePane(TabPosition.SECONDARY_RIGHT, true);
+            get(handler).openUnscoped(tabDefs.find((d) => d.type === TabType.SEARCH)!, TabPosition.SECONDARY_RIGHT);
+        }),
     ];
     return () => callbacks.forEach((c) => c());
 };

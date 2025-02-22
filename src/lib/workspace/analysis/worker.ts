@@ -1,5 +1,5 @@
 import { type Node, read } from "@run-slicer/asm";
-import { formatEntry } from "@run-slicer/asm/analysis/disasm";
+import { escapeLiteral, formatEntry } from "@run-slicer/asm/analysis/disasm";
 import { ConstantType } from "@run-slicer/asm/spec";
 import { expose } from "comlink";
 import { type SearchData, SearchMode, type SearchResultData } from "./search";
@@ -8,7 +8,8 @@ export interface Worker {
     read(data: Uint8Array, flags: number): Promise<Node>;
 
     searchPoolEntry(data: SearchData): Promise<SearchResultData[]>;
-    searchMember(data: SearchData): Promise<SearchResultData[]>;
+    searchField(data: SearchData): Promise<SearchResultData[]>;
+    searchMethod(data: SearchData): Promise<SearchResultData[]>;
 }
 
 const createComparator = (value: string, mode: SearchMode): ((v: string) => boolean) => {
@@ -35,12 +36,22 @@ expose({
             .map((e) => ({ value: `${ConstantType[e.type]} ${formatEntry(e, node.pool)}` }))
             .filter((e) => comparator(e.value));
     },
-    async searchMember({ node, value, mode }: SearchData): Promise<SearchResultData[]> {
+    async searchField({ node, value, mode }: SearchData): Promise<SearchResultData[]> {
         const comparator = createComparator(value, mode);
 
-        return [...node.fields, ...node.methods]
+        return node.fields
             .map((m) => ({
-                value: `${m.type.string[0] === "(" ? "method" : "field"} ${m.name.string} ${m.type.string}`,
+                value: `${escapeLiteral(m.name.string)} ${escapeLiteral(m.type.string)}`,
+                member: m,
+            }))
+            .filter((m) => comparator(m.value));
+    },
+    async searchMethod({ node, value, mode }: SearchData): Promise<SearchResultData[]> {
+        const comparator = createComparator(value, mode);
+
+        return node.methods
+            .map((m) => ({
+                value: `${escapeLiteral(m.name.string)}${escapeLiteral(m.type.string)}`,
                 member: m,
             }))
             .filter((m) => comparator(m.value));

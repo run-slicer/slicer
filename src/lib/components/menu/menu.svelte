@@ -12,7 +12,7 @@
     import { type Entry, EntryType } from "$lib/workspace";
     import { encodings } from "$lib/workspace/encoding";
     import type { ProtoScript } from "$lib/script";
-    import { type Tab, TabPosition, TabType } from "$lib/tab";
+    import { type Tab, TabPosition, TabType, tabDefs } from "$lib/tab";
     import { Modifier } from "$lib/shortcut";
     import Shortcut from "./shortcut.svelte";
     import ScriptMenu from "./script/menu.svelte";
@@ -103,6 +103,11 @@
     };
 
     const exportEntries = (disasm?: Disassembler) => handler.export(entries, disasm);
+
+    const openSearch = async () => {
+        updatePane(TabPosition.SECONDARY_RIGHT, true);
+        handler.openUnscoped(tabDefs.find((d) => d.type === TabType.SEARCH)!, TabPosition.SECONDARY_RIGHT);
+    };
 </script>
 
 <Menubar class="window-controls justify-between rounded-none border-b border-none px-2 lg:px-4">
@@ -277,6 +282,10 @@
                 <MenubarCheckboxItem class="justify-between" bind:checked={$analysisBackground}>
                     Background <SendToBack size={16} />
                 </MenubarCheckboxItem>
+                <MenubarSeparator />
+                <MenubarItem class="justify-between" onclick={openSearch}>
+                    Search <Shortcut key="f" modifier={Modifier.CTRL | Modifier.SHIFT} />
+                </MenubarItem>
             </MenubarContent>
         </MenubarMenu>
         <MenubarMenu>

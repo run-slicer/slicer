@@ -16,10 +16,10 @@
     let searching = $state(false);
     let time = $state(-1);
 
-    let type = $state(QueryType.MEMBER);
+    let type = $state(QueryType.POOL_ENTRY);
     let mode = $state(SearchMode.PARTIAL_MATCH);
 
-    let results: SearchResult[] = $state([]);
+    let results: SearchResult[] = $state.raw([]);
     $effect(() => {
         const entryNames = new Set(entries.map((e) => e.name));
 
@@ -29,7 +29,7 @@
 
     const handleSearch = async (e: KeyboardEvent) => {
         if (e.key === "Enter") {
-            results.length = 0;
+            results = [];
             searching = true;
 
             const start = Date.now();
@@ -37,14 +37,16 @@
                 time = Date.now() - start;
             }, 20);
 
-            await search(entries, { type, value, mode }, (r) => results.push(r));
+            await search(entries, { type, value, mode }, (r) => {
+                results = [...results, r];
+            });
 
             clearInterval(intervalId);
             searching = false;
         }
     };
     const handleClear = () => {
-        results.length = 0;
+        results = [];
         value = "";
         time = -1;
         searching = false;

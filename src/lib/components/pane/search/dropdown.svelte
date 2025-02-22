@@ -7,8 +7,12 @@
             label: "Constant pool",
         },
         {
-            value: QueryType.MEMBER,
-            label: "Members",
+            value: QueryType.FIELD,
+            label: "Fields",
+        },
+        {
+            value: QueryType.METHOD,
+            label: "Methods",
         },
     ];
     export const modes = [

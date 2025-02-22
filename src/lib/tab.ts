@@ -123,6 +123,20 @@ tabs.subscribe(($tabs) => {
     });
 });
 
+// utility function for creating+opening/closing a pane
+export const updatePane = (position: TabPosition, open: boolean) => {
+    panes.update(($panes) => {
+        let pane = $panes.find((p) => p.position === position);
+        if (!pane) {
+            pane = { position, tabs: [], open };
+            $panes.push(pane);
+        }
+
+        pane.open = open;
+        return $panes;
+    });
+};
+
 export const current = derived(tabs, ($tabs) => {
     return Array.from($tabs.values()).find((t) => t.active && t.position === TabPosition.PRIMARY_CENTER) || null;
 });

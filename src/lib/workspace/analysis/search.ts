@@ -3,7 +3,8 @@ import type { Member, Node } from "@run-slicer/asm";
 
 export enum QueryType {
     POOL_ENTRY = "pool_entry",
-    MEMBER = "member",
+    FIELD = "field",
+    METHOD = "method",
 }
 
 export enum SearchMode {
