@@ -2,9 +2,12 @@ import { error } from "$lib/log";
 import { analysisBackground } from "$lib/state";
 import { recordProgress } from "$lib/task";
 import { FLAG_SKIP_ATTR } from "@run-slicer/asm";
+import { formatEntry } from "@run-slicer/asm/analysis/disasm";
+import { ConstantType } from "@run-slicer/asm/spec";
 import { wrap } from "comlink";
 import { get } from "svelte/store";
 import { type ClassEntry, type Entry, EntryType } from "../";
+import { QueryFlag, QueryType, type SearchData, type SearchQuery, type SearchResult } from "./search";
 import type { Worker as AnalysisWorker } from "./worker";
 import Worker from "./worker?worker";
 
@@ -60,7 +63,7 @@ export const analyze = async (entry: Entry, state: AnalysisState = AnalysisState
 
 let queue: Entry[] = [];
 
-export const schedule = (entry: Entry) => queue.push(entry);
+export const analyzeSchedule = (entry: Entry) => queue.push(entry);
 
 export const analyzeBackground = async () => {
     // snapshot queue
@@ -78,5 +81,43 @@ export const analyzeBackground = async () => {
         }
 
         task.desc.set(`${$queue.length} entries`);
+    });
+};
+
+export { QueryFlag, QueryType, type SearchQuery, type SearchResult };
+
+export const search = async (entries: Entry[], query: SearchQuery, onResult: (result: SearchResult) => void) => {
+    await recordProgress("searching", null, async (task) => {
+        for (let i = 0; i < entries.length; i++) {
+            const entry = entries[i];
+            if (entry.type === EntryType.CLASS) {
+                const data: SearchData = { node: (entry as ClassEntry).node, value: query.value, flags: query.flags };
+                switch (query.type) {
+                    case QueryType.POOL_ENTRY: {
+                        for (const e of await worker.searchPoolEntry(data)) {
+                            onResult({
+                                value: `${ConstantType[e.type]} ${formatEntry(e, data.node.pool)}`,
+                                entry,
+                            });
+                        }
+                        break;
+                    }
+                    case QueryType.MEMBER: {
+                        for (const m of await worker.searchMember(data)) {
+                            onResult({
+                                value: `${m.name.string} ${m.type.string}`,
+                                entry,
+                            });
+                        }
+                        break;
+                    }
+                }
+            }
+
+            task.desc.set(`${entries.length} entries (${entries.length - i - 1} remaining)`);
+            task.progress?.set(((i + 1) / entries.length) * 100);
+        }
+
+        task.desc.set(`${entries.length} entries`);
     });
 };
