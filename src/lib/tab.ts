@@ -2,13 +2,14 @@ import { type Icon, type StyledIcon, tabIcon } from "$lib/components/icons";
 import { error } from "$lib/log";
 import { panes, workspaceEncoding } from "$lib/state";
 import { type Entry, EntryType, readDeferred } from "$lib/workspace";
-import { Box, Folders, ScrollText, Sparkles } from "lucide-svelte";
+import { Box, Folders, ScrollText, Search, Sparkles } from "lucide-svelte";
 import { derived, get, writable } from "svelte/store";
 
 export enum TabType {
     PROJECT = "project",
     LOGGING = "logging",
     PLAYGROUND = "playground",
+    SEARCH = "search",
     WELCOME = "welcome",
     CODE = "code",
     HEX = "hex",
@@ -67,6 +68,11 @@ export const tabDefs: TabDefinition[] = [
         name: "Playground",
         icon: Box,
     },
+    {
+        type: TabType.SEARCH,
+        name: "Search",
+        icon: Search,
+    },
 ];
 
 const typedDefs = new Map(tabDefs.map((d) => [d.type, d]));
@@ -116,6 +122,20 @@ tabs.subscribe(($tabs) => {
         });
     });
 });
+
+// utility function for creating+opening/closing a pane
+export const updatePane = (position: TabPosition, open: boolean) => {
+    panes.update(($panes) => {
+        let pane = $panes.find((p) => p.position === position);
+        if (!pane) {
+            pane = { position, tabs: [], open };
+            $panes.push(pane);
+        }
+
+        pane.open = open;
+        return $panes;
+    });
+};
 
 export const current = derived(tabs, ($tabs) => {
     return Array.from($tabs.values()).find((t) => t.active && t.position === TabPosition.PRIMARY_CENTER) || null;

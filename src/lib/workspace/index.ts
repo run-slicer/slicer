@@ -6,7 +6,7 @@ import type { Member, Node } from "@run-slicer/asm";
 import type { UTF8Entry } from "@run-slicer/asm/pool";
 import type { Zip } from "@run-slicer/zip";
 import { derived, get, writable } from "svelte/store";
-import { AnalysisState, analyze, analyzeBackground, schedule as scheduleAnalysis } from "./analysis";
+import { AnalysisState, analyze, analyzeBackground, analyzeSchedule } from "./analysis";
 import { type Data, fileData, memoryData, type Named, parseName, transformData, zipData } from "./data";
 import { archiveDecoder } from "./encoding";
 
@@ -113,7 +113,7 @@ export const entries = writable<Map<string, Entry>>(new Map());
 analysisBackground.subscribe(($analysisBackground) => {
     if ($analysisBackground) {
         for (const entry of get(entries).values()) {
-            scheduleAnalysis(entry);
+            analyzeSchedule(entry);
         }
 
         analyzeBackground().then();
@@ -181,7 +181,7 @@ const load0 = async (entries: Map<string, Entry>, d: Data, parent?: Entry): Prom
             warn(`failed to read archive-like entry ${entry.name}`, e);
         }
     } else {
-        scheduleAnalysis(entry);
+        analyzeSchedule(entry);
     }
 
     results.push({ entry, created: true });

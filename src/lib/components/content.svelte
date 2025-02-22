@@ -45,7 +45,7 @@
                 {/snippet}
             </Pane>
             <Pane
-                size={20}
+                size={30}
                 position={TabPosition.SECONDARY_RIGHT}
                 handleBefore
                 hidden={!secondaryRight.current?.open}
