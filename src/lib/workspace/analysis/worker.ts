@@ -1,44 +1,48 @@
-import { read, type Member, type Node } from "@run-slicer/asm";
+import { type Node, read } from "@run-slicer/asm";
 import { formatEntry } from "@run-slicer/asm/analysis/disasm";
-import type { Entry as PoolEntry } from "@run-slicer/asm/pool";
+import { ConstantType } from "@run-slicer/asm/spec";
 import { expose } from "comlink";
-import { QueryFlag, type SearchData } from "./search";
+import { type SearchData, SearchMode, type SearchResultData } from "./search";
 
 export interface Worker {
     read(data: Uint8Array, flags: number): Promise<Node>;
 
-    searchPoolEntry(data: SearchData): Promise<PoolEntry[]>;
-    searchMember(data: SearchData): Promise<Member[]>;
+    searchPoolEntry(data: SearchData): Promise<SearchResultData[]>;
+    searchMember(data: SearchData): Promise<SearchResultData[]>;
 }
 
-const createComparator = (value: string, flags: number): ((v: string) => boolean) => {
-    if ((flags & QueryFlag.CASE_INSENSITIVE) !== 0) {
-        value = value.toLowerCase();
+const createComparator = (value: string, mode: SearchMode): ((v: string) => boolean) => {
+    switch (mode) {
+        case SearchMode.PARTIAL_MATCH:
+            return (v) => v.includes(value);
+        case SearchMode.EXACT_MATCH:
+            return (v) => v === value;
+        case SearchMode.REGEXP:
+            const regex = new RegExp(value);
+            return (v) => regex.test(v);
     }
-
-    return (v) => {
-        if ((flags & QueryFlag.CASE_INSENSITIVE) !== 0) {
-            v = v.toLowerCase();
-        }
-
-        return (flags & QueryFlag.EXACT_MATCH) !== 0 ? v === value : v.includes(value);
-    };
 };
 
 expose({
     async read(buf: Uint8Array, flags: number): Promise<Node> {
         return read(buf, flags);
     },
-    async searchPoolEntry(data: SearchData): Promise<PoolEntry[]> {
-        const { node, value, flags } = data;
-        const comparator = createComparator(value, flags);
+    async searchPoolEntry({ node, value, mode }: SearchData): Promise<SearchResultData[]> {
+        const comparator = createComparator(value, mode);
 
-        return node.pool.filter((e) => e && comparator(formatEntry(e, node.pool))) as PoolEntry[];
+        return node.pool
+            .filter((e) => e !== null)
+            .map((e) => ({ value: `${ConstantType[e.type]} ${formatEntry(e, node.pool)}` }))
+            .filter((e) => comparator(e.value));
     },
-    async searchMember(data: SearchData): Promise<Member[]> {
-        const { node, value, flags } = data;
-        const comparator = createComparator(value, flags);
+    async searchMember({ node, value, mode }: SearchData): Promise<SearchResultData[]> {
+        const comparator = createComparator(value, mode);
 
-        return [...node.fields, ...node.methods].filter((m) => comparator(`${m.name.string} ${m.type.string}`));
+        return [...node.fields, ...node.methods]
+            .map((m) => ({
+                value: `${m.type.string[0] === "(" ? "method" : "field"} ${m.name.string} ${m.type.string}`,
+                member: m,
+            }))
+            .filter((m) => comparator(m.value));
     },
 } satisfies Worker);

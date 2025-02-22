@@ -2,12 +2,10 @@ import { error } from "$lib/log";
 import { analysisBackground } from "$lib/state";
 import { recordProgress } from "$lib/task";
 import { FLAG_SKIP_ATTR } from "@run-slicer/asm";
-import { formatEntry } from "@run-slicer/asm/analysis/disasm";
-import { ConstantType } from "@run-slicer/asm/spec";
 import { wrap } from "comlink";
 import { get } from "svelte/store";
 import { type ClassEntry, type Entry, EntryType } from "../";
-import { QueryFlag, QueryType, type SearchData, type SearchQuery, type SearchResult } from "./search";
+import { QueryType, type SearchData, SearchMode, type SearchQuery, type SearchResult } from "./search";
 import type { Worker as AnalysisWorker } from "./worker";
 import Worker from "./worker?worker";
 
@@ -84,33 +82,28 @@ export const analyzeBackground = async () => {
     });
 };
 
-export { QueryFlag, QueryType, type SearchQuery, type SearchResult };
+export { QueryType, SearchMode, type SearchQuery, type SearchResult };
 
 export const search = async (entries: Entry[], query: SearchQuery, onResult: (result: SearchResult) => void) => {
+    entries = entries.filter((e) => e.type === EntryType.CLASS);
+
     await recordProgress("searching", null, async (task) => {
         for (let i = 0; i < entries.length; i++) {
-            const entry = entries[i];
-            if (entry.type === EntryType.CLASS) {
-                const data: SearchData = { node: (entry as ClassEntry).node, value: query.value, flags: query.flags };
-                switch (query.type) {
-                    case QueryType.POOL_ENTRY: {
-                        for (const e of await worker.searchPoolEntry(data)) {
-                            onResult({
-                                value: `${ConstantType[e.type]} ${formatEntry(e, data.node.pool)}`,
-                                entry,
-                            });
-                        }
-                        break;
+            const entry = entries[i] as ClassEntry;
+
+            const data: SearchData = { node: entry.node, value: query.value, mode: query.mode };
+            switch (query.type) {
+                case QueryType.POOL_ENTRY: {
+                    for (const d of await worker.searchPoolEntry(data)) {
+                        onResult({ ...d, entry });
                     }
-                    case QueryType.MEMBER: {
-                        for (const m of await worker.searchMember(data)) {
-                            onResult({
-                                value: `${m.name.string} ${m.type.string}`,
-                                entry,
-                            });
-                        }
-                        break;
+                    break;
+                }
+                case QueryType.MEMBER: {
+                    for (const d of await worker.searchMember(data)) {
+                        onResult({ ...d, entry });
                     }
+                    break;
                 }
             }
 

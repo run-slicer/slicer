@@ -1,7 +1,7 @@
 <script lang="ts" module>
-    import { QueryType } from "$lib/workspace/analysis";
+    import { QueryType, SearchMode } from "$lib/workspace/analysis";
 
-    export const choices = [
+    export const types = [
         {
             value: QueryType.POOL_ENTRY,
             label: "Constant pool",
@@ -9,6 +9,20 @@
         {
             value: QueryType.MEMBER,
             label: "Members",
+        },
+    ];
+    export const modes = [
+        {
+            value: SearchMode.PARTIAL_MATCH,
+            label: "Partial match",
+        },
+        {
+            value: SearchMode.EXACT_MATCH,
+            label: "Exact match",
+        },
+        {
+            value: SearchMode.REGEXP,
+            label: "Regular expression",
         },
     ];
 </script>
@@ -21,30 +35,40 @@
         DropdownMenuContent,
         DropdownMenuRadioGroup,
         DropdownMenuRadioItem,
+        DropdownMenuSeparator,
     } from "$lib/components/ui/dropdown-menu";
     import { cn } from "$lib/components/utils";
     import { ChevronsUpDown } from "lucide-svelte";
 
     interface Props {
-        value: QueryType;
+        type: QueryType;
+        mode: SearchMode;
+        disabled?: boolean;
     }
 
-    let { value = $bindable() }: Props = $props();
+    let { type = $bindable(), mode = $bindable(), disabled }: Props = $props();
 
-    let current = $derived(choices.find((c) => c.value === value)!);
+    let currentType = $derived(types.find((t) => t.value === type)!);
 </script>
 
 <DropdownMenu>
     <DropdownMenuTrigger
+        {disabled}
         class={cn(buttonVariants({ variant: "outline" }), "min-w-44 justify-between rounded-r-none border-r-0")}
     >
-        {current.label}
+        {currentType.label}
         <ChevronsUpDown class="opacity-50" />
     </DropdownMenuTrigger>
     <DropdownMenuContent class="w-44" align="start">
-        <DropdownMenuRadioGroup bind:value>
-            {#each choices as choice}
-                <DropdownMenuRadioItem value={choice.value}>{choice.label}</DropdownMenuRadioItem>
+        <DropdownMenuRadioGroup bind:value={type}>
+            {#each types as type}
+                <DropdownMenuRadioItem value={type.value}>{type.label}</DropdownMenuRadioItem>
+            {/each}
+        </DropdownMenuRadioGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuRadioGroup bind:value={mode}>
+            {#each modes as mode}
+                <DropdownMenuRadioItem value={mode.value}>{mode.label}</DropdownMenuRadioItem>
             {/each}
         </DropdownMenuRadioGroup>
     </DropdownMenuContent>

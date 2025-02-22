@@ -1,29 +1,38 @@
-import type { Entry } from "$lib/workspace";
-import type { Node } from "@run-slicer/asm";
+import type { ClassEntry } from "$lib/workspace";
+import type { Member, Node } from "@run-slicer/asm";
 
 export enum QueryType {
     POOL_ENTRY = "pool_entry",
     MEMBER = "member",
 }
 
-export const enum QueryFlag {
-    CASE_INSENSITIVE = 1 << 0,
-    EXACT_MATCH = 1 << 1,
+export enum SearchMode {
+    PARTIAL_MATCH = "partial_match",
+    EXACT_MATCH = "exact_match",
+    REGEXP = "regexp",
 }
 
 export interface SearchQuery {
     type: QueryType;
     value: string;
-    flags: number;
+    mode: SearchMode;
 }
 
 export interface SearchResult {
     value: string;
-    entry: Entry;
+    entry: ClassEntry;
+    member?: Member;
 }
+
+// for marshalling over the worker barrier
 
 export interface SearchData {
     node: Node;
     value: string;
-    flags: number;
+    mode: SearchMode;
+}
+
+export interface SearchResultData {
+    value: string;
+    member?: Member;
 }
