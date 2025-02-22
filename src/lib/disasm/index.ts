@@ -9,6 +9,7 @@ import { cfr, jasm, procyon, slicer, vf } from "./builtin";
 export interface Disassembler {
     id: string;
     name?: string;
+    version?: string;
     language?: Language;
     concurrency?: number;
     options?: Record<string, string>;
@@ -19,11 +20,11 @@ export interface Disassembler {
 
 export const all = writable<Map<string, Disassembler>>(
     new Map([
+        [slicer.id, slicer],
         [jasm.id, jasm],
         [cfr.id, cfr],
         [vf.id, vf],
         [procyon.id, procyon],
-        [slicer.id, slicer],
     ])
 );
 

@@ -11,6 +11,7 @@ export const cfr: Disassembler = createFromWorker(
     {
         id: "cfr",
         name: "CFR",
+        version: "0.152",
         language: "java",
         concurrency: 5,
     },
@@ -22,6 +23,7 @@ export const jasm: Disassembler = createFromWorker(
     {
         id: "jasm",
         name: "JASM",
+        version: "2.7.0",
         language: "jasm",
         concurrency: 5,
     },
@@ -33,6 +35,7 @@ export const vf: Disassembler = createFromWorker(
     {
         id: "vf",
         name: "Vineflower",
+        version: "1.10.1",
         language: "java",
         concurrency: 5,
     },
@@ -44,6 +47,7 @@ export const procyon: Disassembler = createFromWorker(
     {
         id: "procyon",
         name: "Procyon",
+        version: "0.6.0",
         language: "java",
         concurrency: 5,
     },

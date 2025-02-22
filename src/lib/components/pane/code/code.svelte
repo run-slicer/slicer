@@ -66,8 +66,9 @@
                 </SelectTrigger>
                 <SelectContent class="max-h-[240px] w-full overflow-scroll" side="top" align="end">
                     {#each usableDisasms as dism (dism.id)}
-                        <SelectItem value={dism.id} label={dism.id} class="text-xs tracking-tight">
-                            {dism.name || dism.id}
+                        <SelectItem value={dism.id} label={dism.id} class="justify-between text-xs tracking-tight">
+                            <span>{dism.name || dism.id}</span>
+                            {#if dism.version}<span class="text-muted-foreground">{dism.version}</span>{/if}
                         </SelectItem>
                     {/each}
                 </SelectContent>
