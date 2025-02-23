@@ -25,7 +25,7 @@
 </script>
 
 {#await readEntry(entry)}
-    <Loading value="Reading..." />
+    <Loading value="Reading..." timed />
 {:then result}
     <div class="flex h-8 min-h-8 w-full flex-col">
         <div class="flex grow flex-row items-center gap-4 bg-background px-2 text-xs">

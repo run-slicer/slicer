@@ -100,7 +100,7 @@
 </script>
 
 {#await entry.data.blob()}
-    <Loading value="Reading..." />
+    <Loading value="Reading..." timed />
 {:then blob}
     <div class="flex h-8 min-h-8 w-full flex-col">
         <div class="flex grow flex-row items-center justify-between bg-background px-2">

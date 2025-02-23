@@ -48,7 +48,7 @@
 
 <div class="relative basis-full overflow-hidden scrollbar-thin">
     {#await Promise.all([loadLanguage(language), readPromise])}
-        <Loading value={shouldDisasm ? "Disassembling..." : "Reading..."} />
+        <Loading value={shouldDisasm ? "Disassembling..." : "Reading..."} timed />
     {:then [lang, value]}
         <ContextMenu>
             <ContextMenuTrigger>

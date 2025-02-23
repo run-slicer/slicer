@@ -55,7 +55,7 @@
         <ContextMenu>
             <ContextMenuTrigger class="h-full w-full">
                 {#await createComputedGraph(member, pool, showHandlerEdges)}
-                    <Loading value="Computing graph..." />
+                    <Loading value="Computing graph..." timed />
                 {:then [nodes, edges]}
                     <SvelteFlow
                         id={cyrb53(tab.id).toString(16)}
