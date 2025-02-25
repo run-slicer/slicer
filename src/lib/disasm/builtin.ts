@@ -35,7 +35,7 @@ export const vf: Disassembler = createFromWorker(
     {
         id: "vf",
         name: "Vineflower",
-        version: "1.10.1",
+        version: "1.11.0",
         language: "java",
         concurrency: 5,
     },
