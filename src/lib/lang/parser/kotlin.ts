@@ -1,6 +1,6 @@
 import { LanguageSupport, StreamLanguage } from "@codemirror/language";
-import { properties as parser } from "@codemirror/legacy-modes/mode/properties";
+import { kotlin as parser } from "@codemirror/legacy-modes/mode/clike";
 
-export const properties = (): LanguageSupport => {
+export const kotlin = (): LanguageSupport => {
     return new LanguageSupport(StreamLanguage.define(parser));
 };

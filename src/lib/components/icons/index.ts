@@ -27,6 +27,7 @@ import {
 } from "lucide-svelte";
 import type { ComponentType } from "svelte";
 import GitHub from "./github.svelte";
+import Kotlin from "./kotlin.svelte";
 
 export type Icon = ComponentType<LucideIcon> /* Component<IconProps> */;
 
@@ -66,6 +67,9 @@ export const fileIcon = (label: string): StyledIcon => {
             case "java":
             case "class":
                 return { icon: Coffee, classes: ["text-red-500"] };
+            case "kt":
+            case "kts":
+                return { icon: Kotlin as unknown as Icon };
             case "json":
                 return { icon: Braces, classes: ["text-green-500"] };
             case "jpg":
