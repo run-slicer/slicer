@@ -1,3 +1,7 @@
+import type { Language } from "$lib/lang";
+import type { ClassEntry } from "$lib/workspace";
+import type { UTF8Entry } from "@run-slicer/asm/pool";
+import { ConstantType } from "@run-slicer/asm/spec";
 import { wrap } from "comlink";
 import type { Disassembler } from "./";
 import { createFromWorker, createInternalFromWorker, type InternalWorker, type Worker } from "./worker";
@@ -38,6 +42,15 @@ export const vf: Disassembler = createFromWorker(
         version: "1.11.0",
         language: "java",
         concurrency: 5,
+        languageContextual(entry: ClassEntry): Language {
+            const pool = entry.node.pool;
+
+            // search for annotation descriptor
+            const hasMeta = pool.some((e) => {
+                return e?.type === ConstantType.UTF8 && (e as UTF8Entry).string === "Lkotlin/Metadata;";
+            });
+            return (this.options?.["kt-enable"] ?? "1") === "1" && hasMeta ? "kotlin" : "java";
+        },
     },
     () => wrap<Worker>(new VFWorker()),
     false

@@ -13,7 +13,9 @@ export const detectLanguage = (tabType: TabType, entry: Entry, disasm: Disassemb
         return "hex";
     } else if (entry.type === EntryType.CLASS || entry.type === EntryType.MEMBER) {
         // disassembled view
-        return disasm.language || "plaintext";
+        const classEntry = entry as ClassEntry;
+
+        return disasm.languageContextual?.(classEntry) || disasm.language || "plaintext";
     }
 
     return entry.extension ? fromExtension(entry.extension) : "plaintext";

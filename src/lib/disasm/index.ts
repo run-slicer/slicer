@@ -14,6 +14,8 @@ export interface Disassembler {
     concurrency?: number;
     options?: Record<string, string>;
 
+    languageContextual?: (entry: ClassEntry) => Language;
+
     class: (entry: ClassEntry) => Promise<string>;
     method?: (entry: ClassEntry, method: Member) => Promise<string>;
 }
@@ -72,5 +74,9 @@ export const disassembleMethod = async (entry: ClassEntry, method: Member, disas
 };
 
 export const disassembleEntry = async (entry: ClassEntry, disasm: Disassembler): Promise<Entry> => {
-    return transformEntry(entry, toExtension(disasm.language || "plaintext"), await disassemble(entry, disasm));
+    return transformEntry(
+        entry,
+        toExtension(disasm.languageContextual?.(entry) || disasm.language || "plaintext"),
+        await disassemble(entry, disasm)
+    );
 };
