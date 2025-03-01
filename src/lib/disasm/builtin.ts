@@ -4,7 +4,7 @@ import type { UTF8Entry } from "@run-slicer/asm/pool";
 import { ConstantType } from "@run-slicer/asm/spec";
 import { wrap } from "comlink";
 import type { Disassembler } from "./";
-import { createFromWorker, createInternalFromWorker, type InternalWorker, type Worker } from "./worker";
+import { createFromWorker, type Worker } from "./worker";
 import CFRWorker from "./worker/cfr?worker";
 import JASMWorker from "./worker/jasm?worker";
 import ProcyonWorker from "./worker/procyon?worker";
@@ -68,13 +68,13 @@ export const procyon: Disassembler = createFromWorker(
     false
 );
 
-export const slicer: Disassembler = createInternalFromWorker(
+export const slicer: Disassembler = createFromWorker(
     {
         id: "slicer",
         name: "slicer",
         language: "java",
         concurrency: 5,
     },
-    () => wrap<InternalWorker>(new SlicerWorker()),
+    () => wrap<Worker>(new SlicerWorker()),
     true
 );
