@@ -10,6 +10,7 @@
     import PaneMenu from "./menu.svelte";
     import { Plus } from "lucide-svelte";
     import { paneIcon } from "$lib/components/icons";
+    import type { PaneAPI } from "paneforge";
 
     interface Props {
         tabs: Tab[];
@@ -49,10 +50,36 @@
     };
 
     let Icon = $derived(paneIcon(position, false));
+
+    // update PaneForge's internal size, so we don't get weird resizing behavior
+    let pane: PaneAPI | undefined = $state();
+    let collapsed = $state(hidden ?? false);
+    $effect(() => {
+        if (!pane || typeof pane.getSize() !== "number" /* too early? */) return;
+
+        if (hidden) {
+            pane.collapse();
+            collapsed = true;
+        } else if (collapsed) {
+            pane.expand();
+            collapsed = false;
+
+            const currentSize = pane.getSize();
+            if (currentSize <= 0) {
+                pane.resize(size ?? 20);
+            }
+        }
+    });
 </script>
 
 {#if handleBefore}<ResizableHandle class={cn(hidden && "hidden")} />{/if}
-<ResizablePane defaultSize={size} class={cn(hidden && "hidden")}>
+<ResizablePane
+    defaultSize={hidden ? 0 : size}
+    collapsedSize={0}
+    collapsible
+    class={cn(hidden && "hidden")}
+    bind:this={pane}
+>
     <div class="flex h-full w-full flex-col">
         <PaneHeader>
             <div
