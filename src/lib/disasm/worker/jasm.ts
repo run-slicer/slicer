@@ -11,7 +11,7 @@ expose({
     async class(name: string, _resources: string[], source: EntrySource, options?: Options): Promise<string> {
         const data = await source(name);
         if (!data) {
-            return "";
+            throw new Error("Class not found");
         }
 
         const { disassemble } = await import("@run-slicer/jasm");
@@ -20,7 +20,7 @@ expose({
     async method(name: string, signature: string, source: EntrySource, options?: Options): Promise<string> {
         const data = await source(name);
         if (!data) {
-            return "";
+            throw new Error("Class not found");
         }
 
         const { disassemble } = await import("@run-slicer/jasm");

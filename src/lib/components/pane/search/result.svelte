@@ -11,13 +11,14 @@
 
     let { result, handler }: Props = $props();
 
-    const handleOpen = () =>
-        handler.open(
-            result.member?.type?.string?.charAt(0) === "(" /* method */
-                ? memberEntry(result.entry, result.member)
-                : result.entry,
-            TabType.CODE
+    const handleOpen = async () => {
+        const method = result.member?.type?.string?.charAt(0) === "(";
+
+        await handler.open(
+            method ? memberEntry(result.entry, result.member!) : result.entry,
+            method ? TabType.CODE : TabType.CLASS,
         );
+    };
 </script>
 
 <div

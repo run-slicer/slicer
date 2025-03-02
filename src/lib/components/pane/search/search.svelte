@@ -60,7 +60,7 @@
             placeholder="Search anything..."
             type="text"
             bind:value
-            class="z-10 rounded-l-none rounded-r-none"
+            class="z-10 rounded-l-none rounded-r-none border-r-0"
             onkeydown={handleSearch}
             disabled={searching}
         />
