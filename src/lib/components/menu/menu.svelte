@@ -22,6 +22,7 @@
         ScriptDeleteDialog,
         ScriptDialog,
         ScriptLoadDialog,
+        ScriptLoadShareDialog,
     } from "$lib/components/dialog";
     import {
         Menubar,
@@ -93,6 +94,14 @@
     let scriptLoadOpen = $state(false);
     let scriptDeleteOpen: ProtoScript | null = $state(null);
     let scriptInfoOpen: ProtoScript | null = $state(null);
+
+    let scriptShareUrl: string | null = $state(new URLSearchParams(window.location.search).get("script"));
+    $effect(() => {
+        if (!scriptShareUrl) {
+            // clear search params on dialog close
+            window.history.replaceState(null, "", window.location.pathname);
+        }
+    });
 
     const openEntry = (tabType: TabType) => handler.open(entry!, tabType);
 
@@ -350,4 +359,5 @@
 <ScriptDialog bind:proto={scriptInfoOpen} />
 <ScriptLoadDialog bind:open={scriptLoadOpen} {handler} />
 <ScriptDeleteDialog bind:proto={scriptDeleteOpen} {handler} />
+<ScriptLoadShareDialog bind:url={scriptShareUrl} {handler} />
 <ClearDialog bind:open={clearOpen} {handler} />

@@ -16,7 +16,7 @@
 
         await handler.open(
             method ? memberEntry(result.entry, result.member!) : result.entry,
-            method ? TabType.CODE : TabType.CLASS,
+            method ? TabType.CODE : TabType.CLASS
         );
     };
 </script>

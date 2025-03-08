@@ -17,7 +17,7 @@ export interface EventHandler {
     export(entries?: Entry[], disasm?: Disassembler): Awaitable<void>;
     close(tab?: Tab): Awaitable<void>;
 
-    addScript(url?: string): Awaitable<void>;
+    addScript(url?: string, load?: boolean): Awaitable<void>;
     loadScript(proto: ProtoScript): Awaitable<void>;
     unloadScript(proto: ProtoScript): Awaitable<void>;
     removeScript(proto: ProtoScript): Awaitable<void>;

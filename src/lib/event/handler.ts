@@ -252,7 +252,7 @@ export default {
             removeTab(tab);
         }
     },
-    async addScript(url?: string): Promise<void> {
+    async addScript(url?: string, load?: boolean): Promise<void> {
         if (!url) {
             if (!navigator.clipboard) {
                 toast.error("Error occurred", {
@@ -277,6 +277,10 @@ export default {
         toast.success("Imported", {
             description: `Imported script ${proto.id}.`,
         });
+
+        if (load) {
+            await loadScript(proto);
+        }
     },
     loadScript,
     unloadScript,

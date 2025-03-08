@@ -28,7 +28,7 @@
     };
 </script>
 
-<AlertDialog open={proto !== null} onOpenChange={() => (proto = null)} controlledOpen>
+<AlertDialog open={proto !== null} onOpenChange={() => (proto = null)}>
     <AlertDialogContent class="sm:max-w-[425px]">
         {#if proto}
             <AlertDialogHeader>

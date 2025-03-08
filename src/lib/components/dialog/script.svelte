@@ -10,7 +10,7 @@
     let { proto = $bindable(null) }: Props = $props();
 </script>
 
-<Dialog open={proto !== null} onOpenChange={() => (proto = null)} controlledOpen>
+<Dialog open={proto !== null} onOpenChange={() => (proto = null)}>
     <DialogContent class="flex h-1/2 flex-col sm:max-w-2xl">
         {#if proto}
             <div class="flex flex-col gap-4">

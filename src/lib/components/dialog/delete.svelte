@@ -28,7 +28,7 @@
     };
 </script>
 
-<AlertDialog open={entries !== null} onOpenChange={() => (entries = null)} controlledOpen>
+<AlertDialog open={entries !== null} onOpenChange={() => (entries = null)}>
     <AlertDialogContent class="sm:max-w-[425px]">
         {#if entries}
             <AlertDialogHeader>
