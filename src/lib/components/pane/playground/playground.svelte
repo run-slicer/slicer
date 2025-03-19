@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { PaneProps } from "$lib/components/pane";
-    import { ChevronsRight } from "lucide-svelte";
+    import { ChevronsRight } from "@lucide/svelte";
     import { type Result, evalContext } from "./repl";
     import ResultLine from "./result.svelte";
     import { onMount } from "svelte";

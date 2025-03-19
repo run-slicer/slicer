@@ -13,7 +13,7 @@
 </script>
 
 <script lang="ts">
-    import { Plus } from "lucide-svelte";
+    import { Plus } from "@lucide/svelte";
     import { Button } from "$lib/components/ui/button";
     import { ContextMenu, ContextMenuTrigger } from "$lib/components/ui/context-menu";
     import { DeleteDialog } from "$lib/components/dialog";

@@ -8,7 +8,7 @@
     import { type Snippet, untrack } from "svelte";
     import { ResizableHandle } from "$lib/components/ui/resizable";
     import PaneMenu from "./menu.svelte";
-    import { Plus } from "lucide-svelte";
+    import { Plus } from "@lucide/svelte";
     import { paneIcon } from "$lib/components/icons";
     import type { PaneAPI } from "paneforge";
 

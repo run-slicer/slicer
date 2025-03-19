@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Binary, Code, Download, FileCode2, Gauge, GitBranchPlus, Image, Trash2 } from "lucide-svelte";
+    import { Binary, Code, Download, FileCode2, Gauge, GitBranchPlus, Image, Trash2 } from "@lucide/svelte";
     import { EntryType } from "$lib/workspace";
     import { TabType } from "$lib/tab";
     import type { Node } from "./node.svelte";

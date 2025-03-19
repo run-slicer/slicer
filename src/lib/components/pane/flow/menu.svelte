@@ -13,7 +13,7 @@
     import { downloadUrl, prettyMethodDesc } from "$lib/utils";
     import type { Node, Member } from "@run-slicer/asm";
     import type { UTF8Entry } from "@run-slicer/asm/pool";
-    import { CodeXml, Image } from "lucide-svelte";
+    import { CodeXml, Image } from "@lucide/svelte";
 
     interface Props {
         node: Node | null;

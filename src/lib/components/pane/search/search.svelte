@@ -6,7 +6,7 @@
     import Dropdown from "./dropdown.svelte";
     import { VList } from "virtua/svelte";
     import { Button } from "$lib/components/ui/button";
-    import { X } from "lucide-svelte";
+    import { X } from "@lucide/svelte";
     import { untrack } from "svelte";
 
     let { entries, handler }: PaneProps = $props();

@@ -5,7 +5,7 @@
     import { Separator } from "$lib/components/ui/separator";
     import type { Entry } from "$lib/workspace";
     import { error } from "$lib/log";
-    import { FileQuestion } from "lucide-svelte";
+    import { FileQuestion } from "@lucide/svelte";
     import Table from "./table.svelte";
     import { humanSize } from "$lib/utils";
     import type { PaneProps } from "$lib/components/pane";

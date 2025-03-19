@@ -18,7 +18,7 @@
     import { humanSize, prettyJavaType } from "$lib/utils";
     import { Input } from "$lib/components/ui/input";
     import { Button } from "$lib/components/ui/button";
-    import { ChevronLeft, ChevronRight } from "lucide-svelte";
+    import { ChevronLeft, ChevronRight } from "@lucide/svelte";
     import { cn } from "$lib/components/utils";
     import { createSvelteTable, FlexRender, renderComponent } from "$lib/components/ui/data-table";
     import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "$lib/components/ui/table";

@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { Result } from "./repl";
     import { prettyError, prettyObject } from "$lib/utils";
-    import { ArrowLeft, ChevronsRight, CircleAlert } from "lucide-svelte";
+    import { ArrowLeft, ChevronsRight, CircleAlert } from "@lucide/svelte";
     import { cn } from "$lib/components/utils";
 
     interface Props {

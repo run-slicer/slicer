@@ -3,7 +3,7 @@
     import { onMount } from "svelte";
     import type { Entry } from "$lib/workspace";
     import { fileIcon } from "$lib/components/icons";
-    import { Search } from "lucide-svelte";
+    import { Search } from "@lucide/svelte";
     import { cn } from "$lib/components/utils";
     import { VList } from "virtua/svelte";
     import type { EventHandler } from "$lib/event";

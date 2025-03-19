@@ -9,7 +9,7 @@
     } from "$lib/components/ui/menubar";
     import { type ProtoScript, ScriptState } from "$lib/script";
     import ScriptOption from "./option.svelte";
-    import { Info, Trash2 } from "lucide-svelte";
+    import { Info, Trash2 } from "@lucide/svelte";
     import type { EventHandler } from "$lib/event";
 
     interface Props {

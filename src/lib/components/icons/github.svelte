@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Icon, type IconNode, type IconProps } from "lucide-svelte";
+    import { Icon, type IconNode, type IconProps } from "@lucide/svelte";
 
     let props: IconProps = $props();
 

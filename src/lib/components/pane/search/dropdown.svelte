@@ -42,7 +42,7 @@
         DropdownMenuSeparator,
     } from "$lib/components/ui/dropdown-menu";
     import { cn } from "$lib/components/utils";
-    import { ChevronsUpDown } from "lucide-svelte";
+    import { ChevronsUpDown } from "@lucide/svelte";
 
     interface Props {
         type: QueryType;

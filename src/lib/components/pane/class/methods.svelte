@@ -7,7 +7,7 @@
         DropdownMenuItem,
         DropdownMenuTrigger,
     } from "$lib/components/ui/dropdown-menu";
-    import { Code, Ellipsis, GitBranchPlus } from "lucide-svelte";
+    import { Code, Ellipsis, GitBranchPlus } from "@lucide/svelte";
     import { Button } from "$lib/components/ui/button";
     import { type ClassEntry, memberEntry } from "$lib/workspace";
     import { TabType } from "$lib/tab";

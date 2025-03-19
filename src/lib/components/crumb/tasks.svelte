@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { Task } from "$lib/task";
-    import { LoaderCircle } from "lucide-svelte";
+    import { LoaderCircle } from "@lucide/svelte";
     import { capitalize } from "$lib/utils";
     import { Popover, PopoverContent, PopoverTrigger } from "$lib/components/ui/popover";
     import TaskComponent from "./task.svelte";

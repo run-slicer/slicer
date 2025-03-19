@@ -11,7 +11,7 @@
         ContextMenuSeparator,
     } from "$lib/components/ui/context-menu";
     import ContextMenuLabel from "$lib/components/menu_label.svelte";
-    import { Binary, CaseSensitive, Code, WrapText } from "lucide-svelte";
+    import { Binary, CaseSensitive, Code, WrapText } from "@lucide/svelte";
     import { type Language, toExtension } from "$lib/lang";
     import { isDisassembled } from "./";
     import type { EventHandler } from "$lib/event";

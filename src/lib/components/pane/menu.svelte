@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { ChevronsUpDown } from "lucide-svelte";
+    import { ChevronsUpDown } from "@lucide/svelte";
     import {
         Command,
         CommandEmpty,

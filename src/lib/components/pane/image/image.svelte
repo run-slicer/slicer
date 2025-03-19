@@ -5,7 +5,7 @@
     import { cubicOut } from "svelte/easing";
     import { onDestroy } from "svelte";
     import { humanSize } from "$lib/utils";
-    import { Fullscreen, ZoomIn, ZoomOut } from "lucide-svelte";
+    import { Fullscreen, ZoomIn, ZoomOut } from "@lucide/svelte";
     import MenuButton from "./menu_button.svelte";
     import type { PaneProps } from "$lib/components/pane";
 

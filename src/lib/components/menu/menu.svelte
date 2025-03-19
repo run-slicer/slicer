@@ -53,7 +53,7 @@
         SendToBack,
         Settings,
         Sun,
-    } from "lucide-svelte";
+    } from "@lucide/svelte";
     import { themes } from "$lib/theme";
     import type { Disassembler } from "$lib/disasm";
     import type { EventHandler } from "$lib/event";

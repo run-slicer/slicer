@@ -24,12 +24,12 @@ import {
     Sparkles,
     Text,
     TextQuote,
-} from "lucide-svelte";
-import type { ComponentType } from "svelte";
+} from "@lucide/svelte";
+import type { Component } from "svelte";
 import GitHub from "./github.svelte";
 import Kotlin from "./kotlin.svelte";
 
-export type Icon = ComponentType<LucideIcon> /* Component<IconProps> */;
+export type Icon = Component<LucideIcon>;
 
 export interface StyledIcon {
     icon: Icon;
@@ -69,7 +69,7 @@ export const fileIcon = (label: string): StyledIcon => {
                 return { icon: Coffee, classes: ["text-red-500"] };
             case "kt":
             case "kts":
-                return { icon: Kotlin as unknown as Icon };
+                return { icon: Kotlin };
             case "json":
                 return { icon: Braces, classes: ["text-green-500"] };
             case "jpg":

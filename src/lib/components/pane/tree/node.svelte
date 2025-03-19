@@ -13,7 +13,7 @@
 <script lang="ts">
     import type { HTMLAttributes } from "svelte/elements";
     import TreeNode from "./node.svelte";
-    import { ChevronDown, ChevronRight, Folder } from "lucide-svelte";
+    import { ChevronDown, ChevronRight, Folder } from "@lucide/svelte";
     import { cn } from "$lib/components/utils";
     import { fileIcon } from "$lib/components/icons";
 

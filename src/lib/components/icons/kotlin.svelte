@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { IconProps } from "lucide-svelte";
+    import type { IconProps } from "@lucide/svelte";
     import { cn } from "$lib/components/utils";
 
     let { size, class: className }: IconProps = $props();

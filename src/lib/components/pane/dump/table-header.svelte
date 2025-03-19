@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-svelte";
+    import { ArrowDown, ArrowUp, ArrowUpDown } from "@lucide/svelte";
 
     interface Props {
         text: string;

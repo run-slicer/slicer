@@ -10,7 +10,7 @@
 
 <script lang="ts">
     import { userPrefersMode } from "mode-watcher";
-    import { FilePlus2, Folder, Moon, Settings, Sun } from "lucide-svelte";
+    import { FilePlus2, Folder, Moon, Settings, Sun } from "@lucide/svelte";
     import { ToggleGroup, ToggleGroupItem } from "$lib/components/ui/toggle-group";
     import { Button } from "$lib/components/ui/button";
     import type { PaneProps } from "$lib/components/pane";

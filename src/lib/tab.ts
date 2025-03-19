@@ -2,7 +2,7 @@ import { type Icon, type StyledIcon, tabIcon } from "$lib/components/icons";
 import { error } from "$lib/log";
 import { panes, workspaceEncoding } from "$lib/state";
 import { type Entry, EntryType, readDeferred } from "$lib/workspace";
-import { Box, Folders, ScrollText, Search, Sparkles } from "lucide-svelte";
+import { Box, Folders, ScrollText, Search, Sparkles } from "@lucide/svelte";
 import { derived, get, writable } from "svelte/store";
 
 export enum TabType {

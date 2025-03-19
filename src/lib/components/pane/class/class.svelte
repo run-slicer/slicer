@@ -2,7 +2,7 @@
     import { TabType } from "$lib/tab";
     import type { ClassEntry } from "$lib/workspace";
     import { Tabs, TabsList, TabsContent, TabsTrigger } from "$lib/components/ui/tabs";
-    import { Code, Ellipsis, FileQuestion, GitBranchPlus } from "lucide-svelte";
+    import { Code, Ellipsis, FileQuestion, GitBranchPlus } from "@lucide/svelte";
     import Pool from "./pool.svelte";
     import Fields from "./fields.svelte";
     import Methods from "./methods.svelte";

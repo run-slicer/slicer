@@ -1,7 +1,7 @@
 <script lang="ts">
     import { type ClassEntry, EntryType, type MemberEntry } from "$lib/workspace";
     import type { Member } from "@run-slicer/asm";
-    import { Zap, ZapOff } from "lucide-svelte";
+    import { Zap, ZapOff } from "@lucide/svelte";
     import { mode } from "mode-watcher";
     import {
         Background,
