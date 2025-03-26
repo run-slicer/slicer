@@ -15,7 +15,7 @@ export const detectLanguage = (tabType: TabType, entry: Entry, disasm: Disassemb
         // disassembled view
         const classEntry = entry as ClassEntry;
 
-        return disasm.languageContextual?.(classEntry) || disasm.language || "plaintext";
+        return disasm.language(classEntry) || "plaintext";
     }
 
     return entry.extension ? fromExtension(entry.extension) : "plaintext";

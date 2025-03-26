@@ -115,7 +115,7 @@ const wrapDisasm = (disasm: Disassembler): ScriptDisassembler => {
         id: disasm.id,
         label: disasm.name,
         version: disasm.version,
-        language: disasm.language,
+        language: disasm.language(),
         get options() {
             return disasm.options;
         },
@@ -200,7 +200,9 @@ const unwrapDisasm = (disasm: ScriptDisassembler): Disassembler => {
         id: disasm.id,
         name: disasm.label,
         version: disasm.version,
-        language: disasm.language as Language,
+        language(): Language {
+            return disasm.language as Language;
+        },
         get options() {
             return disasm.options;
         },

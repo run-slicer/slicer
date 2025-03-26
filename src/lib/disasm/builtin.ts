@@ -16,7 +16,7 @@ export const cfr: Disassembler = createFromWorker(
         id: "cfr",
         name: "CFR",
         version: "0.152",
-        language: "java",
+        language: () => "java",
         concurrency: 5,
     },
     () => wrap<Worker>(new CFRWorker()),
@@ -28,7 +28,7 @@ export const jasm: Disassembler = createFromWorker(
         id: "jasm",
         name: "JASM",
         version: "2.7.0",
-        language: "jasm",
+        language: () => "jasm",
         concurrency: 5,
     },
     () => wrap<Worker>(new JASMWorker()),
@@ -40,9 +40,12 @@ export const vf: Disassembler = createFromWorker(
         id: "vf",
         name: "Vineflower",
         version: "1.11.1",
-        language: "java",
         concurrency: 5,
-        languageContextual(entry: ClassEntry): Language {
+        language(entry?: ClassEntry): Language {
+            if (!entry) {
+                return "java";
+            }
+
             const pool = entry.node.pool;
 
             // search for annotation descriptor
@@ -61,7 +64,7 @@ export const procyon: Disassembler = createFromWorker(
         id: "procyon",
         name: "Procyon",
         version: "0.6.0",
-        language: "java",
+        language: () => "java",
         concurrency: 5,
     },
     () => wrap<Worker>(new ProcyonWorker()),
@@ -72,7 +75,7 @@ export const slicer: Disassembler = createFromWorker(
     {
         id: "slicer",
         name: "slicer",
-        language: "java",
+        language: () => "java",
         concurrency: 5,
     },
     () => wrap<Worker>(new SlicerWorker()),

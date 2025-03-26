@@ -10,11 +10,10 @@ export interface Disassembler {
     id: string;
     name?: string;
     version?: string;
-    language?: Language;
     concurrency?: number;
     options?: Record<string, string>;
 
-    languageContextual?: (entry: ClassEntry) => Language;
+    language: (entry?: ClassEntry) => Language;
 
     class: (entry: ClassEntry) => Promise<string>;
     method?: (entry: ClassEntry, method: Member) => Promise<string>;
@@ -74,9 +73,5 @@ export const disassembleMethod = async (entry: ClassEntry, method: Member, disas
 };
 
 export const disassembleEntry = async (entry: ClassEntry, disasm: Disassembler): Promise<Entry> => {
-    return transformEntry(
-        entry,
-        toExtension(disasm.languageContextual?.(entry) || disasm.language || "plaintext"),
-        await disassemble(entry, disasm)
-    );
+    return transformEntry(entry, toExtension(disasm.language(entry) || "plaintext"), await disassemble(entry, disasm));
 };
