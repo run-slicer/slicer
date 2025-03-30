@@ -55,20 +55,20 @@ export const register = (): DestroyCallback => {
     return () => callbacks.forEach((c) => c());
 };
 
-export const format = (key: string, mod: number): string => {
+export const format = (key: string, mod: number, short: boolean = false): string => {
     if (isMac) {
         return formatMac(key, mod);
     }
 
     let keys: string[] = [];
     if ((mod & Modifier.CTRL) !== 0) {
-        keys.push("Ctrl");
+        keys.push(short ? "C" : "Ctrl");
     }
     if ((mod & Modifier.ALT) !== 0) {
-        keys.push("Alt");
+        keys.push(short ? "A" : "Alt");
     }
     if ((mod & Modifier.SHIFT) !== 0) {
-        keys.push("Shift");
+        keys.push(short ? "S" : "Shift");
     }
 
     keys.push(key.toUpperCase());

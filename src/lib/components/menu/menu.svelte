@@ -239,6 +239,10 @@
         <MenubarMenu>
             <MenubarTrigger class="relative">View</MenubarTrigger>
             <MenubarContent align="start">
+                <MenubarItem class="justify-between" onclick={openSearch}>
+                    Search <Shortcut key="f" modifier={Modifier.CTRL | Modifier.SHIFT} />
+                </MenubarItem>
+                <MenubarSeparator />
                 <MenubarItem
                     class="justify-between"
                     disabled={!tab?.entry || tab.entry.type === EntryType.ARCHIVE || tab.type === TabType.CODE}
@@ -291,10 +295,6 @@
                 <MenubarCheckboxItem class="justify-between" bind:checked={$analysisBackground}>
                     Background <SendToBack size={16} />
                 </MenubarCheckboxItem>
-                <MenubarSeparator />
-                <MenubarItem class="justify-between" onclick={openSearch}>
-                    Search <Shortcut key="f" modifier={Modifier.CTRL | Modifier.SHIFT} />
-                </MenubarItem>
             </MenubarContent>
         </MenubarMenu>
         <MenubarMenu>

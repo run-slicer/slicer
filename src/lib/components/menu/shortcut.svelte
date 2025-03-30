@@ -5,9 +5,10 @@
     interface Props {
         key: string;
         modifier: number;
+        short?: boolean;
     }
 
-    let { key, modifier }: Props = $props();
+    let { key, modifier, short = false }: Props = $props();
 </script>
 
-<MenubarShortcut>{format(key, modifier)}</MenubarShortcut>
+<MenubarShortcut>{format(key, modifier, short)}</MenubarShortcut>
