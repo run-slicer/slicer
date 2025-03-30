@@ -29,7 +29,7 @@ import {
     recordTimed,
     remove as removeTask,
 } from "$lib/task";
-import { chunk, downloadBlob, partition, readFiles, timestampFile } from "$lib/utils";
+import { chunk, distribute, downloadBlob, partition, readFiles, timestampFile } from "$lib/utils";
 import {
     type ClassEntry,
     clear as clearWs,
@@ -191,6 +191,12 @@ export default {
             });
         }
 
+        // evenly distribute classes for more efficient disassembly
+        if (disasm) {
+            const [classes, others] = partition(entries, (e) => e.type === EntryType.CLASS);
+            entries = distribute(classes, others);
+        }
+
         return recordProgress("exporting", `${entries.length} entries`, async (exportTask) => {
             const channel = new Channel<Data>();
             const chunks = chunk(entries, Math.ceil(entries.length / (disasm?.concurrency || 1)));
@@ -200,19 +206,14 @@ export default {
                 const task = addTask(createTask("reading", null));
 
                 for (let entry of chunk) {
-                    task.desc.set(entry.name);
-                    // not always accurate, but less expensive to do
-                    task.name.set(disasm && entry.extension === "class" ? "disassembling" : "reading");
+                    entry = await readDeferred(entry);
 
-                    try {
-                        if (disasm) {
-                            entry = await readDeferred(entry);
-                            if (entry.type === EntryType.CLASS) {
-                                entry = await disassembleEntry(entry as ClassEntry, disasm);
-                            }
-                        }
-                    } catch (e) {
-                        error(`failed to read entry ${entry.name}`, e);
+                    const disassemble = disasm && entry.type === EntryType.CLASS;
+                    task.desc.set(entry.name);
+                    task.name.set(disassemble ? "disassembling" : "reading");
+
+                    if (disassemble) {
+                        entry = await disassembleEntry(entry as ClassEntry, disasm);
                     }
 
                     // finished with entry
@@ -221,7 +222,7 @@ export default {
 
                     // exclude archives that have been expanded
                     if (entry.type !== EntryType.ARCHIVE || !entries.some((e) => e.parent === entry)) {
-                        await channel.push({ ...entry.data, name: entry.name });
+                        channel.push({ ...entry.data, name: entry.name }).then(); // we don't care about the result
                     }
 
                     exportTask.desc.set(`${entries.length} entries (${entries.length - count} remaining)`);

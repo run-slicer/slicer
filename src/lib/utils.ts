@@ -37,6 +37,15 @@ export const chunk = <T>(arr: T[], size: number): T[][] => {
     return chunks;
 };
 
+// https://stackoverflow.com/a/66358141
+
+// xs has the smaller length
+const _distribute = <T>(xs: T[], ys: T[], count: number = Math.round(ys.length / (xs.length + 1))): T[] =>
+    xs.length == 0 ? [...ys] : [...ys.slice(0, count), xs[0], ..._distribute(xs.slice(1), ys.slice(count))];
+
+export const distribute = <T>(xs: T[], ys: T[]): T[] =>
+    xs.length > ys.length ? _distribute(ys, xs) : _distribute(xs, ys);
+
 export const roundRobin = <T>(size: number, func: () => T): (() => T) => {
     const items = new Array<T>(size);
     for (let i = 0; i < size; i++) {
