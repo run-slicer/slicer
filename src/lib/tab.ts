@@ -251,6 +251,15 @@ export const clear = () => {
             }
         }
 
+        for (const pos of Object.values(TabPosition)) {
+            const posTabs = Array.from($tabs.values()).filter((t) => t.position === pos);
+
+            if (posTabs.length > 0 && !posTabs.some((t) => t.active)) {
+                // no active tab for position, make the last one active
+                posTabs[posTabs.length - 1]!.active = true;
+            }
+        }
+
         return $tabs;
     });
 };
