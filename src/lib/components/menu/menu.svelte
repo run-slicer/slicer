@@ -3,6 +3,7 @@
     import { Separator } from "$lib/components/ui/separator";
     import {
         analysisBackground,
+        analysisTransformers,
         type PaneData,
         themeColor,
         themeRadius,
@@ -57,6 +58,7 @@
     import { themes } from "$lib/theme";
     import type { Disassembler } from "$lib/disasm";
     import type { EventHandler } from "$lib/event";
+    import { type Transformer, toggle as toggleTransformer } from "$lib/workspace/analysis/transform";
     import PaneButton from "./pane_button.svelte";
 
     interface Props {
@@ -66,10 +68,11 @@
         classes: Entry[];
         scripts: ProtoScript[];
         disasms: Disassembler[];
+        transformers: Transformer[];
         handler: EventHandler;
     }
 
-    let { panes = $bindable(), tab, entries, classes, scripts, disasms, handler }: Props = $props();
+    let { panes = $bindable(), tab, entries, classes, scripts, disasms, transformers, handler }: Props = $props();
 
     const updatePane = (position: TabPosition, open: boolean) => {
         let pane = panes.find((p) => p.position === position);
@@ -291,6 +294,25 @@
                 <MenubarItem class="justify-between" onclick={openSearch}>
                     Search <Shortcut key="f" modifier={Modifier.CTRL | Modifier.SHIFT} />
                 </MenubarItem>
+                <MenubarSeparator />
+                <MenubarSub>
+                    <MenubarSubTrigger disabled={!transformers.some((t) => !t.internal)}>
+                        Transformers
+                    </MenubarSubTrigger>
+                    <MenubarSubContent class="w-[16rem]" align="start">
+                        {#each transformers.filter((t) => !t.internal) as trf (trf.id)}
+                            {@const Icon = trf.icon}
+                            <MenubarCheckboxItem
+                                class="justify-between"
+                                checked={$analysisTransformers.includes(trf.id)}
+                                onCheckedChange={(checked) => toggleTransformer(trf, checked)}
+                            >
+                                {trf.name || trf.id}
+                                {#if Icon}<Icon size={16} />{/if}
+                            </MenubarCheckboxItem>
+                        {/each}
+                    </MenubarSubContent>
+                </MenubarSub>
                 <MenubarSeparator />
                 <MenubarCheckboxItem class="justify-between" bind:checked={$analysisBackground}>
                     Background <SendToBack size={16} />

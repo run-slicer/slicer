@@ -31,6 +31,7 @@ export const editorWrap = persisted<boolean>(`${root}.editor.wrap`, true);
 export const editorTextSize = persisted<number>(`${root}.editor.text-size`, 0.75);
 export const editorTextSizeSync = persisted<boolean>(`${root}.editor.text-size.sync`, true);
 export const analysisBackground = persisted<boolean>(`${root}.analysis.background`, true);
+export const analysisTransformers = persisted<string[]>(`${root}.analysis.transformers`, ["script"]);
 
 export const panes = persisted<PaneData[]>(`${root}.panes`, [
     { position: "primary_center" as TabPosition, tabs: [{ type: "welcome" as TabType, active: true }], open: true },
