@@ -15,6 +15,7 @@ import { AnalysisState, analyze } from "./";
 export interface Transformer {
     id: string;
     name?: string;
+    group?: string;
     icon?: Icon;
 
     // hides it from the menu and makes it always enabled
@@ -24,14 +25,6 @@ export interface Transformer {
 }
 
 export const transformers: Writable<Transformer[]> = writable([
-    {
-        id: "script",
-        name: "Scripts",
-        internal: true,
-        async run(entry, data) {
-            return (await rootContext.dispatchEvent({ type: "preload", name: entry.name, data })).data;
-        },
-    },
     {
         id: "verify",
         name: "Verify attributes",
@@ -57,6 +50,15 @@ export const transformers: Writable<Transformer[]> = writable([
             }
 
             return write(entry.node);
+        },
+    },
+    // script transforms should be processed after all internal ones
+    {
+        id: "script",
+        name: "Scripts",
+        internal: true,
+        async run(entry, data) {
+            return (await rootContext.dispatchEvent({ type: "preload", name: entry.name, data })).data;
         },
     },
 ]);

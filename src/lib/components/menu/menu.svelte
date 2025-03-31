@@ -60,6 +60,7 @@
     import type { EventHandler } from "$lib/event";
     import { type Transformer, toggle as toggleTransformer } from "$lib/workspace/analysis/transform";
     import PaneButton from "./pane_button.svelte";
+    import { groupBy } from "$lib/utils";
 
     interface Props {
         panes: PaneData[];
@@ -299,17 +300,28 @@
                     <MenubarSubTrigger disabled={!transformers.some((t) => !t.internal)}>
                         Transformers
                     </MenubarSubTrigger>
-                    <MenubarSubContent class="w-[16rem]" align="start">
-                        {#each transformers.filter((t) => !t.internal) as trf (trf.id)}
-                            {@const Icon = trf.icon}
-                            <MenubarCheckboxItem
-                                class="justify-between"
-                                checked={$analysisTransformers.includes(trf.id)}
-                                onCheckedChange={(checked) => toggleTransformer(trf, checked)}
-                            >
-                                {trf.name || trf.id}
-                                {#if Icon}<Icon size={16} />{/if}
-                            </MenubarCheckboxItem>
+                    <MenubarSubContent class="w-[12rem]" align="start">
+                        {@const groups = groupBy(
+                            transformers.filter((t) => !t.internal),
+                            (t) => t.group
+                        )}
+                        {#each groups.entries() as [group, trfs]}
+                            <MenubarSub>
+                                <MenubarSubTrigger>{group || "General"}</MenubarSubTrigger>
+                                <MenubarSubContent class="w-[16rem]" align="start">
+                                    {#each trfs as trf (trf.id)}
+                                        {@const Icon = trf.icon}
+                                        <MenubarCheckboxItem
+                                            class="justify-between"
+                                            checked={$analysisTransformers.includes(trf.id)}
+                                            onCheckedChange={(checked) => toggleTransformer(trf, checked)}
+                                        >
+                                            {trf.name || trf.id}
+                                            {#if Icon}<Icon size={16} />{/if}
+                                        </MenubarCheckboxItem>
+                                    {/each}
+                                </MenubarSubContent>
+                            </MenubarSub>
                         {/each}
                     </MenubarSubContent>
                 </MenubarSub>
