@@ -1,3 +1,4 @@
+import { escapeNonPrintable, uniqueBy } from "$lib/utils";
 import type { Entry, Zip } from "@run-slicer/zip";
 import { get } from "svelte/store";
 import { decoder } from "./encoding";
@@ -81,28 +82,31 @@ export interface ZipData extends Data {
 }
 
 export const zipData = async (zip: Zip): Promise<ZipData[]> => {
-    return zip.entries
-        .filter((v) => !v.isDirectory)
-        .map((v) => {
-            return {
-                type: DataType.ZIP,
-                name: v.fileName || v.name,
-                parent: zip,
-                entry: v,
-                async stream(): Promise<ReadableStream<Uint8Array>> {
-                    return (await v.blob()).stream();
-                },
-                bytes(): Promise<Uint8Array> {
-                    return v.bytes();
-                },
-                async text(): Promise<string> {
-                    return get(decoder).decode(await this.bytes());
-                },
-                blob(): Promise<Blob> {
-                    return v.blob();
-                },
-            };
-        });
+    return uniqueBy(
+        zip.entries
+            .filter((v) => !v.isDirectory)
+            .map((v) => {
+                return {
+                    type: DataType.ZIP,
+                    name: escapeNonPrintable(v.fileName || v.name),
+                    parent: zip,
+                    entry: v,
+                    async stream(): Promise<ReadableStream<Uint8Array>> {
+                        return (await v.blob()).stream();
+                    },
+                    bytes(): Promise<Uint8Array> {
+                        return v.bytes();
+                    },
+                    async text(): Promise<string> {
+                        return get(decoder).decode(await this.bytes());
+                    },
+                    blob(): Promise<Blob> {
+                        return v.blob();
+                    },
+                };
+            }),
+        (e) => e.name
+    );
 };
 
 export interface MemoryData extends Data {

@@ -63,6 +63,18 @@ export const roundRobin = <T>(size: number, func: () => T): (() => T) => {
     };
 };
 
+export const uniqueBy = <T, K>(arr: T[], func: (e: T) => K): T[] => {
+    const seen = new Map<K, T>();
+    for (let i = arr.length - 1; i >= 0; i--) {
+        const key = func(arr[i]);
+        if (!seen.has(key)) {
+            seen.set(key, arr[i]);
+        }
+    }
+
+    return Array.from(seen.values()).reverse();
+};
+
 /*
     cyrb53 (c) 2018 bryc (github.com/bryc)
     License: Public domain (or MIT if needed). Attribution appreciated.
@@ -366,6 +378,32 @@ export const truncate = (str: string, n: number, suffix: string = "..."): string
 export const capitalize = (str: string): string => {
     return str.charAt(0).toUpperCase() + str.substring(1);
 };
+
+const npEscapes = new Map<string, string>();
+for (const [start, end] of [
+    [0x0000, 0x001f],
+    [0x007f, 0x009f],
+    [0x06e5, 0x06e5],
+    [0x17b4, 0x17b4],
+    [0x180b, 0x180e],
+    [0x2000, 0x200e],
+    [0x2028, 0x202e],
+    [0x205f, 0x206e],
+    [0x2400, 0x243e],
+    [0xe000, 0xf8ff],
+    [0xfe00, 0xfe0f],
+    [0xfe1a, 0xfe20],
+    [0xfff0, 0xffff],
+]) {
+    for (let i = start; i <= end; i++) {
+        npEscapes.set(String.fromCharCode(i), `\\u${i.toString(16).toUpperCase().padStart(4, "0")}`);
+    }
+}
+
+export const escapeNonPrintable = (str: string): string =>
+    Array.from(str)
+        .map((c) => npEscapes.get(c) ?? c)
+        .join("");
 
 /* dates */
 
