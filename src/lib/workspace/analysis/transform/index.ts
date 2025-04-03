@@ -2,15 +2,14 @@ import type { Icon } from "$lib/components/icons";
 import { log } from "$lib/log";
 import { rootContext } from "$lib/script";
 import { analysisTransformers } from "$lib/state";
+import { refreshIf } from "$lib/tab";
 import { recordProgress } from "$lib/task";
-import type { ClassEntry } from "$lib/workspace";
+import { type ClassEntry, EntryType } from "$lib/workspace";
+import { AnalysisState, analyze } from "$lib/workspace/analysis";
 import { transformData } from "$lib/workspace/data";
-import { Paintbrush, ShieldCheck } from "@lucide/svelte";
-import { write } from "@run-slicer/asm";
-import type { CodeAttribute } from "@run-slicer/asm/attr";
-import { AttributeType } from "@run-slicer/asm/spec";
 import { get, writable, type Writable } from "svelte/store";
-import { AnalysisState, analyze } from "./";
+import generalTransformers from "./general";
+import readabilityTransformers from "./readability";
 
 export interface Transformer {
     id: string;
@@ -25,34 +24,9 @@ export interface Transformer {
 }
 
 export const transformers: Writable<Transformer[]> = writable([
-    {
-        id: "verify",
-        name: "Verify attributes",
-        icon: ShieldCheck,
-        async run(entry, _data) {
-            const { verify } = await import("@run-slicer/asm/analysis/verify");
-            entry.node = verify(entry.node);
-
-            return write(entry.node);
-        },
-    },
-    {
-        id: "unreachable",
-        name: "No-op unreachable code",
-        icon: Paintbrush,
-        async run(entry, _data) {
-            const { removeUnreachable } = await import("@run-slicer/asm/analysis/reach");
-            for (const method of entry.node.methods) {
-                const code = method.attrs.findIndex((a) => a.type === AttributeType.CODE);
-                if (code !== -1) {
-                    method.attrs[code] = removeUnreachable(method.attrs[code] as CodeAttribute);
-                }
-            }
-
-            return write(entry.node);
-        },
-    },
-    // script transforms should be processed after all internal ones
+    ...generalTransformers,
+    ...readabilityTransformers,
+    // script transforms should be processed last
     {
         id: "script",
         name: "Scripts",
@@ -62,6 +36,11 @@ export const transformers: Writable<Transformer[]> = writable([
         },
     },
 ]);
+
+// hard-refresh tabs on transformer change
+analysisTransformers.subscribe(() => {
+    refreshIf((tab) => tab.entry?.type === EntryType.CLASS, true).then();
+});
 
 export const enabled = (trf: Transformer): boolean => trf.internal || get(analysisTransformers).includes(trf.id);
 export const toggle = (trf: Transformer, enabled: boolean) => {

@@ -2,6 +2,8 @@ import { type Icon, type StyledIcon, tabIcon } from "$lib/components/icons";
 import { error } from "$lib/log";
 import { panes, workspaceEncoding } from "$lib/state";
 import { type Entry, EntryType, readDeferred } from "$lib/workspace";
+import { AnalysisState } from "$lib/workspace/analysis";
+import { unwrapTransform } from "$lib/workspace/data";
 import { Box, Folders, ScrollText, Search, Sparkles } from "@lucide/svelte";
 import { derived, get, writable } from "svelte/store";
 
@@ -194,7 +196,17 @@ export const update = (tab: Tab): Tab => {
     return tab;
 };
 
-export const refresh = (tab: Tab): Tab => {
+export const refresh = async (tab: Tab, hard: boolean = false): Promise<Tab> => {
+    if (hard && tab.entry) {
+        tab.entry = await readDeferred({
+            ...tab.entry,
+            type: EntryType.FILE,
+            // unwrap any transforms, something may have touched the tab entry
+            data: unwrapTransform(tab.entry.data),
+            state: AnalysisState.NONE,
+        });
+    }
+
     // try immediate update for the current tab
     if (tab.active) {
         return refreshImmediately(tab);
@@ -202,6 +214,14 @@ export const refresh = (tab: Tab): Tab => {
 
     tab.dirty = true;
     return tab;
+};
+
+export const refreshIf = async (func: (tab: Tab) => boolean, hard: boolean = false) => {
+    for (const tab of get(tabs).values()) {
+        if (func(tab)) {
+            await refresh(tab, hard);
+        }
+    }
 };
 
 // gets the preceding tab or null if there's only one in position
@@ -272,11 +292,7 @@ export const isEncodingDependent = (tab: Tab): boolean => {
 
 // soft-refresh code tabs on encoding change
 workspaceEncoding.subscribe(() => {
-    for (const tab of get(tabs).values()) {
-        if (isEncodingDependent(tab)) {
-            refresh(tab);
-        }
-    }
+    refreshIf(isEncodingDependent).then();
 });
 
 // prettier-ignore
