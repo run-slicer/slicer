@@ -8,7 +8,6 @@ import { type ClassEntry, EntryType } from "$lib/workspace";
 import { AnalysisState, analyze } from "$lib/workspace/analysis";
 import { transformData } from "$lib/workspace/data";
 import { get, writable, type Writable } from "svelte/store";
-import generalTransformers from "./general";
 import normalizationTransformers from "./normalization";
 import readabilityTransformers from "./readability";
 
@@ -25,7 +24,6 @@ export interface Transformer {
 }
 
 export const transformers: Writable<Transformer[]> = writable([
-    ...generalTransformers,
     ...readabilityTransformers,
     ...normalizationTransformers,
     // script transforms should be processed last

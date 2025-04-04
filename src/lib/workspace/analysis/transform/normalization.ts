@@ -1,4 +1,4 @@
-import { Binary, Paintbrush } from "@lucide/svelte";
+import { Binary, Paintbrush, ShieldCheck } from "@lucide/svelte";
 import { type Member, write } from "@run-slicer/asm";
 import type { CodeAttribute } from "@run-slicer/asm/attr";
 import { AttributeType, Modifier } from "@run-slicer/asm/spec";
@@ -21,6 +21,18 @@ const checkAccess = (member: Member, field: boolean) => {
 };
 
 export default [
+    {
+        id: "verify",
+        name: "Verify attributes",
+        group: "Normalization",
+        icon: ShieldCheck,
+        async run(entry, _data) {
+            const { verify } = await import("@run-slicer/asm/analysis/verify");
+            entry.node = verify(entry.node);
+
+            return write(entry.node);
+        },
+    },
     {
         id: "nop-unreachable",
         name: "No-op unreachable code",
