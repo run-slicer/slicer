@@ -118,7 +118,8 @@ export default [
                 return (
                     name !== AttributeType.DEPRECATED &&
                     name !== AttributeType.SOURCE_FILE &&
-                    name !== AttributeType.SOURCE_DEBUG_EXTENSION
+                    name !== AttributeType.SOURCE_DEBUG_EXTENSION &&
+                    name !== AttributeType.LINE_NUMBER_TABLE
                 );
             });
 
