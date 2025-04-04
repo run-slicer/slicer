@@ -1,4 +1,4 @@
-import { AtSign, Paintbrush, ZapOff } from "@lucide/svelte";
+import { AtSign, BugOff, Type, Variable, ZapOff } from "@lucide/svelte";
 import { type DirtyMarkable, type Node, write } from "@run-slicer/asm";
 import type { Attributable, Attribute, CodeAttribute } from "@run-slicer/asm/attr";
 import { AttributeType } from "@run-slicer/asm/spec";
@@ -46,23 +46,6 @@ const checkNode = (node: Node, func: CheckFunc): Node => {
 
 export default [
     {
-        id: "remove-unreachable",
-        name: "No-op unreachable code",
-        group: "Readability",
-        icon: Paintbrush,
-        async run(entry, _data) {
-            const { removeUnreachable } = await import("@run-slicer/asm/analysis/reach");
-            for (const method of entry.node.methods) {
-                const code = method.attrs.findIndex((a) => a.type === AttributeType.CODE);
-                if (code !== -1) {
-                    method.attrs[code] = removeUnreachable(method.attrs[code] as CodeAttribute);
-                }
-            }
-
-            return write(entry.node);
-        },
-    },
-    {
         id: "remove-annotations",
         name: "Strip annotations",
         group: "Readability",
@@ -89,6 +72,55 @@ export default [
                     }
                 }
             }
+
+            return write(entry.node);
+        },
+    },
+    {
+        id: "remove-lvt",
+        name: "Strip local variables",
+        group: "Readability",
+        icon: Variable,
+        async run(entry, _data) {
+            for (const method of entry.node.methods) {
+                const code = method.attrs.findIndex((a) => a.type === AttributeType.CODE);
+                if (code !== -1) {
+                    const attr = method.attrs[code] as CodeAttribute;
+                    attr.attrs = attr.attrs.filter((a) => !a.name?.string?.startsWith("LocalVariable"));
+                }
+
+                // method parameters also count as local vars
+                method.attrs = method.attrs.filter((a) => a.name?.string !== AttributeType.METHOD_PARAMETERS);
+            }
+
+            return write(entry.node);
+        },
+    },
+    {
+        id: "remove-signatures",
+        name: "Strip generic signatures",
+        group: "Readability",
+        icon: Type,
+        async run(entry, _data) {
+            entry.node = checkNode(entry.node, (attr) => attr.name?.string !== AttributeType.SIGNATURE);
+
+            return write(entry.node);
+        },
+    },
+    {
+        id: "remove-debug",
+        name: "Strip debug information",
+        group: "Readability",
+        icon: BugOff,
+        async run(entry, _data) {
+            entry.node = checkNode(entry.node, (attr) => {
+                const name = attr.name?.string;
+                return (
+                    name !== AttributeType.DEPRECATED &&
+                    name !== AttributeType.SOURCE_FILE &&
+                    name !== AttributeType.SOURCE_DEBUG_EXTENSION
+                );
+            });
 
             return write(entry.node);
         },

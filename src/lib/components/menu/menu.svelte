@@ -308,7 +308,7 @@
                         {#each groups.entries() as [group, trfs]}
                             <MenubarSub>
                                 <MenubarSubTrigger>{group || "General"}</MenubarSubTrigger>
-                                <MenubarSubContent class="w-[16rem]" align="start">
+                                <MenubarSubContent class="w-[12rem]" align="start">
                                     {#each trfs as trf (trf.id)}
                                         {@const Icon = trf.icon}
                                         <MenubarCheckboxItem
@@ -317,7 +317,7 @@
                                             onCheckedChange={(checked) => toggleTransformer(trf, checked)}
                                         >
                                             {trf.name || trf.id}
-                                            {#if Icon}<Icon size={16} />{/if}
+                                            {#if Icon}<Icon size={16} class="ml-3" />{/if}
                                         </MenubarCheckboxItem>
                                     {/each}
                                 </MenubarSubContent>
