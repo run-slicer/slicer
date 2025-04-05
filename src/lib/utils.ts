@@ -327,7 +327,10 @@ export const prettyError = (e: any): string => {
     }
 
     const stack = prettyErrorStack(e);
-    return e.toString() + (stack ? "\n" + stack : "");
+    const error = e.toString() + (stack ? "\n" + stack : "");
+
+    const cause = (e as Error)?.cause;
+    return cause ? `${error}\nCaused by: ${prettyError(cause)}` : error;
 };
 
 // https://stackoverflow.com/a/9382383

@@ -1,6 +1,6 @@
 import { type Icon, type StyledIcon, tabIcon } from "$lib/components/icons";
 import { error } from "$lib/log";
-import { panes, workspaceEncoding } from "$lib/state";
+import { analysisTransformers, panes, workspaceEncoding } from "$lib/state";
 import { type Entry, EntryType, readDeferred } from "$lib/workspace";
 import { AnalysisState } from "$lib/workspace/analysis";
 import { unwrapTransform } from "$lib/workspace/data";
@@ -293,6 +293,11 @@ export const isEncodingDependent = (tab: Tab): boolean => {
 // soft-refresh code tabs on encoding change
 workspaceEncoding.subscribe(() => {
     refreshIf(isEncodingDependent).then();
+});
+
+// hard-refresh tabs on transformer change
+analysisTransformers.subscribe(() => {
+    refreshIf((tab) => tab.entry !== undefined && tab.entry.type === EntryType.CLASS, true).then();
 });
 
 // prettier-ignore

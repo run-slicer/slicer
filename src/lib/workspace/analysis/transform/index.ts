@@ -2,9 +2,8 @@ import type { Icon } from "$lib/components/icons";
 import { log } from "$lib/log";
 import { rootContext } from "$lib/script";
 import { analysisTransformers } from "$lib/state";
-import { refreshIf } from "$lib/tab";
 import { recordProgress } from "$lib/task";
-import { type ClassEntry, EntryType } from "$lib/workspace";
+import type { ClassEntry } from "$lib/workspace";
 import { AnalysisState, analyze } from "$lib/workspace/analysis";
 import { transformData } from "$lib/workspace/data";
 import { get, writable, type Writable } from "svelte/store";
@@ -36,11 +35,6 @@ export const transformers: Writable<Transformer[]> = writable([
         },
     },
 ]);
-
-// hard-refresh tabs on transformer change
-analysisTransformers.subscribe(() => {
-    refreshIf((tab) => tab.entry?.type === EntryType.CLASS, true).then();
-});
 
 export const enabled = (trf: Transformer): boolean => trf.internal || get(analysisTransformers).includes(trf.id);
 export const toggle = (trf: Transformer, enabled: boolean) => {
