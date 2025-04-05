@@ -86,7 +86,9 @@ export default [
                 const code = method.attrs.findIndex((a) => a.type === AttributeType.CODE);
                 if (code !== -1) {
                     const attr = method.attrs[code] as CodeAttribute;
+
                     attr.attrs = attr.attrs.filter((a) => !a.name?.string?.startsWith("LocalVariable"));
+                    attr.dirty = true;
                 }
 
                 // method parameters also count as local vars
