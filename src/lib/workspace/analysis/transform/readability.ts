@@ -51,7 +51,7 @@ export default [
         group: "Readability",
         icon: AtSign,
         async run(entry, _data) {
-            entry.node = checkNode(entry.node, (attr) => !attr.name?.string?.endsWith("Annotations"));
+            entry.node = checkNode(entry.node, (attr) => !attr.name?.string?.includes("Annotation"));
 
             return write(entry.node);
         },
