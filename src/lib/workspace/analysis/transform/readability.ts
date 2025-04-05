@@ -1,7 +1,7 @@
-import { AtSign, BugOff, Type, Variable, ZapOff } from "@lucide/svelte";
+import { AtSign, BugOff, RefreshCwOff, Type, Variable, ZapOff } from "@lucide/svelte";
 import { type DirtyMarkable, type Node, write } from "@run-slicer/asm";
 import type { Attributable, Attribute, CodeAttribute } from "@run-slicer/asm/attr";
-import { AttributeType } from "@run-slicer/asm/spec";
+import { AttributeType, Opcode } from "@run-slicer/asm/spec";
 import type { Transformer } from "./";
 
 // walking logic adapted from @run-slicer/asm/analysis/verify
@@ -77,6 +77,28 @@ export default [
         },
     },
     {
+        id: "remove-monitors",
+        name: "Strip synchronized blocks",
+        group: "Readability",
+        icon: RefreshCwOff,
+        async run(entry, _data) {
+            for (const method of entry.node.methods) {
+                const code = method.attrs.findIndex((a) => a.type === AttributeType.CODE);
+                if (code !== -1) {
+                    const attr = method.attrs[code] as CodeAttribute;
+                    for (const insn of attr.insns) {
+                        if (insn.opcode === Opcode.MONITORENTER || insn.opcode === Opcode.MONITOREXIT) {
+                            insn.opcode = Opcode.NOP;
+                            attr.dirty = true;
+                        }
+                    }
+                }
+            }
+
+            return write(entry.node);
+        },
+    },
+    {
         id: "remove-lvt",
         name: "Strip local variables",
         group: "Readability",
@@ -87,8 +109,9 @@ export default [
                 if (code !== -1) {
                     const attr = method.attrs[code] as CodeAttribute;
 
-                    attr.attrs = attr.attrs.filter((a) => !a.name?.string?.startsWith("LocalVariable"));
-                    attr.dirty = true;
+                    const valid = attr.attrs.filter((a) => !a.name?.string?.startsWith("LocalVariable"));
+                    attr.dirty = attr.attrs.length > valid.length;
+                    attr.attrs = valid;
                 }
 
                 // method parameters also count as local vars
