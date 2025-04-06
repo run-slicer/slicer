@@ -88,7 +88,7 @@ export default [
                     const attr = method.attrs[code] as CodeAttribute;
                     for (const insn of attr.insns) {
                         if (insn.opcode === Opcode.MONITORENTER || insn.opcode === Opcode.MONITOREXIT) {
-                            insn.opcode = Opcode.NOP;
+                            insn.opcode = Opcode.POP;
                             attr.dirty = true;
                         }
                     }
