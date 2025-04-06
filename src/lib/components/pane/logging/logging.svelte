@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { LogEntry } from "$lib/log";
-    import { prettyErrorStack } from "$lib/utils";
+    import { prettyError, prettyErrorStack } from "$lib/utils";
     import type { PaneProps } from "$lib/components/pane";
     import CodeEditor from "$lib/components/editor/editor.svelte";
     import { log } from "$lib/lang/parser/log";
@@ -16,6 +16,10 @@
             const stack = prettyErrorStack(entry.error);
             if (stack) {
                 result.push(stack);
+            }
+            const cause = (entry.error as Error)?.cause;
+            if (cause) {
+                result.push(`Caused by: ${prettyError(cause)}`.replaceAll(/^/gm, "  "));
             }
         }
 

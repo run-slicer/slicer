@@ -83,6 +83,7 @@ export const fileIcon = (label: string): StyledIcon => {
             case "xhtml":
             case "mhtml":
             case "htm":
+            case "svg":
                 return { icon: CodeXml, classes: ["text-green-600"] };
             case "yaml":
             case "yml":

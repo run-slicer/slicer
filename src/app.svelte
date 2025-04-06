@@ -17,12 +17,14 @@
     import { handler } from "$lib/event";
     import { register as registerShortcuts } from "$lib/shortcut";
     import { onMount } from "svelte";
+    import { transformers } from "$lib/workspace/analysis/transform";
 
     let tabs0 = $derived(Array.from($tabs.values()));
     let entries0 = $derived(Array.from($entries.values()));
     let classes0 = $derived(Array.from($classes.values()));
     let tasks0 = $derived(Array.from($tasks.values()));
     let disasms0 = $derived(Array.from($disasms.values()));
+    let transformers0 = $derived(Array.from($transformers.values()));
 
     onMount(registerShortcuts);
 
@@ -51,6 +53,7 @@
     classes={classes0}
     scripts={$scripts}
     disasms={disasms0}
+    transformers={transformers0}
     handler={$handler}
 />
 <Content

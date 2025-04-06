@@ -1,5 +1,4 @@
 import { warn } from "$lib/log";
-import { rootContext } from "$lib/script";
 import { analysisBackground } from "$lib/state";
 import { prettyMethodDesc } from "$lib/utils";
 import type { Member, Node } from "@run-slicer/asm";
@@ -7,7 +6,8 @@ import type { UTF8Entry } from "@run-slicer/asm/pool";
 import type { Zip } from "@run-slicer/zip";
 import { derived, get, writable } from "svelte/store";
 import { AnalysisState, analyze, analyzeBackground, analyzeSchedule } from "./analysis";
-import { type Data, fileData, memoryData, type Named, parseName, transformData, zipData } from "./data";
+import { transform } from "./analysis/transform";
+import { type Data, fileData, memoryData, type Named, parseName, zipData } from "./data";
 import { archiveDecoder } from "./encoding";
 
 export const enum EntryType {
@@ -42,23 +42,10 @@ export interface MemberEntry extends ClassEntry {
 export const readDeferred = async (entry: Entry): Promise<Entry> => {
     await analyze(entry, AnalysisState.FULL);
 
-    // preprocess class file with script
+    // preprocess class file
     if (entry.type === EntryType.CLASS) {
-        const buffer = await entry.data.bytes();
-        const event = await rootContext.dispatchEvent({
-            type: "preload",
-            name: entry.name,
-            data: buffer,
-        });
-
-        // create transformed entry only if a transformation happened
-        if (event.data !== buffer) {
-            entry = { ...entry, data: transformData(entry.data, event.data), state: AnalysisState.NONE };
-
-            await analyze(entry, AnalysisState.FULL);
-        }
+        entry = await transform(entry as ClassEntry, await entry.data.bytes());
     }
-
     return entry;
 };
 

@@ -30,11 +30,10 @@ import {
     type Entry,
     EntryType,
     load as loadEntry,
-    readDeferred,
     remove as removeEntry,
 } from "$lib/workspace";
 import { AnalysisState, analyze } from "$lib/workspace/analysis";
-import { DataType, memoryBlobData, memoryData, type MemoryData, unwrapTransform } from "$lib/workspace/data";
+import { DataType, memoryBlobData, memoryData, type MemoryData } from "$lib/workspace/data";
 import type { UTF8Entry } from "@run-slicer/asm/pool";
 import type {
     DisassemblerContext,
@@ -246,21 +245,10 @@ const editorCtx: EditorContext = {
         const tab = get(currentTab);
         return tab ? wrapTab(tab) : null;
     },
-    async refresh(id: string, hard?: boolean) {
+    async refresh(id: string, hard: boolean = false) {
         const tab = findTab(id);
         if (tab) {
-            if (hard && tab.entry) {
-                // script wanted a hard refresh, make sure to trigger a preload event
-                tab.entry = await readDeferred({
-                    ...tab.entry,
-                    type: EntryType.FILE,
-                    // unwrap any transforms, a script may have touched the tab entry
-                    data: unwrapTransform(tab.entry.data),
-                    state: AnalysisState.NONE,
-                });
-            }
-
-            refreshTab(tab);
+            await refreshTab(tab, hard);
         }
     },
     async add(type: string, entry?: ScriptEntry): Promise<ScriptTab> {

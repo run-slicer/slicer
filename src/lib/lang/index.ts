@@ -50,6 +50,7 @@ export const fromExtension = (ext: string): Language => {
         case "xhtml":
         case "mhtml":
         case "htm":
+        case "svg":
             return "xml";
         case "json":
             return "json";
