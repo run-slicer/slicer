@@ -44,7 +44,7 @@
             </div>
             <div>
                 <h2 class="pb-2 text-lg font-medium text-muted-foreground">Customize</h2>
-                <ToggleGroup class="justify-start" type="single" bind:value={$userPrefersMode}>
+                <ToggleGroup class="justify-start" type="single" bind:value={userPrefersMode.current}>
                     <ToggleGroupItem value="system" aria-label="Toggle system-preferred theme">
                         <Settings class="h-4 w-4" />
                     </ToggleGroupItem>

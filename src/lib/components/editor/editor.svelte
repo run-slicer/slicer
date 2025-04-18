@@ -125,7 +125,7 @@
     }: Props = $props();
 
     $effect(() => view?.dispatch({ effects: readOnlyStore.reconfigure(EditorState.readOnly.of(readonly)) }));
-    $effect(() => view?.dispatch({ effects: themeStore.reconfigure($mode === "dark" ? dark : light) }));
+    $effect(() => view?.dispatch({ effects: themeStore.reconfigure(mode.current === "dark" ? dark : light) }));
     $effect(() => view?.dispatch({ effects: langStore.reconfigure(lang || []) }));
     $effect(() => view?.dispatch({ effects: wrapStore.reconfigure(wrap ? EditorView.lineWrapping : []) }));
 
@@ -152,7 +152,7 @@
                 extensions: [
                     basicSetup,
                     readOnlyStore.of(EditorState.readOnly.of(readonly)),
-                    themeStore.of($mode === "dark" ? dark : light),
+                    themeStore.of(mode.current === "dark" ? dark : light),
                     langStore.of(lang || []),
                     wrapStore.of(wrap ? EditorView.lineWrapping : []),
                     styles,

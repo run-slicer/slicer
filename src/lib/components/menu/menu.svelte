@@ -144,7 +144,7 @@
                                 <MenubarRadioGroup bind:value={$themeColor}>
                                     {#each themes as theme (theme.name)}
                                         {@const activeColor =
-                                            $mode === "light" ? theme.activeColor.light : theme.activeColor.dark}
+                                            mode.current === "light" ? theme.activeColor.light : theme.activeColor.dark}
                                         <MenubarRadioItem value={theme.name} class="justify-between">
                                             {theme.label || theme.name}
                                             <Circle
@@ -172,7 +172,7 @@
                             </MenubarSubContent>
                         </MenubarSub>
                         <MenubarSeparator />
-                        <MenubarRadioGroup bind:value={$userPrefersMode}>
+                        <MenubarRadioGroup bind:value={userPrefersMode.current}>
                             <MenubarRadioItem value="system" class="justify-between">
                                 System <Settings size={16} />
                             </MenubarRadioItem>

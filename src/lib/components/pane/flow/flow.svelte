@@ -63,7 +63,7 @@
                         {edges}
                         fitView
                         minZoom={0}
-                        colorMode={$mode || "system"}
+                        colorMode={mode.current || "system"}
                         nodesDraggable={false}
                         nodesConnectable={false}
                         elementsSelectable={false}
