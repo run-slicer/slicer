@@ -1,8 +1,13 @@
-import { Binary, Paintbrush, ShieldCheck, Zap } from "@lucide/svelte";
+import { Binary, Paintbrush, ShieldCheck, Variable, Zap } from "@lucide/svelte";
 import { type Member, write } from "@run-slicer/asm";
 import type { CodeAttribute } from "@run-slicer/asm/attr";
+import type { LoadStoreInstruction } from "@run-slicer/asm/insn";
 import { AttributeType, Modifier, Opcode } from "@run-slicer/asm/spec";
 import type { Transformer } from "./";
+
+const LOAD_OPCODES = new Set(Object.keys(Opcode).filter((o) => o.match(/^[ADFIL]LOAD(?:_[0-3])?$/)));
+const STORE_OPCODES = new Set(Object.keys(Opcode).filter((o) => o.match(/^[ADFIL]STORE(?:_[0-3])?$/)));
+const WSTORE_OPCODES = new Set(Object.keys(Opcode).filter((o) => o.match(/^[DL]STORE(?:_[0-3])?$/)));
 
 // adapted from https://github.com/GraxCode/threadtear/blob/master/core/src/main/java/me/nov/threadtear/execution/generic/ObfuscatedAccess.java
 const checkAccess = (member: Member, field: boolean) => {
@@ -17,12 +22,13 @@ const checkAccess = (member: Member, field: boolean) => {
         }
     }
 
-    member.access &= ~Modifier.SYNTHETIC & ~Modifier.BRIDGE;
+    member.access &= ~Modifier.SYNTHETIC;
+    member.access &= ~Modifier.BRIDGE;
 };
 
 export default [
     {
-        id: "verify",
+        id: "norm-verify",
         name: "Verify attributes",
         group: "Normalization",
         icon: ShieldCheck,
@@ -82,8 +88,65 @@ export default [
             return write(entry.node);
         },
     },
+    // adapted from https://github.com/GraxCode/threadtear/blob/master/core/src/main/java/me/nov/threadtear/execution/cleanup/remove/RemoveUnusedVariables.java
     {
-        id: "nop-unreachable",
+        id: "norm-lvt",
+        name: "Remove unnecessary local variables",
+        group: "Normalization",
+        icon: Variable,
+        async run(entry, _data) {
+            for (const method of entry.node.methods) {
+                const code = method.attrs.findIndex((a) => a.type === AttributeType.CODE);
+                if (code !== -1) {
+                    const attr = method.attrs[code] as CodeAttribute;
+
+                    const loadVars = new Set(
+                        attr.insns
+                            .filter((i) => LOAD_OPCODES.has(Opcode[i.opcode]))
+                            .map((i) => (i as LoadStoreInstruction).index ?? parseInt(Opcode[i.opcode].slice(-1), 10))
+                    );
+                    if ((method.access & Modifier.STATIC) === 0) {
+                        loadVars.add(0); // this
+                    }
+
+                    attr.insns = attr.insns.flatMap((insn) => {
+                        if (!STORE_OPCODES.has(Opcode[insn.opcode])) return [insn];
+
+                        const index =
+                            (insn as LoadStoreInstruction).index ?? parseInt(Opcode[insn.opcode].slice(-1), 10);
+                        if (loadVars.has(index)) return [insn];
+
+                        const insns = [
+                            {
+                                opcode: WSTORE_OPCODES.has(Opcode[insn.opcode]) ? Opcode.POP2 : Opcode.POP,
+                                operands: new Uint8Array(0),
+                                offset: insn.offset,
+                                length: 1,
+                                dirty: false,
+                            },
+                        ];
+                        // no-op the rest of the instruction's length to keep offsets intact
+                        for (let j = 1; j < insn.length; j++) {
+                            insns.push({
+                                opcode: Opcode.NOP,
+                                operands: new Uint8Array(0),
+                                offset: insn.offset + j,
+                                length: 1,
+                                dirty: false,
+                            });
+                        }
+
+                        attr.dirty = true;
+                        return insns;
+                    });
+                }
+            }
+
+            return write(entry.node);
+        },
+    },
+    {
+        id: "norm-unreachable",
         name: "No-op unreachable code",
         group: "Normalization",
         icon: Paintbrush,
