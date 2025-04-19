@@ -27,10 +27,8 @@ export interface SearchResult {
 
 // for marshalling over the worker barrier
 
-export interface SearchData {
+export interface SearchData extends SearchQuery {
     node: Node;
-    value: string;
-    mode: SearchMode;
 }
 
 export interface SearchResultData {

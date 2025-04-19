@@ -1,11 +1,12 @@
 import { error } from "$lib/log";
 import { analysisBackground } from "$lib/state";
 import { recordProgress } from "$lib/task";
+import { rateLimit, roundRobin } from "$lib/utils";
 import { FLAG_SKIP_ATTR } from "@run-slicer/asm";
 import { wrap } from "comlink";
 import { get } from "svelte/store";
 import { type ClassEntry, type Entry, EntryType, type MemberEntry } from "../";
-import { QueryType, type SearchData, SearchMode, type SearchQuery, type SearchResult } from "./search";
+import { QueryType, SearchMode, type SearchQuery, type SearchResult } from "./search";
 import type { Worker as AnalysisWorker } from "./worker";
 import Worker from "./worker?worker";
 
@@ -15,14 +16,16 @@ export const enum AnalysisState {
     FULL,
 }
 
-const worker = wrap<AnalysisWorker>(new Worker());
+const MAX_CONCURRENT = 5;
+
+const worker = roundRobin(MAX_CONCURRENT, () => wrap<AnalysisWorker>(new Worker()));
 const analyzeClass = async (entry: Entry, skipAttr: boolean) => {
     const buffer = await entry.data.bytes();
 
     try {
         const classEntry = entry as ClassEntry;
 
-        classEntry.node = await worker.read(buffer, skipAttr ? FLAG_SKIP_ATTR : 0);
+        classEntry.node = await worker().read(buffer, skipAttr ? FLAG_SKIP_ATTR : 0);
         if (entry.type === EntryType.MEMBER) {
             const memberEntry = entry as MemberEntry;
 
@@ -82,12 +85,18 @@ export const analyzeBackground = async () => {
     if (!get(analysisBackground) || $queue.length === 0) return;
 
     await recordProgress("analyzing", null, async (task) => {
-        for (let i = 0; i < $queue.length; i++) {
-            await analyze($queue[i]);
+        let completed = 0;
+        await Promise.all(
+            $queue.map(
+                rateLimit(async (entry) => {
+                    await analyze(entry);
 
-            task.desc.set(`${$queue.length} entries (${$queue.length - i - 1} remaining)`);
-            task.progress?.set(((i + 1) / $queue.length) * 100);
-        }
+                    completed++;
+                    task.desc.set(`${$queue.length} entries (${$queue.length - completed} remaining)`);
+                    task.progress?.set((completed / $queue.length) * 100);
+                }, MAX_CONCURRENT)
+            )
+        );
 
         task.desc.set(`${$queue.length} entries`);
     });
@@ -99,28 +108,20 @@ export const search = async (entries: Entry[], query: SearchQuery, onResult: (re
     entries = entries.filter((e) => e.type === EntryType.CLASS);
 
     await recordProgress("searching", null, async (task) => {
-        for (let i = 0; i < entries.length; i++) {
-            const entry = entries[i] as ClassEntry;
+        let completed = 0;
+        await Promise.all(
+            (entries as ClassEntry[]).map(
+                rateLimit(async (entry) => {
+                    (await worker().search({ ...query, node: entry.node })).forEach((res) =>
+                        onResult({ ...res, entry })
+                    );
 
-            const data: SearchData = { node: entry.node, value: query.value, mode: query.mode };
-            switch (query.type) {
-                case QueryType.POOL_ENTRY: {
-                    (await worker.searchPoolEntry(data)).forEach((d) => onResult({ ...d, entry }));
-                    break;
-                }
-                case QueryType.FIELD: {
-                    (await worker.searchField(data)).forEach((d) => onResult({ ...d, entry }));
-                    break;
-                }
-                case QueryType.METHOD: {
-                    (await worker.searchMethod(data)).forEach((d) => onResult({ ...d, entry }));
-                    break;
-                }
-            }
-
-            task.desc.set(`${entries.length} entries (${entries.length - i - 1} remaining)`);
-            task.progress?.set(((i + 1) / entries.length) * 100);
-        }
+                    completed++;
+                    task.desc.set(`${entries.length} entries (${entries.length - completed} remaining)`);
+                    task.progress?.set((completed / entries.length) * 100);
+                }, MAX_CONCURRENT)
+            )
+        );
 
         task.desc.set(`${entries.length} entries`);
     });

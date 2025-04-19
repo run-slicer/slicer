@@ -63,6 +63,52 @@ export const roundRobin = <T>(size: number, func: () => T): (() => T) => {
     };
 };
 
+interface Semaphore {
+    acquire(): Promise<void>;
+    release(): void;
+}
+
+const createSemaphore = (maxConcurrent: number): Semaphore => {
+    let current = 0;
+    const queue: Array<() => void> = [];
+    return {
+        acquire(): Promise<void> {
+            return new Promise<void>((resolve) => {
+                if (current < maxConcurrent) {
+                    current++;
+                    resolve();
+                } else {
+                    queue.push(resolve);
+                }
+            });
+        },
+        release() {
+            if (queue.length > 0) {
+                const resolve = queue.shift()!;
+                resolve();
+            } else {
+                current--;
+            }
+        },
+    };
+};
+
+export const rateLimit = <T extends (...args: any[]) => Promise<any>>(
+    func: T,
+    rate: number
+): ((...args: Parameters<T>) => Promise<ReturnType<T>>) => {
+    const semaphore = createSemaphore(rate);
+
+    return async (...args: Parameters<T>): Promise<ReturnType<T>> => {
+        await semaphore.acquire();
+        try {
+            return await func(...args);
+        } finally {
+            semaphore.release();
+        }
+    };
+};
+
 export const uniqueBy = <T, K>(arr: T[], func: (e: T) => K): T[] => {
     const seen = new Map<K, T>();
     for (let i = arr.length - 1; i >= 0; i--) {
