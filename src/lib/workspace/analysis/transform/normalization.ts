@@ -91,7 +91,7 @@ export default [
     // adapted from https://github.com/GraxCode/threadtear/blob/master/core/src/main/java/me/nov/threadtear/execution/cleanup/remove/RemoveUnusedVariables.java
     {
         id: "norm-lvt",
-        name: "Remove unnecessary local variables",
+        name: "Remove unused local variables",
         group: "Normalization",
         icon: Variable,
         async run(entry, _data) {
