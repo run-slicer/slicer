@@ -67,7 +67,7 @@
                         nodesDraggable={false}
                         nodesConnectable={false}
                         elementsSelectable={false}
-                        proOptions={{ hideAttribution: false /* ??? */ }}
+                        proOptions={{ hideAttribution: true }}
                         nodeTypes={{ "elk-node": FlowNode }}
                         edgeTypes={{ "elk-edge": FlowEdge }}
                     >
