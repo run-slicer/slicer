@@ -31,6 +31,7 @@
         if (e.key === "Enter") {
             results = [];
             searching = true;
+            time = 0;
 
             const start = Date.now();
             const intervalId = setInterval(() => {

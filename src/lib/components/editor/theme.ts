@@ -1,3 +1,4 @@
+import { logError, logInfo, logWarn } from "$lib/lang/parser/log";
 import { HighlightStyle, syntaxHighlighting, type TagStyle } from "@codemirror/language";
 import type { Extension } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
@@ -82,6 +83,9 @@ export const dark = createTheme({
         { tag: t.link, textDecoration: "underline" },
         { tag: t.strikethrough, textDecoration: "line-through" },
         { tag: t.invalid, color: "#f97583" },
+        { tag: logInfo, color: "#58a6ff" },
+        { tag: logWarn, color: "#d29922" },
+        { tag: logError, color: "#f85149" },
     ],
 });
 export const light = createTheme({
@@ -106,5 +110,8 @@ export const light = createTheme({
         { tag: t.link, textDecoration: "underline" },
         { tag: t.strikethrough, textDecoration: "line-through" },
         { tag: t.invalid, color: "#cb2431" },
+        { tag: logInfo, color: "#0366d6" },
+        { tag: logWarn, color: "#e36209" },
+        { tag: logError, color: "#d73a49" },
     ],
 });
