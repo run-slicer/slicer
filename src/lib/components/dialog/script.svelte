@@ -31,7 +31,7 @@
                     </TableHeader>
                     <TableBody>
                         <TableRow>
-                            <TableCell class="break-all font-medium">{proto.id}</TableCell>
+                            <TableCell class="font-medium break-all">{proto.id}</TableCell>
                             <TableCell class="break-anywhere">{proto.script?.name || "<unknown>"}</TableCell>
                             <TableCell class="break-anywhere">{proto.script?.description || "<unknown>"}</TableCell>
                             <TableCell class="break-all">{proto.script?.version || "<unknown>"}</TableCell>
@@ -40,7 +40,7 @@
                 </Table>
             </div>
             <pre
-                class="grow overflow-auto whitespace-pre-wrap break-all rounded-md bg-muted/40 p-4 font-mono text-sm">{proto.url}</pre>
+                class="bg-muted/40 grow overflow-auto rounded-md p-4 font-mono text-sm break-all whitespace-pre-wrap">{proto.url}</pre>
         {/if}
     </DialogContent>
 </Dialog>

@@ -47,7 +47,7 @@
         </MenubarItem>
         <MenubarItem
             inset
-            class="justify-between data-highlighted:bg-destructive data-highlighted:text-destructive-foreground"
+            class="data-highlighted:bg-destructive data-highlighted:text-destructive-foreground justify-between"
             onclick={() => ondelete?.(proto)}
         >
             Delete <Trash2 size={16} />

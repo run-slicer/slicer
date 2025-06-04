@@ -13,7 +13,7 @@
 
 <div
     class={cn(
-        "overflow-hidden text-ellipsis px-2 py-1.5 text-sm font-semibold text-foreground",
+        "text-foreground overflow-hidden px-2 py-1.5 text-sm font-semibold text-ellipsis",
         center && "text-center",
         inset && "pl-8"
     )}

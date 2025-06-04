@@ -33,7 +33,7 @@
     bind:this={elem}
     class={cn(
         "inline-flex h-full max-w-96 cursor-default items-center px-3",
-        !active || "border-t border-t-primary bg-background"
+        !active || "border-t-primary bg-background border-t"
     )}
     aria-label={name}
     {onclick}
@@ -41,7 +41,7 @@
     {#if icon}
         <Icon size={16} class={cn("mr-1.5 min-w-[16px]", icon.classes)} />
     {/if}
-    <span class="overflow-hidden text-ellipsis whitespace-nowrap break-keep text-sm">{name}</span>
+    <span class="overflow-hidden text-sm break-keep text-ellipsis whitespace-nowrap">{name}</span>
     {#if closeable}
         <div
             role="button"
@@ -51,7 +51,7 @@
             onclick={handleClose}
             onkeydown={handleClose}
         >
-            <X size={14} class="min-w-[14px] text-muted-foreground/60 hover:text-muted-foreground/80" />
+            <X size={14} class="text-muted-foreground/60 hover:text-muted-foreground/80 min-w-[14px]" />
         </div>
     {/if}
 </button>

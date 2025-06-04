@@ -26,11 +26,10 @@
     let { position, align, offset, handler, children }: Props = $props();
 
     let open = $state(false);
-    let triggerRef = $state<HTMLButtonElement>(null!);
 </script>
 
 <Popover bind:open>
-    <PopoverTrigger bind:ref={triggerRef}>
+    <PopoverTrigger>
         {#snippet child({ props })}
             {#if children}
                 {@render children(props)}

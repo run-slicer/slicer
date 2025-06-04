@@ -698,7 +698,7 @@ export const theme = derived(themeColor, ($themeColor) => {
 });
 
 const themeStyle = document.createElement("style");
-document.head.appendChild(themeStyle);
+// document.head.appendChild(themeStyle);
 
 theme.subscribe(($theme) => {
     const modes = Object.entries($theme.cssVars).map(([k, v]) => {

@@ -24,7 +24,7 @@
     let entry = $derived(node.entry);
 </script>
 
-<ContextMenuContent class="min-w-48 max-w-[16rem]">
+<ContextMenuContent class="max-w-[16rem] min-w-48">
     <ContextMenuLabel center>{node.label}</ContextMenuLabel>
     <ContextMenuSeparator />
     {#if entry}
@@ -64,7 +64,7 @@
         </ContextMenuItem>
     {/if}
     <ContextMenuItem
-        class="flex justify-between data-highlighted:bg-destructive data-highlighted:text-destructive-foreground"
+        class="data-highlighted:bg-destructive data-highlighted:text-destructive-foreground flex justify-between"
         onclick={() => ondelete?.(node)}
     >
         Delete <Trash2 size={16} />

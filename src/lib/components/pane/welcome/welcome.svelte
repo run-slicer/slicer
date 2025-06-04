@@ -32,19 +32,19 @@
     <div class="flex h-full flex-col justify-between">
         <div class="flex max-w-lg flex-row flex-wrap justify-between gap-4">
             <div>
-                <h2 class="text-lg font-medium text-muted-foreground">Get started</h2>
+                <h2 class="text-muted-foreground text-lg font-medium">Get started</h2>
                 <div class="flex flex-col items-start">
-                    <Button variant="link" class="h-8 p-0" onclick={() => handler.load()}>
+                    <Button variant="link" class="h-8 !p-0" onclick={() => handler.load()}>
                         <Folder /> Open
                     </Button>
-                    <Button variant="link" class="h-8 p-0" onclick={() => handler.add()}>
+                    <Button variant="link" class="h-8 !p-0" onclick={() => handler.add()}>
                         <FilePlus2 /> Add file
                     </Button>
                 </div>
             </div>
             <div>
-                <h2 class="pb-2 text-lg font-medium text-muted-foreground">Customize</h2>
-                <ToggleGroup class="justify-start" type="single" bind:value={userPrefersMode.current}>
+                <h2 class="text-muted-foreground pb-2 text-lg font-medium">Customize</h2>
+                <ToggleGroup class="justify-start" size="lg" type="single" bind:value={userPrefersMode.current}>
                     <ToggleGroupItem value="system" aria-label="Toggle system-preferred theme">
                         <Settings class="h-4 w-4" />
                     </ToggleGroupItem>
@@ -59,7 +59,7 @@
         </div>
         <div class="flex flex-row items-center justify-between gap-2 pt-8">
             <button class="cursor-help text-sm" onclick={handleRevolver}>
-                <span class="text-base font-medium text-accent-foreground/60">Tip: </span>
+                <span class="text-accent-foreground/60 text-base font-medium">Tip: </span>
                 {@html tip}
             </button>
             <a

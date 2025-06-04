@@ -28,7 +28,7 @@
     <Loading value="Reading..." timed />
 {:then result}
     <div class="flex h-8 min-h-8 w-full flex-col">
-        <div class="flex grow flex-row items-center gap-4 bg-background px-2 text-xs">
+        <div class="bg-background flex grow flex-row items-center gap-4 px-2 text-xs">
             <p>timestamp: <span class="text-muted-foreground">{result.timestamp.toLocaleString()}</span></p>
             <p>
                 identifier size:
@@ -46,9 +46,9 @@
     <Table class="h-full min-h-0 w-full p-2" entries={result.entries} />
 {:catch e}
     <div class="flex h-full w-full flex-col items-center justify-center">
-        <FileQuestion class="mb-4 animate-bounce text-muted-foreground" size={128} />
+        <FileQuestion class="text-muted-foreground mb-4 animate-bounce" size={128} />
         <p class="mb-1 text-2xl font-semibold">Is the file in HPROF format?</p>
-        <p class="mb-32 text-sm text-muted-foreground">Failed to read heap dump.</p>
-        <p class="text-xs text-muted-foreground">{e}</p>
+        <p class="text-muted-foreground mb-32 text-sm">Failed to read heap dump.</p>
+        <p class="text-muted-foreground text-xs">{e}</p>
     </div>
 {/await}

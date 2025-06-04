@@ -53,7 +53,7 @@
         },
         ".cm-foldPlaceholder": {
             // fix color on collapse placeholder
-            "background-color": "hsl(var(--muted))",
+            "background-color": "var(--muted)",
             border: "unset",
             color: "unset",
             margin: "0 0.25rem",
@@ -68,7 +68,7 @@
         },
         ".cm-panels": {
             // fix color on panel container
-            "background-color": "hsl(var(--background))",
+            "background-color": "var(--background)",
             // fix overlapping
             "z-index": "auto",
         },
@@ -79,13 +79,13 @@
         },
         ".cm-button": {
             // fix color on search button
-            "border-color": "hsl(var(--secondary))",
+            "border-color": "var(--secondary)",
             "border-radius": "0.25rem", // rounded
             "background-image": "unset",
         },
         ".cm-button:active": {
             // fix color on search button
-            "background-color": "hsl(var(--secondary))",
+            "background-color": "var(--secondary)",
             "background-image": "unset",
         },
     });

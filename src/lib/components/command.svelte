@@ -74,7 +74,7 @@
                     </VList>
                 {/key}
             {:else}
-                <p class="py-4 text-center text-sm text-muted-foreground">
+                <p class="text-muted-foreground py-4 text-center text-sm">
                     There's nothing here? Add something to the workspace.
                 </p>
             {/if}

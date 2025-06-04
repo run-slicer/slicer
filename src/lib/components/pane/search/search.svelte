@@ -75,7 +75,7 @@
             <X />
         </Button>
     </div>
-    <div class="flex w-full flex-row justify-between border-b border-b-border px-4 py-2 text-xs">
+    <div class="border-b-border flex w-full flex-row justify-between border-b px-3 py-2 text-xs">
         {#if searching}
             <span>Searching...</span>
             <span class="text-muted-foreground">{results.length} result(s), elapsed {time}ms</span>

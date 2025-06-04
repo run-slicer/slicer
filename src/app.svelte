@@ -41,8 +41,8 @@
     themeStorageKey={`${rootKey}.theme`}
     modeStorageKey={`${rootKey}.mode`}
     themeColors={{
-        dark: `hsl(${$theme.cssVars.dark.background})`,
-        light: `hsl(${$theme.cssVars.light.background})`,
+        dark: `${$theme.cssVars.dark.background}`,
+        light: `${$theme.cssVars.light.background}`,
     }}
 />
 <Toaster position="top-right" richColors />

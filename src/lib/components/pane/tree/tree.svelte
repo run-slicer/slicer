@@ -78,7 +78,7 @@
     <ContextMenuTrigger bind:ref={triggerElem} class="flex h-full w-full">
         <div class="flex h-full w-full" role="presentation" ondrop={handleDrop} ondragover={(e) => e.preventDefault()}>
             {#if root.nodes && root.nodes.length > 0}
-                <div class="flex w-full flex-col overflow-auto text-nowrap p-2 contain-strict scrollbar-thin">
+                <div class="scrollbar-thin flex w-full flex-col overflow-auto p-2 text-nowrap contain-strict">
                     {#each root.nodes as node (node.label)}
                         <TreeNode
                             data={node}
@@ -96,8 +96,8 @@
                     <Button variant="outline" size="sm" onclick={() => handler.load()}>
                         <Plus /> Open
                     </Button>
-                    <span class="text-xs text-muted-foreground">or</span>
-                    <span class="text-sm text-accent-foreground">drag n' drop</span>
+                    <span class="text-muted-foreground text-xs">or</span>
+                    <span class="text-accent-foreground text-sm">drag n' drop</span>
                 </div>
             {/if}
         </div>

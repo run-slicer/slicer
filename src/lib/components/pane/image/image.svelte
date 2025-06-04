@@ -103,7 +103,7 @@
     <Loading value="Reading..." timed />
 {:then blob}
     <div class="flex h-8 min-h-8 w-full flex-col">
-        <div class="flex grow flex-row items-center justify-between bg-background px-2">
+        <div class="bg-background flex grow flex-row items-center justify-between px-2">
             <div class="flex gap-2">
                 <MenuButton icon={Fullscreen} label="Reset" onclick={reset} />
                 <MenuButton icon={ZoomIn} label="Zoom in" onclick={() => rescale((s) => s + 0.5)} />
@@ -119,7 +119,7 @@
     </div>
     <div class="relative h-full w-full">
         <div
-            class="absolute bottom-0 left-0 right-0 top-0 flex select-none items-center justify-center overflow-hidden"
+            class="absolute top-0 right-0 bottom-0 left-0 flex items-center justify-center overflow-hidden select-none"
             onwheel={(e) => rescale((s) => s * (1.0 - e.deltaY / 250) /* smoothing */)}
             onpointerup={handlePointerUp}
             onpointermove={handlePointerMove}

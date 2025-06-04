@@ -93,8 +93,8 @@
             <PaneMenu offset {position} {handler}>
                 {#snippet children(props)}
                     <div
-                        class="flex h-8 min-h-8 w-8 min-w-8 cursor-pointer items-center justify-center text-primary/60"
                         {...props}
+                        class="text-primary/60 flex h-8 min-h-8 w-8 min-w-8 cursor-pointer items-center justify-center"
                     >
                         <Plus size={18} />
                     </div>
@@ -113,7 +113,7 @@
                     <div>
                         <Icon size={24} class="mb-4" />
                         <p class="mb-0.5 text-lg">Nothing here...</p>
-                        <p class="text-sm text-muted-foreground">Open a new tab or move an existing one here.</p>
+                        <p class="text-muted-foreground text-sm">Open a new tab or move an existing one here.</p>
                     </div>
                     <PaneMenu align="start" {position} {handler} />
                 </div>

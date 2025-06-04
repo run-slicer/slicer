@@ -32,15 +32,15 @@
 
 <div
     out:fade={{ duration }}
-    class="absolute left-0 top-0 z-10 h-full w-full bg-background/80 backdrop-blur-xs will-change-[opacity]"
+    class="bg-background/80 absolute top-0 left-0 z-10 h-full w-full backdrop-blur-xs will-change-[opacity]"
 >
     <div class={cn("flex w-full flex-col items-center", center ? "h-full justify-center" : "mt-16", clazz)}>
-        <div class="h-16 w-16 animate-spin rounded-full border-4 border-t-4 border-muted border-t-primary"></div>
+        <div class="border-muted border-t-primary h-16 w-16 animate-spin rounded-full border-4 border-t-4"></div>
         {#if value}
-            <span class="mt-2 text-muted-foreground">{value}</span>
+            <span class="text-muted-foreground mt-2">{value}</span>
         {/if}
         {#if timed}
-            <span class="mt-1 text-xs text-muted-foreground">{time}ms</span>
+            <span class="text-muted-foreground mt-1 text-xs">{time}ms</span>
         {/if}
     </div>
 </div>

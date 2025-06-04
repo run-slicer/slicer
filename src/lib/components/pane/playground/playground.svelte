@@ -64,11 +64,11 @@
             <ResultLine {result} />
         {/each}
     </div>
-    <div class="flex w-full flex-row border-t border-t-input px-3 py-2">
+    <div class="border-t-input flex w-full flex-row border-t px-3 py-2">
         <ChevronsRight class="mr-2 size-4" />
         <textarea
             bind:value
-            class="min-h-10 w-full resize-none overflow-hidden bg-background font-mono text-xs focus-visible:outline-hidden"
+            class="bg-background min-h-10 w-full resize-none overflow-hidden font-mono text-xs focus-visible:outline-hidden"
             spellcheck="false"
             onkeydown={handleKeyDown}
             oninput={handleInput}

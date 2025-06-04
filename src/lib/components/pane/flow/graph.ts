@@ -116,7 +116,7 @@ export const createComputedGraph = async (
                     y: elkNode?.y ?? 0,
                 },
                 // highlight entrypoint node
-                style: d.node.offset === 0 ? "border: 1px solid hsl(var(--primary));" : undefined,
+                style: d.node.offset === 0 ? "border: 1px solid var(--primary);" : undefined,
             };
         }),
         [
@@ -156,7 +156,7 @@ export const createComputedGraph = async (
             ...excEdges.map((edge) => ({
                 id: `${edge.source}-${edge.target}`,
                 type: "elk-edge",
-                style: "stroke: hsl(var(--destructive));",
+                style: "stroke: var(--destructive);",
                 label: edge.catchType,
                 source: `${edge.source}`,
                 target: `${edge.target}`,

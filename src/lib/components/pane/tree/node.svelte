@@ -53,11 +53,11 @@
     {#if sortedNodes}
         {@const ExpandedIcon = expanded ? ChevronDown : ChevronRight}
         <button class="highlight flex w-full py-[0.2rem]" onclick={() => (expanded = !expanded)}>
-            <ExpandedIcon size={14} class="my-auto mr-1 min-w-[14px] text-muted-foreground" />
+            <ExpandedIcon size={14} class="text-muted-foreground my-auto mr-1 min-w-[14px]" />
             {#if data.entry}
                 <FileIcon size={16} class={cn("my-auto mr-1 min-w-[16px]", classes)} />
             {:else}
-                <Folder size={16} class="my-auto mr-1 min-w-[16px] fill-muted" />
+                <Folder size={16} class="fill-muted my-auto mr-1 min-w-[16px]" />
             {/if}
             <span class="text-sm">{data.label}</span>
         </button>
@@ -67,7 +67,7 @@
                     data={node}
                     {onopen}
                     {onmenu}
-                    class={cn("border-l border-l-border pl-4.5", hasNonLeaf || "pl-9")}
+                    class={cn("border-l-border border-l pl-4.5", hasNonLeaf || "pl-9")}
                 />
             {/each}
         {/if}
@@ -81,10 +81,11 @@
 
 <style>
     .highlight:hover {
-        border-image: conic-gradient(hsl(var(--accent) / 0.4) 0, hsl(var(--accent) / 0.4) 0) fill 0/0/0 100vw;
+        border-image: conic-gradient(oklch(from var(--accent) l c h / 0.4) 0, oklch(from var(--accent) l c h / 0.4) 0)
+            fill 0/0/0 100vw;
     }
 
     .highlight:focus {
-        border-image: conic-gradient(hsl(var(--accent)) 0, hsl(var(--accent)) 0) fill 0/0/0 100vw;
+        border-image: conic-gradient(var(--accent) 0, var(--accent) 0) fill 0/0/0 100vw;
     }
 </style>
