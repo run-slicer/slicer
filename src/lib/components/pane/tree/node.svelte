@@ -67,7 +67,7 @@
                     data={node}
                     {onopen}
                     {onmenu}
-                    class={cn("border-l border-l-border pl-[1.125rem]", hasNonLeaf || "pl-[2.25rem]")}
+                    class={cn("border-l border-l-border pl-4.5", hasNonLeaf || "pl-9")}
                 />
             {/each}
         {/if}

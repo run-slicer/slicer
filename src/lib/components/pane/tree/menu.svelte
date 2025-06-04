@@ -24,13 +24,13 @@
     let entry = $derived(node.entry);
 </script>
 
-<ContextMenuContent class="min-w-[12rem] max-w-[16rem]">
+<ContextMenuContent class="min-w-48 max-w-[16rem]">
     <ContextMenuLabel center>{node.label}</ContextMenuLabel>
     <ContextMenuSeparator />
     {#if entry}
         <ContextMenuSub>
             <ContextMenuSubTrigger>Open as</ContextMenuSubTrigger>
-            <ContextMenuSubContent class="w-[12rem]">
+            <ContextMenuSubContent class="w-48">
                 {#if entry.type !== EntryType.ARCHIVE}
                     <ContextMenuItem class="flex justify-between" onclick={() => handler.open(entry, TabType.CODE)}>
                         Code <Code size={16} />
@@ -64,7 +64,7 @@
         </ContextMenuItem>
     {/if}
     <ContextMenuItem
-        class="flex justify-between data-[highlighted]:bg-destructive data-[highlighted]:text-destructive-foreground"
+        class="flex justify-between data-highlighted:bg-destructive data-highlighted:text-destructive-foreground"
         onclick={() => ondelete?.(node)}
     >
         Delete <Trash2 size={16} />

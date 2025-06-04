@@ -33,7 +33,7 @@
 
 <MenubarSub>
     <MenubarSubTrigger>{script?.name || proto.id}</MenubarSubTrigger>
-    <MenubarSubContent class="w-[12rem]">
+    <MenubarSubContent class="w-48">
         <MenubarCheckboxItem
             checked={proto.state === ScriptState.LOADED}
             disabled={proto.state === ScriptState.FAILED}
@@ -47,7 +47,7 @@
         </MenubarItem>
         <MenubarItem
             inset
-            class="justify-between data-[highlighted]:bg-destructive data-[highlighted]:text-destructive-foreground"
+            class="justify-between data-highlighted:bg-destructive data-highlighted:text-destructive-foreground"
             onclick={() => ondelete?.(proto)}
         >
             Delete <Trash2 size={16} />

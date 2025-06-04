@@ -68,7 +68,7 @@
         <ChevronsRight class="mr-2 size-4" />
         <textarea
             bind:value
-            class="min-h-10 w-full resize-none overflow-hidden bg-background font-mono text-xs focus-visible:outline-none"
+            class="min-h-10 w-full resize-none overflow-hidden bg-background font-mono text-xs focus-visible:outline-hidden"
             spellcheck="false"
             onkeydown={handleKeyDown}
             oninput={handleInput}

@@ -74,12 +74,12 @@
     };
 </script>
 
-<ContextMenuContent class="w-[12rem]">
+<ContextMenuContent class="w-48">
     <ContextMenuLabel>Flow chart</ContextMenuLabel>
     <ContextMenuSeparator />
     <ContextMenuSub>
         <ContextMenuSubTrigger>Export</ContextMenuSubTrigger>
-        <ContextMenuSubContent class="w-[12rem]">
+        <ContextMenuSubContent class="w-48">
             <ContextMenuItem class="flex justify-between" onclick={() => exportImage("svg")}>
                 SVG <CodeXml size={16} />
             </ContextMenuItem>

@@ -32,7 +32,7 @@
 
 <div
     out:fade={{ duration }}
-    class="absolute left-0 top-0 z-10 h-full w-full bg-background/80 backdrop-blur-sm will-change-[opacity]"
+    class="absolute left-0 top-0 z-10 h-full w-full bg-background/80 backdrop-blur-xs will-change-[opacity]"
 >
     <div class={cn("flex w-full flex-col items-center", center ? "h-full justify-center" : "mt-16", clazz)}>
         <div class="h-16 w-16 animate-spin rounded-full border-4 border-t-4 border-muted border-t-primary"></div>

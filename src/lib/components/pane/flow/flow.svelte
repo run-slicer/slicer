@@ -80,7 +80,7 @@
                                 aria-label="toggle exception handler edges"
                             >
                                 {@const Icon = showHandlerEdges ? Zap : ZapOff}
-                                <Icon size={12} class="!fill-none" />
+                                <Icon size={12} class="fill-none!" />
                             </ControlButton>
                         </Controls>
                     </SvelteFlow>

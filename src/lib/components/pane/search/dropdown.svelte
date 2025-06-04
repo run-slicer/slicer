@@ -58,7 +58,7 @@
 <DropdownMenu>
     <DropdownMenuTrigger
         {disabled}
-        class={cn(buttonVariants({ variant: "outline" }), "min-w-44 justify-between rounded-r-none border-r-0")}
+        class={cn(buttonVariants({ variant: "outline-solid" }), "min-w-44 justify-between rounded-r-none border-r-0")}
     >
         {currentType.label}
         <ChevronsUpDown class="opacity-50" />

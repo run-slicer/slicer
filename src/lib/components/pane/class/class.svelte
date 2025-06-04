@@ -40,7 +40,7 @@
                         </Button>
                     {/snippet}
                 </DropdownMenuTrigger>
-                <DropdownMenuContent class="w-[12rem]" align="end">
+                <DropdownMenuContent class="w-48" align="end">
                     <DropdownMenuItem class="justify-between" onclick={() => handler.open(entry, TabType.CODE)}>
                         Disassemble <Code size={16} />
                     </DropdownMenuItem>

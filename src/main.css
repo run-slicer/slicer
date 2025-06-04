@@ -1,6 +1,35 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+@config '../tailwind.config.ts';
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+@utility break-anywhere {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+@utility scrollbar-none {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
 
 @layer base {
     :root {
@@ -92,17 +121,6 @@
     }
     #app {
         @apply flex h-full w-full flex-col overflow-hidden;
-    }
-}
-
-@layer utilities {
-    .break-anywhere {
-        overflow-wrap: anywhere;
-        word-break: normal;
-    }
-
-    .scrollbar-none::-webkit-scrollbar {
-        display: none;
     }
 }
 
