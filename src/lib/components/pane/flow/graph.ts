@@ -14,7 +14,7 @@ export type NodeData = {
     height: number;
 };
 
-const monoFont = `400 12px / 18px "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace`;
+const monoFont = `400 12px / 18px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace`;
 
 const canvas = document.createElement("canvas");
 const computeTextSize = (text: string): TextMetrics => {
@@ -83,7 +83,8 @@ export const createComputedGraph = async (
             node,
             lines,
             width: metrics.width + 24,
-            height: (metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent) * lines.length * 1.125 + 24,
+            // TODO: fix font magic value
+            height: (metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent) * lines.length * 1.285 + 24,
         };
     });
 

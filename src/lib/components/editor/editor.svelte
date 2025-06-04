@@ -62,9 +62,9 @@
         ".cm-scroller": {
             // make scrollbar thinner
             "scrollbar-width": "thin",
-            // use new font
+            // use Tailwind monospace fonts
             "font-family":
-                '"Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+                'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
         },
         ".cm-panels": {
             // fix color on panel container

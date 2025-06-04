@@ -90,9 +90,9 @@
         </ContextMenu>
     </SvelteFlowProvider>
     {#if entry.type !== EntryType.MEMBER}
-        <div class="absolute bottom-0 m-[15px] max-w-[425px]">
+        <div class="absolute bottom-0 m-[15px]">
             <Select type="single" bind:value={method}>
-                <SelectTrigger class="h-7 text-xs whitespace-nowrap [&_svg]:ml-2 [&_svg]:h-4 [&_svg]:w-4">
+                <SelectTrigger class="h-7 max-w-[425px] text-xs whitespace-nowrap [&_svg]:ml-2 [&_svg]:h-4 [&_svg]:w-4">
                     <div class="overflow-hidden text-ellipsis">
                         <span class="text-muted-foreground mr-2">Method: </span>
                         <span class="font-mono tracking-tight">{createLabel(member)}</span>
