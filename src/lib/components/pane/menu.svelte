@@ -29,7 +29,7 @@
 </script>
 
 <Popover bind:open>
-    <PopoverTrigger>
+    <PopoverTrigger class="max-w-[180px]">
         {#snippet child({ props })}
             {#if children}
                 {@render children(props)}
