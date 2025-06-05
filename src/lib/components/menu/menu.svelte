@@ -42,7 +42,6 @@
     import {
         Binary,
         BookOpen,
-        Circle,
         Clipboard,
         Code,
         Coffee,
@@ -137,17 +136,20 @@
                 <MenubarSeparator />
                 <MenubarSub>
                     <MenubarSubTrigger>Theme</MenubarSubTrigger>
-                    <MenubarSubContent align="start">
+                    <MenubarSubContent class="min-w-[12rem]" align="start">
                         <MenubarSub>
                             <MenubarSubTrigger inset>Color</MenubarSubTrigger>
                             <MenubarSubContent align="start">
                                 <MenubarRadioGroup bind:value={$themeColor}>
                                     {#each themes as theme (theme.name)}
-                                        {@const activeColor =
-                                            mode.current === "light" ? theme.activeColor.light : theme.activeColor.dark}
-                                        <MenubarRadioItem value={theme.name} class="justify-between">
+                                        {@const cssVars =
+                                            mode.current === "light" ? theme.cssVars.light : theme.cssVars.dark}
+                                        <MenubarRadioItem value={theme.name} class="items-center justify-between gap-4">
                                             {theme.label || theme.name}
-                                            <Circle size={16} style="stroke: {activeColor}; fill: {activeColor};" />
+                                            <div
+                                                class="size-4 rounded-full"
+                                                style="background: conic-gradient({cssVars.primary}, {cssVars.secondary});"
+                                            ></div>
                                         </MenubarRadioItem>
                                     {/each}
                                 </MenubarRadioGroup>

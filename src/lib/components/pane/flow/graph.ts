@@ -82,9 +82,8 @@ export const createComputedGraph = async (
         return {
             node,
             lines,
-            width: metrics.width + 24,
-            // TODO: fix font magic value
-            height: (metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent) * lines.length * 1.285 + 24,
+            width: metrics.width + 20 /* padding */ + 2 /* border */,
+            height: 18 /* line height */ * lines.length + 20 /* padding */ + 2 /* border */,
         };
     });
 
