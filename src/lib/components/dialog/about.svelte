@@ -46,7 +46,7 @@
                 </p>
             </div>
         </div>
-        <p class="mt-2 text-center text-sm text-muted-foreground">
+        <p class="text-muted-foreground mt-2 text-center text-sm">
             Open-source ❤️
             <span class="mx-2">@</span>
             <a href="https://github.com/run-slicer/slicer" class="text-blue-600 hover:text-blue-700 hover:underline">

@@ -24,10 +24,10 @@
 <div
     role="button"
     tabindex="-1"
-    class="flex cursor-pointer justify-between px-4 py-1 text-xs hover:bg-muted"
+    class="hover:bg-muted flex cursor-pointer justify-between px-4 py-1 text-xs"
     onclick={handleOpen}
     onkeydown={handleOpen}
 >
     <span class="break-anywhere font-mono">{result.value}</span>
-    <span class="pl-2 text-muted-foreground" title={result.entry.name}>{result.entry.shortName}</span>
+    <span class="text-muted-foreground pl-2" title={result.entry.name}>{result.entry.shortName}</span>
 </div>

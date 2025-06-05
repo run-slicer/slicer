@@ -40,7 +40,7 @@
                         </Button>
                     {/snippet}
                 </DropdownMenuTrigger>
-                <DropdownMenuContent class="w-[12rem]" align="end">
+                <DropdownMenuContent class="w-48" align="end">
                     <DropdownMenuItem class="justify-between" onclick={() => handler.open(entry, TabType.CODE)}>
                         Disassemble <Code size={16} />
                     </DropdownMenuItem>
@@ -68,6 +68,6 @@
     <div class="flex h-full w-full flex-col items-center justify-center">
         <FileQuestion class="mb-4 animate-bounce text-red-600" size={128} />
         <p class="mb-1 text-2xl font-semibold">Is the file a class file?</p>
-        <p class="mb-32 text-sm text-muted-foreground">Failed to read ClassFile structures.</p>
+        <p class="text-muted-foreground mb-32 text-sm">Failed to read ClassFile structures.</p>
     </div>
 {/if}

@@ -14,7 +14,7 @@ export type NodeData = {
     height: number;
 };
 
-const monoFont = `400 12px / 18px "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace`;
+const monoFont = `400 12px / 18px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace`;
 
 const canvas = document.createElement("canvas");
 const computeTextSize = (text: string): TextMetrics => {
@@ -82,8 +82,8 @@ export const createComputedGraph = async (
         return {
             node,
             lines,
-            width: metrics.width + 24,
-            height: (metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent) * lines.length * 1.125 + 24,
+            width: metrics.width + 20 /* padding */ + 2 /* border */,
+            height: 18 /* line height */ * lines.length + 20 /* padding */ + 2 /* border */,
         };
     });
 
@@ -116,7 +116,7 @@ export const createComputedGraph = async (
                     y: elkNode?.y ?? 0,
                 },
                 // highlight entrypoint node
-                style: d.node.offset === 0 ? "border: 1px solid hsl(var(--primary));" : undefined,
+                style: d.node.offset === 0 ? "border: 1px solid var(--primary);" : undefined,
             };
         }),
         [
@@ -156,7 +156,7 @@ export const createComputedGraph = async (
             ...excEdges.map((edge) => ({
                 id: `${edge.source}-${edge.target}`,
                 type: "elk-edge",
-                style: "stroke: hsl(var(--destructive));",
+                style: "stroke: var(--destructive);",
                 label: edge.catchType,
                 source: `${edge.source}`,
                 target: `${edge.target}`,

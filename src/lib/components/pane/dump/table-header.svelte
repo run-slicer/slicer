@@ -17,7 +17,7 @@
     <button
         type="button"
         aria-label="Toggle ordering"
-        class="ml-2 cursor-pointer hover:text-accent-foreground"
+        class="hover:text-accent-foreground ml-2 cursor-pointer"
         {onclick}
     >
         <OrderIcon size={16} />

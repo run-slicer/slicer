@@ -23,7 +23,7 @@
 </script>
 
 <Table>
-    <TableHeader class="sticky top-0 z-10 bg-background shadow-lg">
+    <TableHeader class="bg-background sticky top-0 z-10 shadow-lg">
         <TableRow>
             <TableHead>Index</TableHead>
             <TableHead>Modifiers</TableHead>
@@ -58,7 +58,7 @@
                                     </Button>
                                 {/snippet}
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent class="w-[12rem]" align="end">
+                            <DropdownMenuContent class="w-48" align="end">
                                 <DropdownMenuItem
                                     class="justify-between"
                                     onclick={() => handler.open(memberEntry(entry, method), TabType.CODE)}

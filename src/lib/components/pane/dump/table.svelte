@@ -160,7 +160,7 @@
             }}
         />
         <div class="flex items-center space-x-4">
-            <div class="text-sm text-muted-foreground">
+            <div class="text-muted-foreground text-sm">
                 {pageSize * pageIndex + 1}-{pageSize * (pageIndex + 1)} of {entries.length} items
             </div>
             <Button
@@ -182,7 +182,7 @@
                 {#each table.getHeaderGroups() as headerGroup (headerGroup.id)}
                     <TableRow>
                         {#each headerGroup.headers as header (header.id)}
-                            <TableHead class="whitespace-nowrap bg-background brightness-125">
+                            <TableHead class="bg-background whitespace-nowrap brightness-125">
                                 {#if !header.isPlaceholder}
                                     <FlexRender
                                         content={header.column.columnDef.header}

@@ -32,7 +32,7 @@
 </script>
 
 <Separator />
-<div class="flex h-6 items-center justify-between overflow-x-auto px-2 scrollbar-none">
+<div class="scrollbar-none flex h-6 items-center justify-between overflow-x-auto px-2">
     <Breadcrumb>
         {#if tab?.entry}
             {@const entries = flatten(tab.entry)}
@@ -57,11 +57,11 @@
             </BreadcrumbList>
         {/if}
     </Breadcrumb>
-    <div class="flex flex-row text-xs text-muted-foreground">
+    <div class="text-muted-foreground flex flex-row text-xs">
         <Tasks {tasks} />
         {#if tab && encoding && isEncodingDependent(tab)}
             {#if tasks.length > 0}
-                <span class="px-2 text-muted-foreground/60">|</span>
+                <span class="text-muted-foreground/60 px-2">|</span>
             {/if}
             <span>{encoding.label || encoding.id.toUpperCase()}</span>
         {/if}

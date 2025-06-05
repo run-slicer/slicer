@@ -11,5 +11,5 @@
 </script>
 
 <button title={label} aria-label={label} {onclick}>
-    <IconComponent size={14} class="min-w-[14px] hover:text-muted-foreground" />
+    <IconComponent size={14} class="hover:text-muted-foreground min-w-[14px]" />
 </button>

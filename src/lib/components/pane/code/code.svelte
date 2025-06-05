@@ -46,7 +46,7 @@
     });
 </script>
 
-<div class="relative basis-full overflow-hidden scrollbar-thin">
+<div class="scrollbar-thin relative basis-full overflow-hidden">
     {#await Promise.all([loadLanguage(language), readPromise])}
         <Loading value={shouldDisasm ? "Disassembling..." : "Reading..."} timed />
     {:then [lang, value]}
@@ -58,10 +58,10 @@
         </ContextMenu>
     {/await}
     {#if shouldDisasm}
-        <div class="absolute bottom-0 right-0 z-20 m-[15px]">
+        <div class="absolute right-0 bottom-0 z-20 m-[15px]">
             <Select type="single" bind:value={disasmId}>
                 <SelectTrigger class="h-7 text-xs [&_svg]:ml-2 [&_svg]:h-4 [&_svg]:w-4">
-                    <span class="mr-2 text-muted-foreground">Disassembler: </span>
+                    <span class="text-muted-foreground mr-2">Disassembler: </span>
                     <span class="tracking-tight">{disasm.name || disasm.id}</span>
                 </SelectTrigger>
                 <SelectContent class="max-h-[240px] w-full overflow-scroll" side="top" align="end">

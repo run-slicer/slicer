@@ -16,7 +16,7 @@
 
 <div
     class={cn(
-        "flex flex-col gap-1.5 border-b border-b-border px-3 py-2 font-mono text-xs",
+        "border-b-border flex flex-col gap-1.5 border-b px-3 py-2 font-mono text-xs",
         error && "bg-destructive/60"
     )}
 >

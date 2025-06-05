@@ -43,7 +43,7 @@
     {@const hasCheckbox = groupOption.options.some((o) => o.type === "checkbox")}
     <MenubarSub>
         <MenubarSubTrigger {inset}>{option.label || option.id}</MenubarSubTrigger>
-        <MenubarSubContent class="w-[12rem]">
+        <MenubarSubContent class="w-48">
             {#each groupOption.options as subOption (subOption.id)}
                 <ScriptOption inset={hasCheckbox} {proto} option={subOption} />
             {/each}
@@ -58,7 +58,7 @@
 {:else if option.type === "radio"}
     <MenubarSub>
         <MenubarSubTrigger {inset}>{option.label || option.id}</MenubarSubTrigger>
-        <MenubarSubContent class="w-[12rem]">
+        <MenubarSubContent class="w-48">
             <MenubarRadioGroup value={radioOption.selected} onValueChange={handleRadio}>
                 {#each radioOption.items as subOption (subOption.id)}
                     <MenubarRadioItem value={subOption.id}>{subOption.label || subOption.id}</MenubarRadioItem>

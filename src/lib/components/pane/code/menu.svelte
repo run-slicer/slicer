@@ -29,7 +29,7 @@
     let entry = $derived(tab.entry!);
 </script>
 
-<ContextMenuContent class="w-[12rem]">
+<ContextMenuContent class="w-48">
     <ContextMenuLabel inset>Editor</ContextMenuLabel>
     <ContextMenuSeparator />
     <ContextMenuCheckboxItem class="justify-between" bind:checked={wrap}>
@@ -43,7 +43,7 @@
     <ContextMenuSeparator />
     <ContextMenuSub>
         <ContextMenuSubTrigger inset>Export</ContextMenuSubTrigger>
-        <ContextMenuSubContent class="w-[12rem]">
+        <ContextMenuSubContent class="w-48">
             <ContextMenuItem class="flex justify-between" onclick={() => handler.export([entry])}>
                 Raw <Binary size={16} />
             </ContextMenuItem>

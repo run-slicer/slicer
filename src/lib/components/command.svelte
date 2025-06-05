@@ -65,7 +65,7 @@
                 {#key filteredEntries.length}
                     <VList data={filteredEntries} getKey={(e) => e.name} class="p-2">
                         {#snippet children(entry)}
-                            <CommandItem class="!py-2.5" onSelect={() => handleClick(entry)}>
+                            <CommandItem class="py-2.5!" onSelect={() => handleClick(entry)}>
                                 {@const { icon: Icon, classes } = fileIcon(entry.shortName)}
                                 <Icon class={classes} />
                                 <span class="break-anywhere">{entry.name}</span>
@@ -74,7 +74,7 @@
                     </VList>
                 {/key}
             {:else}
-                <p class="py-4 text-center text-sm text-muted-foreground">
+                <p class="text-muted-foreground py-4 text-center text-sm">
                     There's nothing here? Add something to the workspace.
                 </p>
             {/if}

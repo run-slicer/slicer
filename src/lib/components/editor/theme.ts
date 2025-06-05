@@ -22,12 +22,12 @@ interface Settings {
 const createTheme = ({ dark, settings, styles }: ThemeOptions): Extension => {
     const themeOptions: Record<string, Record<string, any>> = {
         "&": {
-            backgroundColor: "hsl(var(--background))",
-            color: "hsl(var(--foreground))",
+            backgroundColor: "var(--background)",
+            color: "var(--foreground)",
         },
         ".cm-gutters": {
-            backgroundColor: "hsl(var(--background))",
-            color: "hsl(var(--muted-foreground))",
+            backgroundColor: "var(--background)",
+            color: "var(--muted-foreground)",
         },
     };
 

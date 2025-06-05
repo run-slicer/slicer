@@ -80,7 +80,7 @@
                                 aria-label="toggle exception handler edges"
                             >
                                 {@const Icon = showHandlerEdges ? Zap : ZapOff}
-                                <Icon size={12} class="!fill-none" />
+                                <Icon size={12} class="fill-none!" />
                             </ControlButton>
                         </Controls>
                     </SvelteFlow>
@@ -90,18 +90,18 @@
         </ContextMenu>
     </SvelteFlowProvider>
     {#if entry.type !== EntryType.MEMBER}
-        <div class="absolute bottom-0 m-[15px] max-w-[425px]">
+        <div class="absolute bottom-0 m-[15px]">
             <Select type="single" bind:value={method}>
-                <SelectTrigger class="h-7 whitespace-nowrap text-xs [&_svg]:ml-2 [&_svg]:h-4 [&_svg]:w-4">
+                <SelectTrigger class="h-7 max-w-[425px] text-xs whitespace-nowrap [&_svg]:ml-2 [&_svg]:h-4 [&_svg]:w-4">
                     <div class="overflow-hidden text-ellipsis">
-                        <span class="mr-2 text-muted-foreground">Method: </span>
+                        <span class="text-muted-foreground mr-2">Method: </span>
                         <span class="font-mono tracking-tight">{createLabel(member)}</span>
                     </div>
                 </SelectTrigger>
                 <SelectContent class="max-h-[240px] w-full overflow-scroll" side="top" align="start">
                     {#each methods as mth, i}
                         {@const label = createLabel(mth)}
-                        <SelectItem value={i.toString()} {label} class="break-all font-mono text-xs tracking-tight">
+                        <SelectItem value={i.toString()} {label} class="font-mono text-xs tracking-tight break-all">
                             {label}
                         </SelectItem>
                     {/each}

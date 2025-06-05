@@ -42,7 +42,6 @@
     import {
         Binary,
         BookOpen,
-        Circle,
         Clipboard,
         Code,
         Coffee,
@@ -137,20 +136,20 @@
                 <MenubarSeparator />
                 <MenubarSub>
                     <MenubarSubTrigger>Theme</MenubarSubTrigger>
-                    <MenubarSubContent class="w-[12rem]" align="start">
+                    <MenubarSubContent class="min-w-[12rem]" align="start">
                         <MenubarSub>
                             <MenubarSubTrigger inset>Color</MenubarSubTrigger>
-                            <MenubarSubContent class="w-[12rem]" align="start">
+                            <MenubarSubContent align="start">
                                 <MenubarRadioGroup bind:value={$themeColor}>
                                     {#each themes as theme (theme.name)}
-                                        {@const activeColor =
-                                            mode.current === "light" ? theme.activeColor.light : theme.activeColor.dark}
-                                        <MenubarRadioItem value={theme.name} class="justify-between">
+                                        {@const cssVars =
+                                            mode.current === "light" ? theme.cssVars.light : theme.cssVars.dark}
+                                        <MenubarRadioItem value={theme.name} class="items-center justify-between gap-4">
                                             {theme.label || theme.name}
-                                            <Circle
-                                                size={16}
-                                                style="stroke: hsl({activeColor}); fill: hsl({activeColor});"
-                                            />
+                                            <div
+                                                class="size-4 rounded-full"
+                                                style="background: conic-gradient({cssVars.primary}, {cssVars.secondary});"
+                                            ></div>
                                         </MenubarRadioItem>
                                     {/each}
                                 </MenubarRadioGroup>
@@ -158,7 +157,7 @@
                         </MenubarSub>
                         <MenubarSub>
                             <MenubarSubTrigger inset>Radius</MenubarSubTrigger>
-                            <MenubarSubContent class="w-[12rem]" align="start">
+                            <MenubarSubContent align="start">
                                 <MenubarRadioGroup
                                     value={$themeRadius.toString()}
                                     onValueChange={(v) => ($themeRadius = parseFloat(v || "0.5"))}
@@ -199,13 +198,13 @@
                 <MenubarItem disabled={entries.length === 0} onclick={() => (clearOpen = true)}>Clear all</MenubarItem>
                 <MenubarSub>
                     <MenubarSubTrigger disabled={entries.length === 0}>Export all</MenubarSubTrigger>
-                    <MenubarSubContent class="w-[12rem]" align="start">
+                    <MenubarSubContent class="min-w-[12rem]" align="start">
                         <MenubarItem class="justify-between" onclick={() => exportEntries()}>
                             Raw <Binary size={16} />
                         </MenubarItem>
                         <MenubarSub>
                             <MenubarSubTrigger disabled={classes.length === 0}>Disassembled</MenubarSubTrigger>
-                            <MenubarSubContent class="w-[12rem]" align="start">
+                            <MenubarSubContent class="min-w-[12rem]" align="start">
                                 {#each disasms as dism}
                                     <MenubarItem class="justify-between" onclick={() => exportEntries(dism)}>
                                         {dism.name || dism.id}
@@ -228,7 +227,7 @@
                 <MenubarSeparator />
                 <MenubarSub>
                     <MenubarSubTrigger>ZIP encoding</MenubarSubTrigger>
-                    <MenubarSubContent class="w-[12rem]" align="start">
+                    <MenubarSubContent class="min-w-[12rem]" align="start">
                         <MenubarRadioGroup bind:value={$workspaceArchiveEncoding}>
                             {#each Object.values(encodings) as encoding}
                                 <MenubarRadioItem value={encoding.id} class="justify-between">
@@ -277,7 +276,7 @@
                 <MenubarSeparator />
                 <MenubarSub>
                     <MenubarSubTrigger>Encoding</MenubarSubTrigger>
-                    <MenubarSubContent class="w-[12rem]" align="start">
+                    <MenubarSubContent class="min-w-[12rem]" align="start">
                         <MenubarRadioGroup bind:value={$workspaceEncoding}>
                             {#each Object.values(encodings) as encoding}
                                 <MenubarRadioItem value={encoding.id} class="justify-between">
@@ -300,7 +299,7 @@
                     <MenubarSubTrigger disabled={!transformers.some((t) => !t.internal)}>
                         Transformers
                     </MenubarSubTrigger>
-                    <MenubarSubContent class="w-[12rem]" align="start">
+                    <MenubarSubContent class="min-w-[12rem]" align="start">
                         {@const groups = groupBy(
                             transformers.filter((t) => !t.internal),
                             (t) => t.group
@@ -308,7 +307,7 @@
                         {#each groups.entries() as [group, trfs]}
                             <MenubarSub>
                                 <MenubarSubTrigger>{group || "General"}</MenubarSubTrigger>
-                                <MenubarSubContent class="w-[12rem]" align="start">
+                                <MenubarSubContent class="min-w-[12rem]" align="start">
                                     {#each trfs as trf (trf.id)}
                                         {@const Icon = trf.icon}
                                         <MenubarCheckboxItem
@@ -336,7 +335,7 @@
             <MenubarContent align="start">
                 <MenubarSub>
                     <MenubarSubTrigger>Import</MenubarSubTrigger>
-                    <MenubarSubContent class="w-[12rem]" align="start">
+                    <MenubarSubContent class="min-w-[12rem]" align="start">
                         <MenubarItem class="justify-between" onclick={() => (scriptLoadOpen = true)}>
                             From URL <Globe size={16} />
                         </MenubarItem>
