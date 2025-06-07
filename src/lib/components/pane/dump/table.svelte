@@ -198,7 +198,7 @@
                 {#each table.getRowModel().rows as row (row.id)}
                     <TableRow data-state={row.getIsSelected() && "selected"}>
                         {#each row.getVisibleCells() as cell (cell.id)}
-                            <TableCell class="break-anywhere">
+                            <TableCell class="break-anywhere whitespace-normal">
                                 <FlexRender content={cell.column.columnDef.cell} context={cell.getContext()} />
                             </TableCell>
                         {/each}

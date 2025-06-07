@@ -31,8 +31,10 @@
                         </span>
                         ({field.access})
                     </TableCell>
-                    <TableCell class="break-anywhere font-mono tracking-tight">{field.type.string}</TableCell>
-                    <TableCell class="break-anywhere font-mono tracking-tight">
+                    <TableCell class="break-anywhere font-mono tracking-tight whitespace-normal">
+                        {field.type.string}
+                    </TableCell>
+                    <TableCell class="break-anywhere font-mono tracking-tight whitespace-normal">
                         {escapeLiteral(field.name.string)}
                     </TableCell>
                 </TableRow>

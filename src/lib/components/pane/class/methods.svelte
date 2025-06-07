@@ -44,10 +44,12 @@
                         </span>
                         ({method.access})
                     </TableCell>
-                    <TableCell class="break-anywhere font-mono tracking-tight">
+                    <TableCell class="break-anywhere font-mono tracking-tight whitespace-normal">
                         {escapeLiteral(method.name.string)}
                     </TableCell>
-                    <TableCell class="break-anywhere font-mono tracking-tight">{method.type.string}</TableCell>
+                    <TableCell class="break-anywhere font-mono tracking-tight whitespace-normal">
+                        {method.type.string}
+                    </TableCell>
                     <TableCell>
                         <DropdownMenu>
                             <DropdownMenuTrigger>

@@ -29,7 +29,7 @@
                             <span class="font-mono tracking-tight">{ConstantType[entry.type] || "<unknown>"}</span>
                             ({entry.type})
                         </TableCell>
-                        <TableCell class="break-anywhere font-mono tracking-tight">
+                        <TableCell class="break-anywhere font-mono tracking-tight whitespace-normal">
                             {formatEntry(entry, node.pool)}
                         </TableCell>
                     </TableRow>

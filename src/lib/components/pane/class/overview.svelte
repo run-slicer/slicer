@@ -52,7 +52,7 @@
     </TableRow>
     <TableRow>
         <TableHead>Name</TableHead>
-        <TableCell class="break-anywhere font-mono tracking-tight">{name}</TableCell>
+        <TableCell class="break-anywhere font-mono tracking-tight whitespace-normal">{name}</TableCell>
     </TableRow>
     <TableRow>
         <TableHead>Modifiers</TableHead>
@@ -69,7 +69,7 @@
     </TableRow>
     <TableRow>
         <TableHead>Interfaces</TableHead>
-        <TableCell class="break-anywhere font-mono tracking-tight">
+        <TableCell class="break-anywhere font-mono tracking-tight whitespace-normal">
             {#if interfaces.length > 0}
                 {#each interfaces as iff, i}
                     {iff}
@@ -82,10 +82,11 @@
     </TableRow>
     <TableRow>
         <TableHead>Signature</TableHead>
-        <TableCell class="break-anywhere font-mono tracking-tight">{signature || "<none>"}</TableCell>
+        <TableCell class="break-anywhere font-mono tracking-tight whitespace-normal">{signature || "<none>"}</TableCell>
     </TableRow>
     <TableRow>
         <TableHead>Source file</TableHead>
-        <TableCell class="break-anywhere font-mono tracking-tight">{sourceFile || "<none>"}</TableCell>
+        <TableCell class="break-anywhere font-mono tracking-tight whitespace-normal">{sourceFile || "<none>"}</TableCell
+        >
     </TableRow>
 </Table>
