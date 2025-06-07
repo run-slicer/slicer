@@ -200,7 +200,6 @@ export const refresh = async (tab: Tab, hard: boolean = false): Promise<Tab> => 
     if (hard && tab.entry) {
         tab.entry = await readDeferred({
             ...tab.entry,
-            type: EntryType.FILE,
             // unwrap any transforms, something may have touched the tab entry
             data: unwrapTransform(tab.entry.data),
             state: AnalysisState.NONE,
@@ -297,7 +296,9 @@ workspaceEncoding.subscribe(() => {
 
 // hard-refresh tabs on transformer change
 analysisTransformers.subscribe(() => {
-    refreshIf((tab) => tab.entry !== undefined && tab.entry.type === EntryType.CLASS, true).then();
+    refreshIf(({ entry }) => {
+        return entry !== undefined && (entry.type === EntryType.CLASS || entry.type === EntryType.MEMBER);
+    }, true).then();
 });
 
 // prettier-ignore
