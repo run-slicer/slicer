@@ -48,8 +48,8 @@ importers:
         specifier: 0.1.4-0.152
         version: 0.1.4-0.152
       '@run-slicer/jasm':
-        specifier: 0.3.1-6969690d0f
-        version: 0.3.1-6969690d0f
+        specifier: 0.4.0-2.8.0
+        version: 0.4.0-2.8.0
       '@run-slicer/procyon':
         specifier: 0.1.1-0.6.0
         version: 0.1.1-0.6.0
@@ -524,8 +524,8 @@ packages:
   '@run-slicer/cfr@0.1.4-0.152':
     resolution: {integrity: sha512-k0OIMP4J4f7LZ0UX7+FT6zjtuDjuN6G0pvb1VRtMEPt9pYJgzRgnP3s7bfk8lh9PuAmD7IN9Heyzq/TyUf0Duw==}
 
-  '@run-slicer/jasm@0.3.1-6969690d0f':
-    resolution: {integrity: sha512-kcJWAe/+tAQIl9Bu8k7h1JPqTKXHWbXqKOSInuBOy7ZKilg7Q7hcvYJcZCgffo7bhUh8MIZN92OGyIy57sED/g==}
+  '@run-slicer/jasm@0.4.0-2.8.0':
+    resolution: {integrity: sha512-rn+AdzVMij2jHMkIusu7RJpSrRP3RNdf0B0RlHcMBNznDon9a1sK94C1FYdqlbYFkZuiPPyJxSNc5s8C0BlFgA==}
 
   '@run-slicer/procyon@0.1.1-0.6.0':
     resolution: {integrity: sha512-LoWGZwtAvmnaW0dXShyXw/aPyznLgQNwBwZwHvOJIlntYkkJ6IOY3E47qB+BgI5coUK8Xb/ahonLX93wsWNF6A==}
@@ -1570,7 +1570,7 @@ snapshots:
 
   '@run-slicer/cfr@0.1.4-0.152': {}
 
-  '@run-slicer/jasm@0.3.1-6969690d0f': {}
+  '@run-slicer/jasm@0.4.0-2.8.0': {}
 
   '@run-slicer/procyon@0.1.1-0.6.0': {}
 
