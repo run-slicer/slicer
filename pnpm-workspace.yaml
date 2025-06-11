@@ -1,2 +1,0 @@
-patchedDependencies:
-  wasm-imports-parser: patches/wasm-imports-parser.patch
