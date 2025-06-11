@@ -26,7 +26,7 @@
         "@lezer/highlight": "^1.2.1",
         "@run-slicer/asm": "^0.16.0",
         "@run-slicer/cfr": "0.1.4-0.152",
-        "@run-slicer/jasm": "0.4.0-2.8.0",
+        "@run-slicer/jasm": "0.4.1-2.8.0",
         "@run-slicer/procyon": "0.1.1-0.6.0",
         "@run-slicer/script": "^0.11.1",
         "@run-slicer/vf": "0.2.1-1.11.1",
