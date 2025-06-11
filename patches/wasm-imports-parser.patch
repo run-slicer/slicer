@@ -1,0 +1,17 @@
+diff --git a/polyfill.js b/polyfill.js
+index 13c83e5a022b4460f6eb10ab1bf5839b7c928241..b25101c6d4ea6a4a3a6c9a992b8d04693d0d0488 100644
+--- a/polyfill.js
++++ b/polyfill.js
+@@ -39,10 +39,10 @@ export const hasWasmTypeReflectionSupport = (() => {
+ export function polyfill(WebAssembly) {
+     // Check if the WebAssembly type reflection is supported.
+ 
+-    if (hasWasmTypeReflectionSupport) {
++    /*if (hasWasmTypeReflectionSupport) {
+         // If the WebAssembly type reflection is supported, no need to polyfill.
+         return WebAssembly;
+-    }
++    }*/
+ 
+     // Re-construct the WebAssembly object with the polyfill.
+     const newWebAssembly = {};

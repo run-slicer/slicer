@@ -1,5 +1,6 @@
 # lock files
 pnpm-lock.yaml
+pnpm-workspace.yaml
 
 # shadcn-svelte
 components.json
