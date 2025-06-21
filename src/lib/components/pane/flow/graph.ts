@@ -7,7 +7,7 @@ import { AttributeType } from "@run-slicer/asm/spec";
 import type { Edge, MarkerType, Node } from "@xyflow/svelte";
 import ELK, { type ElkNode } from "elkjs/lib/elk-api";
 
-export type NodeData = {
+export type ControlFlowNodeData = {
     node: GraphNode;
     lines: string[];
     width: number;
@@ -46,7 +46,6 @@ const elk = new ELK({
     workerFactory: () => new Worker(new URL("elkjs/lib/elk-worker.js", import.meta.url)),
 });
 
-
 export const computeControlFlowGraph = async (
     method: Member,
     pool: Pool,
@@ -72,7 +71,7 @@ export const computeControlFlowGraph = async (
             }));
     });
 
-    const data: NodeData[] = nodes.map((node) => {
+    const data: ControlFlowNodeData[] = nodes.map((node) => {
         const lines = node.insns.map((i) => formatInsn(code, i, pool, false));
         const metrics = computeTextSize(lines.reduce((a, b) => (a.length > b.length ? a : b)));
 
@@ -106,7 +105,7 @@ export const computeControlFlowGraph = async (
 
             return {
                 id: `${d.node.offset}`,
-                type: "elk-node",
+                type: "cf-node",
                 data: d,
                 position: {
                     x: elkNode?.x ?? 0,
@@ -136,7 +135,7 @@ export const computeControlFlowGraph = async (
 
                 return {
                     id: `${edge.source}-${edge.target}`,
-                    type: "elk-edge",
+                    type: "auto-edge",
                     label,
                     source: `${edge.source}`,
                     target: `${edge.target}`,
@@ -152,7 +151,7 @@ export const computeControlFlowGraph = async (
             }),
             ...excEdges.map((edge) => ({
                 id: `${edge.source}-${edge.target}`,
-                type: "elk-edge",
+                type: "auto-edge",
                 style: "stroke: var(--destructive);",
                 label: edge.catchType,
                 source: `${edge.source}`,

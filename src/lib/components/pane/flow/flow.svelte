@@ -14,7 +14,7 @@
     import { Select, SelectContent, SelectItem, SelectTrigger } from "$lib/components/ui/select";
     import { ContextMenu, ContextMenuTrigger } from "$lib/components/ui/context-menu";
     import Loading from "$lib/components/loading.svelte";
-    import FlowNode from "./node.svelte";
+    import ControlFlowNode from "./nodes/control_flow.svelte";
     import FlowEdge from "./edge.svelte";
     import FlowMenu from "./menu.svelte";
     import { computeControlFlowGraph } from "./graph";
@@ -30,25 +30,20 @@
     const pool = node ? node.pool : [];
     const methods = node ? node.methods : [];
 
-    let member = $state(
-        entry.type === EntryType.MEMBER ? (entry as MemberEntry).member : null
-    );
+    let member = $state(entry.type === EntryType.MEMBER ? (entry as MemberEntry).member : null);
     const createLabel = (method: Member | null): string => {
         return !method ? "<none>" : `${method.name.string}${method.type.string}`;
     };
 
-    let method = $state((member ? methods.indexOf(member) : -1).toString());
+    let methodIndex = $state((member ? methods.indexOf(member) : -1).toString());
     $effect(() => {
-        const parsedId = parseInt(method);
-        if (parsedId !== -1) {
-            member = methods[parsedId];
-        }
+        const parsedId = parseInt(methodIndex);
+        member = parsedId > -1 ? methods[parsedId] : null;
     });
 
     let parentElem: HTMLElement | undefined = $state();
 
     let showHandlerEdges = $state(false);
-
     const computeGraph = async (member: Member | null, showHandlerEdges: boolean): Promise<[Node[], Edge[]]> => {
         return member ? computeControlFlowGraph(member, pool, showHandlerEdges) : [[], []];
     };
@@ -72,8 +67,8 @@
                         nodesConnectable={false}
                         elementsSelectable={false}
                         proOptions={{ hideAttribution: true }}
-                        nodeTypes={{ "elk-node": FlowNode }}
-                        edgeTypes={{ "elk-edge": FlowEdge }}
+                        nodeTypes={{ "cf-node": ControlFlowNode }}
+                        edgeTypes={{ "auto-edge": FlowEdge }}
                     >
                         <Background variant={BackgroundVariant.Dots} />
                         <Controls showLock={false} position="bottom-right">
@@ -95,7 +90,7 @@
     </SvelteFlowProvider>
     {#if entry.type !== EntryType.MEMBER}
         <div class="absolute bottom-0 m-[15px]">
-            <Select type="single" bind:value={method}>
+            <Select type="single" bind:value={methodIndex}>
                 <SelectTrigger class="h-7 max-w-[425px] text-xs whitespace-nowrap [&_svg]:ml-2 [&_svg]:h-4 [&_svg]:w-4">
                     <div class="overflow-hidden text-ellipsis">
                         <span class="text-muted-foreground mr-2">Method: </span>
@@ -103,6 +98,9 @@
                     </div>
                 </SelectTrigger>
                 <SelectContent class="max-h-[240px] w-full overflow-scroll" side="top" align="start">
+                    <SelectItem value="-1" label="<none>" class="font-mono text-xs tracking-tight">
+                        {"<none>"}
+                    </SelectItem>
                     {#each methods as mth, i}
                         {@const label = createLabel(mth)}
                         <SelectItem value={i.toString()} {label} class="font-mono text-xs tracking-tight break-all">
@@ -114,3 +112,32 @@
         </div>
     {/if}
 </div>
+
+<style>
+    :root {
+        --xy-background-color: var(--background);
+        --xy-node-background-color: var(--muted);
+        --xy-node-border: 1px solid var(--border);
+        --xy-node-border-radius: calc(var(--radius) / 2);
+        --xy-edge-stroke: oklch(from var(--primary) l c h / 0.6);
+        --xy-edge-label-background-color: var(--background);
+        --xy-controls-button-background-color: var(--muted);
+        --xy-controls-button-background-color-hover: oklch(from var(--muted) l c h / 0.6);
+    }
+
+    :global(.svelte-flow__handle) {
+        background-color: transparent;
+        border: none;
+    }
+    :global(.svelte-flow__edge-label) {
+        border-radius: 5px;
+    }
+    :global(.svelte-flow__controls > :first-child) {
+        border-top-left-radius: calc(var(--radius) / 2);
+        border-top-right-radius: calc(var(--radius) / 2);
+    }
+    :global(.svelte-flow__controls > :last-child) {
+        border-bottom-left-radius: calc(var(--radius) / 2);
+        border-bottom-right-radius: calc(var(--radius) / 2);
+    }
+</style>
