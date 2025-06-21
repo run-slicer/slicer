@@ -17,7 +17,8 @@
     import FlowNode from "./node.svelte";
     import FlowEdge from "./edge.svelte";
     import FlowMenu from "./menu.svelte";
-    import { createComputedGraph } from "./graph";
+    import { computeControlFlowGraph } from "./graph";
+    import type { Edge, Node } from "@xyflow/svelte";
     import type { PaneProps } from "$lib/components/pane";
     import { cyrb53 } from "$lib/utils";
 
@@ -30,9 +31,8 @@
     const methods = node ? node.methods : [];
 
     let member = $state(
-        entry.type === EntryType.MEMBER ? (entry as MemberEntry).member : methods.length > 0 ? methods[0] : null
+        entry.type === EntryType.MEMBER ? (entry as MemberEntry).member : null
     );
-
     const createLabel = (method: Member | null): string => {
         return !method ? "<none>" : `${method.name.string}${method.type.string}`;
     };
@@ -48,13 +48,17 @@
     let parentElem: HTMLElement | undefined = $state();
 
     let showHandlerEdges = $state(false);
+
+    const computeGraph = async (member: Member | null, showHandlerEdges: boolean): Promise<[Node[], Edge[]]> => {
+        return member ? computeControlFlowGraph(member, pool, showHandlerEdges) : [[], []];
+    };
 </script>
 
 <div class="relative h-full w-full" bind:this={parentElem}>
     <SvelteFlowProvider>
         <ContextMenu>
             <ContextMenuTrigger class="h-full w-full">
-                {#await createComputedGraph(member, pool, showHandlerEdges)}
+                {#await computeGraph(member, showHandlerEdges)}
                     <Loading value="Computing graph..." timed />
                 {:then [nodes, edges]}
                     <SvelteFlow

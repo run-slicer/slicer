@@ -46,15 +46,12 @@ const elk = new ELK({
     workerFactory: () => new Worker(new URL("elkjs/lib/elk-worker.js", import.meta.url)),
 });
 
-export const createComputedGraph = async (
-    method: Member | null,
+
+export const computeControlFlowGraph = async (
+    method: Member,
     pool: Pool,
     withExcHandlers: boolean
 ): Promise<[Node[], Edge[]]> => {
-    if (!method) {
-        return [[], []]; // no method
-    }
-
     const attr = method.attrs.find((a) => a.type === AttributeType.CODE);
     if (!attr) {
         return [[], []]; // no Code attribute
