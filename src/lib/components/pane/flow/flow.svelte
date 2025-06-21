@@ -20,7 +20,6 @@
     import { createComputedGraph } from "./graph";
     import type { PaneProps } from "$lib/components/pane";
     import { cyrb53 } from "$lib/utils";
-    import { cubicOut } from "svelte/easing";
 
     let { tab }: PaneProps = $props();
     const entry = tab.entry!;
@@ -63,7 +62,6 @@
                         {nodes}
                         {edges}
                         fitView
-                        fitViewOptions={{ duration: 125, ease: cubicOut }}
                         minZoom={0}
                         colorMode={mode.current || "system"}
                         nodesDraggable={false}
