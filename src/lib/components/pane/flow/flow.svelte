@@ -1,7 +1,7 @@
 <script lang="ts">
     import { type ClassEntry, EntryType, type MemberEntry } from "$lib/workspace";
     import type { Member } from "@run-slicer/asm";
-    import { Zap, ZapOff } from "@lucide/svelte";
+    import { Circle, CircleX, Zap, ZapOff } from "@lucide/svelte";
     import { mode } from "mode-watcher";
     import {
         Background,
@@ -15,14 +15,15 @@
     import { ContextMenu, ContextMenuTrigger } from "$lib/components/ui/context-menu";
     import Loading from "$lib/components/loading.svelte";
     import ControlFlowNode from "./nodes/control_flow.svelte";
+    import HierarchyNode from "./nodes/hierarchy.svelte";
     import FlowEdge from "./edge.svelte";
     import FlowMenu from "./menu.svelte";
-    import { computeControlFlowGraph } from "./graph";
+    import { computeControlFlowGraph, computeHierarchyGraph } from "./graph";
     import type { Edge, Node } from "@xyflow/svelte";
     import type { PaneProps } from "$lib/components/pane";
     import { cyrb53 } from "$lib/utils";
 
-    let { tab }: PaneProps = $props();
+    let { tab, classes }: PaneProps = $props();
     const entry = tab.entry!;
 
     const node = "node" in entry ? (entry as ClassEntry).node : null;
@@ -44,8 +45,19 @@
     let parentElem: HTMLElement | undefined = $state();
 
     let showHandlerEdges = $state(false);
-    const computeGraph = async (member: Member | null, showHandlerEdges: boolean): Promise<[Node[], Edge[]]> => {
-        return member ? computeControlFlowGraph(member, pool, showHandlerEdges) : [[], []];
+    let showImplicitSuperTypes = $state(false);
+    const computeGraph = async (
+        member: Member | null,
+        showHandlerEdges: boolean,
+        showImplicitSuperTypes: boolean
+    ): Promise<[Node[], Edge[]]> => {
+        if (!node) {
+            return [[], []]; // not a class
+        }
+
+        return member
+            ? computeControlFlowGraph(member, pool, showHandlerEdges)
+            : computeHierarchyGraph(node, classes, showImplicitSuperTypes);
     };
 </script>
 
@@ -53,7 +65,7 @@
     <SvelteFlowProvider>
         <ContextMenu>
             <ContextMenuTrigger class="h-full w-full">
-                {#await computeGraph(member, showHandlerEdges)}
+                {#await computeGraph(member, showHandlerEdges, showImplicitSuperTypes)}
                     <Loading value="Computing graph..." timed />
                 {:then [nodes, edges]}
                     <SvelteFlow
@@ -67,7 +79,7 @@
                         nodesConnectable={false}
                         elementsSelectable={false}
                         proOptions={{ hideAttribution: true }}
-                        nodeTypes={{ "cf-node": ControlFlowNode }}
+                        nodeTypes={{ "cf-node": ControlFlowNode, "hier-node": HierarchyNode }}
                         edgeTypes={{ "auto-edge": FlowEdge }}
                     >
                         <Background variant={BackgroundVariant.Dots} />
@@ -81,6 +93,17 @@
                                 {@const Icon = showHandlerEdges ? Zap : ZapOff}
                                 <Icon size={12} class="fill-none!" />
                             </ControlButton>
+                            {#if !member}
+                                <ControlButton
+                                    class="svelte-flow__controls-interactive"
+                                    onclick={() => (showImplicitSuperTypes = !showImplicitSuperTypes)}
+                                    title="toggle implicit super types"
+                                    aria-label="toggle implicit super types"
+                                >
+                                    {@const Icon = showImplicitSuperTypes ? Circle : CircleX}
+                                    <Icon size={12} class="fill-none!" />
+                                </ControlButton>
+                            {/if}
                         </Controls>
                     </SvelteFlow>
                 {/await}
