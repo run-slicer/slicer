@@ -268,10 +268,10 @@
                 </MenubarItem>
                 <MenubarItem
                     class="justify-between"
-                    disabled={!tab?.entry || tab.entry.type === EntryType.ARCHIVE || tab.type === TabType.FLOW_GRAPH}
-                    onclick={() => openEntry(TabType.FLOW_GRAPH)}
+                    disabled={!tab?.entry || tab.entry.type === EntryType.ARCHIVE || tab.type === TabType.GRAPH}
+                    onclick={() => openEntry(TabType.GRAPH)}
                 >
-                    Flow graph <GitBranchPlus size={16} />
+                    Graph <GitBranchPlus size={16} />
                 </MenubarItem>
                 <MenubarSeparator />
                 <MenubarSub>

@@ -313,8 +313,8 @@ export const computeHierarchyGraph = async (
                         const childNode = (childEntry as ClassEntry).node;
                         if (childNode) {
                             // Determine if this is an interface relationship
-                            const isInterfaceRelation = childNode.interfaces.some(itf =>
-                                (childNode.pool[itf.name] as UTF8Entry).string === name
+                            const isInterfaceRelation = childNode.interfaces.some(
+                                (itf) => (childNode.pool[itf.name] as UTF8Entry).string === name
                             );
 
                             edges.push({ parent: name, child: childName, itf: isInterfaceRelation });

@@ -15,7 +15,7 @@ export enum TabType {
     WELCOME = "welcome",
     CODE = "code",
     HEX = "hex",
-    FLOW_GRAPH = "flow_graph",
+    GRAPH = "graph",
     CLASS = "class",
     IMAGE = "image",
     HEAP_DUMP = "heap_dump",

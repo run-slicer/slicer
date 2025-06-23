@@ -43,11 +43,8 @@
                     Image <Image size={16} />
                 </ContextMenuItem>
                 {#if entry.type !== EntryType.ARCHIVE}
-                    <ContextMenuItem
-                        class="flex justify-between"
-                        onclick={() => handler.open(entry, TabType.FLOW_GRAPH)}
-                    >
-                        Flow graph <GitBranchPlus size={16} />
+                    <ContextMenuItem class="flex justify-between" onclick={() => handler.open(entry, TabType.GRAPH)}>
+                        Graph <GitBranchPlus size={16} />
                     </ContextMenuItem>
                     <ContextMenuItem class="flex justify-between" onclick={() => handler.open(entry, TabType.CLASS)}>
                         Class <FileCode2 size={16} />

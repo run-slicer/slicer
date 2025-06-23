@@ -44,8 +44,8 @@
                     <DropdownMenuItem class="justify-between" onclick={() => handler.open(entry, TabType.CODE)}>
                         Disassemble <Code size={16} />
                     </DropdownMenuItem>
-                    <DropdownMenuItem class="justify-between" onclick={() => handler.open(entry, TabType.FLOW_GRAPH)}>
-                        View flow graph <GitBranchPlus size={16} />
+                    <DropdownMenuItem class="justify-between" onclick={() => handler.open(entry, TabType.GRAPH)}>
+                        View graph <GitBranchPlus size={16} />
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>

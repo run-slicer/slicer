@@ -69,7 +69,7 @@
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                     class="justify-between"
-                                    onclick={() => handler.open(memberEntry(entry, method), TabType.FLOW_GRAPH)}
+                                    onclick={() => handler.open(memberEntry(entry, method), TabType.GRAPH)}
                                 >
                                     View flow graph <GitBranchPlus size={16} />
                                 </DropdownMenuItem>
