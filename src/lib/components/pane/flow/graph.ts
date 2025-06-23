@@ -1,7 +1,8 @@
+import { prettyJavaType, prettyMethodDesc } from "$lib/utils";
 import { type ClassEntry, type Entry, EntryType, readDeferred } from "$lib/workspace";
 import type { Node as ClassNode, Member } from "@run-slicer/asm";
-import { formatEntry, formatInsn } from "@run-slicer/asm/analysis/disasm";
-import { type Node as GraphNode, EdgeType, computeGraph } from "@run-slicer/asm/analysis/graph";
+import { escapeLiteral, formatEntry, formatInsn } from "@run-slicer/asm/analysis/disasm";
+import { computeGraph, EdgeType, type Node as GraphNode } from "@run-slicer/asm/analysis/graph";
 import type { CodeAttribute } from "@run-slicer/asm/attr";
 import type { Pool, UTF8Entry } from "@run-slicer/asm/pool";
 import { AttributeType } from "@run-slicer/asm/spec";
@@ -15,12 +16,16 @@ export type ControlFlowNodeData = {
     height: number;
 };
 
-const monoFont = `400 12px / 18px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace`;
+const monoFF = `ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace`;
 
 const canvas = document.createElement("canvas");
-const computeTextSize = (text: string): TextMetrics => {
+const computeTextSize = (text: string, font: string): TextMetrics => {
+    if (text.length === 0) {
+        return { width: 0 } as TextMetrics;
+    }
+
     const context = canvas.getContext("2d")!;
-    context.font = monoFont;
+    context.font = font;
 
     return context.measureText(text);
 };
@@ -83,7 +88,10 @@ export const computeControlFlowGraph = async (
 
     const data: ControlFlowNodeData[] = nodes.map((node) => {
         const lines = node.insns.map((i) => formatInsn(code, i, pool, false));
-        const metrics = computeTextSize(lines.reduce((a, b) => (a.length > b.length ? a : b)));
+        const metrics = computeTextSize(
+            lines.reduce((a, b) => (a.length > b.length ? a : b)),
+            `400 12px / 18px ${monoFF}`
+        );
 
         return {
             node,
@@ -184,9 +192,16 @@ export type HierarchyNodeData = {
     height: number;
 };
 
+interface MemberData {
+    type: string;
+    descriptor: string;
+}
+
 interface HierarchyNode {
     name: string;
     node?: ClassNode;
+    fields: MemberData[];
+    methods: MemberData[];
 }
 
 interface HierarchyEdge {
@@ -212,7 +227,20 @@ export const computeHierarchyGraph = async (
             return; // don't include Object parent
         }
 
-        nodes.push({ name, node });
+        nodes.push({
+            name,
+            node,
+            fields:
+                node?.fields?.map((f) => ({
+                    type: prettyJavaType(f.type.string, true),
+                    descriptor: escapeLiteral(f.name.string),
+                })) || [],
+            methods:
+                node?.methods?.map((m) => ({
+                    type: prettyJavaType(m.type.string.substring(m.type.string.lastIndexOf(")") + 1), true),
+                    descriptor: escapeLiteral(m.name.string) + prettyMethodDesc(m.type.string),
+                })) || [],
+        });
 
         if (!node) {
             return; // need the node for super type examination
@@ -250,13 +278,20 @@ export const computeHierarchyGraph = async (
     await process(currentName, node);
 
     const data: HierarchyNodeData[] = nodes.map((node) => {
-        const metrics = computeTextSize(node.name);
+        const metrics = computeTextSize(node.name, `400 12px / 18px ${monoFF}`);
 
-        return {
-            node,
-            width: metrics.width + 20 /* padding */ + 2 /* border */,
-            height: 18 /* line height */ + 20 /* padding */ + 2 /* border */,
-        };
+        const lines = [...node.fields, ...node.methods].map((f) => `${f.type} ${f.descriptor}`);
+        const smallMetrics = computeTextSize(
+            lines.reduce((a, b) => (a.length > b.length ? a : b), ""),
+            `400 10px / 15px ${monoFF}`
+        );
+
+        let width = Math.max(metrics.width, smallMetrics.width) + 20 /* padding */ + 2; /* border */
+        let height = 18 + 15 * lines.length /* line height */ + 20 /* padding */ + 2; /* border */
+        if (node.fields.length > 0) height += 1 /* separator */ + 20 /* separator padding */;
+        if (node.methods.length > 0) height += 1 /* separator */ + 20 /* separator padding */;
+
+        return { node, width, height };
     });
 
     const graph: ElkNode = {

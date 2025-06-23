@@ -11,7 +11,11 @@
 
 <Handle type="target" position={Position.Top} />
 {#each data.lines as line}
-    <p class="font-mono tracking-tight whitespace-nowrap">{line}</p>
+    {@const parts = line.split(" ", 2)}
+    <p class="font-mono tracking-tight whitespace-nowrap">
+        <span class="text-muted-foreground">{parts[0]}</span>
+        {parts[1]}
+    </p>
 {/each}
 <Handle type="source" position={Position.Bottom} />
 
