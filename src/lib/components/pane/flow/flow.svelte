@@ -84,16 +84,17 @@
                     >
                         <Background variant={BackgroundVariant.Dots} />
                         <Controls showLock={false} position="bottom-right">
-                            <ControlButton
-                                class="svelte-flow__controls-interactive"
-                                onclick={() => (showHandlerEdges = !showHandlerEdges)}
-                                title="toggle exception handler edges"
-                                aria-label="toggle exception handler edges"
-                            >
-                                {@const Icon = showHandlerEdges ? Zap : ZapOff}
-                                <Icon size={12} class="fill-none!" />
-                            </ControlButton>
-                            {#if !member}
+                            {#if member}
+                                <ControlButton
+                                    class="svelte-flow__controls-interactive"
+                                    onclick={() => (showHandlerEdges = !showHandlerEdges)}
+                                    title="toggle exception handler edges"
+                                    aria-label="toggle exception handler edges"
+                                >
+                                    {@const Icon = showHandlerEdges ? Zap : ZapOff}
+                                    <Icon size={12} class="fill-none!" />
+                                </ControlButton>
+                            {:else}
                                 <ControlButton
                                     class="svelte-flow__controls-interactive"
                                     onclick={() => (showImplicitSuperTypes = !showImplicitSuperTypes)}
