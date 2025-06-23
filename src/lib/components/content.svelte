@@ -1,23 +1,16 @@
 <script lang="ts">
     import { ResizablePane, ResizablePaneGroup } from "$lib/components/ui/resizable";
-    import type { Entry } from "$lib/workspace";
     import { type Tab, TabPosition } from "$lib/tab";
-    import type { LogEntry } from "$lib/log";
-    import { Pane, RootPane } from "$lib/components/pane";
-    import type { Disassembler } from "$lib/disasm";
-    import type { EventHandler } from "$lib/event";
+    import { Pane, type PaneAccess, RootPane } from "$lib/components/pane";
     import type { PaneData } from "$lib/state";
 
-    interface Props {
+    interface Props extends PaneAccess {
         panes: PaneData[];
         tabs: Tab[];
-        entries: Entry[];
-        logEntries: LogEntry[];
-        disasms: Disassembler[];
-        handler: EventHandler;
     }
 
-    let { panes, tabs, entries, logEntries, disasms, handler }: Props = $props();
+    let { panes, tabs, ...paneAccess }: Props = $props();
+    let { handler } = $derived(paneAccess);
 
     let primaryBottom = $derived({ current: panes.find((p) => p.position === TabPosition.PRIMARY_BOTTOM) });
     let secondaryLeft = $derived({ current: panes.find((p) => p.position === TabPosition.SECONDARY_LEFT) });
@@ -36,12 +29,12 @@
                 {handler}
             >
                 {#snippet children(tab)}
-                    <RootPane {tab} {entries} {logEntries} {disasms} {handler} />
+                    <RootPane {tab} {...paneAccess} />
                 {/snippet}
             </Pane>
             <Pane position={TabPosition.PRIMARY_CENTER} {tabs} {handler}>
                 {#snippet children(tab)}
-                    <RootPane {tab} {entries} {logEntries} {disasms} {handler} />
+                    <RootPane {tab} {...paneAccess} />
                 {/snippet}
             </Pane>
             <Pane
@@ -53,7 +46,7 @@
                 {handler}
             >
                 {#snippet children(tab)}
-                    <RootPane {tab} {entries} {logEntries} {disasms} {handler} />
+                    <RootPane {tab} {...paneAccess} />
                 {/snippet}
             </Pane>
         </ResizablePaneGroup>
@@ -67,7 +60,7 @@
         {handler}
     >
         {#snippet children(tab)}
-            <RootPane {tab} {entries} {logEntries} {disasms} {handler} />
+            <RootPane {tab} {...paneAccess} />
         {/snippet}
     </Pane>
 </ResizablePaneGroup>

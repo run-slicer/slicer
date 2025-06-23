@@ -60,6 +60,7 @@
     panes={$panes}
     tabs={tabs0}
     entries={entries0}
+    classes={$classes}
     logEntries={$logEntries}
     disasms={disasms0}
     handler={$handler}
