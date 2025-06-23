@@ -11,7 +11,7 @@
         [TabType.WELCOME]: () => import("./welcome/welcome.svelte"),
         [TabType.CODE]: () => import("./code/code.svelte"),
         [TabType.HEX]: () => import("./code/code.svelte"),
-        [TabType.FLOW_GRAPH]: () => import("./flow/flow.svelte"),
+        [TabType.GRAPH]: () => import("./flow/flow.svelte"),
         [TabType.IMAGE]: () => import("./image/image.svelte"),
         [TabType.HEAP_DUMP]: () => import("./dump/dump.svelte"),
         [TabType.CLASS]: () => import("./class/class.svelte"),
