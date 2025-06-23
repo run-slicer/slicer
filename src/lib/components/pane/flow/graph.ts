@@ -35,6 +35,7 @@ const commonOptions = {
     "elk.portAlignment.default": "CENTER",
     "elk.portConstraints": "FIXED_SIDE",
     "elk.edgeRouting": "ORTHOGONAL",
+    "elk.layered.crossingMinimization.semiInteractive": "true",
     // spacing
     "elk.spacing.nodeNode": "60",
     "elk.spacing.edgeEdge": "40",
@@ -50,13 +51,11 @@ const controlFlowLayoutOptions = {
     "elk.layered.layering.strategy": "LONGEST_PATH_SOURCE",
     "elk.layered.considerModelOrder.strategy": "PREFER_NODES",
     "elk.layered.cycleBreaking.strategy": "MODEL_ORDER",
-    "elk.layered.crossingMinimization.semiInteractive": "true",
 };
 
 const hierarchyLayoutOptions = {
     ...commonOptions,
     "elk.direction": "UP",
-    "elk.layered.nodePlacement.strategy": "SIMPLE",
 };
 
 const elk = new ELK({ workerFactory: () => new Worker(new URL("elkjs/lib/elk-worker.js", import.meta.url)) });
@@ -221,6 +220,33 @@ export const computeHierarchyGraph = async (
     const edges: HierarchyEdge[] = [];
 
     const processed = new Set<string>();
+
+    // First, build a reverse lookup map for descendants
+    const descendants = new Map<string, Set<string>>();
+    for (const [className, entry] of classes) {
+        if (entry.type === EntryType.CLASS) {
+            const classNode = (entry as ClassEntry).node;
+
+            // Add superclass relationship
+            if (classNode.superClass) {
+                const superName = (classNode.pool[classNode.superClass.name] as UTF8Entry).string;
+                if (!descendants.has(superName)) {
+                    descendants.set(superName, new Set());
+                }
+                descendants.get(superName)!.add(className);
+            }
+
+            // Add interface relationships
+            for (const itf of classNode.interfaces) {
+                const itfName = (classNode.pool[itf.name] as UTF8Entry).string;
+                if (!descendants.has(itfName)) {
+                    descendants.set(itfName, new Set());
+                }
+                descendants.get(itfName)!.add(className);
+            }
+        }
+    }
+
     const process = async (name: string, node?: ClassNode) => {
         processed.add(name);
         if (name === "java/lang/Object" && !withImplicitSuperTypes) {
@@ -246,31 +272,56 @@ export const computeHierarchyGraph = async (
             return; // need the node for super type examination
         }
 
-        const processSuper = async (name: string) => {
+        const processRelated = async (name: string, analyze: boolean = true) => {
             let entry = classes.get(name);
-            if (entry) {
+            if (entry && analyze) {
                 entry = await readDeferred(entry);
             }
 
             await process(name, entry?.type === EntryType.CLASS ? (entry as ClassEntry).node : undefined);
         };
 
+        // Process superclass (walking up)
         if (node.superClass) {
             const superName = (node.pool[node.superClass.name] as UTF8Entry).string;
             if (superName !== "java/lang/Object" || withImplicitSuperTypes) {
                 edges.push({ parent: superName, child: name, itf: false });
 
                 if (!processed.has(superName)) {
-                    await processSuper(superName);
+                    await processRelated(superName);
                 }
             }
         }
+
+        // Process interfaces (walking up)
         for (const itf of node.interfaces) {
             const itfName = (node.pool[itf.name] as UTF8Entry).string;
             edges.push({ parent: itfName, child: name, itf: true });
 
             if (!processed.has(itfName)) {
-                await processSuper(itfName);
+                await processRelated(itfName);
+            }
+        }
+
+        // Process descendants (walking down)
+        const childClasses = descendants.get(name);
+        if (childClasses) {
+            for (const childName of childClasses) {
+                if (!processed.has(childName)) {
+                    const childEntry = classes.get(childName);
+                    if (childEntry?.type === EntryType.CLASS) {
+                        const childNode = (childEntry as ClassEntry).node;
+                        if (childNode) {
+                            // Determine if this is an interface relationship
+                            const isInterfaceRelation = childNode.interfaces.some(itf =>
+                                (childNode.pool[itf.name] as UTF8Entry).string === name
+                            );
+
+                            edges.push({ parent: name, child: childName, itf: isInterfaceRelation });
+                            await processRelated(childName, false);
+                        }
+                    }
+                }
             }
         }
     };
