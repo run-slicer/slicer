@@ -71,6 +71,16 @@
     --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
     --sidebar-border: oklch(0.92 0.004 286.32);
     --sidebar-ring: oklch(0.705 0.015 286.067);
+
+    /* xyflow graphs */
+    --xy-background-color: var(--background);
+    --xy-node-background-color: var(--muted);
+    --xy-node-border: 1px solid var(--border);
+    --xy-node-border-radius: calc(var(--radius) / 2);
+    --xy-edge-stroke: oklch(from var(--primary) l c h / 0.6);
+    --xy-edge-label-background-color: var(--background);
+    --xy-controls-button-background-color: var(--muted);
+    --xy-controls-button-background-color-hover: oklch(from var(--muted) l c h / 0.6);
 }
 
 .dark {

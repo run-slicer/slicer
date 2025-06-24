@@ -138,17 +138,6 @@
 </div>
 
 <style>
-    :root {
-        --xy-background-color: var(--background);
-        --xy-node-background-color: var(--muted);
-        --xy-node-border: 1px solid var(--border);
-        --xy-node-border-radius: calc(var(--radius) / 2);
-        --xy-edge-stroke: oklch(from var(--primary) l c h / 0.6);
-        --xy-edge-label-background-color: var(--background);
-        --xy-controls-button-background-color: var(--muted);
-        --xy-controls-button-background-color-hover: oklch(from var(--muted) l c h / 0.6);
-    }
-
     :global(.svelte-flow__handle) {
         background-color: transparent;
         border: none;
