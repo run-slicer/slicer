@@ -42,7 +42,7 @@ export const tabIcon = (tabType: TabType, entry: Entry): StyledIcon => {
             return { icon: Sparkles, classes: ["text-muted-foreground"] };
         case TabType.HEX:
             return { icon: Binary, classes: ["text-muted-foreground"] };
-        case TabType.FLOW_GRAPH:
+        case TabType.GRAPH:
             return { icon: GitPullRequest, classes: ["text-muted-foreground"] };
         case TabType.CLASS:
             return { icon: FileCode2, classes: ["text-red-500"] };

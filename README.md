@@ -8,7 +8,9 @@ A modern Java reverse engineering tool for the web.
 
 - disassembly and decompilation of Java class files
     - CFR, JASM, Vineflower, Procyon, ...
-- bytecode control flow visualization via a [CFG](https://en.wikipedia.org/wiki/Control-flow_graph)
+- graph visualization
+    - inheritance, interface implementation within a workspace
+    - bytecode control flow via a [CFG](https://en.wikipedia.org/wiki/Control-flow_graph)
     - exportable to a PNG/SVG!
 - low-level tabular view of a class file
 - heap dump reading and summarization

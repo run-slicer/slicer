@@ -1,60 +1,70 @@
-import type { Member } from "@run-slicer/asm";
-import { formatEntry, formatInsn } from "@run-slicer/asm/analysis/disasm";
-import { type Node as GraphNode, EdgeType, computeGraph } from "@run-slicer/asm/analysis/graph";
+import { prettyJavaType, prettyMethodDesc } from "$lib/utils";
+import { type ClassEntry, type Entry, EntryType, readDeferred } from "$lib/workspace";
+import type { Node as ClassNode, Member } from "@run-slicer/asm";
+import { escapeLiteral, formatEntry, formatInsn } from "@run-slicer/asm/analysis/disasm";
+import { computeGraph, EdgeType, type Node as GraphNode } from "@run-slicer/asm/analysis/graph";
 import type { CodeAttribute } from "@run-slicer/asm/attr";
-import type { Pool } from "@run-slicer/asm/pool";
+import type { Pool, UTF8Entry } from "@run-slicer/asm/pool";
 import { AttributeType } from "@run-slicer/asm/spec";
 import type { Edge, MarkerType, Node } from "@xyflow/svelte";
 import ELK, { type ElkNode } from "elkjs/lib/elk-api";
 
-export type NodeData = {
+export type ControlFlowNodeData = {
     node: GraphNode;
     lines: string[];
     width: number;
     height: number;
 };
 
-const monoFont = `400 12px / 18px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace`;
+const monoFF = `ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace`;
 
 const canvas = document.createElement("canvas");
-const computeTextSize = (text: string): TextMetrics => {
+const computeTextSize = (text: string, font: string): TextMetrics => {
+    if (text.length === 0) {
+        return { width: 0 } as TextMetrics;
+    }
+
     const context = canvas.getContext("2d")!;
-    context.font = monoFont;
+    context.font = font;
 
     return context.measureText(text);
 };
 
-const elk = new ELK({
-    defaultLayoutOptions: {
-        "elk.algorithm": "layered",
-        "elk.direction": "DOWN",
-        "elk.portAlignment.default": "CENTER",
-        "elk.portConstraints": "FIXED_SIDE",
-        "elk.edgeRouting": "ORTHOGONAL",
-        "elk.layered.layering.strategy": "LONGEST_PATH_SOURCE",
-        "elk.layered.considerModelOrder.strategy": "PREFER_NODES",
-        "elk.layered.cycleBreaking.strategy": "MODEL_ORDER",
-        "elk.layered.crossingMinimization.semiInteractive": "true",
-        // spacing
-        "elk.spacing.nodeNode": "60",
-        "elk.spacing.edgeEdge": "40",
-        "elk.spacing.edgeNode": "40",
-        "elk.layered.spacing.nodeNodeBetweenLayers": "60",
-        "elk.layered.spacing.edgeEdgeBetweenLayers": "40",
-        "elk.layered.spacing.edgeNodeBetweenLayers": "40",
-    },
-    workerFactory: () => new Worker(new URL("elkjs/lib/elk-worker.js", import.meta.url)),
-});
+const commonOptions = {
+    "elk.algorithm": "layered",
+    "elk.portAlignment.default": "CENTER",
+    "elk.portConstraints": "FIXED_SIDE",
+    "elk.edgeRouting": "ORTHOGONAL",
+    "elk.layered.crossingMinimization.semiInteractive": "true",
+    // spacing
+    "elk.spacing.nodeNode": "60",
+    "elk.spacing.edgeEdge": "40",
+    "elk.spacing.edgeNode": "40",
+    "elk.layered.spacing.nodeNodeBetweenLayers": "60",
+    "elk.layered.spacing.edgeEdgeBetweenLayers": "40",
+    "elk.layered.spacing.edgeNodeBetweenLayers": "40",
+};
 
-export const createComputedGraph = async (
-    method: Member | null,
+const controlFlowLayoutOptions = {
+    ...commonOptions,
+    "elk.direction": "DOWN",
+    "elk.layered.layering.strategy": "LONGEST_PATH_SOURCE",
+    "elk.layered.considerModelOrder.strategy": "PREFER_NODES",
+    "elk.layered.cycleBreaking.strategy": "MODEL_ORDER",
+};
+
+const hierarchyLayoutOptions = {
+    ...commonOptions,
+    "elk.direction": "UP",
+};
+
+const elk = new ELK({ workerFactory: () => new Worker(new URL("elkjs/lib/elk-worker.js", import.meta.url)) });
+
+export const computeControlFlowGraph = async (
+    method: Member,
     pool: Pool,
     withExcHandlers: boolean
 ): Promise<[Node[], Edge[]]> => {
-    if (!method) {
-        return [[], []]; // no method
-    }
-
     const attr = method.attrs.find((a) => a.type === AttributeType.CODE);
     if (!attr) {
         return [[], []]; // no Code attribute
@@ -75,9 +85,12 @@ export const createComputedGraph = async (
             }));
     });
 
-    const data: NodeData[] = nodes.map((node) => {
+    const data: ControlFlowNodeData[] = nodes.map((node) => {
         const lines = node.insns.map((i) => formatInsn(code, i, pool, false));
-        const metrics = computeTextSize(lines.reduce((a, b) => (a.length > b.length ? a : b)));
+        const metrics = computeTextSize(
+            lines.reduce((a, b) => (a.length > b.length ? a : b)),
+            `400 12px / 18px ${monoFF}`
+        );
 
         return {
             node,
@@ -102,14 +115,14 @@ export const createComputedGraph = async (
         })),
     };
 
-    const layout = await elk.layout(graph);
+    const layout = await elk.layout(graph, { layoutOptions: controlFlowLayoutOptions });
     return [
         data.map((d) => {
             const elkNode = layout.children?.find((n) => n.id === `${d.node.offset}`);
 
             return {
                 id: `${d.node.offset}`,
-                type: "elk-node",
+                type: "cf-node",
                 data: d,
                 position: {
                     x: elkNode?.x ?? 0,
@@ -139,7 +152,7 @@ export const createComputedGraph = async (
 
                 return {
                     id: `${edge.source}-${edge.target}`,
-                    type: "elk-edge",
+                    type: "auto-edge",
                     label,
                     source: `${edge.source}`,
                     target: `${edge.target}`,
@@ -155,7 +168,7 @@ export const createComputedGraph = async (
             }),
             ...excEdges.map((edge) => ({
                 id: `${edge.source}-${edge.target}`,
-                type: "elk-edge",
+                type: "auto-edge",
                 style: "stroke: var(--destructive);",
                 label: edge.catchType,
                 source: `${edge.source}`,
@@ -169,5 +182,227 @@ export const createComputedGraph = async (
                 >,
             })),
         ],
+    ];
+};
+
+export type HierarchyNodeData = {
+    node: HierarchyNode;
+    width: number;
+    height: number;
+};
+
+interface MemberData {
+    type: string;
+    descriptor: string;
+}
+
+interface HierarchyNode {
+    name: string;
+    node?: ClassNode;
+    fields: MemberData[];
+    methods: MemberData[];
+}
+
+interface HierarchyEdge {
+    parent: string;
+    child: string;
+    itf: boolean;
+}
+
+const IMPLICIT_SUPER = new Set([
+    "java/lang/Object",
+    "java/lang/Enum",
+    "java/lang/Record",
+    "java/lang/annotation/Annotation",
+]);
+
+export const computeHierarchyGraph = async (
+    node: ClassNode,
+    classes: Map<string, Entry>,
+    withImplicitSuperTypes: boolean
+): Promise<[Node[], Edge[]]> => {
+    const currentName = (node.pool[node.thisClass.name] as UTF8Entry).string;
+
+    const nodes: HierarchyNode[] = [];
+    const edges: HierarchyEdge[] = [];
+
+    const processed = new Set<string>();
+
+    // First, build a reverse lookup map for descendants
+    const descendants = new Map<string, Set<string>>();
+    for (const [className, entry] of classes) {
+        if (entry.type === EntryType.CLASS) {
+            const classNode = (entry as ClassEntry).node;
+
+            // Add superclass relationship
+            if (classNode.superClass) {
+                const superName = (classNode.pool[classNode.superClass.name] as UTF8Entry).string;
+                if (withImplicitSuperTypes || !IMPLICIT_SUPER.has(superName)) {
+                    if (!descendants.has(superName)) {
+                        descendants.set(superName, new Set());
+                    }
+                    descendants.get(superName)!.add(className);
+                }
+            }
+
+            // Add interface relationships
+            for (const itf of classNode.interfaces) {
+                const itfName = (classNode.pool[itf.name] as UTF8Entry).string;
+                if (!withImplicitSuperTypes && IMPLICIT_SUPER.has(itfName)) {
+                    continue;
+                }
+
+                if (!descendants.has(itfName)) {
+                    descendants.set(itfName, new Set());
+                }
+                descendants.get(itfName)!.add(className);
+            }
+        }
+    }
+
+    const process = async (name: string, node?: ClassNode) => {
+        processed.add(name);
+        if (!withImplicitSuperTypes && IMPLICIT_SUPER.has(name)) {
+            return; // don't include implicit parent
+        }
+
+        nodes.push({
+            name,
+            node,
+            fields:
+                node?.fields?.map((f) => ({
+                    type: prettyJavaType(f.type.string, true),
+                    descriptor: escapeLiteral(f.name.string),
+                })) || [],
+            methods:
+                node?.methods?.map((m) => ({
+                    type: prettyJavaType(m.type.string.substring(m.type.string.lastIndexOf(")") + 1), true),
+                    descriptor: escapeLiteral(m.name.string) + prettyMethodDesc(m.type.string),
+                })) || [],
+        });
+
+        if (!node) {
+            return; // need the node for super type examination
+        }
+
+        const processRelated = async (name: string, analyze: boolean = true) => {
+            let entry = classes.get(name);
+            if (entry && analyze) {
+                entry = await readDeferred(entry);
+            }
+
+            await process(name, entry?.type === EntryType.CLASS ? (entry as ClassEntry).node : undefined);
+        };
+
+        // Process superclass (walking up)
+        if (node.superClass) {
+            const superName = (node.pool[node.superClass.name] as UTF8Entry).string;
+            if (withImplicitSuperTypes || !IMPLICIT_SUPER.has(superName)) {
+                edges.push({ parent: superName, child: name, itf: false });
+
+                if (!processed.has(superName)) {
+                    await processRelated(superName);
+                }
+            }
+        }
+
+        // Process interfaces (walking up)
+        for (const itf of node.interfaces) {
+            const itfName = (node.pool[itf.name] as UTF8Entry).string;
+            if (withImplicitSuperTypes || !IMPLICIT_SUPER.has(itfName)) {
+                edges.push({ parent: itfName, child: name, itf: true });
+
+                if (!processed.has(itfName)) {
+                    await processRelated(itfName);
+                }
+            }
+        }
+
+        // Process descendants (walking down)
+        const childClasses = descendants.get(name);
+        if (childClasses) {
+            for (const childName of childClasses) {
+                if (!processed.has(childName)) {
+                    const childEntry = classes.get(childName);
+                    if (childEntry?.type === EntryType.CLASS) {
+                        const childNode = (childEntry as ClassEntry).node;
+
+                        // Determine if this is an interface relationship
+                        const isInterfaceRelation = childNode.interfaces.some(
+                            (itf) => (childNode.pool[itf.name] as UTF8Entry).string === name
+                        );
+
+                        edges.push({ parent: name, child: childName, itf: isInterfaceRelation });
+                        await processRelated(childName, false);
+                    }
+                }
+            }
+        }
+    };
+
+    await process(currentName, node);
+
+    const data: HierarchyNodeData[] = nodes.map((node) => {
+        const metrics = computeTextSize(node.name, `400 12px / 18px ${monoFF}`);
+
+        const lines = [...node.fields, ...node.methods].map((f) => `${f.type} ${f.descriptor}`);
+        const smallMetrics = computeTextSize(
+            lines.reduce((a, b) => (a.length > b.length ? a : b), ""),
+            `400 10px / 15px ${monoFF}`
+        );
+
+        let width = Math.max(metrics.width, smallMetrics.width) + 20 /* padding */ + 2; /* border */
+        let height = 18 + 15 * lines.length /* line height */ + 20 /* padding */ + 2; /* border */
+        if (node.fields.length > 0) height += 1 /* separator */ + 20 /* separator padding */;
+        if (node.methods.length > 0) height += 1 /* separator */ + 20 /* separator padding */;
+
+        return { node, width, height };
+    });
+
+    const graph: ElkNode = {
+        id: "root",
+        children: data.map((d) => ({
+            id: d.node.name,
+            width: d.width,
+            height: d.height,
+        })),
+        edges: edges.map((e) => ({
+            id: `${e.parent}-${e.child}`,
+            targets: [`${e.parent}`],
+            sources: [`${e.child}`],
+        })),
+    };
+
+    const layout = await elk.layout(graph, { layoutOptions: hierarchyLayoutOptions });
+    return [
+        data.map((d) => {
+            const elkNode = layout.children?.find((n) => n.id === d.node.name);
+
+            return {
+                id: d.node.name,
+                type: "hier-node",
+                data: d,
+                position: {
+                    x: elkNode?.x ?? 0,
+                    y: elkNode?.y ?? 0,
+                },
+                // highlight current node
+                style: d.node.name === currentName ? "border: 1px solid var(--primary);" : undefined,
+            };
+        }),
+        edges.map((edge) => ({
+            id: `${edge.parent}-${edge.child}`,
+            type: "auto-edge",
+            source: edge.child,
+            target: edge.parent,
+            animated: edge.itf,
+            markerEnd: {
+                type: "arrowclosed" as MarkerType /* skip non-type import */,
+            },
+            data: layout.edges?.find((e) => e.id === `${edge.parent}-${edge.child}`)! as unknown as Record<
+                string,
+                unknown
+            >,
+        })),
     ];
 };

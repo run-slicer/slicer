@@ -2,12 +2,13 @@
     import { Input } from "$lib/components/ui/input";
     import type { PaneProps } from "$lib/components/pane";
     import { QueryType, search, SearchMode, type SearchResult } from "$lib/workspace/analysis";
-    import ResultLine from "./result.svelte";
+    import ResultGroup from "./results.svelte";
     import Dropdown from "./dropdown.svelte";
     import { VList } from "virtua/svelte";
     import { Button } from "$lib/components/ui/button";
     import { X } from "@lucide/svelte";
     import { untrack } from "svelte";
+    import { groupBy } from "$lib/utils";
 
     let { entries, handler }: PaneProps = $props();
 
@@ -26,6 +27,8 @@
         // discard removed entries
         results = untrack(() => results).filter((r) => entryNames.has(r.entry.name));
     });
+
+    let resultsByEntry = $derived(Array.from(groupBy(results, (r) => r.entry.name).entries()));
 
     const handleSearch = async (e: KeyboardEvent) => {
         if (e.key === "Enter") {
@@ -86,9 +89,9 @@
             <span class="text-muted-foreground">No results? Search something.</span>
         {/if}
     </div>
-    <VList data={results} class="flex h-full w-full flex-col" getKey={(_, i) => i}>
-        {#snippet children(result)}
-            <ResultLine {result} {handler} />
+    <VList data={resultsByEntry} class="flex h-full w-full flex-col" getKey={(_, i) => i}>
+        {#snippet children([entryName, entryResults])}
+            <ResultGroup name={entryName} results={entryResults} {handler} />
         {/snippet}
     </VList>
 </div>

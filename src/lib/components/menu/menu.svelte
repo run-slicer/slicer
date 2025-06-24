@@ -268,10 +268,10 @@
                 </MenubarItem>
                 <MenubarItem
                     class="justify-between"
-                    disabled={!tab?.entry || tab.entry.type === EntryType.ARCHIVE || tab.type === TabType.FLOW_GRAPH}
-                    onclick={() => openEntry(TabType.FLOW_GRAPH)}
+                    disabled={!tab?.entry || tab.entry.type === EntryType.ARCHIVE || tab.type === TabType.GRAPH}
+                    onclick={() => openEntry(TabType.GRAPH)}
                 >
-                    Flow graph <GitBranchPlus size={16} />
+                    Graph <GitBranchPlus size={16} />
                 </MenubarItem>
                 <MenubarSeparator />
                 <MenubarSub>
@@ -394,3 +394,32 @@
 <ScriptDeleteDialog bind:proto={scriptDeleteOpen} {handler} />
 <ScriptLoadShareDialog bind:url={scriptShareUrl} {handler} />
 <ClearDialog bind:open={clearOpen} {handler} />
+
+<style>
+    /* PWA title bar */
+    @media (display-mode: window-controls-overlay) {
+        :global(.window-controls) {
+            position: sticky;
+            z-index: 9999;
+            background-color: var(--background);
+
+            left: env(titlebar-area-x, 0);
+            top: env(titlebar-area-y, 0);
+            width: env(titlebar-area-width, 100%);
+            height: env(titlebar-area-height, 2.5rem);
+
+            -webkit-app-region: drag;
+            app-region: drag;
+        }
+
+        :global(.window-controls > *) {
+            /* fix item height on smaller title bars */
+            padding-top: 0;
+            padding-bottom: 0;
+            height: 100%;
+
+            -webkit-app-region: no-drag;
+            app-region: no-drag;
+        }
+    }
+</style>

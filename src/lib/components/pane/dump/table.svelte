@@ -213,9 +213,9 @@
     </div>
 </div>
 
-<style global>
+<style>
     /* unset overflow on table wrapper */
-    .no-overflow :has(> table) {
+    .no-overflow :global(:has(> table)) {
         overflow: unset;
     }
 </style>

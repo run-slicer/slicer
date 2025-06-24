@@ -9,7 +9,7 @@
     } from "$lib/components/ui/context-menu";
     import ContextMenuLabel from "$lib/components/menu_label.svelte";
     import { getViewportForBounds, useSvelteFlow } from "@xyflow/svelte";
-    import { toPng, toSvg } from "html-to-image";
+    import { toPng, toJpeg, toSvg } from "html-to-image";
     import { downloadUrl, prettyMethodDesc } from "$lib/utils";
     import type { Node, Member } from "@run-slicer/asm";
     import type { UTF8Entry } from "@run-slicer/asm/pool";
@@ -24,29 +24,45 @@
     let { node, member, parentElem }: Props = $props();
 
     let name = $derived.by(() => {
-        if (!node || !member) return "unknown()";
+        if (!node) return "Unknown";
 
         const nodeName = (node.pool[node.thisClass.name] as UTF8Entry).string;
-        const signature = member.name.string + prettyMethodDesc(member.type.string);
 
         const slashIndex = nodeName.lastIndexOf("/");
-        return `${slashIndex !== -1 ? nodeName.substring(slashIndex + 1) : nodeName}#${signature}`;
+        const shortName = slashIndex !== -1 ? nodeName.substring(slashIndex + 1) : nodeName;
+
+        if (member) {
+            const signature = member.name.string + prettyMethodDesc(member.type.string);
+            return `${shortName}#${signature}`;
+        }
+        return shortName;
     });
 
     const flow = $derived(useSvelteFlow());
 
+    const convFuncs = {
+        svg: toSvg,
+        png: toPng,
+        jpeg: toJpeg,
+    };
+
     const padding = 128;
-    const exportImage = async (type: "svg" | "png") => {
+    const exportImage = async (type: "svg" | "png" | "jpeg") => {
         const bounds = flow.getNodesBounds(flow.getNodes());
 
         const viewport = getViewportForBounds(bounds, bounds.width + padding, bounds.height + padding, 0, 2.0, 0);
         const domNode = parentElem?.querySelector<HTMLElement>(".svelte-flow__viewport")!;
 
         if (viewport && domNode) {
-            const dataUrl = await (type === "svg" ? toSvg : toPng)(domNode, {
+            const width = bounds.width + padding;
+            const height = bounds.height + padding;
+            const dataUrl = await convFuncs[type](domNode, {
                 skipFonts: true,
-                width: bounds.width + padding,
-                height: bounds.height + padding,
+                width,
+                height,
+                // make canvas larger than needed to preserve text legibility
+                canvasWidth: width * 2,
+                canvasHeight: height * 2,
                 style: {
                     margin: `-${viewport.y}px -${viewport.x}px`,
                     transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,
@@ -69,6 +85,9 @@
             </ContextMenuItem>
             <ContextMenuItem class="flex justify-between" onclick={() => exportImage("png")}>
                 PNG <Image size={16} />
+            </ContextMenuItem>
+            <ContextMenuItem class="flex justify-between" onclick={() => exportImage("jpeg")}>
+                JPEG <Image size={16} />
             </ContextMenuItem>
         </ContextMenuSubContent>
     </ContextMenuSub>
