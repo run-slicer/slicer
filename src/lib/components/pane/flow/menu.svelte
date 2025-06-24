@@ -24,13 +24,18 @@
     let { node, member, parentElem }: Props = $props();
 
     let name = $derived.by(() => {
-        if (!node || !member) return "unknown()";
+        if (!node) return "Unknown";
 
         const nodeName = (node.pool[node.thisClass.name] as UTF8Entry).string;
-        const signature = member.name.string + prettyMethodDesc(member.type.string);
 
         const slashIndex = nodeName.lastIndexOf("/");
-        return `${slashIndex !== -1 ? nodeName.substring(slashIndex + 1) : nodeName}#${signature}`;
+        const shortName = slashIndex !== -1 ? nodeName.substring(slashIndex + 1) : nodeName;
+
+        if (member) {
+            const signature = member.name.string + prettyMethodDesc(member.type.string);
+            return `${shortName}#${signature}`;
+        }
+        return shortName;
     });
 
     const flow = $derived(useSvelteFlow());
