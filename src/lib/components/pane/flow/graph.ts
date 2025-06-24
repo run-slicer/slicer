@@ -209,6 +209,13 @@ interface HierarchyEdge {
     itf: boolean;
 }
 
+const IMPLICIT_SUPER = new Set([
+    "java/lang/Object",
+    "java/lang/Enum",
+    "java/lang/Record",
+    "java/lang/annotation/Annotation",
+]);
+
 export const computeHierarchyGraph = async (
     node: ClassNode,
     classes: Map<string, Entry>,
@@ -230,15 +237,21 @@ export const computeHierarchyGraph = async (
             // Add superclass relationship
             if (classNode.superClass) {
                 const superName = (classNode.pool[classNode.superClass.name] as UTF8Entry).string;
-                if (!descendants.has(superName)) {
-                    descendants.set(superName, new Set());
+                if (withImplicitSuperTypes || !IMPLICIT_SUPER.has(superName)) {
+                    if (!descendants.has(superName)) {
+                        descendants.set(superName, new Set());
+                    }
+                    descendants.get(superName)!.add(className);
                 }
-                descendants.get(superName)!.add(className);
             }
 
             // Add interface relationships
             for (const itf of classNode.interfaces) {
                 const itfName = (classNode.pool[itf.name] as UTF8Entry).string;
+                if (!withImplicitSuperTypes && IMPLICIT_SUPER.has(itfName)) {
+                    continue;
+                }
+
                 if (!descendants.has(itfName)) {
                     descendants.set(itfName, new Set());
                 }
@@ -249,8 +262,8 @@ export const computeHierarchyGraph = async (
 
     const process = async (name: string, node?: ClassNode) => {
         processed.add(name);
-        if (name === "java/lang/Object" && !withImplicitSuperTypes) {
-            return; // don't include Object parent
+        if (!withImplicitSuperTypes && IMPLICIT_SUPER.has(name)) {
+            return; // don't include implicit parent
         }
 
         nodes.push({
@@ -284,7 +297,7 @@ export const computeHierarchyGraph = async (
         // Process superclass (walking up)
         if (node.superClass) {
             const superName = (node.pool[node.superClass.name] as UTF8Entry).string;
-            if (superName !== "java/lang/Object" || withImplicitSuperTypes) {
+            if (withImplicitSuperTypes || !IMPLICIT_SUPER.has(superName)) {
                 edges.push({ parent: superName, child: name, itf: false });
 
                 if (!processed.has(superName)) {
@@ -296,10 +309,12 @@ export const computeHierarchyGraph = async (
         // Process interfaces (walking up)
         for (const itf of node.interfaces) {
             const itfName = (node.pool[itf.name] as UTF8Entry).string;
-            edges.push({ parent: itfName, child: name, itf: true });
+            if (withImplicitSuperTypes || !IMPLICIT_SUPER.has(itfName)) {
+                edges.push({ parent: itfName, child: name, itf: true });
 
-            if (!processed.has(itfName)) {
-                await processRelated(itfName);
+                if (!processed.has(itfName)) {
+                    await processRelated(itfName);
+                }
             }
         }
 
@@ -311,15 +326,14 @@ export const computeHierarchyGraph = async (
                     const childEntry = classes.get(childName);
                     if (childEntry?.type === EntryType.CLASS) {
                         const childNode = (childEntry as ClassEntry).node;
-                        if (childNode) {
-                            // Determine if this is an interface relationship
-                            const isInterfaceRelation = childNode.interfaces.some(
-                                (itf) => (childNode.pool[itf.name] as UTF8Entry).string === name
-                            );
 
-                            edges.push({ parent: name, child: childName, itf: isInterfaceRelation });
-                            await processRelated(childName, false);
-                        }
+                        // Determine if this is an interface relationship
+                        const isInterfaceRelation = childNode.interfaces.some(
+                            (itf) => (childNode.pool[itf.name] as UTF8Entry).string === name
+                        );
+
+                        edges.push({ parent: name, child: childName, itf: isInterfaceRelation });
+                        await processRelated(childName, false);
                     }
                 }
             }
