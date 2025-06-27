@@ -9,6 +9,11 @@ export default defineConfig({
     build: {
         sourcemap: "hidden",
     },
+    server: {
+        fs: {
+            strict: false,
+        },
+    },
     resolve: {
         alias: {
             $lib: resolve("./src/lib"),

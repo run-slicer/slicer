@@ -98,11 +98,13 @@
     let scriptDeleteOpen: ProtoScript | null = $state(null);
     let scriptInfoOpen: ProtoScript | null = $state(null);
 
-    let scriptShareUrl: string | null = $state(new URLSearchParams(window.location.search).get("script"));
+    let scriptShareUrl: string | null = $state(new URL(window.location.href).searchParams.get("script"));
     $effect(() => {
         if (!scriptShareUrl) {
             // clear search params on dialog close
-            window.history.replaceState(null, "", window.location.pathname);
+            const url = new URL(window.location.href);
+            url.searchParams.delete("script");
+            window.history.replaceState(null, "", url);
         }
     });
 
