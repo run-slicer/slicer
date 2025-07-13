@@ -29,7 +29,7 @@ import {
     recordTimed,
     remove as removeTask,
 } from "$lib/task";
-import { chunk, distribute, downloadBlob, partition, readFiles, timestampFile } from "$lib/utils";
+import { chunk, distribute, downloadBlob, partition, readFiles, timestampFile, truncate } from "$lib/utils";
 import {
     type ClassEntry,
     clear as clearWs,
@@ -280,7 +280,7 @@ export default {
             }
         }
 
-        const proto = await readScript(url);
+        const proto = await record("importing script", truncate(url, 120), () => readScript(url));
         toast.success("Imported", {
             description: `Imported script ${proto.id}.`,
         });

@@ -1,5 +1,6 @@
 import { error, warn } from "$lib/log";
 import { analysisBackground } from "$lib/state";
+import { record } from "$lib/task";
 import { prettyMethodDesc } from "$lib/utils";
 import type { Member, Node } from "@run-slicer/asm";
 import type { UTF8Entry } from "@run-slicer/asm/pool";
@@ -228,7 +229,7 @@ if (window.launchQueue) {
         if (launchParams.files) {
             for (const handle of launchParams.files) {
                 if (handle.kind === "file") {
-                    handle.getFile().then(loadFile);
+                    handle.getFile().then((f: File) => record("loading", f.name, () => loadFile(f)));
                 }
             }
         }
@@ -240,7 +241,7 @@ const url = new URL(window.location.href);
 if (url.searchParams.has("url")) {
     const fetchUrl = url.searchParams.get("url")!;
 
-    fetch(fetchUrl)
+    record("fetching", fetchUrl, () => fetch(fetchUrl))
         .then(async (r) => {
             let name = new URL(fetchUrl).pathname.split("/").pop();
             if (!name?.includes(".")) {
@@ -248,7 +249,7 @@ if (url.searchParams.has("url")) {
                 name = "input.jar";
             }
 
-            return load(memoryBlobData(name, await r.blob()));
+            return record("loading", name, async () => load(memoryBlobData(name, await r.blob())));
         })
         .catch((e) => {
             error("failed to read entry from URL", e);

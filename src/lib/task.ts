@@ -73,19 +73,26 @@ export const recordTimed = async <T>(
 ): Promise<TimedResult<T>> => {
     const task = create(name, desc);
 
-    const result = await call(add(task));
-    const { time } = remove(task);
+    let result: T;
+    try {
+        result = await call(add(task));
+    } catch (e) {
+        remove(task);
+        throw e;
+    }
 
+    const { time } = remove(task);
     return { result, time };
 };
 
 export const recordProgress = async <T>(name: string, desc: string | null, call: TaskAction<T>): Promise<T> => {
     const task = create(name, desc, false);
 
-    const result = await call(add(task));
-    remove(task);
-
-    return result;
+    try {
+        return await call(add(task));
+    } finally {
+        remove(task);
+    }
 };
 
 export const record = async <T>(name: string, desc: string | null, call: TaskAction<T>): Promise<T> => {
