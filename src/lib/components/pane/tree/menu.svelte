@@ -1,8 +1,21 @@
+<script lang="ts" module>
+    import type { Entry } from "$lib/workspace";
+    import type { Node } from "./node.svelte";
+
+    export const collectEntries = (node: Node): Entry[] => {
+        const entries = node.entry ? [node.entry] : [];
+        if (node.nodes) {
+            entries.push(...node.nodes.flatMap(collectEntries));
+        }
+
+        return entries;
+    };
+</script>
+
 <script lang="ts">
     import { Binary, Code, Download, FileCode2, Gauge, GitBranchPlus, Image, Trash2 } from "@lucide/svelte";
     import { EntryType } from "$lib/workspace";
     import { TabType } from "$lib/tab";
-    import type { Node } from "./node.svelte";
     import {
         ContextMenuContent,
         ContextMenuItem,
@@ -13,14 +26,15 @@
     } from "$lib/components/ui/context-menu";
     import ContextMenuLabel from "$lib/components/menu_label.svelte";
     import type { EventHandler } from "$lib/event";
+    import { modals } from "svelte-modals";
+    import { DeleteDialog } from "$lib/components/dialog";
 
     interface Props {
         node: Node;
-        ondelete?: (node: Node) => void;
         handler: EventHandler;
     }
 
-    let { node, ondelete, handler }: Props = $props();
+    let { node, handler }: Props = $props();
     let entry = $derived(node.entry);
 </script>
 
@@ -61,8 +75,8 @@
         </ContextMenuItem>
     {/if}
     <ContextMenuItem
-        class="data-highlighted:bg-destructive data-highlighted:text-destructive-foreground flex justify-between"
-        onclick={() => ondelete?.(node)}
+        class="data-highlighted:bg-destructive data-highlighted:text-primary-foreground flex justify-between"
+        onclick={() => modals.open(DeleteDialog, { entries: collectEntries(node), handler })}
     >
         Delete <Trash2 size={16} />
     </ContextMenuItem>

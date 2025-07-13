@@ -142,7 +142,6 @@
     --color-accent: var(--accent);
     --color-accent-foreground: var(--accent-foreground);
     --color-destructive: var(--destructive);
-    --color-destructive-foreground: var(--destructive-foreground);
     --color-ring: var(--ring);
     --color-radius: var(--radius);
     --color-sidebar: var(--sidebar);

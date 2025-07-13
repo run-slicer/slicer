@@ -11,15 +11,15 @@
     import ScriptOption from "./option.svelte";
     import { Info, Trash2 } from "@lucide/svelte";
     import type { EventHandler } from "$lib/event";
+    import { modals } from "svelte-modals";
+    import { ScriptDialog, ScriptDeleteDialog } from "$lib/components/dialog";
 
     interface Props {
         proto: ProtoScript;
-        onopen?: (proto: ProtoScript) => void;
-        ondelete?: (proto: ProtoScript) => void;
         handler: EventHandler;
     }
 
-    let { proto, onopen, ondelete, handler }: Props = $props();
+    let { proto, handler }: Props = $props();
     const script = $derived(proto.script);
 
     const handleEnabled = async (enabled: boolean) => {
@@ -42,13 +42,13 @@
             Enabled
         </MenubarCheckboxItem>
         <MenubarSeparator />
-        <MenubarItem inset class="justify-between" onclick={() => onopen?.(proto)}>
+        <MenubarItem inset class="justify-between" onclick={() => modals.open(ScriptDialog, { proto, handler })}>
             Info <Info size={16} />
         </MenubarItem>
         <MenubarItem
             inset
-            class="data-highlighted:bg-destructive data-highlighted:text-destructive-foreground justify-between"
-            onclick={() => ondelete?.(proto)}
+            class="data-highlighted:bg-destructive data-highlighted:text-primary-foreground justify-between"
+            onclick={() => modals.open(ScriptDeleteDialog, { proto, handler })}
         >
             Delete <Trash2 size={16} />
         </MenubarItem>

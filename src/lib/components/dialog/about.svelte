@@ -1,11 +1,8 @@
 <script lang="ts">
     import { Dialog, DialogContent } from "$lib/components/ui/dialog";
+    import type { ModalProps } from "svelte-modals";
 
-    interface Props {
-        open?: boolean;
-    }
-
-    let { open = $bindable(false) }: Props = $props();
+    let { isOpen, close }: ModalProps = $props();
 
     let imageId = $state(Math.floor(Math.random() * 4));
     const changeImage = () => {
@@ -16,7 +13,7 @@
     };
 </script>
 
-<Dialog bind:open>
+<Dialog bind:open={isOpen} onOpenChangeComplete={(open) => open || close()}>
     <DialogContent class="flex flex-col justify-between">
         <div class="grid grid-cols-2 gap-4">
             <div>

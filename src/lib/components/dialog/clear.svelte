@@ -11,20 +11,20 @@
     } from "$lib/components/ui/alert-dialog";
     import { buttonVariants } from "$lib/components/ui/button";
     import type { EventHandler } from "$lib/event";
+    import type { ModalProps } from "svelte-modals";
 
-    interface Props {
-        open?: boolean;
+    interface Props extends ModalProps {
         handler: EventHandler;
     }
 
-    let { open = $bindable(false), handler }: Props = $props();
+    let { isOpen, close, handler }: Props = $props();
     const handle = async () => {
-        open = false;
+        isOpen = false;
         await handler.clear();
     };
 </script>
 
-<AlertDialog bind:open>
+<AlertDialog bind:open={isOpen} onOpenChangeComplete={(open) => open || close()}>
     <AlertDialogContent class="sm:max-w-[425px]">
         <AlertDialogHeader>
             <AlertDialogTitle>Are you sure, absolutely sure?</AlertDialogTitle>

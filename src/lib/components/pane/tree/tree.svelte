@@ -1,25 +1,11 @@
-<script lang="ts" module>
-    import type { Entry } from "$lib/workspace";
-    import type { Node } from "./node.svelte";
-
-    export const collectEntries = (node: Node): Entry[] => {
-        const entries = node.entry ? [node.entry] : [];
-        if (node.nodes) {
-            entries.push(...node.nodes.flatMap(collectEntries));
-        }
-
-        return entries;
-    };
-</script>
-
 <script lang="ts">
     import { Plus } from "@lucide/svelte";
     import { Button } from "$lib/components/ui/button";
     import { ContextMenu, ContextMenuTrigger } from "$lib/components/ui/context-menu";
-    import { DeleteDialog } from "$lib/components/dialog";
     import TreeNode from "./node.svelte";
     import NodeMenu from "./menu.svelte";
     import type { PaneProps } from "$lib/components/pane";
+    import type { Node } from "./node.svelte";
 
     let { entries, handler }: PaneProps = $props();
 
@@ -49,7 +35,6 @@
     });
 
     let menuData: Node | null = $state(null);
-    let deleteData: Entry[] | null = $state(null);
 
     let triggerElem: HTMLDivElement | null = $state(null);
 
@@ -103,8 +88,6 @@
         </div>
     </ContextMenuTrigger>
     {#if menuData}
-        <NodeMenu node={menuData} ondelete={(node) => (deleteData = collectEntries(node))} {handler} />
+        <NodeMenu node={menuData} {handler} />
     {/if}
 </ContextMenu>
-
-<DeleteDialog bind:entries={deleteData} {handler} />

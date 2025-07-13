@@ -13,39 +13,30 @@
     import { cn } from "$lib/components/utils";
     import type { EventHandler } from "$lib/event";
     import { Switch } from "$lib/components/ui/switch";
+    import type { ModalProps } from "svelte-modals";
 
-    interface Props {
-        open?: boolean;
+    interface Props extends ModalProps {
         handler: EventHandler;
     }
 
-    let { open = $bindable(false), handler }: Props = $props();
+    let { isOpen, close, handler }: Props = $props();
 
     let value = $state("");
     let enabled = $state(true);
-    $effect(() => {
-        if (!open) {
-            // clear after closing
-            value = "";
-            enabled = true;
-        }
-    });
-
     let invalid = $state(false);
     const loadScript = async () => {
         const value0 = value.trim();
-        const enabled0 = enabled;
         if (!value0) {
             invalid = true;
             return;
         }
 
-        open = false;
-        await handler.addScript(value0, enabled0);
+        isOpen = false;
+        await handler.addScript(value0, enabled);
     };
 </script>
 
-<Dialog bind:open>
+<Dialog bind:open={isOpen} onOpenChangeComplete={(open) => open || close()}>
     <DialogContent>
         <DialogHeader>
             <DialogTitle>Import script</DialogTitle>

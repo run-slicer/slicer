@@ -12,32 +12,31 @@
     import type { EventHandler } from "$lib/event";
     import { truncate } from "$lib/utils";
     import { buttonVariants } from "$lib/components/ui/button";
+    import type { ModalProps } from "svelte-modals";
 
-    interface Props {
-        url: string | null;
+    interface Props extends ModalProps {
+        url: string;
         handler: EventHandler;
     }
 
-    let { url = $bindable(), handler }: Props = $props();
+    let { isOpen, close, url, handler }: Props = $props();
 
-    const handle = async (accepted: boolean, enabled: boolean = false) => {
-        const url0 = url!;
-        url = null;
-
+    const handle = async (accepted: boolean, enabled: boolean) => {
+        isOpen = false;
         if (accepted) {
-            await handler.addScript(url0, enabled);
+            await handler.addScript(url, enabled);
         }
     };
 </script>
 
-<AlertDialog open={url !== null} onOpenChange={() => (url = null)}>
+<AlertDialog bind:open={isOpen} onOpenChangeComplete={(open) => open || close()}>
     <AlertDialogContent>
         <AlertDialogHeader>
             <AlertDialogTitle>Import script</AlertDialogTitle>
             <AlertDialogDescription>
                 Import a script from
                 <span class="p-0.5 font-mono text-xs" title={url}>
-                    {truncate(url || "", 120)}
+                    {truncate(url, 120)}
                 </span>?
                 <p class="mt-2 font-semibold">
                     Scripts have <span class="text-destructive">full access</span> to slicer, be aware of what you import!
@@ -45,8 +44,8 @@
             </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-            <AlertDialogCancel onclick={() => handle(false)}>Cancel</AlertDialogCancel>
-            <AlertDialogAction class={buttonVariants({ variant: "secondary" })} onclick={() => handle(true)}>
+            <AlertDialogCancel onclick={() => handle(false, false)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction class={buttonVariants({ variant: "secondary" })} onclick={() => handle(true, false)}>
                 Import
             </AlertDialogAction>
             <AlertDialogAction onclick={() => handle(true, true)}>Import & enable</AlertDialogAction>

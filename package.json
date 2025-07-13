@@ -39,6 +39,7 @@
         "elkjs": "^0.10.0",
         "html-to-image": "^1.11.11",
         "queueable": "^5.3.2",
+        "svelte-modals": "^2.0.1",
         "tailwind-merge": "^3.3.1",
         "virtua": "^0.41.5"
     },

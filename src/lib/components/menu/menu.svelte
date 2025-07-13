@@ -17,14 +17,7 @@
     import { Modifier } from "$lib/shortcut";
     import Shortcut from "./shortcut.svelte";
     import ScriptMenu from "./script/menu.svelte";
-    import {
-        AboutDialog,
-        ClearDialog,
-        ScriptDeleteDialog,
-        ScriptDialog,
-        ScriptLoadDialog,
-        ScriptLoadShareDialog,
-    } from "$lib/components/dialog";
+    import { AboutDialog, ClearDialog, ScriptLoadDialog } from "$lib/components/dialog";
     import {
         Menubar,
         MenubarCheckboxItem,
@@ -60,6 +53,7 @@
     import { type Transformer, toggle as toggleTransformer } from "$lib/workspace/analysis/transform";
     import PaneButton from "./pane_button.svelte";
     import { groupBy } from "$lib/utils";
+    import { modals } from "svelte-modals";
 
     interface Props {
         panes: PaneData[];
@@ -90,13 +84,6 @@
     let secondaryRight = $derived({ current: panes.find((p) => p.position === TabPosition.SECONDARY_RIGHT) });
 
     let entry = $derived(tab?.entry);
-
-    let aboutOpen = $state(false);
-    let clearOpen = $state(false);
-
-    let scriptLoadOpen = $state(false);
-    let scriptDeleteOpen: ProtoScript | null = $state(null);
-    let scriptInfoOpen: ProtoScript | null = $state(null);
 
     let scriptShareUrl: string | null = $state(new URL(window.location.href).searchParams.get("script"));
     $effect(() => {
@@ -129,7 +116,7 @@
         <MenubarMenu>
             <MenubarTrigger class="font-bold">slicer</MenubarTrigger>
             <MenubarContent align="start">
-                <MenubarItem class="justify-between" onclick={() => (aboutOpen = true)}>
+                <MenubarItem class="justify-between" onclick={() => modals.open(AboutDialog)}>
                     About <Info size={16} />
                 </MenubarItem>
                 <MenubarItem class="justify-between" onclick={() => window.open("https://docs.slicer.run/", "_blank")}>
@@ -197,7 +184,9 @@
                 <MenubarItem onclick={() => handler.add()}>
                     Add <Shortcut key="o" modifier={Modifier.CTRL | Modifier.SHIFT} />
                 </MenubarItem>
-                <MenubarItem disabled={entries.length === 0} onclick={() => (clearOpen = true)}>Clear all</MenubarItem>
+                <MenubarItem disabled={entries.length === 0} onclick={() => modals.open(ClearDialog, { handler })}>
+                    Clear all
+                </MenubarItem>
                 <MenubarSub>
                     <MenubarSubTrigger disabled={entries.length === 0}>Export all</MenubarSubTrigger>
                     <MenubarSubContent class="min-w-[12rem]" align="start">
@@ -338,7 +327,7 @@
                 <MenubarSub>
                     <MenubarSubTrigger>Import</MenubarSubTrigger>
                     <MenubarSubContent class="min-w-[12rem]" align="start">
-                        <MenubarItem class="justify-between" onclick={() => (scriptLoadOpen = true)}>
+                        <MenubarItem class="justify-between" onclick={() => modals.open(ScriptLoadDialog, { handler })}>
                             From URL <Globe size={16} />
                         </MenubarItem>
                         <MenubarItem class="justify-between" onclick={() => handler.addScript()}>
@@ -349,12 +338,7 @@
                 {#if scripts.length > 0}
                     <MenubarSeparator />
                     {#each scripts as proto (proto.id)}
-                        <ScriptMenu
-                            {proto}
-                            {handler}
-                            onopen={(proto) => (scriptInfoOpen = proto)}
-                            ondelete={(proto) => (scriptDeleteOpen = proto)}
-                        />
+                        <ScriptMenu {proto} {handler} />
                     {/each}
                 {/if}
                 <MenubarSeparator />
@@ -389,13 +373,6 @@
     </div>
 </Menubar>
 <Separator />
-
-<AboutDialog bind:open={aboutOpen} />
-<ScriptDialog bind:proto={scriptInfoOpen} />
-<ScriptLoadDialog bind:open={scriptLoadOpen} {handler} />
-<ScriptDeleteDialog bind:proto={scriptDeleteOpen} {handler} />
-<ScriptLoadShareDialog bind:url={scriptShareUrl} {handler} />
-<ClearDialog bind:open={clearOpen} {handler} />
 
 <style>
     /* PWA title bar */

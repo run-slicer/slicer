@@ -18,6 +18,7 @@
     import { register as registerShortcuts } from "$lib/shortcut";
     import { onMount } from "svelte";
     import { transformers } from "$lib/workspace/analysis/transform";
+    import { Modals } from "svelte-modals";
 
     let tabs0 = $derived(Array.from($tabs.values()));
     let entries0 = $derived(Array.from($entries.values()));
@@ -67,3 +68,4 @@
 />
 <Crumb tab={$currentTab} tasks={tasks0} encoding={$currentEncoding} />
 <Command entries={entries0} handler={$handler} />
+<Modals />
