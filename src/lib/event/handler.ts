@@ -39,6 +39,7 @@ import {
     loadZip,
     readDeferred,
     remove as removeWs,
+    ZIP_EXTENSIONS,
 } from "$lib/workspace";
 import { type Data, download } from "$lib/workspace/data";
 import { Channel } from "queueable";
@@ -50,7 +51,12 @@ import type { EventHandler } from "./";
 
 export default {
     async load(): Promise<void> {
-        const files = await readFiles(".jar,.zip", true);
+        const files = await readFiles(
+            Array.from(ZIP_EXTENSIONS.values())
+                .map((e) => `.${e}`)
+                .join(","),
+            true
+        );
         if (files.length === 0) {
             return;
         }

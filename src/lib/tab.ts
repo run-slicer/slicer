@@ -304,7 +304,7 @@ analysisTransformers.subscribe(() => {
 // prettier-ignore
 const extensions = {
     [TabType.HEX]: [
-        "bin", "tar", "gz", "rar", "zip", "7z", "jar", "lzma", "dll", "so", "dylib", "exe", "kotlin_builtins",
+        "bin", "tar", "gz", "rar", "zip", "7z", "jar", "apk", "dex", "lzma", "dll", "so", "dylib", "exe", "kotlin_builtins",
         "kotlin_metadata", "kotlin_module", "nbt", "ogg", "cer", "der", "crt",
     ],
     [TabType.IMAGE]: ["jpg", "jpeg", "gif", "png", "webp"],

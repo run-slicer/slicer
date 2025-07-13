@@ -26,6 +26,7 @@ import {
     TextQuote,
 } from "@lucide/svelte";
 import type { Component } from "svelte";
+import Android from "./android.svelte";
 import GitHub from "./github.svelte";
 import Kotlin from "./kotlin.svelte";
 
@@ -90,6 +91,8 @@ export const fileIcon = (label: string): StyledIcon => {
                 return { icon: TextQuote, classes: ["text-green-500"] };
             case "jar":
                 return { icon: FileArchive, classes: ["text-red-500"] };
+            case "apk":
+                return { icon: Android };
             case "zip":
             case "tar":
             case "war":
@@ -127,4 +130,4 @@ export const paneIcon = (pos: TabPosition, open: boolean): Icon => {
     }
 };
 
-export { GitHub };
+export { Android, GitHub, Kotlin };

@@ -129,7 +129,7 @@ export interface LoadResult {
     created: boolean;
 }
 
-const zipExtensions = new Set(["zip", "jar", "war", "ear", "jmod"]);
+export const ZIP_EXTENSIONS = new Set(["zip", "jar", "apk", "war", "ear", "jmod"]);
 
 const load0 = async (entries: Map<string, Entry>, d: Data, parent?: Entry): Promise<LoadResult[]> => {
     const name = parent ? `${parent.name}/${d.name}` : d.name;
@@ -149,7 +149,7 @@ const load0 = async (entries: Map<string, Entry>, d: Data, parent?: Entry): Prom
         state: AnalysisState.NONE,
     };
 
-    if (entry.extension && zipExtensions.has(entry.extension)) {
+    if (entry.extension && ZIP_EXTENSIONS.has(entry.extension)) {
         try {
             const archiveEntry = entry as ArchiveEntry;
 
