@@ -29,9 +29,16 @@
 
     onMount(registerShortcuts);
 
-    // ignore default context menu
+    // ignore default context menu except on double right-clicks
     onMount(() => {
-        const handler = (e: Event) => e.preventDefault();
+        let lastClick = Date.now();
+        const handler = (e: Event) => {
+            // at most 500ms between clicks
+            if (Date.now() - lastClick > 500) {
+                e.preventDefault();
+            }
+            lastClick = Date.now();
+        };
 
         window.addEventListener("contextmenu", handler);
         return () => window.removeEventListener("contextmenu", handler);
