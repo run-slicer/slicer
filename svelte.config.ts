@@ -1,4 +1,4 @@
-import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
+import { type SvelteConfig, vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 
 const ignoredWarnings = [
     "state_referenced_locally", // we're using (immediate) $state values in $state defaults, ignore
@@ -11,4 +11,4 @@ export default {
     compilerOptions: {
         warningFilter: (w) => !ignoredWarnings.includes(w.code),
     },
-};
+} satisfies SvelteConfig;
