@@ -15,7 +15,7 @@
     import TreeNode from "./node.svelte";
     import { ChevronDown, ChevronRight, Folder } from "@lucide/svelte";
     import { cn } from "$lib/components/utils";
-    import { fileIcon, entryIcon } from "$lib/components/icons";
+    import { entryIcon } from "$lib/components/icons";
 
     interface Props extends HTMLAttributes<HTMLDivElement> {
         entries: Entry[];
@@ -32,7 +32,7 @@
         }
     });
 
-    const { icon: FileIcon, classes } = $derived(data.entry ? entryIcon(data.entry) : fileIcon(data.label));
+    const iconData = $derived(data.entry ? entryIcon(data.entry) : undefined)
 
     let expanded = $state(data.expanded === undefined ? (data.parent?.nodes?.length || 0) === 1 : data.expanded);
     $effect(() => {
@@ -55,8 +55,8 @@
         {@const ExpandedIcon = expanded ? ChevronDown : ChevronRight}
         <button class="highlight flex w-full py-[0.2rem]" onclick={() => (expanded = !expanded)}>
             <ExpandedIcon size={14} class="text-muted-foreground my-auto mr-1 min-w-[14px]" />
-            {#if data.entry}
-                <FileIcon size={16} class={cn("my-auto mr-1 min-w-[16px]", classes)} />
+            {#if iconData}
+                <iconData.icon size={16} class={cn("my-auto mr-1 min-w-[16px]", iconData.classes)} />
             {:else}
                 <Folder size={16} class="fill-muted my-auto mr-1 min-w-[16px]" />
             {/if}
@@ -74,7 +74,9 @@
         {/if}
     {:else}
         <button class="highlight flex w-full py-[0.2rem]" ondblclick={() => onopen?.(data)}>
-            <FileIcon size={16} class={cn("my-auto mr-1 min-w-[16px]", classes)} />
+            {#if iconData}
+                <iconData.icon size={16} class={cn("my-auto mr-1 min-w-[16px]", iconData.classes)} />
+            {/if}
             <span class="text-sm">{data.label}</span>
         </button>
     {/if}
