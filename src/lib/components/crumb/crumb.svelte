@@ -18,9 +18,11 @@
     import { cn } from "$lib/components/utils";
     import { isEncodingDependent, type Tab } from "$lib/tab";
     import type { Encoding } from "$lib/workspace/encoding";
+    import { entries as allEntries } from "$lib/workspace";
     import { entryIcon } from "$lib/components/icons";
     import type { Task } from "$lib/task";
     import Tasks from "./tasks.svelte";
+    import { derived, get } from "svelte/store";
 
     interface Props {
         tab: Tab | null;
@@ -29,6 +31,8 @@
     }
 
     let { tab, tasks, encoding }: Props = $props();
+    const entries = $derived(get(allEntries))
+
 </script>
 
 <Separator />
@@ -44,7 +48,7 @@
                         {@const lastPart = y === parts.length - 1}
                         <BreadcrumbItem class="whitespace-nowrap">
                             {#if lastPart}
-                                {@const { icon: FileIcon, classes } = entryIcon(entry)}
+                                {@const { icon: FileIcon, classes } = entryIcon(entry, Array.from(entries.values()))}
                                 <FileIcon size={14} class={cn("min-w-[14px]", classes)} />
                             {/if}
                             {part}
