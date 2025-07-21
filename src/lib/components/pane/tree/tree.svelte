@@ -23,7 +23,7 @@
 
             collapseSingleChildDirs(child);
         }
-    }
+    };
 
     let root: Node = $derived.by(() => {
         const root: Node = { label: "<root>", nodes: [] };

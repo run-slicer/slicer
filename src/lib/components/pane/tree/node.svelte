@@ -32,7 +32,7 @@
         }
     });
 
-    const iconData = $derived(data.entry ? entryIcon(data.entry) : undefined)
+    const iconData = $derived(data.entry ? entryIcon(data.entry) : undefined);
 
     let expanded = $state(data.expanded === undefined ? (data.parent?.nodes?.length || 0) === 1 : data.expanded);
     $effect(() => {
