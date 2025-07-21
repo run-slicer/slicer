@@ -17,8 +17,9 @@
     let searching = $state(false);
     let time = $state(-1);
 
-    let type = $state(QueryType.POOL_ENTRY);
+    let type = $state(QueryType.STRING);
     let mode = $state(SearchMode.PARTIAL_MATCH);
+    let ref = $state(false);
 
     let results: SearchResult[] = $state.raw([]);
     $effect(() => {
@@ -41,7 +42,7 @@
                 time = Date.now() - start;
             }, 20);
 
-            await search(entries, { type, value, mode }, (r) => {
+            await search(entries, { type, value, mode, ref }, (r) => {
                 results = [...results, r];
             });
 
@@ -59,7 +60,7 @@
 
 <div class="flex h-full w-full flex-col">
     <div class="flex w-full flex-row px-2 pt-2">
-        <Dropdown bind:type bind:mode disabled={searching} />
+        <Dropdown bind:type bind:mode bind:ref disabled={searching} />
         <Input
             placeholder="Search anything..."
             type="text"

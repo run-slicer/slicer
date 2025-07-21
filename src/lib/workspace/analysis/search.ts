@@ -2,7 +2,8 @@ import type { ClassEntry } from "$lib/workspace";
 import type { Member, Node } from "@run-slicer/asm";
 
 export enum QueryType {
-    POOL_ENTRY = "pool_entry",
+    PSEUDOCODE = "pseudocode",
+    STRING = "string",
     FIELD = "field",
     METHOD = "method",
 }
@@ -17,6 +18,7 @@ export interface SearchQuery {
     type: QueryType;
     value: string;
     mode: SearchMode;
+    ref: boolean;
 }
 
 export interface SearchResult {

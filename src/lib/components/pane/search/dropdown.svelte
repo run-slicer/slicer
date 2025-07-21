@@ -1,10 +1,14 @@
 <script lang="ts" module>
-    import { QueryType, SearchMode } from "$lib/workspace/analysis";
+    import { QueryType } from "$lib/workspace/analysis";
 
     export const types = [
         {
-            value: QueryType.POOL_ENTRY,
-            label: "Constant pool",
+            value: QueryType.PSEUDOCODE,
+            label: "Pseudocode",
+        },
+        {
+            value: QueryType.STRING,
+            label: "Strings",
         },
         {
             value: QueryType.FIELD,
@@ -13,20 +17,6 @@
         {
             value: QueryType.METHOD,
             label: "Methods",
-        },
-    ];
-    export const modes = [
-        {
-            value: SearchMode.PARTIAL_MATCH,
-            label: "Partial match",
-        },
-        {
-            value: SearchMode.EXACT_MATCH,
-            label: "Exact match",
-        },
-        {
-            value: SearchMode.REGEXP,
-            label: "Regular expression",
         },
     ];
 </script>
@@ -40,17 +30,20 @@
         DropdownMenuRadioGroup,
         DropdownMenuRadioItem,
         DropdownMenuSeparator,
+        DropdownMenuCheckboxItem,
     } from "$lib/components/ui/dropdown-menu";
     import { cn } from "$lib/components/utils";
+    import { SearchMode } from "$lib/workspace/analysis";
     import { ChevronsUpDown } from "@lucide/svelte";
 
     interface Props {
         type: QueryType;
         mode: SearchMode;
+        ref: boolean;
         disabled?: boolean;
     }
 
-    let { type = $bindable(), mode = $bindable(), disabled }: Props = $props();
+    let { type = $bindable(), mode = $bindable(), ref = $bindable(), disabled }: Props = $props();
 
     let currentType = $derived(types.find((t) => t.value === type)!);
 </script>
@@ -70,10 +63,17 @@
             {/each}
         </DropdownMenuRadioGroup>
         <DropdownMenuSeparator />
+        <DropdownMenuCheckboxItem
+            bind:checked={ref}
+            disabled={type === QueryType.PSEUDOCODE || type === QueryType.STRING}
+        >
+            Reference
+        </DropdownMenuCheckboxItem>
+        <DropdownMenuSeparator />
         <DropdownMenuRadioGroup bind:value={mode}>
-            {#each modes as mode}
-                <DropdownMenuRadioItem value={mode.value}>{mode.label}</DropdownMenuRadioItem>
-            {/each}
+            <DropdownMenuRadioItem value={SearchMode.PARTIAL_MATCH}>Partial match</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value={SearchMode.EXACT_MATCH}>Exact match</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value={SearchMode.REGEXP}>RegExp match</DropdownMenuRadioItem>
         </DropdownMenuRadioGroup>
     </DropdownMenuContent>
 </DropdownMenu>
