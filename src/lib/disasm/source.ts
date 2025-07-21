@@ -1,4 +1,9 @@
+import { error } from "$lib/log";
+import { analysisJdkClasses } from "$lib/state";
+import { record } from "$lib/task";
 import { type Entry, EntryType, readDeferred } from "$lib/workspace";
+import { index } from "$lib/workspace/jdk";
+import { get } from "svelte/store";
 
 export type EntrySource = (name: string) => Promise<Uint8Array | null>;
 
@@ -9,15 +14,26 @@ export const createSource = (classes: Map<string, Entry>, name: string, buf: Uin
         }
 
         let entry = classes.get(name0);
-        if (!entry) {
+        if (entry) {
+            entry = await readDeferred(entry);
+            if (entry.type === EntryType.CLASS) {
+                return entry.data.bytes();
+            }
+        }
+
+        const indexedUrl = index.get(name0);
+        if (!indexedUrl || !get(analysisJdkClasses)) {
             return null;
         }
 
-        entry = await readDeferred(entry);
-        if (entry.type !== EntryType.CLASS) {
-            return null; // not a class
-        }
+        return await record("fetching JDK class", name0, async () => {
+            const res = await fetch(indexedUrl);
+            if (!res.ok) {
+                error(`failed to fetch JDK class '${name0}', status code ${res.status}`);
+                return null;
+            }
 
-        return entry.data.bytes();
+            return res.bytes();
+        });
     };
 };

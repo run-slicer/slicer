@@ -1,6 +1,8 @@
 import type { Disassembler } from "$lib/disasm";
+import { analysisJdkClasses } from "$lib/state";
 import { roundRobin } from "$lib/utils";
 import { classes } from "$lib/workspace";
+import { index } from "$lib/workspace/jdk";
 import type { UTF8Entry } from "@run-slicer/asm/pool";
 import { proxy } from "comlink";
 import { get } from "svelte/store";
@@ -37,7 +39,9 @@ export const createFromWorker = (
         const classes0 = get(classes);
         return await worker.class(
             name,
-            Array.from(classes0.keys()),
+            get(analysisJdkClasses)
+                ? [...Array.from(classes0.keys()), ...Array.from(index.keys())]
+                : Array.from(classes0.keys()),
             proxy(createSource(classes0, name, buf)),
             disasm.options
         );
@@ -51,9 +55,7 @@ export const createFromWorker = (
             const signature = method.name.string + method.type.string;
 
             const worker = workerFunc();
-
-            const classes0 = get(classes);
-            return await worker.method(name, signature, proxy(createSource(classes0, name, buf)), disasm.options);
+            return await worker.method(name, signature, proxy(createSource(get(classes), name, buf)), disasm.options);
         };
     }
 

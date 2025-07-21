@@ -4,6 +4,7 @@
     import {
         analysisBackground,
         analysisTransformers,
+        analysisJdkClasses,
         type PaneData,
         themeColor,
         themeRadius,
@@ -318,6 +319,9 @@
                 <MenubarSeparator />
                 <MenubarCheckboxItem class="justify-between" bind:checked={$analysisBackground}>
                     Background <SendToBack size={16} />
+                </MenubarCheckboxItem>
+                <MenubarCheckboxItem class="justify-between" bind:checked={$analysisJdkClasses}>
+                    JDK classes <Coffee size={16} />
                 </MenubarCheckboxItem>
             </MenubarContent>
         </MenubarMenu>

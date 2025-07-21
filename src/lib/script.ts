@@ -215,8 +215,7 @@ const unwrapDisasm = (disasm: ScriptDisassembler): Disassembler => {
             const buf = await data.bytes();
             const name = (node.pool[node.thisClass.name] as UTF8Entry).string;
 
-            const classes0 = get(classes);
-            return disasm.class(name, createClassSource(classes0, name, buf));
+            return disasm.class(name, createClassSource(get(classes), name, buf));
         },
         method: disasm.method
             ? async (entry, method) => {
@@ -226,8 +225,7 @@ const unwrapDisasm = (disasm: ScriptDisassembler): Disassembler => {
                   const name = (node.pool[node.thisClass.name] as UTF8Entry).string;
                   const signature = method.name.string + method.type.string;
 
-                  const classes0 = get(classes);
-                  return disasm.method!(name, signature, createClassSource(classes0, name, buf));
+                  return disasm.method!(name, signature, createClassSource(get(classes), name, buf));
               }
             : undefined,
     };
