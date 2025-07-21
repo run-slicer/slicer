@@ -25,6 +25,7 @@ import {
     Text,
     TextQuote,
 } from "@lucide/svelte";
+import type { UTF8Entry } from "@run-slicer/asm/pool";
 import { Modifier } from "@run-slicer/asm/spec/modifier";
 import type { Component } from "svelte";
 import Android from "./android.svelte";
@@ -70,12 +71,18 @@ export const entryIcon = (entry: Entry): StyledIcon => {
             if (node) {
                 const data = parseClassModifiers(node.access);
 
+                if (node.superClass) {
+                    const superName = (node.pool[node.superClass.name] as UTF8Entry).string;
+
+                    if (superName === "java/lang/Record") {
+                        return { icon: Record, classes: [] };
+                    }
+                }
+
                 if (data.isAbstract && !data.isInterface) {
                     return { icon: Abstract, classes: [] };
                 } else if (data.isAnnotation) {
                     return { icon: Annotation, classes: [] };
-                } else if (data.isRecord) {
-                    return { icon: Record, classes: [] };
                 } else if (data.isInterface) {
                     return { icon: Interface, classes: [] };
                 } else if (data.isEnum) {
@@ -100,7 +107,6 @@ function parseClassModifiers(modifiers: number) {
         isSynthetic: (modifiers & Modifier.SYNTHETIC) !== 0,
         isAnnotation: (modifiers & Modifier.ANNOTATION) !== 0,
         isEnum: (modifiers & Modifier.ENUM) !== 0,
-        isRecord: (modifiers & 0x10000) !== 0, // Java 14+
     };
 }
 
