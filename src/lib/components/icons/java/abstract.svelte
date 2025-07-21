@@ -2,7 +2,7 @@
     import { Icon, type IconNode, type IconProps } from "@lucide/svelte";
 
     let { strokeWidth = 0, ...props }: IconProps = $props();
-    
+
     const iconNode = [
         [
             "path",
@@ -14,4 +14,4 @@
     ] as IconNode;
 </script>
 
-<Icon name="record" {...props} strokeWidth={strokeWidth} {iconNode} />
+<Icon name="record" {...props} {strokeWidth} {iconNode} />

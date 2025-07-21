@@ -25,15 +25,16 @@ import {
     Text,
     TextQuote,
 } from "@lucide/svelte";
+import { Modifier } from "@run-slicer/asm/spec/modifier";
 import type { Component } from "svelte";
 import Android from "./android.svelte";
-import Abstract from './java/abstract.svelte'
-import Annotation from './java/annotation.svelte'
-import Class from './java/class.svelte'
-import Enum from './java/enum.svelte'
-import Interface from './java/interface.svelte'
-import Record from './java/record.svelte'
 import GitHub from "./github.svelte";
+import Abstract from "./java/abstract.svelte";
+import Annotation from "./java/annotation.svelte";
+import Class from "./java/class.svelte";
+import Enum from "./java/enum.svelte";
+import Interface from "./java/interface.svelte";
+import Record from "./java/record.svelte";
 import Kotlin from "./kotlin.svelte";
 
 export type Icon = Component<LucideIcon>;
@@ -43,7 +44,7 @@ export interface StyledIcon {
     classes?: string[];
 }
 
-export const tabIcon = (tabType: TabType, entry: Entry, entries: Entry[]): StyledIcon => {
+export const tabIcon = (tabType: TabType, entry: Entry): StyledIcon => {
     switch (tabType) {
         case TabType.WELCOME:
             return { icon: Sparkles, classes: ["text-muted-foreground"] };
@@ -55,80 +56,60 @@ export const tabIcon = (tabType: TabType, entry: Entry, entries: Entry[]): Style
             return { icon: FileCode2, classes: ["text-red-500"] };
     }
 
-    return entryIcon(entry, entries);
+    return entryIcon(entry);
 };
 
-export const entryIcon = (entry: Entry, entries: Entry[]): StyledIcon => {
+export const entryIcon = (entry: Entry): StyledIcon => {
     switch (entry.type) {
         case EntryType.MEMBER:
             return { icon: Parentheses, classes: ["text-red-500"] };
+        case EntryType.CLASS: {
+            const classEntry = entry as ClassEntry;
+            const node = classEntry.node;
+
+            if (node) {
+                const data = parseClassModifiers(node.access);
+
+                if (data.isAbstract && !data.isInterface) {
+                    return { icon: Abstract, classes: [] };
+                } else if (data.isAnnotation) {
+                    return { icon: Annotation, classes: [] };
+                } else if (data.isRecord) {
+                    return { icon: Record, classes: [] };
+                } else if (data.isInterface) {
+                    return { icon: Interface, classes: [] };
+                } else if (data.isEnum) {
+                    return { icon: Enum, classes: [] };
+                } else {
+                    return { icon: Class, classes: [] };
+                }
+            }
+        }
     }
 
-    const getFullName = (entry: Entry): string => {
-        const labels: string[] = [];
-        let current: Entry | undefined = entry;
-
-        while (current && current.label !== "<root>") {
-            labels.unshift(current.name);
-            current = current.parent;
-        }
-
-        return labels.join("/");
-    };
-
-    const name = getFullName(entry);
-
-    return fileIcon(name, entries);
+    return fileIcon(entry.name);
 };
 
 function parseClassModifiers(modifiers: number) {
     return {
-        isPublic: (modifiers & 0x0001) !== 0,
-        isFinal: (modifiers & 0x0010) !== 0,
-        isSuper: (modifiers & 0x0020) !== 0,
-        isInterface: (modifiers & 0x0200) !== 0,
-        isAbstract: (modifiers & 0x0400) !== 0,
-        isSynthetic: (modifiers & 0x1000) !== 0,
-        isAnnotation: (modifiers & 0x2000) !== 0,
-        isEnum: (modifiers & 0x4000) !== 0,
+        isPublic: (modifiers & Modifier.PUBLIC) !== 0,
+        isFinal: (modifiers & Modifier.FINAL) !== 0,
+        isSuper: (modifiers & Modifier.SUPER) !== 0,
+        isInterface: (modifiers & Modifier.INTERFACE) !== 0,
+        isAbstract: (modifiers & Modifier.ABSTRACT) !== 0,
+        isSynthetic: (modifiers & Modifier.SYNTHETIC) !== 0,
+        isAnnotation: (modifiers & Modifier.ANNOTATION) !== 0,
+        isEnum: (modifiers & Modifier.ENUM) !== 0,
         isRecord: (modifiers & 0x10000) !== 0, // Java 14+
     };
 }
 
-export const fileIcon = (label: string, entries: Entry[]): StyledIcon => {
+export const fileIcon = (label: string): StyledIcon => {
     const dotIndex = label.lastIndexOf(".");
     if (dotIndex !== -1) {
         switch (label.substring(dotIndex + 1)) {
             case "java":
             case "class":
-                if (entries) {
-                    const entryFound = Array.from(entries).find((entry) => entry.name == label);
-
-                    if (entryFound) {
-                        const classEntry = entryFound as ClassEntry;
-                        const node = classEntry.node
-
-                    
-                        if (node) {
-                            const data = parseClassModifiers(node.access);
-
-                             if (data.isAbstract && !data.isInterface) {
-                                return { icon: Abstract, classes: [] };
-                            } else if (data.isAnnotation) {
-                                return { icon: Annotation, classes: [] };
-                            } else if (data.isRecord) {
-                                return { icon: Record, classes: [] };
-                            } else if (data.isInterface) {
-                                return { icon: Interface, classes: [] };
-                            } else if (data.isEnum) {
-                                return { icon: Enum, classes: [] };
-                            } else {
-                                return { icon: Class, classes: [] };
-                            }
-                        }
-                    }
-                }
-
                 return { icon: Coffee, classes: ["text-red-500"] };
             case "kt":
             case "kts":

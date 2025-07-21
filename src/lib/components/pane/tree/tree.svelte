@@ -66,6 +66,7 @@
                 <div class="scrollbar-thin flex w-full flex-col overflow-auto p-2 text-nowrap contain-strict">
                     {#each root.nodes as node (node.label)}
                         <TreeNode
+                            {entries}
                             data={node}
                             onopen={open}
                             onmenu={(e, data) => {

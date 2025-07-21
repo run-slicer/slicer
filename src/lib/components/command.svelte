@@ -1,8 +1,8 @@
 <script lang="ts">
     import { CommandDialog, CommandGroup, CommandInput, CommandItem, CommandList } from "$lib/components/ui/command";
     import { onMount } from "svelte";
-    import { type Entry, entries as allEntries } from "$lib/workspace";
-    import { fileIcon } from "$lib/components/icons";
+    import { type Entry, entries as allEntries, EntryType } from "$lib/workspace";
+    import { fileIcon, entryIcon } from "$lib/components/icons";
     import { Search } from "@lucide/svelte";
     import { cn } from "$lib/components/utils";
     import { VList } from "virtua/svelte";
@@ -67,7 +67,8 @@
                     <VList data={filteredEntries} getKey={(e) => e.name} class="p-2">
                         {#snippet children(entry)}
                             <CommandItem class="py-2.5!" onSelect={() => handleClick(entry)}>
-                                {@const { icon: Icon, classes } = fileIcon(entry.name, Array.from(get(allEntries).values()))}
+                                {@const { icon: Icon, classes } =
+                                    entry.type === EntryType.CLASS ? entryIcon(entry) : fileIcon(entry.name)}
                                 <Icon class={classes} />
                                 <span class="break-anywhere">{entry.name}</span>
                             </CommandItem>

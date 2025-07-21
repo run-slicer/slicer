@@ -31,8 +31,7 @@
     }
 
     let { tab, tasks, encoding }: Props = $props();
-    const entries = $derived(get(allEntries))
-
+    const entries = $derived(get(allEntries));
 </script>
 
 <Separator />
@@ -48,7 +47,7 @@
                         {@const lastPart = y === parts.length - 1}
                         <BreadcrumbItem class="whitespace-nowrap">
                             {#if lastPart}
-                                {@const { icon: FileIcon, classes } = entryIcon(entry, Array.from(entries.values()))}
+                                {@const { icon: FileIcon, classes } = entryIcon(entry)}
                                 <FileIcon size={14} class={cn("min-w-[14px]", classes)} />
                             {/if}
                             {part}

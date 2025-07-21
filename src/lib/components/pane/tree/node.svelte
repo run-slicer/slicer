@@ -1,5 +1,5 @@
 <script lang="ts" module>
-    import { entries, type Entry } from "$lib/workspace";
+    import { type Entry } from "$lib/workspace";
 
     export interface Node {
         label: string;
@@ -15,29 +15,17 @@
     import TreeNode from "./node.svelte";
     import { ChevronDown, ChevronRight, Folder } from "@lucide/svelte";
     import { cn } from "$lib/components/utils";
-    import { fileIcon } from "$lib/components/icons";
+    import { fileIcon, entryIcon } from "$lib/components/icons";
     import { get } from "svelte/store";
 
     interface Props extends HTMLAttributes<HTMLDivElement> {
+        entries: Entry[];
         data: Node;
         onopen?: (data: Node) => void;
         onmenu?: (e: MouseEvent, data: Node) => void;
     }
 
-    const getFullLabel = (node: Node): string => {
-        const labels: string[] = [];
-        let current: Node | undefined = node;
-
-        while (current && current.label !== "<root>") {
-            labels.unshift(current.label);
-            current = current.parent;
-        }
-
-        return labels.join('/');
-    }
-
-
-    let { data = $bindable(), onopen, onmenu, ...rest }: Props = $props();
+    let { data = $bindable(), entries, onopen, onmenu, ...rest }: Props = $props();
     $effect(() => {
         // no children and not a leaf node, remove ourselves from the parent
         if (data.parent && !data.nodes && !data.entry) {
@@ -45,8 +33,8 @@
         }
     });
 
-    const allEntries = $derived(get(entries))
-    const { icon: FileIcon, classes } = $derived(fileIcon(getFullLabel(data), Array.from(allEntries.values())));
+    const { icon: FileIcon, classes } = $derived(data.entry ? entryIcon(data.entry) : fileIcon(data.label));
+    const hasEntry = $derived(data.entry !== undefined);
 
     let expanded = $state(data.expanded === undefined ? (data.parent?.nodes?.length || 0) === 1 : data.expanded);
     $effect(() => {

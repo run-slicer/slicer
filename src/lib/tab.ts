@@ -338,7 +338,7 @@ export const open = async (entry: Entry, type: TabType = detectType(entry)): Pro
                 position: TabPosition.PRIMARY_CENTER,
                 closeable: true,
                 entry: await readDeferred(entry),
-                icon: tabIcon(type, entry, Array.from(get(entries).values())),
+                icon: tabIcon(type, entry),
             });
         } catch (e) {
             error(`failed to read entry ${entry.name}`, e);
