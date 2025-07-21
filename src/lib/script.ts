@@ -8,7 +8,7 @@ import {
 import { createSource as createClassSource } from "$lib/disasm/source";
 import type { Language } from "$lib/lang";
 import { error, warn } from "$lib/log";
-import { scriptingScripts } from "$lib/state";
+import { analysisJdkClasses, scriptingScripts } from "$lib/state";
 import {
     current as currentTab,
     find as findTab,
@@ -215,7 +215,7 @@ const unwrapDisasm = (disasm: ScriptDisassembler): Disassembler => {
             const buf = await data.bytes();
             const name = (node.pool[node.thisClass.name] as UTF8Entry).string;
 
-            return disasm.class(name, createClassSource(get(classes), name, buf));
+            return disasm.class(name, createClassSource(get(classes), name, buf, get(analysisJdkClasses)));
         },
         method: disasm.method
             ? async (entry, method) => {
@@ -225,7 +225,11 @@ const unwrapDisasm = (disasm: ScriptDisassembler): Disassembler => {
                   const name = (node.pool[node.thisClass.name] as UTF8Entry).string;
                   const signature = method.name.string + method.type.string;
 
-                  return disasm.method!(name, signature, createClassSource(get(classes), name, buf));
+                  return disasm.method!(
+                      name,
+                      signature,
+                      createClassSource(get(classes), name, buf, get(analysisJdkClasses))
+                  );
               }
             : undefined,
     };

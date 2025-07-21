@@ -68,7 +68,8 @@ export const procyon: Disassembler = createFromWorker(
         concurrency: 5,
     },
     () => wrap<Worker>(new ProcyonWorker()),
-    false
+    false,
+    false // Procyon is weird and wants to scan the entire JDK
 );
 
 export const slicer: Disassembler = createFromWorker(

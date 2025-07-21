@@ -18,7 +18,8 @@ export interface Worker {
 export const createFromWorker = (
     disasm: Partial<Disassembler>,
     workerFunc: () => Worker,
-    method: boolean
+    method: boolean,
+    useJdkClasses: boolean = true
 ): Disassembler => {
     if ((disasm.concurrency ?? 1) > 1) {
         workerFunc = roundRobin(disasm.concurrency!, workerFunc);
@@ -39,10 +40,8 @@ export const createFromWorker = (
         const classes0 = get(classes);
         return await worker.class(
             name,
-            get(analysisJdkClasses)
-                ? [...Array.from(classes0.keys()), ...Array.from(index.keys())]
-                : Array.from(classes0.keys()),
-            proxy(createSource(classes0, name, buf)),
+            [...Array.from(classes0.keys()), ...Array.from(index.keys())],
+            proxy(createSource(classes0, name, buf, get(analysisJdkClasses) && useJdkClasses)),
             disasm.options
         );
     };
@@ -55,7 +54,12 @@ export const createFromWorker = (
             const signature = method.name.string + method.type.string;
 
             const worker = workerFunc();
-            return await worker.method(name, signature, proxy(createSource(get(classes), name, buf)), disasm.options);
+            return await worker.method(
+                name,
+                signature,
+                proxy(createSource(get(classes), name, buf, get(analysisJdkClasses) && useJdkClasses)),
+                disasm.options
+            );
         };
     }
 

@@ -1,13 +1,16 @@
 import { error } from "$lib/log";
-import { analysisJdkClasses } from "$lib/state";
 import { record } from "$lib/task";
 import { type Entry, EntryType, readDeferred } from "$lib/workspace";
 import { index } from "$lib/workspace/jdk";
-import { get } from "svelte/store";
 
 export type EntrySource = (name: string) => Promise<Uint8Array | null>;
 
-export const createSource = (classes: Map<string, Entry>, name: string, buf: Uint8Array): EntrySource => {
+export const createSource = (
+    classes: Map<string, Entry>,
+    name: string,
+    buf: Uint8Array,
+    useJdkClasses: boolean
+): EntrySource => {
     return async (name0) => {
         if (name0 === name) {
             return buf;
@@ -22,7 +25,7 @@ export const createSource = (classes: Map<string, Entry>, name: string, buf: Uin
         }
 
         const indexedUrl = index.get(name0);
-        if (!indexedUrl || !get(analysisJdkClasses)) {
+        if (!indexedUrl || !useJdkClasses) {
             return null;
         }
 
