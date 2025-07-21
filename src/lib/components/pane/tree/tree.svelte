@@ -9,6 +9,22 @@
 
     let { entries, handler }: PaneProps = $props();
 
+    const collapseSingleChildDirs = (node: Node) => {
+        if (!node.nodes) return;
+
+        for (let i = 0; i < node.nodes.length; i++) {
+            let child = node.nodes[i];
+            while (child.nodes?.length === 1 && !child.entry && !child.nodes[0].entry) {
+                // collapse label
+                const next = child.nodes[0];
+                child.label += "." + next.label;
+                child.nodes = next.nodes;
+            }
+
+            collapseSingleChildDirs(child);
+        }
+    }
+
     let root: Node = $derived.by(() => {
         const root: Node = { label: "<root>", nodes: [] };
 
@@ -31,6 +47,9 @@
         }
 
         root.nodes?.sort((a, b) => +Boolean(b.nodes) - +Boolean(a.nodes)); // non-leaf nodes go first
+
+        collapseSingleChildDirs(root);
+
         return root;
     });
 

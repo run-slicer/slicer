@@ -16,7 +16,6 @@
     import { ChevronDown, ChevronRight, Folder } from "@lucide/svelte";
     import { cn } from "$lib/components/utils";
     import { fileIcon, entryIcon } from "$lib/components/icons";
-    import { get } from "svelte/store";
 
     interface Props extends HTMLAttributes<HTMLDivElement> {
         entries: Entry[];
@@ -34,7 +33,6 @@
     });
 
     const { icon: FileIcon, classes } = $derived(data.entry ? entryIcon(data.entry) : fileIcon(data.label));
-    const hasEntry = $derived(data.entry !== undefined);
 
     let expanded = $state(data.expanded === undefined ? (data.parent?.nodes?.length || 0) === 1 : data.expanded);
     $effect(() => {
