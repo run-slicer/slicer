@@ -6,6 +6,7 @@ import { AnalysisState } from "$lib/workspace/analysis";
 import { unwrapTransform } from "$lib/workspace/data";
 import { Box, Folders, ScrollText, Search, Sparkles } from "@lucide/svelte";
 import { derived, get, writable } from "svelte/store";
+import { entries } from "./workspace/index";
 
 export enum TabType {
     PROJECT = "project",
@@ -337,7 +338,7 @@ export const open = async (entry: Entry, type: TabType = detectType(entry)): Pro
                 position: TabPosition.PRIMARY_CENTER,
                 closeable: true,
                 entry: await readDeferred(entry),
-                icon: tabIcon(type, entry),
+                icon: tabIcon(type, entry, Array.from(get(entries).values())),
             });
         } catch (e) {
             error(`failed to read entry ${entry.name}`, e);
