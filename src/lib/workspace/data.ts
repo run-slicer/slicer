@@ -114,49 +114,35 @@ export interface MemoryData extends Data {
     data: Uint8Array | Blob;
 }
 
-export const memoryData = (name: string, data: Uint8Array, dataDecoder: TextDecoder = get(decoder)): MemoryData => {
+export const memoryData = (
+    name: string,
+    data: Blob | Uint8Array,
+    dataDecoder: TextDecoder = get(decoder)
+): MemoryData => {
     return {
         type: DataType.MEMORY,
         name,
         data,
-        stream(): Promise<ReadableStream<Uint8Array>> {
-            return Promise.resolve(
-                new ReadableStream({
-                    start(controller) {
-                        controller.enqueue(data);
-                        controller.close();
-                    },
-                })
-            );
-        },
-        bytes(): Promise<Uint8Array> {
-            return Promise.resolve(data);
-        },
-        text(): Promise<string> {
-            return Promise.resolve(dataDecoder.decode(data));
-        },
-        blob(): Promise<Blob> {
-            return Promise.resolve(new Blob([data]));
-        },
-    };
-};
+        async stream(): Promise<ReadableStream<Uint8Array>> {
+            if (data instanceof Blob) {
+                return data.stream();
+            }
 
-export const memoryBlobData = (name: string, data: Blob, dataDecoder: TextDecoder = get(decoder)): MemoryData => {
-    return {
-        type: DataType.MEMORY,
-        name,
-        data,
-        stream(): Promise<ReadableStream<Uint8Array>> {
-            return Promise.resolve(data.stream());
+            return new ReadableStream({
+                start(controller) {
+                    controller.enqueue(data);
+                    controller.close();
+                },
+            });
         },
-        bytes(): Promise<Uint8Array> {
-            return data.bytes();
+        async bytes(): Promise<Uint8Array> {
+            return data instanceof Blob ? data.bytes() : data;
         },
         async text(): Promise<string> {
             return dataDecoder.decode(await this.bytes());
         },
-        blob(): Promise<Blob> {
-            return Promise.resolve(data);
+        async blob(): Promise<Blob> {
+            return data instanceof Blob ? data : new Blob([data]);
         },
     };
 };

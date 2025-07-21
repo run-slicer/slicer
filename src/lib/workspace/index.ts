@@ -9,7 +9,7 @@ import { toast } from "svelte-sonner";
 import { derived, get, writable } from "svelte/store";
 import { AnalysisState, analyze, analyzeBackground, analyzeSchedule } from "./analysis";
 import { transform } from "./analysis/transform";
-import { type Data, fileData, memoryBlobData, memoryData, type Named, parseName, zipData } from "./data";
+import { type Data, fileData, memoryData, type Named, parseName, zipData } from "./data";
 import { archiveDecoder } from "./encoding";
 
 export const enum EntryType {
@@ -249,7 +249,7 @@ if (url.searchParams.has("url")) {
                 name = "input.jar";
             }
 
-            return record("loading", name, async () => load(memoryBlobData(name, await r.blob())));
+            return record("loading", name, async () => load(memoryData(name, await r.blob())));
         })
         .catch((e) => {
             error("failed to read entry from URL", e);

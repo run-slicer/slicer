@@ -18,11 +18,38 @@ const fetchIndex = async (url: string): Promise<DataIndex> => {
     } catch (e) {
         error("failed to fetch class index", e);
         toast.error("Error occurred", {
-            description: "Failed to fetch the JDK class index, check the console.",
+            description: "Failed to fetch the class index, check the console.",
         });
     }
 
     return index;
 };
 
-export const index = await record("fetching JDK class index", null, () => fetchIndex("https://data.slicer.run/21"));
+// use the OpenJDK 21 index globally
+export const index = await fetchIndex("https://data.slicer.run/21");
+
+// shouldn't be too big, the entire class library is around a hundred MB
+const cache = new Map<string, Uint8Array>();
+export const findClass = async (name: string): Promise<Uint8Array | null> => {
+    const url = index.get(name);
+    if (!url) {
+        return null;
+    }
+
+    const cacheData = cache.get(name);
+    if (cacheData) {
+        return cacheData;
+    }
+
+    return await record("fetching class", name, async () => {
+        const res = await fetch(url);
+        if (!res.ok) {
+            error(`failed to fetch class '${name}', status code ${res.status}`);
+            return null;
+        }
+
+        const data = await res.bytes();
+        cache.set(name, data);
+        return data;
+    });
+};

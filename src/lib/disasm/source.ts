@@ -1,7 +1,5 @@
-import { error } from "$lib/log";
-import { record } from "$lib/task";
 import { type Entry, EntryType, readDeferred } from "$lib/workspace";
-import { index } from "$lib/workspace/jdk";
+import { findClass } from "$lib/workspace/jdk";
 
 export type EntrySource = (name: string) => Promise<Uint8Array | null>;
 
@@ -24,19 +22,6 @@ export const createSource = (
             }
         }
 
-        const indexedUrl = index.get(name0);
-        if (!indexedUrl || !useJdkClasses) {
-            return null;
-        }
-
-        return await record("fetching JDK class", name0, async () => {
-            const res = await fetch(indexedUrl);
-            if (!res.ok) {
-                error(`failed to fetch JDK class '${name0}', status code ${res.status}`);
-                return null;
-            }
-
-            return res.bytes();
-        });
+        return useJdkClasses ? findClass(name0) : null;
     };
 };

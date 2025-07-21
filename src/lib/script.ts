@@ -33,7 +33,7 @@ import {
     remove as removeEntry,
 } from "$lib/workspace";
 import { AnalysisState, analyze } from "$lib/workspace/analysis";
-import { DataType, memoryBlobData, memoryData, type MemoryData } from "$lib/workspace/data";
+import { DataType, memoryData, type MemoryData } from "$lib/workspace/data";
 import type { UTF8Entry } from "@run-slicer/asm/pool";
 import type {
     DisassemblerContext,
@@ -304,7 +304,7 @@ const workspaceCtx: WorkspaceContext = {
         return entry ? wrapEntry(entry) : null;
     },
     async add(name: string, data: Uint8Array | Blob): Promise<ScriptEntry> {
-        const results = await loadEntry(data instanceof Blob ? memoryBlobData(name, data) : memoryData(name, data));
+        const results = await loadEntry(memoryData(name, data));
 
         return wrapEntry(results.pop()!.entry);
     },
