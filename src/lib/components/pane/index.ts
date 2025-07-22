@@ -8,7 +8,6 @@ import RootPane from "./root.svelte";
 
 export interface PaneAccess {
     entries: Entry[];
-    currentEntry: Entry | undefined;
     classes: Map<string, Entry>;
     logEntries: LogEntry[];
     disasms: Disassembler[];

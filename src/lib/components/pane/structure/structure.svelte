@@ -16,8 +16,12 @@
     import { ContextMenu, ContextMenuTrigger } from "$lib/components/ui/context-menu";
     import { prettyJavaType, prettyMethodDesc } from "$lib/utils";
 
-    let { currentEntry, handler, classes }: PaneProps = $props();
+    import { current as currentTab } from "$lib/tab";
+
+    let { handler, classes }: PaneProps = $props();
     let searchQuery = $state("");
+
+    let currentEntry = $derived($currentTab?.entry);
 
     const packageName = $derived.by(() => {
         const parts = currentEntry?.name.split("/");
