@@ -16,6 +16,7 @@
         [TabType.HEAP_DUMP]: () => import("./dump/dump.svelte"),
         [TabType.CLASS]: () => import("./class/class.svelte"),
         [TabType.STRUCTURE]: () => import("./structure/structure.svelte"),
+        [TabType.PREFS]: () => import("./prefs/prefs.svelte"),
     };
 </script>
 

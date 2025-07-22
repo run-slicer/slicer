@@ -1,16 +1,7 @@
 <script lang="ts">
     import { mode, userPrefersMode } from "mode-watcher";
     import { Separator } from "$lib/components/ui/separator";
-    import {
-        analysisBackground,
-        analysisTransformers,
-        analysisJdkClasses,
-        type PaneData,
-        themeColor,
-        themeRadius,
-        workspaceArchiveEncoding,
-        workspaceEncoding,
-    } from "$lib/state";
+    import { analysisTransformers, type PaneData, themeColor, themeRadius, workspaceEncoding } from "$lib/state";
     import { type Entry, EntryType } from "$lib/workspace";
     import { encodings } from "$lib/workspace/encoding";
     import type { ProtoScript } from "$lib/script";
@@ -44,7 +35,6 @@
         Globe,
         Info,
         Moon,
-        SendToBack,
         Settings,
         Sun,
     } from "@lucide/svelte";
@@ -106,6 +96,9 @@
 
     const exportEntries = (disasm?: Disassembler) => handler.export(entries, disasm);
 
+    const openPrefs = async () => {
+        handler.openUnscoped(tabDefs.find((d) => d.type === TabType.PREFS)!, TabPosition.PRIMARY_CENTER);
+    };
     const openSearch = async () => {
         updatePane(TabPosition.SECONDARY_RIGHT, true);
         handler.openUnscoped(tabDefs.find((d) => d.type === TabType.SEARCH)!, TabPosition.SECONDARY_RIGHT);
@@ -174,6 +167,9 @@
                         </MenubarRadioGroup>
                     </MenubarSubContent>
                 </MenubarSub>
+                <MenubarItem class="justify-between" onclick={openPrefs}>
+                    Preferences <Settings size={16} />
+                </MenubarItem>
             </MenubarContent>
         </MenubarMenu>
         <MenubarMenu>
@@ -216,19 +212,6 @@
                 <MenubarItem disabled={!tab?.entry} onclick={exportEntry}>
                     Export <Shortcut key="e" modifier={Modifier.CTRL} />
                 </MenubarItem>
-                <MenubarSeparator />
-                <MenubarSub>
-                    <MenubarSubTrigger>ZIP encoding</MenubarSubTrigger>
-                    <MenubarSubContent class="min-w-[12rem]" align="start">
-                        <MenubarRadioGroup bind:value={$workspaceArchiveEncoding}>
-                            {#each Object.values(encodings) as encoding}
-                                <MenubarRadioItem value={encoding.id} class="justify-between">
-                                    {encoding.label || encoding.id.toUpperCase()}
-                                </MenubarRadioItem>
-                            {/each}
-                        </MenubarRadioGroup>
-                    </MenubarSubContent>
-                </MenubarSub>
             </MenubarContent>
         </MenubarMenu>
         <MenubarMenu>
@@ -316,13 +299,6 @@
                         {/each}
                     </MenubarSubContent>
                 </MenubarSub>
-                <MenubarSeparator />
-                <MenubarCheckboxItem class="justify-between" bind:checked={$analysisBackground}>
-                    Background <SendToBack size={16} />
-                </MenubarCheckboxItem>
-                <MenubarCheckboxItem class="justify-between" bind:checked={$analysisJdkClasses}>
-                    JDK classes <Coffee size={16} />
-                </MenubarCheckboxItem>
             </MenubarContent>
         </MenubarMenu>
         <MenubarMenu>

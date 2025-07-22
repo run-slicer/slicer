@@ -298,23 +298,3 @@ export default {
         });
     },
 } satisfies EventHandler;
-
-/*const prefsLoad = async () => {
-    const files = await readFiles(".json", false);
-    if (files.length > 0) {
-        if (!loadState(await files[0].text())) {
-            toast.error("Error occurred", {
-                description: `Could not import preferences, check the console.`,
-            });
-        }
-    }
-};
-
-export const prefsExport = async () => {
-    await downloadBlob(`slicer-${timestampFile()}.json`, new Blob([saveState()], { type: "application/json" }));
-    toast.success("Exported", {
-        description: `Preferences exported successfully.`,
-    });
-};
-
-export const prefsClear = clearState;*/

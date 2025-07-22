@@ -37,3 +37,23 @@ export const panes = persisted<PaneData[]>(`${root}.panes`, [
     { position: "primary_center" as TabPosition, tabs: [{ type: "welcome" as TabType, active: true }], open: true },
     { position: "secondary_left" as TabPosition, tabs: [{ type: "project" as TabType, active: true }], open: true },
 ]);
+
+export const load = (data: string): boolean => {
+    try {
+        Object.entries(JSON.parse(data) as Record<string, string>).forEach(([k, v]) => localStorage.setItem(k, v));
+    } catch (e) {
+        return false;
+    }
+
+    window.location.reload();
+    return true;
+};
+
+export const save = (): string => {
+    return JSON.stringify(localStorage, null, 2 /* pretty */);
+};
+
+export const clear = () => {
+    localStorage.clear();
+    window.location.reload();
+};
