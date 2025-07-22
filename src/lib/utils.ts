@@ -315,14 +315,14 @@ export const prettyJavaType = (desc: string, short: boolean = false): string => 
     return primTypes[desc] || desc.replaceAll("/", ".");
 };
 
-export const prettyMethodDesc = (desc: string): string => {
-    const descs = desc.substring(1, desc.lastIndexOf(")")); // ignore return type
+export const prettyMethodDesc = (desc: string, includeReturnType: boolean = false): string => {
+    const descs = desc.substring(1, desc.lastIndexOf(")")); // between the parens
 
     const args: string[] = [];
     for (let i = 0; i < descs.length; i++) {
         const char = descs.charAt(i);
-
         const start = i;
+
         switch (char) {
             case "L": {
                 i = descs.indexOf(";", i);
@@ -330,13 +330,10 @@ export const prettyMethodDesc = (desc: string): string => {
                 break;
             }
             case "[": {
-                while (descs.charAt(i) === "[") {
-                    i++;
-                }
+                while (descs.charAt(i) === "[") i++;
                 if (descs.charAt(i) === "L") {
                     i = descs.indexOf(";", i);
                 }
-
                 args.push(descs.substring(start, i + 1));
                 break;
             }
@@ -347,7 +344,11 @@ export const prettyMethodDesc = (desc: string): string => {
         }
     }
 
-    return `(${args.map((a) => prettyJavaType(a, true)).join(", ")})`;
+    const argsStr = args.map((a) => prettyJavaType(a, true)).join(", ");
+    const returnTypeDesc = desc.substring(desc.lastIndexOf(")") + 1);
+    const returnTypeStr = prettyJavaType(returnTypeDesc, true);
+
+    return includeReturnType ? `(${argsStr}): ${returnTypeStr}` : `(${argsStr})`;
 };
 
 export const prettyErrorStack = (e: any): string | null => {

@@ -1,7 +1,8 @@
 <script lang="ts">
-    import { Icon, type IconNode, type IconProps } from "@lucide/svelte";
+    import { Icon, type IconNode } from "@lucide/svelte";
+    import type { JavaIconProps } from "..";
 
-    let { strokeWidth = 0, ...props }: IconProps = $props();
+    let { strokeWidth = 0, ...props }: JavaIconProps = $props();
 
     const iconNode = [
         [

@@ -15,6 +15,7 @@
         [TabType.IMAGE]: () => import("./image/image.svelte"),
         [TabType.HEAP_DUMP]: () => import("./dump/dump.svelte"),
         [TabType.CLASS]: () => import("./class/class.svelte"),
+        [TabType.STRUCTURE]: () => import("./structure/structure.svelte"),
     };
 </script>
 

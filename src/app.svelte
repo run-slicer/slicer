@@ -27,6 +27,8 @@
     let disasms0 = $derived(Array.from($disasms.values()));
     let transformers0 = $derived(Array.from($transformers.values()));
 
+    let currentEntry = $derived($currentTab?.entry);
+
     onMount(registerShortcuts);
 
     // ignore default context menu except on double right-clicks
@@ -71,6 +73,7 @@
     classes={$classes}
     logEntries={$logEntries}
     disasms={disasms0}
+    {currentEntry}
     handler={$handler}
 />
 <Crumb tab={$currentTab} tasks={tasks0} encoding={$currentEncoding} />
