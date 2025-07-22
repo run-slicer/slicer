@@ -4,7 +4,7 @@ import { analysisTransformers, panes, workspaceEncoding } from "$lib/state";
 import { type Entry, EntryType, readDeferred } from "$lib/workspace";
 import { AnalysisState } from "$lib/workspace/analysis";
 import { unwrapTransform } from "$lib/workspace/data";
-import { Box, Folders, ScrollText, Search, Sparkles } from "@lucide/svelte";
+import { Box, Folders, ScrollText, Search, Settings, Sparkles } from "@lucide/svelte";
 import { derived, get, writable } from "svelte/store";
 
 export enum TabType {
@@ -13,6 +13,7 @@ export enum TabType {
     PLAYGROUND = "playground",
     SEARCH = "search",
     WELCOME = "welcome",
+    PREFS = "prefs",
     CODE = "code",
     HEX = "hex",
     GRAPH = "graph",
@@ -74,6 +75,11 @@ export const tabDefs: TabDefinition[] = [
         type: TabType.SEARCH,
         name: "Search",
         icon: Search,
+    },
+    {
+        type: TabType.PREFS,
+        name: "Preferences",
+        icon: Settings,
     },
 ];
 

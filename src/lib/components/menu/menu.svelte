@@ -106,6 +106,9 @@
 
     const exportEntries = (disasm?: Disassembler) => handler.export(entries, disasm);
 
+    const openPrefs = async () => {
+        handler.openUnscoped(tabDefs.find((d) => d.type === TabType.PREFS)!, TabPosition.PRIMARY_CENTER);
+    };
     const openSearch = async () => {
         updatePane(TabPosition.SECONDARY_RIGHT, true);
         handler.openUnscoped(tabDefs.find((d) => d.type === TabType.SEARCH)!, TabPosition.SECONDARY_RIGHT);
@@ -174,6 +177,9 @@
                         </MenubarRadioGroup>
                     </MenubarSubContent>
                 </MenubarSub>
+                <MenubarItem class="justify-between" onclick={openPrefs}>
+                    Preferences <Settings size={16} />
+                </MenubarItem>
             </MenubarContent>
         </MenubarMenu>
         <MenubarMenu>
