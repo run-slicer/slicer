@@ -15,7 +15,7 @@
     import TreeNode from "./node.svelte";
     import { ChevronDown, ChevronRight, Folder } from "@lucide/svelte";
     import { cn } from "$lib/components/utils";
-    import { fileIcon } from "$lib/components/icons";
+    import { entryIcon, fileIcon } from "$lib/components/icons";
 
     interface Props extends HTMLAttributes<HTMLDivElement> {
         data: Node;
@@ -31,7 +31,7 @@
         }
     });
 
-    const { icon: FileIcon, classes } = $derived(fileIcon(data.label));
+    const { icon: FileIcon, classes } = $derived(data.entry ? entryIcon(data.entry) : fileIcon(data.label));
 
     let expanded = $state(data.expanded === undefined ? (data.parent?.nodes?.length || 0) === 1 : data.expanded);
     $effect(() => {

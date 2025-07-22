@@ -1,5 +1,5 @@
 import { TabPosition, TabType } from "$lib/tab";
-import { type Entry, EntryType } from "$lib/workspace";
+import { type ClassEntry, type Entry, EntryType } from "$lib/workspace";
 import {
     Binary,
     Braces,
@@ -25,9 +25,17 @@ import {
     Text,
     TextQuote,
 } from "@lucide/svelte";
+import type { UTF8Entry } from "@run-slicer/asm/pool";
+import { Modifier } from "@run-slicer/asm/spec";
 import type { Component } from "svelte";
 import Android from "./android.svelte";
 import GitHub from "./github.svelte";
+import Abstract from "./java/abstract.svelte";
+import Annotation from "./java/annotation.svelte";
+import Class from "./java/class.svelte";
+import Enum from "./java/enum.svelte";
+import Interface from "./java/interface.svelte";
+import Record from "./java/record.svelte";
 import Kotlin from "./kotlin.svelte";
 
 export type Icon = Component<LucideIcon>;
@@ -52,10 +60,49 @@ export const tabIcon = (tabType: TabType, entry: Entry): StyledIcon => {
     return entryIcon(entry);
 };
 
+const parseClassModifiers = (modifiers: number) => ({
+    isPublic: (modifiers & Modifier.PUBLIC) !== 0,
+    isFinal: (modifiers & Modifier.FINAL) !== 0,
+    isSuper: (modifiers & Modifier.SUPER) !== 0,
+    isInterface: (modifiers & Modifier.INTERFACE) !== 0,
+    isAbstract: (modifiers & Modifier.ABSTRACT) !== 0,
+    isSynthetic: (modifiers & Modifier.SYNTHETIC) !== 0,
+    isAnnotation: (modifiers & Modifier.ANNOTATION) !== 0,
+    isEnum: (modifiers & Modifier.ENUM) !== 0,
+});
+
 export const entryIcon = (entry: Entry): StyledIcon => {
     switch (entry.type) {
         case EntryType.MEMBER:
             return { icon: Parentheses, classes: ["text-red-500"] };
+        case EntryType.CLASS: {
+            const classEntry = entry as ClassEntry;
+            const node = classEntry.node;
+
+            if (node) {
+                const data = parseClassModifiers(node.access);
+
+                if (node.superClass) {
+                    const superName = (node.pool[node.superClass.name] as UTF8Entry).string;
+
+                    if (superName === "java/lang/Record") {
+                        return { icon: Record, classes: [] };
+                    }
+                }
+
+                if (data.isAbstract && !data.isInterface) {
+                    return { icon: Abstract, classes: [] };
+                } else if (data.isAnnotation) {
+                    return { icon: Annotation, classes: [] };
+                } else if (data.isInterface) {
+                    return { icon: Interface, classes: [] };
+                } else if (data.isEnum) {
+                    return { icon: Enum, classes: [] };
+                } else {
+                    return { icon: Class, classes: [] };
+                }
+            }
+        }
     }
 
     return fileIcon(entry.name);
@@ -130,4 +177,4 @@ export const paneIcon = (pos: TabPosition, open: boolean): Icon => {
     }
 };
 
-export { Android, GitHub, Kotlin };
+export { Abstract, Android, Annotation, Class, Enum, GitHub, Interface, Kotlin, Record };
