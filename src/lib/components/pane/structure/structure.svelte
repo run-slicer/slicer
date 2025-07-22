@@ -9,9 +9,8 @@
     import { EntryType, type ClassEntry } from "$lib/workspace";
     import { entryIcon } from "$lib/components/icons";
     import { cn } from "$lib/components/utils";
-    import type { UTF8Entry } from "@run-slicer/asm/pool";
     import AbstractMethod from "$lib/components/icons/java/abstract-method.svelte";
-    import { getFields, getMethods, getInnerClasses, getModifierIcon, getInnerClassIcon } from "./util";
+    import { getFields, getMethods, getInnerClasses, getModifierIcon, getInnerClassIcon, getAbstractionInfo } from "./util";
     import StructureMenu from "./menu.svelte";
     import { ContextMenu, ContextMenuTrigger } from "$lib/components/ui/context-menu";
     import { prettyJavaType, prettyMethodDesc } from "$lib/utils";
@@ -31,37 +30,9 @@
         return parts.slice(0, parts.length - 1).join("/");
     });
 
-    const node = $derived.by(() => {
-        if (!currentEntry || currentEntry.type !== EntryType.CLASS || !(currentEntry as ClassEntry).node) {
-            return undefined;
-        }
+    const node = $derived((currentEntry as ClassEntry)?.node);
 
-        const classEntry = currentEntry as ClassEntry;
-        const node = classEntry.node;
-
-        return node;
-    });
-
-    const abstractionInfo = $derived.by(() => {
-        if (!node) return undefined;
-
-        let superClass: string | undefined = undefined;
-        const implementations: string[] = [];
-
-        if (node.superClass) {
-            superClass = (node.pool[node.superClass.name] as UTF8Entry).string;
-        }
-
-        node.interfaces.forEach((it) => {
-            implementations.push((node.pool[it.name] as UTF8Entry).string);
-        });
-
-        return {
-            superClass,
-            implementations,
-        };
-    });
-
+    const abstractionInfo = $derived.by(() => getAbstractionInfo(node));
     const fields = $derived.by(() => getFields(node, searchQuery));
     const methods = $derived.by(() => getMethods(currentEntry, node, searchQuery));
     const innerClasses = $derived.by(() => getInnerClasses(node, classes, searchQuery));

@@ -153,6 +153,28 @@ export const getInnerClasses: (
     return output.filter((member) => member.name.toLowerCase().includes(searchQuery.toLowerCase()));
 };
 
+export const getAbstractionInfo: (
+    node: Node | undefined
+) => { superClass: string; implementations: string[] } | undefined = (node) => {
+    if (!node) return undefined;
+
+    let superClass: string | undefined = undefined;
+    const implementations: string[] = [];
+
+    if (node.superClass) {
+        superClass = (node.pool[node.superClass.name] as UTF8Entry).string;
+    }
+
+    node.interfaces.forEach((it) => {
+        implementations.push((node.pool[it.name] as UTF8Entry).string);
+    });
+
+    return {
+        superClass: superClass ?? "Unknown",
+        implementations,
+    };
+};
+
 export function getModifierIcon(modifier: AccessModifier) {
     switch (modifier) {
         case "public":
