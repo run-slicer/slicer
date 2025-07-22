@@ -10,7 +10,14 @@
     import { entryIcon } from "$lib/components/icons";
     import { cn } from "$lib/components/utils";
     import AbstractMethod from "$lib/components/icons/java/abstract-method.svelte";
-    import { getFields, getMethods, getInnerClasses, getModifierIcon, getInnerClassIcon, getAbstractionInfo } from "./util";
+    import {
+        getFields,
+        getMethods,
+        getInnerClasses,
+        getModifierIcon,
+        getInnerClassIcon,
+        getAbstractionInfo,
+    } from "./util";
     import StructureMenu from "./menu.svelte";
     import { ContextMenu, ContextMenuTrigger } from "$lib/components/ui/context-menu";
     import { prettyJavaType, prettyMethodDesc } from "$lib/utils";
@@ -213,8 +220,14 @@
                                         <div class="flex w-full items-center gap-2">
                                             <div class="flex items-center gap-1">
                                                 <TypeIcon
-                                                    finalMember={innerClass.isFinal}
-                                                    staticMember={innerClass.isStatic}
+                                                    finalMember={innerClass.isFinal &&
+                                                        !innerClass.isEnum &&
+                                                        !innerClass.isRecord &&
+                                                        !innerClass.isAnnotation}
+                                                    staticMember={innerClass.isStatic &&
+                                                        !innerClass.isEnum &&
+                                                        !innerClass.isRecord &&
+                                                        !innerClass.isAnnotation}
                                                     class="size-4"
                                                 />
 
