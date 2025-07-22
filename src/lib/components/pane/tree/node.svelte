@@ -1,5 +1,5 @@
 <script lang="ts" module>
-    import { type Entry } from "$lib/workspace";
+    import type { Entry } from "$lib/workspace";
 
     export interface Node {
         label: string;
@@ -15,16 +15,15 @@
     import TreeNode from "./node.svelte";
     import { ChevronDown, ChevronRight, Folder } from "@lucide/svelte";
     import { cn } from "$lib/components/utils";
-    import { entryIcon } from "$lib/components/icons";
+    import { entryIcon, fileIcon } from "$lib/components/icons";
 
     interface Props extends HTMLAttributes<HTMLDivElement> {
-        entries: Entry[];
         data: Node;
         onopen?: (data: Node) => void;
         onmenu?: (e: MouseEvent, data: Node) => void;
     }
 
-    let { data = $bindable(), entries, onopen, onmenu, ...rest }: Props = $props();
+    let { data = $bindable(), onopen, onmenu, ...rest }: Props = $props();
     $effect(() => {
         // no children and not a leaf node, remove ourselves from the parent
         if (data.parent && !data.nodes && !data.entry) {
@@ -32,7 +31,7 @@
         }
     });
 
-    const iconData = $derived(data.entry ? entryIcon(data.entry) : undefined);
+    const { icon: FileIcon, classes } = $derived(data.entry ? entryIcon(data.entry) : fileIcon(data.label));
 
     let expanded = $state(data.expanded === undefined ? (data.parent?.nodes?.length || 0) === 1 : data.expanded);
     $effect(() => {
@@ -55,8 +54,8 @@
         {@const ExpandedIcon = expanded ? ChevronDown : ChevronRight}
         <button class="highlight flex w-full py-[0.2rem]" onclick={() => (expanded = !expanded)}>
             <ExpandedIcon size={14} class="text-muted-foreground my-auto mr-1 min-w-[14px]" />
-            {#if iconData}
-                <iconData.icon size={16} class={cn("my-auto mr-1 min-w-[16px]", iconData.classes)} />
+            {#if data.entry}
+                <FileIcon size={16} class={cn("my-auto mr-1 min-w-[16px]", classes)} />
             {:else}
                 <Folder size={16} class="fill-muted my-auto mr-1 min-w-[16px]" />
             {/if}
@@ -74,9 +73,7 @@
         {/if}
     {:else}
         <button class="highlight flex w-full py-[0.2rem]" ondblclick={() => onopen?.(data)}>
-            {#if iconData}
-                <iconData.icon size={16} class={cn("my-auto mr-1 min-w-[16px]", iconData.classes)} />
-            {/if}
+            <FileIcon size={16} class={cn("my-auto mr-1 min-w-[16px]", classes)} />
             <span class="text-sm">{data.label}</span>
         </button>
     {/if}

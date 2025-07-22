@@ -14,4 +14,4 @@
     ] as IconNode;
 </script>
 
-<Icon name="record" {...props} {strokeWidth} {iconNode} />
+<Icon name="abstract" {...props} {strokeWidth} {iconNode} />

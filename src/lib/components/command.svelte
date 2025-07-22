@@ -1,7 +1,7 @@
 <script lang="ts">
     import { CommandDialog, CommandGroup, CommandInput, CommandItem, CommandList } from "$lib/components/ui/command";
     import { onMount } from "svelte";
-    import { type Entry } from "$lib/workspace";
+    import type { Entry } from "$lib/workspace";
     import { entryIcon } from "$lib/components/icons";
     import { Search } from "@lucide/svelte";
     import { cn } from "$lib/components/utils";

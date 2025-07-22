@@ -17,7 +17,7 @@
             while (child.nodes?.length === 1 && !child.entry && !child.nodes[0].entry) {
                 // collapse label
                 const next = child.nodes[0];
-                child.label += "." + next.label;
+                child.label += "/" + next.label;
                 child.nodes = next.nodes;
             }
 

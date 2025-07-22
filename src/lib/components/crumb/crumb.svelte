@@ -18,11 +18,9 @@
     import { cn } from "$lib/components/utils";
     import { isEncodingDependent, type Tab } from "$lib/tab";
     import type { Encoding } from "$lib/workspace/encoding";
-    import { entries as allEntries } from "$lib/workspace";
     import { entryIcon } from "$lib/components/icons";
     import type { Task } from "$lib/task";
     import Tasks from "./tasks.svelte";
-    import { derived, get } from "svelte/store";
 
     interface Props {
         tab: Tab | null;
@@ -31,7 +29,6 @@
     }
 
     let { tab, tasks, encoding }: Props = $props();
-    const entries = $derived(get(allEntries));
 </script>
 
 <Separator />

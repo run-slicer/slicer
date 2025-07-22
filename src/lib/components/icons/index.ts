@@ -26,7 +26,7 @@ import {
     TextQuote,
 } from "@lucide/svelte";
 import type { UTF8Entry } from "@run-slicer/asm/pool";
-import { Modifier } from "@run-slicer/asm/spec/modifier";
+import { Modifier } from "@run-slicer/asm/spec";
 import type { Component } from "svelte";
 import Android from "./android.svelte";
 import GitHub from "./github.svelte";
@@ -59,6 +59,17 @@ export const tabIcon = (tabType: TabType, entry: Entry): StyledIcon => {
 
     return entryIcon(entry);
 };
+
+const parseClassModifiers = (modifiers: number) => ({
+    isPublic: (modifiers & Modifier.PUBLIC) !== 0,
+    isFinal: (modifiers & Modifier.FINAL) !== 0,
+    isSuper: (modifiers & Modifier.SUPER) !== 0,
+    isInterface: (modifiers & Modifier.INTERFACE) !== 0,
+    isAbstract: (modifiers & Modifier.ABSTRACT) !== 0,
+    isSynthetic: (modifiers & Modifier.SYNTHETIC) !== 0,
+    isAnnotation: (modifiers & Modifier.ANNOTATION) !== 0,
+    isEnum: (modifiers & Modifier.ENUM) !== 0,
+});
 
 export const entryIcon = (entry: Entry): StyledIcon => {
     switch (entry.type) {
@@ -96,19 +107,6 @@ export const entryIcon = (entry: Entry): StyledIcon => {
 
     return fileIcon(entry.name);
 };
-
-function parseClassModifiers(modifiers: number) {
-    return {
-        isPublic: (modifiers & Modifier.PUBLIC) !== 0,
-        isFinal: (modifiers & Modifier.FINAL) !== 0,
-        isSuper: (modifiers & Modifier.SUPER) !== 0,
-        isInterface: (modifiers & Modifier.INTERFACE) !== 0,
-        isAbstract: (modifiers & Modifier.ABSTRACT) !== 0,
-        isSynthetic: (modifiers & Modifier.SYNTHETIC) !== 0,
-        isAnnotation: (modifiers & Modifier.ANNOTATION) !== 0,
-        isEnum: (modifiers & Modifier.ENUM) !== 0,
-    };
-}
 
 export const fileIcon = (label: string): StyledIcon => {
     const dotIndex = label.lastIndexOf(".");
@@ -179,4 +177,4 @@ export const paneIcon = (pos: TabPosition, open: boolean): Icon => {
     }
 };
 
-export { Android, GitHub, Kotlin };
+export { Abstract, Android, Annotation, Class, Enum, GitHub, Interface, Kotlin, Record };

@@ -14,4 +14,4 @@
     ] as IconNode;
 </script>
 
-<Icon name="record" {...props} {strokeWidth} {iconNode} />
+<Icon name="interface" {...props} {strokeWidth} {iconNode} />

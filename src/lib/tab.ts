@@ -6,7 +6,6 @@ import { AnalysisState } from "$lib/workspace/analysis";
 import { unwrapTransform } from "$lib/workspace/data";
 import { Box, Folders, ScrollText, Search, Sparkles } from "@lucide/svelte";
 import { derived, get, writable } from "svelte/store";
-import { entries } from "./workspace/index";
 
 export enum TabType {
     PROJECT = "project",
