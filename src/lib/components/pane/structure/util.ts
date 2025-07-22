@@ -118,6 +118,7 @@ export const getInnerClasses: (
         .filter((pool) => pool && pool.type === ConstantType.CLASS)
         .map((clazz) => (node.pool[(clazz as ASMClassEntry).name] as UTF8Entry).string)
         .filter((name) => name.startsWith(currentName + "$"))
+        .filter((name, i, arr) => arr.indexOf(name) === i)
         .map((name) => classes.get(name))
         .filter((clazz) => clazz !== undefined && clazz.type == EntryType.CLASS)
         .map((clazz) => {
