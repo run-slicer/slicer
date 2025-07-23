@@ -77,30 +77,14 @@
         </ContextMenu>
     {/await}
 
-    <div class="absolute right-0 bottom-0 z-20 m-4 flex gap-2">
-        {#if interpType === Interpretation.CLASS}
-            <Select type="single" bind:value={disasmId}>
-                <SelectTrigger class="h-7 text-xs [&_svg]:ml-2 [&_svg]:h-4 [&_svg]:w-4">
-                    <span class="text-muted-foreground mr-2">Disassembler: </span>
-                    <span class="tracking-tight">{disasm.name || disasm.id}</span>
-                </SelectTrigger>
-                <SelectContent class="max-h-[240px] w-full overflow-scroll" side="top" align="end">
-                    {#each usableDisasms as dism (dism.id)}
-                        <SelectItem value={dism.id} label={dism.id} class="justify-between text-xs tracking-tight">
-                            <span>{dism.name || dism.id}</span>
-                            {#if dism.version}<span class="text-muted-foreground">{dism.version}</span>{/if}
-                        </SelectItem>
-                    {/each}
-                </SelectContent>
-            </Select>
-        {/if}
+    <div class="absolute right-0 bottom-0 z-20 m-4 flex flex-col items-end gap-2">
         <Popover>
             <PopoverTrigger>
-                <Button variant="outline" size="icon">
+                <Button variant="outline" size="icon" class="flex">
                     <ScanEye />
                 </Button>
             </PopoverTrigger>
-            <PopoverContent side="top" align="end" sideOffset={8} class="w-56">
+            <PopoverContent side="left" align="end" sideOffset={8} class="w-56">
                 <div class="flex flex-col gap-2">
                     <div class="text-xs">Interpretation mode</div>
                     <Select type="single" bind:value={interpType}>
@@ -128,5 +112,21 @@
                 </div>
             </PopoverContent>
         </Popover>
+        {#if interpType === Interpretation.CLASS}
+            <Select type="single" bind:value={disasmId}>
+                <SelectTrigger class="h-7 text-xs [&_svg]:ml-2 [&_svg]:h-4 [&_svg]:w-4">
+                    <span class="text-muted-foreground mr-2">Disassembler: </span>
+                    <span class="tracking-tight">{disasm.name || disasm.id}</span>
+                </SelectTrigger>
+                <SelectContent class="max-h-[240px] w-full overflow-scroll" side="top" align="end">
+                    {#each usableDisasms as dism (dism.id)}
+                        <SelectItem value={dism.id} label={dism.id} class="justify-between text-xs tracking-tight">
+                            <span>{dism.name || dism.id}</span>
+                            {#if dism.version}<span class="text-muted-foreground">{dism.version}</span>{/if}
+                        </SelectItem>
+                    {/each}
+                </SelectContent>
+            </Select>
+        {/if}
     </div>
 </div>
