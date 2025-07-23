@@ -210,7 +210,6 @@
                         {#each innerClasses as innerClass}
                             {@const TypeIcon = getInnerClassIcon(innerClass)}
                             {@const ModifierIcon = getModifierIcon(innerClass.modifier)}
-                            {@const name = innerClass.name.split("$").slice(1).join(" ")}
 
                             <ContextMenu>
                                 <ContextMenuTrigger>
@@ -236,11 +235,11 @@
                                                 {/if}
                                             </div>
 
-                                            <span class="truncate font-mono text-xs">{name}</span>
+                                            <span class="truncate font-mono text-xs">{innerClass.name}</span>
                                         </div>
                                     </div>
                                 </ContextMenuTrigger>
-                                <StructureMenu title={name} {handler} entry={innerClass.entry} />
+                                <StructureMenu title={innerClass.name} {handler} entry={innerClass.entry} />
                             </ContextMenu>
                         {/each}
                     </div>

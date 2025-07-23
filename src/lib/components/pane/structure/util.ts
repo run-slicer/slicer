@@ -9,8 +9,9 @@ import PublicMember from "$lib/components/icons/java/public-member.svelte";
 import RecordIcon from "$lib/components/icons/java/record.svelte";
 import { type ClassEntry, type Entry, EntryType, memberEntry } from "$lib/workspace";
 import type { Node } from "@run-slicer/asm";
-import type { ClassEntry as ASMClassEntry, UTF8Entry } from "@run-slicer/asm/pool";
-import { ConstantType, Modifier } from "@run-slicer/asm/spec";
+import type { InnerClassesAttribute } from "@run-slicer/asm/attr/inner_classes";
+import type { UTF8Entry } from "@run-slicer/asm/pool";
+import { AttributeType, Modifier } from "@run-slicer/asm/spec";
 
 type AccessModifier = "public" | "private" | "protected";
 
@@ -112,19 +113,21 @@ export const getInnerClasses: (
 ) => InnerClass[] = (node, classes, searchQuery) => {
     if (!node || !classes) return [];
 
-    const currentName = (node.pool[node.thisClass.name] as UTF8Entry).string;
+    const attribute = node.attrs.find((attr) => attr.type === AttributeType.INNER_CLASSES);
 
-    const output = node.pool
-        .filter((pool) => pool && pool.type === ConstantType.CLASS)
-        .map((clazz) => (node.pool[(clazz as ASMClassEntry).name] as UTF8Entry).string)
-        .filter((name) => name.startsWith(currentName + "$"))
-        .filter((name, i, arr) => arr.indexOf(name) === i)
-        .map((name) => classes.get(name))
-        .filter((clazz) => clazz !== undefined && clazz.type == EntryType.CLASS)
+    if (!attribute) return [];
+
+    const output = (attribute as InnerClassesAttribute).classes
+        .filter((clazz) => clazz.innerNameEntry && clazz.innerEntry)
         .map((clazz) => {
-            const innerClassNode = (clazz as ClassEntry).node;
-            const innerClassName = (innerClassNode.pool[innerClassNode.thisClass.name] as UTF8Entry).string;
-            const nameParts = innerClassName.split("/");
+            const poolEntry = clazz.innerEntry!!;
+            const fullName = (node.pool[poolEntry.name] as UTF8Entry).string;
+            const innerClassEntry = classes.get(fullName) as ClassEntry;
+
+            if (!innerClassEntry) return undefined;
+
+            const innerClassNode = innerClassEntry.node;
+
             let isRecord = false;
 
             if (innerClassNode.superClass) {
@@ -136,18 +139,19 @@ export const getInnerClasses: (
             }
 
             return {
-                name: nameParts[nameParts.length - 1],
-                modifier: parseModifier(innerClassNode.access),
-                isFinal: (innerClassNode.access & Modifier.FINAL) !== 0,
-                isStatic: (innerClassNode.access & Modifier.STATIC) !== 0,
-                isAbstract: (innerClassNode.access & Modifier.ABSTRACT) !== 0,
-                isEnum: (innerClassNode.access & Modifier.ENUM) !== 0,
-                isInterface: (innerClassNode.access & Modifier.INTERFACE) !== 0,
-                isAnnotation: (innerClassNode.access & Modifier.ANNOTATION) !== 0,
+                name: clazz.innerNameEntry!!.string,
+                modifier: parseModifier(clazz.innerAccess),
+                isFinal: (clazz.innerAccess & Modifier.FINAL) !== 0,
+                isStatic: (clazz.innerAccess & Modifier.STATIC) !== 0,
+                isAbstract: (clazz.innerAccess & Modifier.ABSTRACT) !== 0,
+                isEnum: (clazz.innerAccess & Modifier.ENUM) !== 0,
+                isInterface: (clazz.innerAccess & Modifier.INTERFACE) !== 0,
+                isAnnotation: (clazz.innerAccess & Modifier.ANNOTATION) !== 0,
                 isRecord,
-                entry: clazz,
+                entry: innerClassEntry,
             } as InnerClass;
-        });
+        })
+        .filter((it) => it !== undefined);
 
     if (!searchQuery) return output;
     return output.filter((member) => member.name.toLowerCase().includes(searchQuery.toLowerCase()));
