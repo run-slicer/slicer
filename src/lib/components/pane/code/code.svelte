@@ -80,7 +80,7 @@
     <div class="absolute right-0 bottom-0 z-20 m-4 flex flex-col items-end gap-2">
         <Popover>
             <PopoverTrigger>
-                <Button variant="outline" size="icon" class="flex">
+                <Button variant="outline" size="icon" class="bg-card">
                     <ScanEye />
                 </Button>
             </PopoverTrigger>
@@ -114,7 +114,7 @@
         </Popover>
         {#if interpType === Interpretation.CLASS}
             <Select type="single" bind:value={disasmId}>
-                <SelectTrigger class="h-7 text-xs [&_svg]:ml-2 [&_svg]:h-4 [&_svg]:w-4">
+                <SelectTrigger class="!bg-card h-7 text-xs [&_svg]:ml-2 [&_svg]:h-4 [&_svg]:w-4">
                     <span class="text-muted-foreground mr-2">Disassembler: </span>
                     <span class="tracking-tight">{disasm.name || disasm.id}</span>
                 </SelectTrigger>
