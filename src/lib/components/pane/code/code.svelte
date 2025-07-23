@@ -59,7 +59,7 @@
 
 <div class="scrollbar-thin relative basis-full overflow-hidden">
     {#await Promise.all([loadLanguage(language), readPromise])}
-        <Loading value={interpType === Interpretation.TEXT ? "Disassembling..." : "Reading..."} timed />
+        <Loading value={interpType !== Interpretation.TEXT ? "Disassembling..." : "Reading..."} timed />
     {:then [lang, value]}
         <ContextMenu>
             <ContextMenuTrigger>
