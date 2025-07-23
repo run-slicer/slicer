@@ -17,7 +17,7 @@
     import { Select, SelectContent, SelectItem, SelectTrigger } from "$lib/components/ui/select";
     import { Button } from "$lib/components/ui/button";
     import { Popover, PopoverContent, PopoverTrigger } from "$lib/components/ui/popover";
-    import { ScanEye } from "@lucide/svelte";
+    import { SquareCode } from "@lucide/svelte";
     import { jasm, vf } from "$lib/disasm/builtin";
     import { editorTextSize, editorTextSizeSync, editorWrap, toolsDisasm } from "$lib/state";
     import { get, writable } from "svelte/store";
@@ -25,6 +25,7 @@
     import CodeMenu from "./menu.svelte";
     import { record } from "$lib/task";
     import type { PaneProps } from "$lib/components/pane";
+    import { cn } from "$lib/components/utils";
 
     let { tab, disasms, handler }: PaneProps = $props();
     const entry = $derived(tab.entry!);
@@ -77,14 +78,36 @@
         </ContextMenu>
     {/await}
 
-    <div class="absolute right-0 bottom-0 z-20 m-4 flex flex-col items-end gap-2">
+    <div class="absolute right-0 bottom-0 z-20 m-4 flex flex-row">
+        {#if interpType === Interpretation.CLASS}
+            <Select type="single" bind:value={disasmId}>
+                <SelectTrigger
+                    class="!bg-card h-7 rounded-r-none border-r-0 text-xs [&_svg]:ml-2 [&_svg]:h-4 [&_svg]:w-4"
+                >
+                    <span class="text-muted-foreground mr-2">Disassembler: </span>
+                    <span class="tracking-tight">{disasm.name || disasm.id}</span>
+                </SelectTrigger>
+                <SelectContent class="max-h-[240px] w-full overflow-scroll" side="top" align="end">
+                    {#each usableDisasms as dism (dism.id)}
+                        <SelectItem value={dism.id} label={dism.id} class="justify-between text-xs tracking-tight">
+                            <span>{dism.name || dism.id}</span>
+                            {#if dism.version}<span class="text-muted-foreground">{dism.version}</span>{/if}
+                        </SelectItem>
+                    {/each}
+                </SelectContent>
+            </Select>
+        {/if}
         <Popover>
             <PopoverTrigger>
-                <Button variant="outline" size="icon" class="bg-card">
-                    <ScanEye />
+                <Button
+                    variant="outline"
+                    size="icon"
+                    class={cn("!bg-card", interpType === Interpretation.CLASS && "rounded-l-none")}
+                >
+                    <SquareCode />
                 </Button>
             </PopoverTrigger>
-            <PopoverContent side="left" align="end" sideOffset={8} class="w-56">
+            <PopoverContent side="top" align="end">
                 <div class="flex flex-col gap-2">
                     <div class="text-xs">Interpretation mode</div>
                     <Select type="single" bind:value={interpType}>
@@ -112,21 +135,5 @@
                 </div>
             </PopoverContent>
         </Popover>
-        {#if interpType === Interpretation.CLASS}
-            <Select type="single" bind:value={disasmId}>
-                <SelectTrigger class="!bg-card h-7 text-xs [&_svg]:ml-2 [&_svg]:h-4 [&_svg]:w-4">
-                    <span class="text-muted-foreground mr-2">Disassembler: </span>
-                    <span class="tracking-tight">{disasm.name || disasm.id}</span>
-                </SelectTrigger>
-                <SelectContent class="max-h-[240px] w-full overflow-scroll" side="top" align="end">
-                    {#each usableDisasms as dism (dism.id)}
-                        <SelectItem value={dism.id} label={dism.id} class="justify-between text-xs tracking-tight">
-                            <span>{dism.name || dism.id}</span>
-                            {#if dism.version}<span class="text-muted-foreground">{dism.version}</span>{/if}
-                        </SelectItem>
-                    {/each}
-                </SelectContent>
-            </Select>
-        {/if}
     </div>
 </div>
