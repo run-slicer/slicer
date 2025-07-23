@@ -10,6 +10,7 @@ type Awaitable<T> = T | PromiseLike<T>;
 export interface EventHandler {
     load(): Awaitable<void>;
     add(files?: File[]): Awaitable<void>;
+    addRemote(url: string): Awaitable<void>;
     clear(): Awaitable<void>;
     open(entry: Entry, tabType?: TabType): Awaitable<void>;
     openUnscoped(def: TabDefinition, position: TabPosition): Awaitable<void>;

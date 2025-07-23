@@ -27,6 +27,14 @@
     let disasms0 = $derived(Array.from($disasms.values()));
     let transformers0 = $derived(Array.from($transformers.values()));
 
+    // HTTP file share handler
+    const url = new URL(window.location.href);
+    if (url.searchParams.has("url")) {
+        const fetchUrl = url.searchParams.get("url")!;
+
+        $handler.addRemote(fetchUrl);
+    }
+
     onMount(registerShortcuts);
 
     // ignore default context menu except on double right-clicks
