@@ -68,14 +68,16 @@
         if (!tabs) return;
 
         const samePosition = (t: Tab) => t.position === tab.position;
-        const tabIndex = tabs.indexOf(tab);
-
         const filteredTabs = tabs.filter(samePosition);
+
+        const localIndex = filteredTabs.findIndex((t) => t.id === tab.id);
+
+        const isLast = localIndex === filteredTabs.length - 1;
 
         const targets = {
             self: [tab],
             others: filteredTabs.filter((t) => t.id !== tab.id),
-            right: filteredTabs.slice(tabIndex - 1),
+            right: isLast || localIndex === -1 ? [] : filteredTabs.slice(localIndex + 1),
             all: filteredTabs,
         } as const;
 
