@@ -183,10 +183,7 @@
                     Add <Shortcut key="o" modifier={Modifier.CTRL | Modifier.SHIFT} />
                 </MenubarItem>
                 <MenubarItem onclick={() => modals.open(LoadExternal)} class="justify-between">
-                    Open from URL <ExternalLink
-                    class="text-muted-foreground"
-                    size={16}
-                />
+                    Open from URL <ExternalLink class="text-muted-foreground" size={16} />
                 </MenubarItem>
                 <MenubarItem disabled={entries.length === 0} onclick={() => modals.open(ClearDialog, { handler })}>
                     Clear all

@@ -26,7 +26,7 @@
         }
 
         isOpen = false;
-        loadExternally(value0)
+        loadExternally(value0);
     };
 </script>
 
@@ -34,30 +34,20 @@
     <DialogContent>
         <DialogHeader>
             <DialogTitle>Open File Externally</DialogTitle>
-            <DialogDescription>
-                Import a file from an arbitrary URL here.
-            </DialogDescription>
+            <DialogDescription>Import a file from an arbitrary URL here.</DialogDescription>
         </DialogHeader>
         <div class="grid grid-cols-6 items-center gap-4">
-            <Label for="name" class="text-right">
-                URL
-            </Label>
+            <Label for="name" class="text-right">URL</Label>
             <Input
                 id="name"
                 placeholder="https://..."
-                class={cn(
-                    "col-span-5",
-                    !invalid ||
-                        "border-destructive ring-offset-destructive"
-                )}
+                class={cn("col-span-5", !invalid || "border-destructive ring-offset-destructive")}
                 bind:value
                 onchange={() => (invalid = false)}
             />
         </div>
         <DialogFooter>
-            <Button type="submit" onclick={loadFile}>
-                Import
-            </Button>
+            <Button type="submit" onclick={loadFile}>Import</Button>
         </DialogFooter>
     </DialogContent>
 </Dialog>
