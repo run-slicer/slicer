@@ -7,6 +7,7 @@
     import { cn } from "$lib/components/utils";
     import { VList } from "virtua/svelte";
     import type { EventHandler } from "$lib/event";
+    import { tabDefs, TabPosition } from "$lib/tab";
 
     interface Props {
         entries: Entry[];
@@ -17,15 +18,8 @@
 
     let open = $state(false);
     let searchWorkspace = $state(false);
-
-    $effect(() => {
-        // reset page on close
-        if (!open) {
-            searchWorkspace = false;
-        }
-    });
-
     let search = $state("");
+
     const filter = (entries: Entry[], term: string): Entry[] => {
         return entries
             .filter((e) => e.name.includes(term))
@@ -50,14 +44,19 @@
         document.addEventListener("keydown", handleKeydown);
         return () => document.removeEventListener("keydown", handleKeydown);
     });
-
-    const handleClick = async (entry: Entry) => {
-        open = false;
-        await handler.open(entry);
-    };
 </script>
 
-<CommandDialog bind:open shouldFilter={!searchWorkspace}>
+<CommandDialog
+    bind:open
+    shouldFilter={!searchWorkspace}
+    onOpenChangeComplete={(open) => {
+        // reset page on close
+        if (!open) {
+            searchWorkspace = false;
+            search = "";
+        }
+    }}
+>
     <CommandInput bind:value={search} placeholder={searchWorkspace ? "Search files..." : "Type a command..."} />
     <CommandList class={cn(!searchWorkspace || "h-[80vh] max-h-[80vh] [&>div]:contents")}>
         {#if searchWorkspace}
@@ -65,7 +64,13 @@
                 {#key filteredEntries.length}
                     <VList data={filteredEntries} getKey={(e) => e.name} class="p-2">
                         {#snippet children(entry)}
-                            <CommandItem class="py-2.5!" onSelect={() => handleClick(entry)}>
+                            <CommandItem
+                                class="py-2.5!"
+                                onSelect={async () => {
+                                    open = false;
+                                    await handler.open(entry);
+                                }}
+                            >
                                 {@const { icon: Icon, classes } = entryIcon(entry)}
                                 <Icon class={classes} />
                                 <span class="break-anywhere">{entry.name}</span>
@@ -79,6 +84,21 @@
                 </p>
             {/if}
         {:else}
+            <CommandGroup heading="Tabs">
+                {#each tabDefs as def}
+                    {@const Icon = def.icon}
+                    <CommandItem
+                        value={def.type}
+                        onSelect={async () => {
+                            open = false;
+                            await handler.openUnscoped(def, TabPosition.PRIMARY_CENTER, false);
+                        }}
+                    >
+                        <Icon />
+                        {def.name}
+                    </CommandItem>
+                {/each}
+            </CommandGroup>
             <CommandGroup forceMount heading="Workspace">
                 <CommandItem forceMount value="Search workspace" onSelect={() => (searchWorkspace = true)}>
                     <Search />

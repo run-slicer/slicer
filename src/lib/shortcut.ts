@@ -1,5 +1,5 @@
 import { handler } from "$lib/event";
-import { tabDefs, TabPosition, TabType, updatePane } from "$lib/tab";
+import { tabDefs, TabPosition, TabType } from "$lib/tab";
 import { get } from "svelte/store";
 
 // https://stackoverflow.com/questions/38241480/detect-macos-ios-windows-android-and-linux-os-with-js
@@ -11,7 +11,7 @@ export const enum Modifier {
     ALT = 1 << 2,
 }
 
-type ShortcutCallback = (e: KeyboardEvent) => void;
+type ShortcutCallback = (e: KeyboardEvent) => void | PromiseLike<void>;
 export type DestroyCallback = () => void;
 
 const listen = (key: string, mod: number, callback: ShortcutCallback): DestroyCallback => {
@@ -26,12 +26,12 @@ const listen = (key: string, mod: number, callback: ShortcutCallback): DestroyCa
         checks.push((e) => e.getModifierState("Shift"));
     }
 
-    const handler: ShortcutCallback = (e) => {
+    const handler: ShortcutCallback = async (e) => {
         if (checks.every((check) => check(e))) {
             e.preventDefault();
             e.stopPropagation();
 
-            callback(e);
+            await callback(e);
         }
     };
 
@@ -47,9 +47,12 @@ export const register = (): DestroyCallback => {
         listen("o", Modifier.CTRL, () => get(handler).load()),
         listen("w", Modifier.CTRL | Modifier.ALT, () => get(handler).close()),
         listen("e", Modifier.CTRL, () => get(handler).export()),
-        listen("f", Modifier.CTRL | Modifier.SHIFT, () => {
-            updatePane(TabPosition.SECONDARY_RIGHT, true);
-            get(handler).openUnscoped(tabDefs.find((d) => d.type === TabType.SEARCH)!, TabPosition.SECONDARY_RIGHT);
+        listen("f", Modifier.CTRL | Modifier.SHIFT, async () => {
+            await get(handler).openUnscoped(
+                tabDefs.find((d) => d.type === TabType.SEARCH)!,
+                TabPosition.SECONDARY_RIGHT,
+                false
+            );
         }),
     ];
     return () => callbacks.forEach((c) => c());

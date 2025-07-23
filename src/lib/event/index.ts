@@ -13,7 +13,7 @@ export interface EventHandler {
     addRemote(url: string): Awaitable<void>;
     clear(): Awaitable<void>;
     open(entry: Entry, tabType?: TabType): Awaitable<void>;
-    openUnscoped(def: TabDefinition, position: TabPosition): Awaitable<void>;
+    openUnscoped(def: TabDefinition, position: TabPosition, move: boolean): Awaitable<void>;
     remove(entries: Entry[]): Awaitable<void>;
     export(entries?: Entry[], disasm?: Disassembler): Awaitable<void>;
     close(tab?: Tab): Awaitable<void>;

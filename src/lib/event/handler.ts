@@ -11,6 +11,7 @@ import {
     clear as clearTabs,
     current as currentTab,
     detectType as detectTabType,
+    move as moveTab,
     open as openTab,
     openUnscoped as openUnscopedTab,
     remove as removeTab,
@@ -19,6 +20,7 @@ import {
     TabPosition,
     tabs,
     TabType,
+    updatePane,
 } from "$lib/tab";
 import {
     add as addTask,
@@ -160,8 +162,12 @@ export default {
             });
         }
     },
-    openUnscoped(def: TabDefinition, position: TabPosition): void {
-        openUnscopedTab(def, position);
+    openUnscoped(def: TabDefinition, position: TabPosition, move: boolean): void {
+        const tab = openUnscopedTab(def, position);
+        if (move) {
+            moveTab(tab, position);
+        }
+        updatePane(tab.position, true);
     },
     async remove(entries: Entry[]): Promise<void> {
         const names = new Set(entries.map((e) => e.name));

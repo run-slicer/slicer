@@ -5,7 +5,7 @@
     import { type Entry, EntryType } from "$lib/workspace";
     import { encodings } from "$lib/workspace/encoding";
     import type { ProtoScript } from "$lib/script";
-    import { type Tab, TabPosition, TabType, tabDefs } from "$lib/tab";
+    import { type Tab, tabDefs, TabPosition, TabType } from "$lib/tab";
     import { Modifier } from "$lib/shortcut";
     import Shortcut from "./shortcut.svelte";
     import ScriptMenu from "./script/menu.svelte";
@@ -41,7 +41,7 @@
     import { themes } from "$lib/theme";
     import type { Disassembler } from "$lib/disasm";
     import type { EventHandler } from "$lib/event";
-    import { type Transformer, toggle as toggleTransformer } from "$lib/workspace/analysis/transform";
+    import { toggle as toggleTransformer, type Transformer } from "$lib/workspace/analysis/transform";
     import PaneButton from "./pane_button.svelte";
     import { groupBy } from "$lib/utils";
     import { modals } from "svelte-modals";
@@ -97,11 +97,10 @@
     const exportEntries = (disasm?: Disassembler) => handler.export(entries, disasm);
 
     const openPrefs = async () => {
-        handler.openUnscoped(tabDefs.find((d) => d.type === TabType.PREFS)!, TabPosition.PRIMARY_CENTER);
+        await handler.openUnscoped(tabDefs.find((d) => d.type === TabType.PREFS)!, TabPosition.PRIMARY_CENTER, false);
     };
     const openSearch = async () => {
-        updatePane(TabPosition.SECONDARY_RIGHT, true);
-        handler.openUnscoped(tabDefs.find((d) => d.type === TabType.SEARCH)!, TabPosition.SECONDARY_RIGHT);
+        await handler.openUnscoped(tabDefs.find((d) => d.type === TabType.SEARCH)!, TabPosition.SECONDARY_RIGHT, false);
     };
 </script>
 

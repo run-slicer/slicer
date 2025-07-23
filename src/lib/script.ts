@@ -17,7 +17,6 @@ import {
     refresh as refreshTab,
     type Tab,
     tabDefs,
-    TabPosition,
     tabs,
     TabType,
 } from "$lib/tab";
@@ -266,7 +265,7 @@ const editorCtx: EditorContext = {
 
         const def = tabDefs.find((d) => d.type === type);
         if (def) {
-            return wrapTab(openUnscopedTab(def, TabPosition.PRIMARY_CENTER));
+            return wrapTab(openUnscopedTab(def));
         }
 
         throw new Error("Invalid tab type");

@@ -58,7 +58,7 @@
                             value={def.type}
                             onSelect={async () => {
                                 open = false;
-                                await handler.openUnscoped(def, position);
+                                await handler.openUnscoped(def, position, true);
                             }}
                         >
                             <Icon />

@@ -351,12 +351,10 @@ export const open = async (entry: Entry, type: TabType = detectType(entry)): Pro
     return tab;
 };
 
-export const openUnscoped = (def: TabDefinition, position: TabPosition): Tab => {
+// specified position is used only if the tab is not already open
+export const openUnscoped = (def: TabDefinition, position: TabPosition = TabPosition.PRIMARY_CENTER): Tab => {
     let tab = Array.from(get(tabs).values()).find((t) => t.type === def.type);
-
-    if (tab) {
-        move(tab, position);
-    } else {
+    if (!tab) {
         tab = update({
             id: `${def.type}:slicer`,
             type: def.type,
@@ -365,9 +363,8 @@ export const openUnscoped = (def: TabDefinition, position: TabPosition): Tab => 
             closeable: true,
             icon: { icon: def.icon, classes: ["text-muted-foreground"] },
         });
-
-        updateCurrent(tab.position, tab);
     }
 
+    updateCurrent(tab.position, tab);
     return tab;
 };
