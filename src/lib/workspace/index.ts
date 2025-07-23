@@ -1,11 +1,10 @@
-import { error, warn } from "$lib/log";
+import { warn } from "$lib/log";
 import { analysisBackground } from "$lib/state";
 import { record } from "$lib/task";
 import { prettyMethodDesc } from "$lib/utils";
 import type { Member, Node } from "@run-slicer/asm";
 import type { UTF8Entry } from "@run-slicer/asm/pool";
 import type { Zip } from "@run-slicer/zip";
-import { toast } from "svelte-sonner";
 import { derived, get, writable } from "svelte/store";
 import { AnalysisState, analyze, analyzeBackground, analyzeSchedule } from "./analysis";
 import { transform } from "./analysis/transform";
@@ -207,6 +206,19 @@ export const loadZip = async (f: File): Promise<LoadResult[]> => {
     return load(...(await zipData(await readBlob(f, { decoder: get(archiveDecoder) }))));
 };
 
+export const loadRemote = async (url: string, name?: string): Promise<LoadResult[]> => {
+    const res = await fetch(url);
+    if (!name) {
+        name = new URL(url).pathname.split("/").pop();
+        if (!name?.includes(".")) {
+            // no extension
+            name = "input.jar";
+        }
+    }
+
+    return load(memoryData(name, await res.blob()));
+};
+
 export const remove = (name: string) => {
     entries.update(($entries) => {
         $entries.delete(name);
@@ -219,25 +231,6 @@ export const clear = () => {
         $entries.clear();
         return $entries;
     });
-};
-
-export const loadExternally = (fetchUrl: string) => {
-    record("fetching", fetchUrl, () => fetch(fetchUrl))
-        .then(async (r) => {
-            let name = new URL(fetchUrl).pathname.split("/").pop();
-            if (!name?.includes(".")) {
-                // no extension
-                name = "input.jar";
-            }
-
-            return record("loading", name, async () => load(memoryData(name, await r.blob())));
-        })
-        .catch((e) => {
-            error("failed to read entry from URL", e);
-            toast.error("Error occurred", {
-                description: `Could not load entry from URL, check the console.`,
-            });
-        });
 };
 
 // PWA file handler
@@ -253,12 +246,4 @@ if (window.launchQueue) {
             }
         }
     });
-}
-
-// HTTP file share handler
-const url = new URL(window.location.href);
-if (url.searchParams.has("url")) {
-    const fetchUrl = url.searchParams.get("url")!;
-
-    loadExternally(fetchUrl);
 }

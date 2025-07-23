@@ -11,10 +11,14 @@
     import { Input } from "$lib/components/ui/input";
     import { Button } from "$lib/components/ui/button";
     import { cn } from "$lib/components/utils";
-    import { loadExternally } from "$lib/workspace";
     import type { ModalProps } from "svelte-modals";
+    import type { EventHandler } from "$lib/event";
 
-    let { isOpen, close }: ModalProps = $props();
+    interface Props extends ModalProps {
+        handler: EventHandler;
+    }
+
+    let { isOpen, close, handler }: Props = $props();
 
     let value = $state("");
     let invalid = $state(false);
@@ -26,15 +30,18 @@
         }
 
         isOpen = false;
-        loadExternally(value0);
+        await handler.addRemote(value0);
     };
 </script>
 
 <Dialog bind:open={isOpen} onOpenChangeComplete={(open) => open || close()}>
     <DialogContent>
         <DialogHeader>
-            <DialogTitle>Open File Externally</DialogTitle>
-            <DialogDescription>Import a file from an arbitrary URL here.</DialogDescription>
+            <DialogTitle>Add remote file</DialogTitle>
+            <DialogDescription>
+                Import a file from an arbitrary URL here.
+                <p class="mt-2 italic">The serving HTTP server has to have CORS enabled for this to work.</p>
+            </DialogDescription>
         </DialogHeader>
         <div class="grid grid-cols-6 items-center gap-4">
             <Label for="name" class="text-right">URL</Label>

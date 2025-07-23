@@ -36,6 +36,8 @@ import {
     type Entry,
     EntryType,
     loadFile,
+    loadRemote,
+    type LoadResult,
     loadZip,
     readDeferred,
     remove as removeWs,
@@ -48,6 +50,28 @@ import { get } from "svelte/store";
 import type { EventHandler } from "./";
 
 // one hell of a file that responds to basically all essential actions as signalled by the UI
+
+const toastAdd = async (created: LoadResult[], skipped: LoadResult[], time: number): Promise<void> => {
+    if (skipped.length > 0) {
+        if (skipped.length <= 5) {
+            for (const result of skipped) {
+                toast.info("Duplicate entry", {
+                    description: `Skipped adding ${result.entry.name}, as it is already present in the workspace.`,
+                });
+            }
+        } else {
+            // don't spam toasts for more than 5 entries
+            toast.info("Duplicate entries", {
+                description: `Skipped adding ${skipped.length} entries, as they were already present in the workspace.`,
+            });
+        }
+    }
+    if (created.length > 0) {
+        toast.success("Added", {
+            description: `Added ${created.length} ${created.length === 1 ? "entry" : "entries"} in ${time}ms.`,
+        });
+    }
+};
 
 export default {
     async load(): Promise<void> {
@@ -119,25 +143,13 @@ export default {
             results.flatMap((r) => r.result),
             (r) => r.created
         );
-        if (skipped.length > 0) {
-            if (skipped.length <= 5) {
-                for (const result of skipped) {
-                    toast.info("Duplicate entry", {
-                        description: `Skipped adding ${result.entry.name}, as it is already present in the workspace.`,
-                    });
-                }
-            } else {
-                // don't spam toasts for more than 5 entries
-                toast.info("Duplicate entries", {
-                    description: `Skipped adding ${skipped.length} entries, as they were already present in the workspace.`,
-                });
-            }
-        }
-        if (created.length > 0) {
-            toast.success("Added", {
-                description: `Added ${created.length} ${created.length === 1 ? "entry" : "entries"} in ${time}ms.`,
-            });
-        }
+        await toastAdd(created, skipped, time);
+    },
+    async addRemote(url: string): Promise<void> {
+        const { time, result } = await recordTimed("adding", url, () => loadRemote(url));
+
+        const [created, skipped] = partition(result, (r) => r.created);
+        await toastAdd(created, skipped, time);
     },
     async open(entry: Entry, tabType: TabType = detectTabType(entry)): Promise<void> {
         try {

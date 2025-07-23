@@ -9,7 +9,7 @@
     import { Modifier } from "$lib/shortcut";
     import Shortcut from "./shortcut.svelte";
     import ScriptMenu from "./script/menu.svelte";
-    import { AboutDialog, ClearDialog, LoadExternal, ScriptLoadDialog } from "$lib/components/dialog";
+    import { AboutDialog, ClearDialog, LoadExternalDialog, ScriptLoadDialog } from "$lib/components/dialog";
     import {
         Menubar,
         MenubarCheckboxItem,
@@ -30,7 +30,6 @@
         Clipboard,
         Code,
         Coffee,
-        ExternalLink,
         FileCode2,
         GitBranchPlus,
         Globe,
@@ -182,8 +181,8 @@
                 <MenubarItem onclick={() => handler.add()}>
                     Add <Shortcut key="o" modifier={Modifier.CTRL | Modifier.SHIFT} />
                 </MenubarItem>
-                <MenubarItem onclick={() => modals.open(LoadExternal)} class="justify-between">
-                    Open from URL <ExternalLink class="text-muted-foreground" size={16} />
+                <MenubarItem onclick={() => modals.open(LoadExternalDialog, { handler })} class="justify-between">
+                    Add from URL
                 </MenubarItem>
                 <MenubarItem disabled={entries.length === 0} onclick={() => modals.open(ClearDialog, { handler })}>
                     Clear all
