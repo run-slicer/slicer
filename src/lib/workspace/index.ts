@@ -221,6 +221,25 @@ export const clear = () => {
     });
 };
 
+export const loadExternally = (fetchUrl: string) => {
+    record("fetching", fetchUrl, () => fetch(fetchUrl))
+    .then(async (r) => {
+        let name = new URL(fetchUrl).pathname.split("/").pop();
+        if (!name?.includes(".")) {
+            // no extension
+            name = "input.jar";
+        }
+
+        return record("loading", name, async () => load(memoryData(name, await r.blob())));
+    })
+    .catch((e) => {
+        error("failed to read entry from URL", e);
+        toast.error("Error occurred", {
+            description: `Could not load entry from URL, check the console.`,
+        });
+    });
+}
+
 // PWA file handler
 // @ts-ignore - experimental APIs
 if (window.launchQueue) {
@@ -241,20 +260,5 @@ const url = new URL(window.location.href);
 if (url.searchParams.has("url")) {
     const fetchUrl = url.searchParams.get("url")!;
 
-    record("fetching", fetchUrl, () => fetch(fetchUrl))
-        .then(async (r) => {
-            let name = new URL(fetchUrl).pathname.split("/").pop();
-            if (!name?.includes(".")) {
-                // no extension
-                name = "input.jar";
-            }
-
-            return record("loading", name, async () => load(memoryData(name, await r.blob())));
-        })
-        .catch((e) => {
-            error("failed to read entry from URL", e);
-            toast.error("Error occurred", {
-                description: `Could not load entry from URL, check the console.`,
-            });
-        });
+    loadExternally(fetchUrl)
 }
