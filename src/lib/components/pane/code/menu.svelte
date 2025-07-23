@@ -13,11 +13,12 @@
     import ContextMenuLabel from "$lib/components/menu_label.svelte";
     import { Binary, CaseSensitive, Code, WrapText } from "@lucide/svelte";
     import { type Language, toExtension } from "$lib/lang";
-    import { isDisassembled } from "./";
+    import { Interpretation } from "./";
     import type { EventHandler } from "$lib/event";
 
     interface Props {
         tab: Tab;
+        interpType: Interpretation;
         lang: Language;
         value: string;
         wrap: boolean;
@@ -25,7 +26,7 @@
         handler: EventHandler;
     }
 
-    let { tab, lang, value, handler, wrap = $bindable(), sizeSync = $bindable() }: Props = $props();
+    let { tab, interpType, lang, value, handler, wrap = $bindable(), sizeSync = $bindable() }: Props = $props();
     let entry = $derived(tab.entry!);
 </script>
 
@@ -49,7 +50,7 @@
             </ContextMenuItem>
             <ContextMenuItem
                 class="flex justify-between"
-                disabled={!isDisassembled(tab.type, entry)}
+                disabled={interpType === Interpretation.TEXT}
                 onclick={() => handler.export([transformEntry(entry, toExtension(lang), value)])}
             >
                 Disassembled <Code size={16} />

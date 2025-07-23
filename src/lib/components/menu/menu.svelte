@@ -219,7 +219,7 @@
             <MenubarContent align="start">
                 <MenubarItem
                     class="justify-between"
-                    disabled={!tab?.entry || tab.entry.type === EntryType.ARCHIVE || tab.type === TabType.CODE}
+                    disabled={!tab?.entry || tab.type === TabType.CODE}
                     onclick={() => openEntry(TabType.CODE)}
                 >
                     Code <Code size={16} />
@@ -230,16 +230,6 @@
                     onclick={() => openEntry(TabType.CLASS)}
                 >
                     Class <FileCode2 size={16} />
-                </MenubarItem>
-                <MenubarItem
-                    class="justify-between"
-                    disabled={!tab?.entry ||
-                        tab.entry.type === EntryType.ARCHIVE ||
-                        tab.entry.type === EntryType.MEMBER ||
-                        tab.type === TabType.HEX}
-                    onclick={() => openEntry(TabType.HEX)}
-                >
-                    Hexadecimal <Binary size={16} />
                 </MenubarItem>
                 <MenubarItem
                     class="justify-between"

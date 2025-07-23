@@ -1,7 +1,6 @@
 import { TabPosition, TabType } from "$lib/tab";
 import { type ClassEntry, type Entry, EntryType } from "$lib/workspace";
 import {
-    Binary,
     Braces,
     CodeXml,
     Coffee,
@@ -49,8 +48,6 @@ export const tabIcon = (tabType: TabType, entry: Entry): StyledIcon => {
     switch (tabType) {
         case TabType.WELCOME:
             return { icon: Sparkles, classes: ["text-muted-foreground"] };
-        case TabType.HEX:
-            return { icon: Binary, classes: ["text-muted-foreground"] };
         case TabType.GRAPH:
             return { icon: GitPullRequest, classes: ["text-muted-foreground"] };
         case TabType.CLASS:

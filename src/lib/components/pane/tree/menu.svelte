@@ -13,7 +13,7 @@
 </script>
 
 <script lang="ts">
-    import { Binary, Code, Download, FileCode2, Gauge, GitBranchPlus, Image, Trash2 } from "@lucide/svelte";
+    import { Code, Download, FileCode2, Gauge, GitBranchPlus, Image, Trash2 } from "@lucide/svelte";
     import { EntryType } from "$lib/workspace";
     import { TabType } from "$lib/tab";
     import {
@@ -45,13 +45,8 @@
         <ContextMenuSub>
             <ContextMenuSubTrigger>Open as</ContextMenuSubTrigger>
             <ContextMenuSubContent class="w-48">
-                {#if entry.type !== EntryType.ARCHIVE}
-                    <ContextMenuItem class="flex justify-between" onclick={() => handler.open(entry, TabType.CODE)}>
-                        Code <Code size={16} />
-                    </ContextMenuItem>
-                {/if}
-                <ContextMenuItem class="flex justify-between" onclick={() => handler.open(entry, TabType.HEX)}>
-                    Hexadecimal <Binary size={16} />
+                <ContextMenuItem class="flex justify-between" onclick={() => handler.open(entry, TabType.CODE)}>
+                    Code <Code size={16} />
                 </ContextMenuItem>
                 <ContextMenuItem class="flex justify-between" onclick={() => handler.open(entry, TabType.IMAGE)}>
                     Image <Image size={16} />

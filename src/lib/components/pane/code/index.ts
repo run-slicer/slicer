@@ -1,35 +1,81 @@
 import { disassemble, disassembleMethod, type Disassembler } from "$lib/disasm";
 import { fromExtension, type Language } from "$lib/lang";
-import { TabType } from "$lib/tab";
+import { interpHexRowBytes } from "$lib/state";
 import { formatHex } from "$lib/utils";
 import { type ClassEntry, type Entry, EntryType, type MemberEntry } from "$lib/workspace";
+import { derived, type Readable } from "svelte/store";
 
-export const isDisassembled = (tabType: TabType, entry: Entry): boolean => {
-    return tabType === TabType.HEX || entry.type === EntryType.CLASS || entry.type === EntryType.MEMBER;
+export enum Interpretation {
+    TEXT = "text",
+    HEX = "hex",
+    CLASS = "class",
+}
+
+export interface InterpretationOptions {
+    hexRowBytes: number;
+}
+
+export const interpOptions: Readable<InterpretationOptions> = derived([interpHexRowBytes], ([hexRowBytes]) => ({
+    hexRowBytes,
+}));
+
+// prettier-ignore
+const extensions = {
+    [Interpretation.HEX]: [
+        "bin", "tar", "gz", "rar", "zip", "7z", "jar", "apk", "dex", "lzma", "dll", "so", "dylib", "exe", "kotlin_builtins",
+        "kotlin_metadata", "kotlin_module", "nbt", "ogg", "cer", "der", "crt",
+    ],
 };
 
-export const detectLanguage = (tabType: TabType, entry: Entry, disasm: Disassembler): Language => {
-    if (tabType === TabType.HEX) {
-        return "hex";
-    } else if (entry.type === EntryType.CLASS || entry.type === EntryType.MEMBER) {
-        // disassembled view
-        const classEntry = entry as ClassEntry;
+const typesByExts = new Map(
+    (Object.entries(extensions) as [Interpretation, string[]][]).flatMap(([k, v]) => v.map((ext) => [ext, k]))
+);
 
-        return disasm.language(classEntry) || "plaintext";
+export const detectInterpretation = (entry: Entry): Interpretation => {
+    if (entry.type === EntryType.CLASS || entry.type === EntryType.MEMBER) {
+        return Interpretation.CLASS;
+    }
+
+    return entry.extension ? typesByExts.get(entry.extension) || Interpretation.TEXT : Interpretation.TEXT;
+};
+
+export const canInterpret = (type: Interpretation, entry: Entry): boolean => {
+    switch (type) {
+        case Interpretation.CLASS:
+            return entry.type === EntryType.CLASS || entry.type === EntryType.MEMBER;
+    }
+
+    return true;
+};
+
+export const detectLanguage = (type: Interpretation, entry: Entry, disasm: Disassembler): Language => {
+    switch (type) {
+        case Interpretation.CLASS:
+            return disasm.language(entry as ClassEntry) || "plaintext";
+        case Interpretation.HEX:
+            return "hex";
     }
 
     return entry.extension ? fromExtension(entry.extension) : "plaintext";
 };
 
-export const read = async (tabType: TabType, entry: Entry, disasm: Disassembler): Promise<string> => {
-    if (tabType === TabType.HEX) {
-        return formatHex(await entry.data.bytes());
-    } else if (entry.type === EntryType.CLASS) {
-        return disassemble(entry as ClassEntry, disasm);
-    } else if (entry.type === EntryType.MEMBER) {
-        const memberEntry = entry as MemberEntry;
+export const read = async (
+    type: Interpretation,
+    options: InterpretationOptions,
+    entry: Entry,
+    disasm: Disassembler
+): Promise<string> => {
+    switch (type) {
+        case Interpretation.CLASS:
+            if (entry.type === EntryType.MEMBER) {
+                const memberEntry = entry as MemberEntry;
 
-        return disassembleMethod(memberEntry, memberEntry.member, disasm);
+                return disassembleMethod(memberEntry, memberEntry.member, disasm);
+            }
+
+            return disassemble(entry as ClassEntry, disasm);
+        case Interpretation.HEX:
+            return formatHex(await entry.data.bytes(), options.hexRowBytes);
     }
 
     return entry.data.text();

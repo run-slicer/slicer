@@ -18,6 +18,7 @@
         analysisJdkClasses,
         load,
         save,
+        interpHexRowBytes,
     } from "$lib/state";
     import { encodings } from "$lib/workspace/encoding";
     import { themes } from "$lib/theme";
@@ -27,6 +28,7 @@
     import { toast } from "svelte-sonner";
     import { modals } from "svelte-modals";
     import PrefsClearDialog from "$lib/components/dialog/prefs_clear.svelte";
+    import { Input } from "$lib/components/ui/input";
 
     let _: PaneProps = $props();
     let currentSection: string | null = $state("theme");
@@ -202,6 +204,26 @@
                             </div>
                         </TooltipProvider>
                         <Switch id="editorTextSizeSync" bind:checked={$editorTextSizeSync} />
+                    </div>
+                </div>
+
+                <h2 class="border-b py-2 font-semibold">Interpretation</h2>
+                <div class="grid gap-2">
+                    <div class="grid min-h-[2.5rem] grid-cols-[12rem_10rem_1fr] items-center gap-4">
+                        <TooltipProvider>
+                            <div class="flex items-center gap-2">
+                                <Label for="bytesPerRow">Bytes per row</Label>
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <HelpCircle class="text-muted-foreground h-4 w-4" />
+                                    </TooltipTrigger>
+                                    <TooltipContent side="right">
+                                        Number of bytes displayed per row in the hexadecimal interpretation mode.
+                                    </TooltipContent>
+                                </Tooltip>
+                            </div>
+                        </TooltipProvider>
+                        <Input id="bytesPerRow" type="number" bind:value={$interpHexRowBytes} class="w-48" />
                     </div>
                 </div>
             </div>
