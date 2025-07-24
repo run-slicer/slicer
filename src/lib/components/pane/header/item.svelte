@@ -6,9 +6,16 @@
     import { X } from "@lucide/svelte";
     import type { StyledIcon } from "$lib/components/icons";
     import { cn } from "$lib/components/utils";
-    import { ContextMenu, ContextMenuTrigger, ContextMenuContent, ContextMenuItem } from "$lib/components/ui/context-menu";
+    import {
+        ContextMenu,
+        ContextMenuTrigger,
+        ContextMenuContent,
+        ContextMenuItem,
+        ContextMenuSeparator,
+    } from "$lib/components/ui/context-menu";
     import { Modifier } from "$lib/shortcut";
     import Shortcut from "$lib/components/menu/shortcut.svelte";
+    import ContextMenuLabel from "$lib/components/menu_label.svelte";
 
     interface Props {
         name?: string;
@@ -65,18 +72,14 @@
             {/if}
         </button>
     </ContextMenuTrigger>
-    <ContextMenuContent>
+    <ContextMenuContent class="w-48">
+        <ContextMenuLabel>{name}</ContextMenuLabel>
+        <ContextMenuSeparator />
         <ContextMenuItem onclick={(e) => handleClose(e, "self")} class="justify-between">
-            Close <Shortcut key="w" modifier={Modifier.CTRL | Modifier.ALT} />
+            Close {#if active}<Shortcut key="w" modifier={Modifier.CTRL | Modifier.ALT} />{/if}
         </ContextMenuItem>
-        <ContextMenuItem onclick={(e) => handleClose(e, "others")}>
-            Close Others
-        </ContextMenuItem>
-        <ContextMenuItem onclick={(e) => handleClose(e, "right")}>
-            Close to the Right
-        </ContextMenuItem>
-        <ContextMenuItem onclick={(e) => handleClose(e, "all")}>
-            Close All
-        </ContextMenuItem>
+        <ContextMenuItem onclick={(e) => handleClose(e, "others")}>Close others</ContextMenuItem>
+        <ContextMenuItem onclick={(e) => handleClose(e, "right")}>Close to the right</ContextMenuItem>
+        <ContextMenuItem onclick={(e) => handleClose(e, "all")}>Close all</ContextMenuItem>
     </ContextMenuContent>
 </ContextMenu>

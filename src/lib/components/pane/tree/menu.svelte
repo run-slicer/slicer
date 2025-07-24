@@ -38,8 +38,8 @@
     let entry = $derived(node.entry);
 </script>
 
-<ContextMenuContent class="max-w-[16rem] min-w-48">
-    <ContextMenuLabel center>{node.label}</ContextMenuLabel>
+<ContextMenuContent class="w-48">
+    <ContextMenuLabel>{node.label}</ContextMenuLabel>
     <ContextMenuSeparator />
     {#if entry}
         <ContextMenuSub>
