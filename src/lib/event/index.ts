@@ -4,11 +4,14 @@ import type { Tab, TabDefinition, TabPosition, TabType } from "$lib/tab";
 import type { Entry } from "$lib/workspace";
 import { writable } from "svelte/store";
 import defaultHandler from "./handler";
+import type { MappingFormat } from "$lib/mapping";
 
 type Awaitable<T> = T | PromiseLike<T>;
 
 export interface EventHandler {
     load(): Awaitable<void>;
+    loadMappings(entries: Entry[]): Awaitable<void>;
+    applyMappings(content: string, format: MappingFormat): Awaitable<void>;
     add(files?: File[]): Awaitable<void>;
     addRemote(url: string): Awaitable<void>;
     clear(): Awaitable<void>;

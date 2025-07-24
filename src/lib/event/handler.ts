@@ -1,5 +1,7 @@
+import { LoadMappings } from "$lib/components/dialog";
 import { disassembleEntry, type Disassembler } from "$lib/disasm";
 import { error } from "$lib/log";
+import { detectMappingFormat, MappingFormat, parseMappings } from "$lib/mapping";
 import {
     load as loadScript,
     type ProtoScript,
@@ -31,25 +33,40 @@ import {
     recordTimed,
     remove as removeTask,
 } from "$lib/task";
-import { chunk, distribute, downloadBlob, partition, readFiles, timestampFile, truncate } from "$lib/utils";
+import {
+    chunk,
+    distribute,
+    downloadBlob,
+    fileToString,
+    partition,
+    readFiles,
+    timestampFile,
+    truncate,
+} from "$lib/utils";
 import {
     type ClassEntry,
     clear as clearWs,
+    entries,
     type Entry,
     EntryType,
     loadFile,
     loadRemote,
     type LoadResult,
     loadZip,
+    mapClass,
+    type MapClassResult,
+    MAPPINGS_EXTENSIONS,
     readDeferred,
     remove as removeWs,
     ZIP_EXTENSIONS,
 } from "$lib/workspace";
+import { analyzeBackground } from "$lib/workspace/analysis";
 import { type Data, download } from "$lib/workspace/data";
 import { Channel } from "queueable";
+import { modals } from "svelte-modals";
 import { toast } from "svelte-sonner";
 import { get } from "svelte/store";
-import type { EventHandler } from "./";
+import { type EventHandler } from "./";
 
 // one hell of a file that responds to basically all essential actions as signalled by the UI
 
@@ -126,6 +143,74 @@ export default {
         if (created.length > 0) {
             toast.success("Loaded", {
                 description: `Loaded ${created.length} ${created.length === 1 ? "entry" : "entries"} in ${time}ms.`,
+            });
+        }
+    },
+    async loadMappings(entries: Entry[]): Promise<void> {
+        if (entries.length === 0) return;
+
+        const files = await readFiles(
+            Array.from(MAPPINGS_EXTENSIONS.values())
+                .map((e) => `.${e}`)
+                .join(","),
+            false
+        );
+        if (files.length === 0) {
+            return;
+        }
+
+        const file = files[0];
+
+        try {
+            const content = await fileToString(file);
+
+            const detectedFormat = detectMappingFormat(content);
+
+            modals.open(LoadMappings, { detectedFormat, handler: this, content });
+        } catch (e) {
+            error(`failed to read mappings file ${file.name}`, e);
+            toast.error("Error occurred", {
+                description: `Could not read mappings file ${file.name}, check the console.`,
+            });
+        }
+    },
+    async applyMappings(content: string, format: MappingFormat): Promise<void> {
+        try {
+            const parsed = parseMappings(format, content);
+
+            recordProgress("applying mappings", null, async (task) => {
+                let completed = 0;
+                parsed.classes.forEach(async (clazz) => {
+                    const data = await mapClass(clazz, parsed);
+
+                    if (data.mapped) {
+
+                        entries.update(($entries) => {
+                            $entries.delete(data.oldName);
+                            $entries.set(data.entry?.name + ".class", data.entry!!);
+                            return $entries;
+                        });
+                        completed++;
+                        task.desc.set(
+                            `${parsed.classes.length} entries (${parsed.classes.length - completed} remaining)`
+                        );
+                        task.progress?.set((completed / parsed.classes.length) * 100);
+                    }
+                });
+
+                task.desc.set(`${parsed.classes.length} entries`);
+            }).then(() => {
+
+                analyzeBackground().then();
+
+                toast.success("Mapped classes", {
+                    description: `Mapped ${parsed.classes.length} ${parsed.classes.length === 1 ? "entry" : "entries"}.`,
+                });
+            });
+        } catch (e) {
+            error(`failed to apply mappings`, e);
+            toast.error("Error occurred", {
+                description: `Could not apply mappings file, check the console.`,
             });
         }
     },

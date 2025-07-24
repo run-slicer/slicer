@@ -186,6 +186,22 @@ export const readFiles = (pattern: string, multiple: boolean): Promise<File[]> =
     });
 };
 
+export const fileToString = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      resolve(reader.result as string);
+    };
+
+    reader.onerror = () => {
+      reject(reader.error);
+    };
+
+    reader.readAsText(file); // reads file as string (UTF-8 by default)
+  });
+}
+
 export const downloadUrl = (name: string, url: string) => {
     const link = document.createElement("a");
     link.style.display = "none";
