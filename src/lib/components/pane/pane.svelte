@@ -11,6 +11,7 @@
     import { Plus } from "@lucide/svelte";
     import { paneIcon } from "$lib/components/icons";
     import type { PaneAPI } from "paneforge";
+    import type { CloseType } from "./header/item.svelte";
 
     interface Props {
         tabs: Tab[];
@@ -62,6 +63,28 @@
             pane.expand();
         }
     });
+
+    const handleClose = (type: CloseType, tab: Tab) => {
+        if (!tabs) return;
+
+        const samePosition = (t: Tab) => t.position === tab.position;
+        const filteredTabs = tabs.filter(samePosition);
+
+        const localIndex = filteredTabs.findIndex((t) => t.id === tab.id);
+
+        const isLast = localIndex === filteredTabs.length - 1;
+
+        const targets = {
+            self: [tab],
+            others: filteredTabs.filter((t) => t.id !== tab.id),
+            right: isLast || localIndex === -1 ? [] : filteredTabs.slice(localIndex + 1),
+            all: filteredTabs,
+        } as const;
+
+        const toClose = targets[type] ?? [];
+
+        toClose.forEach(handler.close);
+    };
 </script>
 
 {#if handleBefore}<ResizableHandle class={cn(hidden && "hidden")} />{/if}
@@ -86,7 +109,7 @@
                         icon={tab0.icon}
                         closeable={tab0.closeable}
                         onclick={() => updateCurrent(position, tab0)}
-                        onclose={() => handler.close(tab0)}
+                        onclose={(type) => handleClose(type, tab0)}
                     />
                 {/each}
             </div>

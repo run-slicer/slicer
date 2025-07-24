@@ -1,7 +1,21 @@
+<script lang="ts" module>
+    export type CloseType = "self" | "others" | "right" | "all";
+</script>
+
 <script lang="ts">
     import { X } from "@lucide/svelte";
     import type { StyledIcon } from "$lib/components/icons";
     import { cn } from "$lib/components/utils";
+    import {
+        ContextMenu,
+        ContextMenuTrigger,
+        ContextMenuContent,
+        ContextMenuItem,
+        ContextMenuSeparator,
+    } from "$lib/components/ui/context-menu";
+    import { Modifier } from "$lib/shortcut";
+    import Shortcut from "$lib/components/menu/shortcut.svelte";
+    import ContextMenuLabel from "$lib/components/menu_label.svelte";
 
     interface Props {
         name?: string;
@@ -9,16 +23,16 @@
         active?: boolean;
         closeable?: boolean;
         onclick?: () => void;
-        onclose?: () => void;
+        onclose?: (type: CloseType) => void;
     }
 
     let { name = "", icon = null, active = true, closeable = false, onclick, onclose }: Props = $props();
 
     let Icon = $derived(icon?.icon);
 
-    const handleClose = (e: MouseEvent | KeyboardEvent) => {
+    const handleClose = (e: MouseEvent | KeyboardEvent, type: CloseType) => {
         e.stopPropagation();
-        onclose?.();
+        onclose?.(type);
     };
 
     let elem: HTMLButtonElement | undefined = $state();
@@ -29,29 +43,43 @@
     });
 </script>
 
-<button
-    bind:this={elem}
-    class={cn(
-        "inline-flex h-full max-w-96 cursor-default items-center px-3",
-        !active || "border-t-primary bg-background border-t"
-    )}
-    aria-label={name}
-    {onclick}
->
-    {#if icon}
-        <Icon size={16} class={cn("mr-1.5 min-w-[16px]", icon.classes)} />
-    {/if}
-    <span class="overflow-hidden text-sm break-keep text-ellipsis whitespace-nowrap">{name}</span>
-    {#if closeable}
-        <div
-            role="button"
-            tabindex="-1"
-            class="ml-3 cursor-pointer"
-            aria-label="Close"
-            onclick={handleClose}
-            onkeydown={handleClose}
+<ContextMenu>
+    <ContextMenuTrigger>
+        <button
+            bind:this={elem}
+            class={cn(
+                "inline-flex h-full max-w-96 cursor-default items-center px-3",
+                !active || "border-t-primary bg-background border-t"
+            )}
+            aria-label={name}
+            {onclick}
         >
-            <X size={14} class="text-muted-foreground/60 hover:text-muted-foreground/80 min-w-[14px]" />
-        </div>
-    {/if}
-</button>
+            {#if icon}
+                <Icon size={16} class={cn("mr-1.5 min-w-[16px]", icon.classes)} />
+            {/if}
+            <span class="overflow-hidden text-sm break-keep text-ellipsis whitespace-nowrap">{name}</span>
+            {#if closeable}
+                <div
+                    role="button"
+                    tabindex="-1"
+                    class="ml-3 cursor-pointer"
+                    aria-label="Close"
+                    onclick={(e) => handleClose(e, "self")}
+                    onkeydown={(e) => handleClose(e, "self")}
+                >
+                    <X size={14} class="text-muted-foreground/60 hover:text-muted-foreground/80 min-w-[14px]" />
+                </div>
+            {/if}
+        </button>
+    </ContextMenuTrigger>
+    <ContextMenuContent class="w-48">
+        <ContextMenuLabel>{name}</ContextMenuLabel>
+        <ContextMenuSeparator />
+        <ContextMenuItem onclick={(e) => handleClose(e, "self")} class="justify-between">
+            Close {#if active}<Shortcut key="w" modifier={Modifier.CTRL | Modifier.ALT} />{/if}
+        </ContextMenuItem>
+        <ContextMenuItem onclick={(e) => handleClose(e, "others")}>Close others</ContextMenuItem>
+        <ContextMenuItem onclick={(e) => handleClose(e, "right")}>Close to the right</ContextMenuItem>
+        <ContextMenuItem onclick={(e) => handleClose(e, "all")}>Close all</ContextMenuItem>
+    </ContextMenuContent>
+</ContextMenu>
