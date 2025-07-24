@@ -29,13 +29,13 @@
                     {#if import.meta.env.DEV}
                         development build
                     {:else}
-                        {@const commit = import.meta.env.CF_PAGES_COMMIT_SHA || "0".repeat(40)}
+                        {@const commit = import.meta.env.WORKERS_CI_COMMIT_SHA || "0".repeat(40)}
                         <!-- this is ugly, but I don't want a space before the comma -->
                         <a
                             href={`https://github.com/run-slicer/slicer/commit/${commit}`}
                             target="_blank"
                             class="hover:text-blue-700 hover:underline">{commit.substring(0, 7)}</a
-                        >, branch {import.meta.env.CF_PAGES_BRANCH || "unknown"}
+                        >, branch {import.meta.env.WORKERS_CI_BRANCH || "unknown"}
                     {/if}
                 </p>
                 <p class="mt-6 font-mono text-sm">
