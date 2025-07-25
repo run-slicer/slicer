@@ -5,7 +5,17 @@
     import { Slider } from "$lib/components/ui/slider";
     import { Button } from "$lib/components/ui/button";
     import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "$lib/components/ui/tooltip";
-    import { HelpCircle, Paintbrush, Type, FolderOpen, ActivitySquare, Upload, Download, Eraser } from "@lucide/svelte";
+    import {
+        HelpCircle,
+        Paintbrush,
+        Type,
+        FolderOpen,
+        ActivitySquare,
+        Upload,
+        Download,
+        Eraser,
+        AlertCircle,
+    } from "@lucide/svelte";
     import {
         themeColor,
         themeRadius,
@@ -29,6 +39,7 @@
     import { modals } from "svelte-modals";
     import PrefsClearDialog from "$lib/components/dialog/prefs_clear.svelte";
     import { Input } from "$lib/components/ui/input";
+    import { Alert, AlertTitle } from "$lib/components/ui/alert";
 
     let _: PaneProps = $props();
     let currentSection: string | null = $state("theme");
@@ -206,26 +217,6 @@
                         <Switch id="editorTextSizeSync" bind:checked={$editorTextSizeSync} />
                     </div>
                 </div>
-
-                <h2 class="border-b py-2 font-semibold">Interpretation</h2>
-                <div class="grid gap-2">
-                    <div class="grid min-h-[2.5rem] grid-cols-[12rem_10rem_1fr] items-center gap-4">
-                        <TooltipProvider>
-                            <div class="flex items-center gap-2">
-                                <Label for="bytesPerRow">Bytes per row</Label>
-                                <Tooltip>
-                                    <TooltipTrigger>
-                                        <HelpCircle class="text-muted-foreground h-4 w-4" />
-                                    </TooltipTrigger>
-                                    <TooltipContent side="right">
-                                        Number of bytes displayed per row in the hexadecimal interpretation mode.
-                                    </TooltipContent>
-                                </Tooltip>
-                            </div>
-                        </TooltipProvider>
-                        <Input id="bytesPerRow" type="number" bind:value={$interpHexRowBytes} class="w-48" />
-                    </div>
-                </div>
             </div>
 
             <div id="workspace" class="space-y-3">
@@ -270,6 +261,32 @@
                                 {/each}
                             </SelectContent>
                         </Select>
+                    </div>
+                </div>
+
+                <h2 class="border-b py-2 font-semibold">Interpretation</h2>
+                <div class="grid gap-2">
+                    <Alert variant="destructive">
+                        <AlertCircle />
+                        <AlertTitle
+                            >Changes to these settings will cause all open entries to be reinterpreted!</AlertTitle
+                        >
+                    </Alert>
+                    <div class="grid min-h-[2.5rem] grid-cols-[12rem_10rem_1fr] items-center gap-4">
+                        <TooltipProvider>
+                            <div class="flex items-center gap-2">
+                                <Label for="bytesPerRow">Bytes per row</Label>
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <HelpCircle class="text-muted-foreground h-4 w-4" />
+                                    </TooltipTrigger>
+                                    <TooltipContent side="right">
+                                        Number of bytes displayed per row in the hexadecimal interpretation mode.
+                                    </TooltipContent>
+                                </Tooltip>
+                            </div>
+                        </TooltipProvider>
+                        <Input id="bytesPerRow" type="number" bind:value={$interpHexRowBytes} class="w-48" />
                     </div>
                 </div>
             </div>
