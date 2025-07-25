@@ -32,6 +32,7 @@ export const methods = (entry: ClassEntry): Method[] => {
     return node.methods.map((method) => ({
         name: method.name.string,
         type: method.type.string,
+        // TODO: <clinit> is a class initializer, so it shouldn't be considered a constructor
         constructor: method.name.string === "<init>" || method.name.string === "<clinit>",
         access: parseModifiers(method.access),
         entry: memberEntry(entry, method),
