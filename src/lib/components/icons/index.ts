@@ -1,4 +1,5 @@
 import { TabPosition, TabType } from "$lib/tab";
+import { type Modifiers, parseModifiers } from "$lib/utils";
 import { type ClassEntry, type Entry, EntryType } from "$lib/workspace";
 import {
     Binary,
@@ -11,11 +12,9 @@ import {
     FileDigit,
     FileText,
     GitPullRequest,
-    type IconNode,
     type IconProps,
     Image,
     InspectionPanel,
-    type Icon as LucideIcon,
     PanelBottom,
     PanelBottomDashed,
     PanelLeft,
@@ -28,20 +27,58 @@ import {
     TextQuote,
 } from "@lucide/svelte";
 import type { UTF8Entry } from "@run-slicer/asm/pool";
-import { Modifier } from "@run-slicer/asm/spec";
-import { mode } from "mode-watcher";
 import type { Component } from "svelte";
 import Android from "./android.svelte";
 import GitHub from "./github.svelte";
+import AbstractMethod from "./java/abstract-method.svelte";
 import Abstract from "./java/abstract.svelte";
 import Annotation from "./java/annotation.svelte";
 import Class from "./java/class.svelte";
+import Constructor from "./java/constructor.svelte";
 import Enum from "./java/enum.svelte";
+import Field from "./java/field.svelte";
 import Interface from "./java/interface.svelte";
+import Method from "./java/method.svelte";
+import PrivateMember from "./java/private-member.svelte";
+import ProtectedMember from "./java/protected-member.svelte";
+import PublicMember from "./java/public-member.svelte";
 import Record from "./java/record.svelte";
 import Kotlin from "./kotlin.svelte";
 
-export type Icon = Component<LucideIcon>;
+export type Icon = Component<IconProps>;
+
+export interface JavaIconProps extends IconProps {
+    finalMember?: boolean;
+    staticMember?: boolean;
+}
+
+export const classIcon = (mods: Modifiers, record: boolean = false): Component<JavaIconProps> => {
+    if (mods.abstract && !mods.interface) {
+        return Abstract;
+    } else if (mods.annotation) {
+        return Annotation;
+    } else if (mods.interface) {
+        return Interface;
+    } else if (mods.enum) {
+        return Enum;
+    } else if (record) {
+        return Record;
+    }
+
+    return Class;
+};
+
+export const accessIcon = (mods: Modifiers): Icon | null => {
+    if (mods.public) {
+        return PublicMember;
+    } else if (mods.private) {
+        return PrivateMember;
+    } else if (mods.protected) {
+        return ProtectedMember;
+    }
+
+    return null;
+};
 
 export interface StyledIcon {
     icon: Icon;
@@ -63,47 +100,22 @@ export const tabIcon = (tabType: TabType, entry: Entry): StyledIcon => {
     return entryIcon(entry);
 };
 
-const parseClassModifiers = (modifiers: number) => ({
-    isPublic: (modifiers & Modifier.PUBLIC) !== 0,
-    isFinal: (modifiers & Modifier.FINAL) !== 0,
-    isSuper: (modifiers & Modifier.SUPER) !== 0,
-    isInterface: (modifiers & Modifier.INTERFACE) !== 0,
-    isAbstract: (modifiers & Modifier.ABSTRACT) !== 0,
-    isSynthetic: (modifiers & Modifier.SYNTHETIC) !== 0,
-    isAnnotation: (modifiers & Modifier.ANNOTATION) !== 0,
-    isEnum: (modifiers & Modifier.ENUM) !== 0,
-});
-
 export const entryIcon = (entry: Entry): StyledIcon => {
     switch (entry.type) {
         case EntryType.MEMBER:
             return { icon: Parentheses, classes: ["text-red-500"] };
         case EntryType.CLASS: {
-            const classEntry = entry as ClassEntry;
-            const node = classEntry.node;
-
+            const node = (entry as ClassEntry).node;
             if (node) {
-                const data = parseClassModifiers(node.access);
+                const data = parseModifiers(node.access);
 
+                let record = false;
                 if (node.superClass) {
                     const superName = (node.pool[node.superClass.name] as UTF8Entry).string;
-
-                    if (superName === "java/lang/Record") {
-                        return { icon: Record, classes: [] };
-                    }
+                    record = superName === "java/lang/Record";
                 }
 
-                if (data.isAbstract && !data.isInterface) {
-                    return { icon: Abstract, classes: [] };
-                } else if (data.isAnnotation) {
-                    return { icon: Annotation, classes: [] };
-                } else if (data.isInterface) {
-                    return { icon: Interface, classes: [] };
-                } else if (data.isEnum) {
-                    return { icon: Enum, classes: [] };
-                } else {
-                    return { icon: Class, classes: [] };
-                }
+                return { icon: classIcon(data, record) };
             }
         }
     }
@@ -180,9 +192,21 @@ export const paneIcon = (pos: TabPosition, open: boolean): Icon => {
     }
 };
 
-export interface JavaIconProps extends IconProps {
-    finalMember?: boolean;
-    staticMember?: boolean;
-}
-
-export { Abstract, Android, Annotation, Class, Enum, GitHub, Interface, Kotlin, Record };
+export {
+    Abstract,
+    AbstractMethod,
+    Android,
+    Annotation,
+    Class,
+    Constructor,
+    Enum,
+    Field,
+    GitHub,
+    Interface,
+    Kotlin,
+    Method,
+    PrivateMember,
+    ProtectedMember,
+    PublicMember,
+    Record,
+};

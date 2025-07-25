@@ -1,5 +1,6 @@
 /* array ops */
 
+import { Modifier } from "@run-slicer/asm/spec";
 import { derived, type Readable, writable, type Writable } from "svelte/store";
 
 export const partition = <T>(arr: T[], func: (e: T) => boolean): [T[], T[]] => {
@@ -350,6 +351,35 @@ export const prettyMethodDesc = (desc: string, includeReturnType: boolean = fals
 
     return includeReturnType ? `(${argsStr}): ${returnTypeStr}` : `(${argsStr})`;
 };
+
+export interface Modifiers {
+    public: boolean;
+    private: boolean;
+    protected: boolean;
+
+    final: boolean;
+    static: boolean;
+    super: boolean;
+    interface: boolean;
+    abstract: boolean;
+    synthetic: boolean;
+    annotation: boolean;
+    enum: boolean;
+}
+
+export const parseModifiers = (mod: number): Modifiers => ({
+    public: (mod & Modifier.PUBLIC) !== 0,
+    private: (mod & Modifier.PRIVATE) !== 0,
+    protected: (mod & Modifier.PROTECTED) !== 0,
+    final: (mod & Modifier.FINAL) !== 0,
+    static: (mod & Modifier.STATIC) !== 0,
+    super: (mod & Modifier.SUPER) !== 0,
+    interface: (mod & Modifier.INTERFACE) !== 0,
+    abstract: (mod & Modifier.ABSTRACT) !== 0,
+    synthetic: (mod & Modifier.SYNTHETIC) !== 0,
+    annotation: (mod & Modifier.ANNOTATION) !== 0,
+    enum: (mod & Modifier.ENUM) !== 0,
+});
 
 export const prettyErrorStack = (e: any): string | null => {
     const stack = (e as Error)?.stack;
