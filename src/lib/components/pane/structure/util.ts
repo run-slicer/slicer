@@ -1,4 +1,4 @@
-import { type Modifiers, parseModifiers } from "$lib/utils";
+import { type Modifiers, parseModifiers, prettyJavaType, prettyMethodDesc } from "$lib/utils";
 import { type ClassEntry, type Entry, EntryType, memberEntry } from "$lib/workspace";
 import type { Node } from "@run-slicer/asm";
 import type { InnerClassesAttribute } from "@run-slicer/asm/attr";
@@ -8,7 +8,9 @@ import { AttributeType } from "@run-slicer/asm/spec";
 interface Method {
     name: string;
     type: string;
+    signature: string;
     constructor: boolean;
+    initializer: boolean;
     access: Modifiers;
     entry: Entry;
 }
@@ -16,6 +18,7 @@ interface Method {
 interface Field {
     name: string;
     type: string;
+    signature: string;
     access: Modifiers;
 }
 
@@ -29,20 +32,28 @@ interface InnerClass {
 export const methods = (entry: ClassEntry): Method[] => {
     const node = entry.node!;
 
-    return node.methods.map((method) => ({
-        name: method.name.string,
-        type: method.type.string,
-        // TODO: <clinit> is a class initializer, so it shouldn't be considered a constructor
-        constructor: method.name.string === "<init>" || method.name.string === "<clinit>",
-        access: parseModifiers(method.access),
-        entry: memberEntry(entry, method),
-    }));
+    return node.methods.map((method) => {
+        const constructor = method.name.string === "<init>";
+        const initializer = method.name.string === "<clinit>";
+        return {
+            name: method.name.string,
+            type: method.type.string,
+            signature:
+                (constructor || initializer ? "" : method.name.string) +
+                prettyMethodDesc(method.type.string, !constructor && !initializer),
+            constructor,
+            initializer,
+            access: parseModifiers(method.access),
+            entry: memberEntry(entry, method),
+        };
+    });
 };
 
 export const fields = (node: Node): Field[] => {
     return node.fields.map((field) => ({
         name: field.name.string,
         type: field.type.string,
+        signature: `${field.name.string}: ${prettyJavaType(field.type.string, true)}`,
         access: parseModifiers(field.access),
     }));
 };

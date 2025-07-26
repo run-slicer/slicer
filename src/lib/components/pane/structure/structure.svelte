@@ -9,7 +9,7 @@
     import { fields, methods, innerClasses, abstractionInfo } from "./util";
     import StructureMenu from "./menu.svelte";
     import { ContextMenu, ContextMenuTrigger } from "$lib/components/ui/context-menu";
-    import { partition, prettyJavaType, prettyMethodDesc } from "$lib/utils";
+    import { partition } from "$lib/utils";
     import { current as currentTab } from "$lib/tab";
     import type { UTF8Entry } from "@run-slicer/asm/pool";
 
@@ -31,31 +31,29 @@
         return [parts.slice(0, parts.length - 1).join("."), parts.pop()];
     });
 
-    // TODO: filter over the pretty representation and not the raw descriptors
     let absData = $derived(currentNode ? abstractionInfo(currentNode) : null);
     let fieldData = $derived(currentNode ? fields(currentNode) : []);
     let filteredFieldData = $derived(
-        fieldData.filter(
-            (member) =>
-                member.name.toLowerCase().includes(query.toLowerCase()) ||
-                member.type?.toLowerCase().includes(query.toLowerCase())
-        )
-    );
-    let methodData = $derived(currentEntry ? methods(currentEntry) : []);
-    let filteredMethodData = $derived(
-        methodData.filter(
-            (member) =>
-                member.name.toLowerCase().includes(query.toLowerCase()) ||
-                member.type?.toLowerCase().includes(query.toLowerCase())
-        )
+        fieldData.filter((member) => member.signature.toLowerCase().includes(query.toLowerCase()))
     );
     let innerClassData = $derived(currentNode ? innerClasses(currentNode, classes) : []);
     let filteredInnerClassData = $derived(
         innerClassData.filter((cls) => !cls.name || cls.name.toLowerCase().includes(query.toLowerCase()))
     );
 
-    // TODO: filter the partitioned data instead of partitioning the filtered data to have correct counts in the UI
-    let [constructors, nonConstructors] = $derived(partition(filteredMethodData, (m) => m.constructor));
+    let allMethodData = $derived(currentEntry ? methods(currentEntry) : []);
+    let [constructorData, nonConstructors] = $derived(partition(allMethodData, (m) => m.constructor));
+    let filteredConstructorData = $derived(
+        constructorData.filter((member) => member.signature.toLowerCase().includes(query.toLowerCase()))
+    );
+
+    let [initializerData, methodData] = $derived(partition(nonConstructors, (m) => m.initializer));
+    let filteredInitializerData = $derived(
+        initializerData.filter((member) => member.signature.toLowerCase().includes(query.toLowerCase()))
+    );
+    let filteredMethodData = $derived(
+        methodData.filter((member) => member.signature.toLowerCase().includes(query.toLowerCase()))
+    );
 </script>
 
 <div class="flex h-full w-full flex-col">
@@ -69,14 +67,18 @@
             </div>
             <div class="text-muted-foreground text-xs">
                 {#if packageName}
-                    <div>Package: {packageName}</div>
+                    <div class="truncate" title={packageName}>Package: {packageName}</div>
                 {/if}
                 {#if absData}
                     {#if absData.superClass}
-                        <div>Extends: {absData.superClass}</div>
+                        <div class="truncate" title={absData.superClass}>
+                            Extends: {absData.superClass}
+                        </div>
                     {/if}
                     {#if absData.implementations.length > 0}
-                        <div>Implements: {absData.implementations.join(", ")}</div>
+                        <div class="truncate" title={absData.implementations.join(", ")}>
+                            Implements: {absData.implementations.join(", ")}
+                        </div>
                     {/if}
                 {/if}
             </div>
@@ -117,7 +119,7 @@
                                     </div>
 
                                     <span class="truncate font-mono text-xs">
-                                        {field.name}: {prettyJavaType(field.type, true)}
+                                        {field.signature}
                                     </span>
                                 </div>
                             </div>
@@ -125,17 +127,16 @@
                     </div>
                 {/if}
 
-                <!-- Constructors Section -->
-                {#if constructors.length > 0}
+                <!-- Initializers Section -->
+                {#if filteredInitializerData.length > 0}
                     <div class="mb-4">
                         <div class="mb-2 flex items-center gap-2 px-2">
                             <span class="text-muted-foreground text-sm font-medium">
-                                Constructors ({constructors.length})
+                                Initializers ({initializerData.length})
                             </span>
                         </div>
-                        {#each constructors as constructor}
-                            {@const ModifierIcon = accessIcon(constructor.access)}
-                            {@const signature = constructor.name + prettyMethodDesc(constructor.type, true)}
+                        {#each filteredInitializerData as initializer}
+                            {@const ModifierIcon = accessIcon(initializer.access)}
                             <ContextMenu>
                                 <ContextMenuTrigger>
                                     <div
@@ -151,30 +152,64 @@
                                             </div>
 
                                             <span class="truncate font-mono text-xs">
-                                                {signature}
+                                                {initializer.signature}
                                             </span>
                                         </div>
                                     </div>
                                 </ContextMenuTrigger>
-                                <StructureMenu title={signature} {handler} entry={constructor.entry} />
+                                <StructureMenu title={initializer.signature} {handler} entry={initializer.entry} />
+                            </ContextMenu>
+                        {/each}
+                    </div>
+                {/if}
+
+                <!-- Constructors Section -->
+                {#if filteredConstructorData.length > 0}
+                    <div class="mb-4">
+                        <div class="mb-2 flex items-center gap-2 px-2">
+                            <span class="text-muted-foreground text-sm font-medium">
+                                Constructors ({constructorData.length})
+                            </span>
+                        </div>
+                        {#each filteredConstructorData as constructor}
+                            {@const ModifierIcon = accessIcon(constructor.access)}
+                            <ContextMenu>
+                                <ContextMenuTrigger>
+                                    <div
+                                        class="hover:bg-muted/50 inline-flex h-8 w-full shrink-0 items-center justify-start gap-2 rounded-md px-2 text-sm font-medium whitespace-nowrap transition-all outline-none"
+                                    >
+                                        <div class="flex w-full items-center gap-2">
+                                            <div class="flex items-center gap-1">
+                                                <Constructor class="size-4" />
+
+                                                {#if ModifierIcon}
+                                                    <ModifierIcon class="size-2.5" />
+                                                {/if}
+                                            </div>
+
+                                            <span class="truncate font-mono text-xs">
+                                                {constructor.signature}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </ContextMenuTrigger>
+                                <StructureMenu title={constructor.signature} {handler} entry={constructor.entry} />
                             </ContextMenu>
                         {/each}
                     </div>
                 {/if}
 
                 <!-- Methods Section -->
-                {#if nonConstructors.length > 0}
+                {#if methodData.length > 0}
                     <div class="mb-4">
                         <div class="mb-2 flex items-center gap-2 px-2">
                             <span class="text-muted-foreground text-sm font-medium">
-                                Methods ({nonConstructors.length})
+                                Methods ({methodData.length})
                             </span>
                         </div>
-                        {#each nonConstructors as method}
+                        {#each methodData as method}
                             {@const TypeIcon = method.access.abstract ? AbstractMethod : Method}
                             {@const ModifierIcon = accessIcon(method.access)}
-                            {@const signature = method.name + prettyMethodDesc(method.type, true)}
-
                             <ContextMenu>
                                 <ContextMenuTrigger>
                                     <div
@@ -194,12 +229,12 @@
                                             </div>
 
                                             <span class="truncate font-mono text-xs">
-                                                {signature}
+                                                {method.signature}
                                             </span>
                                         </div>
                                     </div>
                                 </ContextMenuTrigger>
-                                <StructureMenu title={signature} {handler} entry={method.entry} />
+                                <StructureMenu title={method.signature} {handler} entry={method.entry} />
                             </ContextMenu>
                         {/each}
                     </div>
@@ -216,7 +251,6 @@
                         {#each filteredInnerClassData as innerClass}
                             {@const TypeIcon = classIcon(innerClass.access, innerClass.record)}
                             {@const ModifierIcon = accessIcon(innerClass.access)}
-
                             <ContextMenu>
                                 <ContextMenuTrigger>
                                     <div
@@ -255,7 +289,7 @@
                     </div>
                 {/if}
 
-                {#if filteredMethodData.length === 0 && filteredFieldData.length === 0 && filteredInnerClassData.length === 0}
+                {#if filteredMethodData.length === 0 && filteredConstructorData.length === 0 && filteredInitializerData.length === 0 && filteredFieldData.length === 0 && filteredInnerClassData.length === 0}
                     <div class="text-muted-foreground py-8 text-center text-sm">No members found.</div>
                 {/if}
             </div>
