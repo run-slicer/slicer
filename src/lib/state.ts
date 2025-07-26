@@ -37,6 +37,7 @@ export const interpHexRowBytes = persisted<number>(`${root}.interp.hex.row-bytes
 export const panes = persisted<PaneData[]>(`${root}.panes`, [
     { position: "primary_center" as TabPosition, tabs: [{ type: "welcome" as TabType, active: true }], open: true },
     { position: "secondary_left" as TabPosition, tabs: [{ type: "project" as TabType, active: true }], open: true },
+    { position: "secondary_right" as TabPosition, tabs: [{ type: "structure" as TabType, active: true }], open: true },
 ]);
 
 export const load = (data: string): boolean => {

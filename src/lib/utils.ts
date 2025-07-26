@@ -1,5 +1,6 @@
 /* array ops */
 
+import { Modifier } from "@run-slicer/asm/spec";
 import { derived, type Readable, writable, type Writable } from "svelte/store";
 
 export const partition = <T>(arr: T[], func: (e: T) => boolean): [T[], T[]] => {
@@ -313,14 +314,14 @@ export const prettyJavaType = (desc: string, short: boolean = false): string => 
     return primTypes[desc] || desc.replaceAll("/", ".");
 };
 
-export const prettyMethodDesc = (desc: string): string => {
-    const descs = desc.substring(1, desc.lastIndexOf(")")); // ignore return type
+export const prettyMethodDesc = (desc: string, includeReturnType: boolean = false): string => {
+    const descs = desc.substring(1, desc.lastIndexOf(")")); // between the parens
 
     const args: string[] = [];
     for (let i = 0; i < descs.length; i++) {
         const char = descs.charAt(i);
-
         const start = i;
+
         switch (char) {
             case "L": {
                 i = descs.indexOf(";", i);
@@ -328,13 +329,10 @@ export const prettyMethodDesc = (desc: string): string => {
                 break;
             }
             case "[": {
-                while (descs.charAt(i) === "[") {
-                    i++;
-                }
+                while (descs.charAt(i) === "[") i++;
                 if (descs.charAt(i) === "L") {
                     i = descs.indexOf(";", i);
                 }
-
                 args.push(descs.substring(start, i + 1));
                 break;
             }
@@ -345,8 +343,41 @@ export const prettyMethodDesc = (desc: string): string => {
         }
     }
 
-    return `(${args.map((a) => prettyJavaType(a, true)).join(", ")})`;
+    const argsStr = args.map((a) => prettyJavaType(a, true)).join(", ");
+    const returnTypeDesc = desc.substring(desc.lastIndexOf(")") + 1);
+    const returnTypeStr = prettyJavaType(returnTypeDesc, true);
+
+    return includeReturnType ? `(${argsStr}): ${returnTypeStr}` : `(${argsStr})`;
 };
+
+export interface Modifiers {
+    public: boolean;
+    private: boolean;
+    protected: boolean;
+
+    final: boolean;
+    static: boolean;
+    super: boolean;
+    interface: boolean;
+    abstract: boolean;
+    synthetic: boolean;
+    annotation: boolean;
+    enum: boolean;
+}
+
+export const parseModifiers = (mod: number): Modifiers => ({
+    public: (mod & Modifier.PUBLIC) !== 0,
+    private: (mod & Modifier.PRIVATE) !== 0,
+    protected: (mod & Modifier.PROTECTED) !== 0,
+    final: (mod & Modifier.FINAL) !== 0,
+    static: (mod & Modifier.STATIC) !== 0,
+    super: (mod & Modifier.SUPER) !== 0,
+    interface: (mod & Modifier.INTERFACE) !== 0,
+    abstract: (mod & Modifier.ABSTRACT) !== 0,
+    synthetic: (mod & Modifier.SYNTHETIC) !== 0,
+    annotation: (mod & Modifier.ANNOTATION) !== 0,
+    enum: (mod & Modifier.ENUM) !== 0,
+});
 
 export const prettyErrorStack = (e: any): string | null => {
     const stack = (e as Error)?.stack;

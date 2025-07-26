@@ -13,10 +13,10 @@
     xmlns="http://www.w3.org/2000/svg"
     height={size}
     width={size}
-    class={cn("lucide lucide-icon lucide-java-abstract-class", className)}
+    class={cn("lucide lucide-icon lucide-java-constructor", className)}
 >
     <path
-        d="M21,16.5C21,16.88 20.79,17.21 20.47,17.38L12.57,21.82C12.41,21.94 12.21,22 12,22C11.79,22 11.59,21.94 11.43,21.82L3.53,17.38C3.21,17.21 3,16.88 3,16.5V7.5C3,7.12 3.21,6.79 3.53,6.62L11.43,2.18C11.59,2.06 11.79,2 12,2C12.21,2 12.41,2.06 12.57,2.18L20.47,6.62C20.79,6.79 21,7.12 21,7.5V16.5M12,4.15L6.04,7.5L12,10.85L17.96,7.5L12,4.15M5,15.91L11,19.29V12.58L5,9.21V15.91M19,15.91V9.21L13,12.58V19.29L19,15.91Z"
+        d="M20,4C21.11,4 22,4.89 22,6V18C22,19.11 21.11,20 20,20H4C2.89,20 2,19.11 2,18V6C2,4.89 2.89,4 4,4H20M8.5,15V9H7.25V12.5L4.75,9H3.5V15H4.75V11.5L7.3,15H8.5M13.5,10.26V9H9.5V15H13.5V13.75H11V12.64H13.5V11.38H11V10.26H13.5M20.5,14V9H19.25V13.5H18.13V10H16.88V13.5H15.75V9H14.5V14A1,1 0 0,0 15.5,15H19.5A1,1 0 0,0 20.5,14Z"
     />
 
     {#if finalMember}
@@ -29,8 +29,8 @@
 </svg>
 
 <style>
-    .lucide-java-abstract-class {
-        fill: #91b859;
+    .lucide-java-constructor {
+        fill: #c792ea;
         stroke-width: 0;
     }
 </style>
