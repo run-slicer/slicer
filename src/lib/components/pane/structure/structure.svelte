@@ -16,9 +16,17 @@
     let { handler, classes }: PaneProps = $props();
     let query = $state("");
 
-    let currentEntry = $derived(
-        $currentTab?.entry?.type === EntryType.CLASS ? ($currentTab.entry as ClassEntry) : null
-    );
+    let currentEntry = $derived.by(() => {
+        const entry = $currentTab?.entry;
+        switch (entry?.type) {
+            case EntryType.CLASS:
+                return entry as ClassEntry;
+            case EntryType.MEMBER:
+                return entry.parent as ClassEntry;
+        }
+
+        return null;
+    });
     let currentNode = $derived(currentEntry ? currentEntry.node! : null);
 
     let [packageName, simpleName] = $derived.by(() => {
