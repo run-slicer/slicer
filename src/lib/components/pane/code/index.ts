@@ -1,9 +1,7 @@
 import { disassemble, disassembleMethod, type Disassembler } from "$lib/disasm";
 import { fromExtension, type Language } from "$lib/lang";
-import { interpHexRowBytes } from "$lib/state";
 import { formatHex } from "$lib/utils";
 import { type ClassEntry, type Entry, EntryType, type MemberEntry } from "$lib/workspace";
-import { derived, type Readable } from "svelte/store";
 
 export enum Interpretation {
     TEXT = "text",
@@ -14,10 +12,6 @@ export enum Interpretation {
 export interface InterpretationOptions {
     hexRowBytes: number;
 }
-
-export const interpOptions: Readable<InterpretationOptions> = derived([interpHexRowBytes], ([hexRowBytes]) => ({
-    hexRowBytes,
-}));
 
 // prettier-ignore
 const extensions = {
@@ -61,9 +55,9 @@ export const detectLanguage = (type: Interpretation, entry: Entry, disasm: Disas
 
 export const read = async (
     type: Interpretation,
-    options: InterpretationOptions,
     entry: Entry,
-    disasm: Disassembler
+    disasm: Disassembler,
+    options: InterpretationOptions
 ): Promise<string> => {
     switch (type) {
         case Interpretation.CLASS:

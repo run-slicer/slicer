@@ -12,7 +12,7 @@
     import { EntryType } from "$lib/workspace";
     import Loading from "$lib/components/loading.svelte";
     import { load as loadLanguage } from "$lib/lang";
-    import { detectLanguage, read, detectInterpretation, canInterpret, interpOptions } from "./";
+    import { detectLanguage, read, detectInterpretation, canInterpret } from "./";
     import CodeEditor from "$lib/components/editor/editor.svelte";
     import { Select, SelectContent, SelectItem, SelectTrigger } from "$lib/components/ui/select";
     import { Button } from "$lib/components/ui/button";
@@ -26,6 +26,7 @@
     import { record } from "$lib/task";
     import type { PaneProps } from "$lib/components/pane";
     import { cn } from "$lib/components/utils";
+    import { interpHexRowBytes } from "$lib/state";
 
     let { tab, disasms, handler }: PaneProps = $props();
     const entry = $derived(tab.entry!);
@@ -52,7 +53,11 @@
         $editorTextSizeSync ? editorTextSize : writable(get(editorTextSize) /* immediate value, no subscription */)
     );
 
-    let readPromise = $derived(read(interpType, $interpOptions, entry, disasm));
+    let readPromise = $derived(
+        read(interpType, entry, disasm, {
+            hexRowBytes: $interpHexRowBytes,
+        })
+    );
     $effect(() => {
         record(interpType !== Interpretation.TEXT ? "disassembling" : "reading", entry.name, () => readPromise);
     });
@@ -107,7 +112,7 @@
                     <SquareCode />
                 </Button>
             </PopoverTrigger>
-            <PopoverContent side="top" align="end">
+            <PopoverContent side="top" align="end" class="w-64">
                 <div class="flex flex-col gap-2">
                     <div class="text-xs">Interpretation mode</div>
                     <Select type="single" bind:value={interpType}>
