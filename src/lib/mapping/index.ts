@@ -1,5 +1,5 @@
 import { CSRGTSRGParser, ProguardParser, SRGXSRGParser, TinyParser, TinyV2Parser, TSRG2Parser } from "./parsers";
-import type { MappingSet } from "./types";
+import type { MappingSet } from "java-remapper";
 import { stripComment } from "./util";
 
 export enum MappingFormat {

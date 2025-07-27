@@ -1,5 +1,5 @@
 import { AbstractMappingsParser } from "./abstract-mapping-parser";
-import type { MappingSet, ClassMapping, FieldMapping, MethodMapping } from "../types";
+import type { MappingSet, ClassMapping, FieldMapping, MethodMapping } from "java-remapper";
 
 /**
  * Parses CSRG format mappings.

@@ -1,4 +1,4 @@
-import type { ClassMapping } from "./types";
+import type { ClassMapping } from "java-remapper";
 
 export const stripComment = (line: string): string => {
     const idx = line.indexOf("#");

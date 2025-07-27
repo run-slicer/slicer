@@ -5,7 +5,7 @@ import type {
   MethodMapping,
   FieldMapping,
   ParameterMapping,
-} from "../types";
+} from "java-remapper";
 import { AbstractMappingsParser } from "./abstract-mapping-parser";
 
 export enum TinyV2State {

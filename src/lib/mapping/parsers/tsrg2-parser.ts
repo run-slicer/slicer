@@ -1,5 +1,5 @@
 import { AbstractMappingsParser } from "./abstract-mapping-parser";
-import type { MappingSet, ClassMapping, MethodMapping } from "../types";
+import type { MappingSet, ClassMapping, MethodMapping } from "java-remapper";
 import { putOrGetClass, swapFirst } from "../util";
 
 /**

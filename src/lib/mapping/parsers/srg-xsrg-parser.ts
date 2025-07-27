@@ -4,7 +4,7 @@ import type {
   ClassMapping,
   FieldMapping,
   MethodMapping,
-} from "../types";
+} from "java-remapper";
 import { AbstractMappingsParser } from "./abstract-mapping-parser";
 
 /**

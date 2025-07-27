@@ -1,7 +1,7 @@
 import type {
   MappingSet,
   ClassMapping,
-} from "../types";
+} from "java-remapper";
 import { putOrGetClass } from "../util";
 import { AbstractMappingsParser } from "./abstract-mapping-parser";
 

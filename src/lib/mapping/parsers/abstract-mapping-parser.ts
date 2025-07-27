@@ -1,4 +1,4 @@
-import type { MappingSet } from "../types";
+import type { MappingSet } from "java-remapper";
 
 export abstract class AbstractMappingsParser {
   

@@ -1,9 +1,9 @@
 import { warn } from "$lib/log";
-import type { ClassMapping, MappingSet } from "$lib/mapping/types";
+import { remap, type ClassMapping, type MappingSet } from "java-remapper";
 import { analysisBackground } from "$lib/state";
 import { record } from "$lib/task";
 import { prettyMethodDesc } from "$lib/utils";
-import type { Member, Node } from "@run-slicer/asm";
+import { read, type Member, type Node } from "@run-slicer/asm";
 import { type UTF8Entry } from "@run-slicer/asm/pool";
 import type { Zip } from "@run-slicer/zip";
 import { derived, get, writable } from "svelte/store";
@@ -251,7 +251,10 @@ export const mapClass = async (clazz: ClassMapping, mappings: MappingSet): Promi
 
     const parsedNames = parseName(clazz.deobfuscatedName + ".class");
 
-    // TODO: change name, interfaces, superclasses, fields, methods, methods' parameters,...
+    const entryBytes = await entry.data.bytes()
+    const remappedData = await remap(entryBytes, mappings)
+    const newData = memoryData(parsedNames.name, remappedData)
+    const newNode = read(remappedData)
 
     return {
         mapped: true,
@@ -259,10 +262,12 @@ export const mapClass = async (clazz: ClassMapping, mappings: MappingSet): Promi
         entry: {
             ...entry,
             ...parsedNames,
+            node: newNode,
             parent: undefined,
             state: AnalysisState.NONE,
-        } as ClassEntry,
-    };
+            data: newData
+        } as ClassEntry
+    }
 };
 
 // PWA file handler
