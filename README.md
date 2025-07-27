@@ -17,6 +17,8 @@ A modern Java reverse engineering tool for the web.
 - simple hexadecimal viewer for binary files
 - a simple JS scripting API for doing various things
 - multi-pane workspace for viewing multiple files at once
+- supports loading different mapping formats for remapping
+    - Tiny v1, Tiny v2, SRG/XSRC, CSRG/TSRG, TSRG v2, ProGuard
 - [shadcn/ui](https://ui.shadcn.com/) design and theming support
 
 ## Installation
