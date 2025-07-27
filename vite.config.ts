@@ -36,8 +36,8 @@ export default defineConfig({
             },
             {
                 file: "jasm.wasm",
-                module: "@run-slicer/jasm"
-            }
+                module: "@run-slicer/jasm",
+            },
         ]),
     ],
     build: {

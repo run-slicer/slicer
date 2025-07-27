@@ -178,33 +178,54 @@ export default {
         try {
             const parsed = parseMappings(format, content);
 
-            recordProgress("applying mappings", null, async (task) => {
+            await recordProgress("applying mappings", null, async (task) => {
                 let completed = 0;
-                parsed.classes.forEach(async (clazz) => {
+                const oldToNewMap = new Map<string, Entry>(); // Track old → new mapping
+
+                for (const clazz of parsed.classes) {
                     const data = await mapClass(clazz, parsed);
 
                     if (data.mapped) {
-
-                        entries.update(($entries) => {
-                            $entries.delete(data.oldName);
-                            $entries.set(data.entry?.name + ".class", data.entry!!);
-                            return $entries;
-                        });
-                        completed++;
-                        task.desc.set(
-                            `${parsed.classes.length} entries (${parsed.classes.length - completed} remaining)`
-                        );
-                        task.progress?.set((completed / parsed.classes.length) * 100);
+                        oldToNewMap.set(data.oldName, data.entry!!);
                     }
+
+                    completed++;
+                    task.desc.set(`${parsed.classes.length} entries (${parsed.classes.length - completed} remaining)`);
+                    task.progress?.set((completed / parsed.classes.length) * 100);
+                }
+
+                entries.update(($entries) => {
+                    oldToNewMap.forEach((value, key) => {
+                        $entries.delete(key);
+                        $entries.set(value.name, value);
+                    });
+                    return $entries;
+                });
+
+                tabs.update(($tabs) => {
+                    oldToNewMap.forEach((newEntry, oldName) => {
+                        for (const [key, tab] of $tabs.entries()) {
+                            if (tab.entry && tab.entry.name === oldName) {
+                                $tabs.set(key, {
+                                    ...tab,
+                                    id: `${TabType.CODE}:${newEntry.name}`,
+                                    name: newEntry.shortName,
+                                    entry: newEntry,
+                                });
+                            }
+                        }
+                    });
+                    return $tabs;
                 });
 
                 task.desc.set(`${parsed.classes.length} entries`);
-            }).then(() => {
 
-                analyzeBackground().then();
+                await analyzeBackground();
 
                 toast.success("Mapped classes", {
-                    description: `Mapped ${parsed.classes.length} ${parsed.classes.length === 1 ? "entry" : "entries"}.`,
+                    description: `Mapped ${parsed.classes.length} ${
+                        parsed.classes.length === 1 ? "entry" : "entries"
+                    }.`,
                 });
             });
         } catch (e) {

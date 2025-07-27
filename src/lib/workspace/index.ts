@@ -1,15 +1,15 @@
 import { warn } from "$lib/log";
-import { remap, type ClassMapping, type MappingSet } from "java-remapper";
 import { analysisBackground } from "$lib/state";
 import { record } from "$lib/task";
 import { prettyMethodDesc } from "$lib/utils";
 import { read, type Member, type Node } from "@run-slicer/asm";
 import { type UTF8Entry } from "@run-slicer/asm/pool";
 import type { Zip } from "@run-slicer/zip";
+import { remap, type ClassMapping, type MappingSet } from "java-remapper";
 import { derived, get, writable } from "svelte/store";
 import { AnalysisState, analyze, analyzeBackground, analyzeSchedule } from "./analysis";
 import { transform } from "./analysis/transform";
-import { type Data, fileData, memoryData, type Named, parseName, zipData } from "./data";
+import { fileData, memoryData, parseName, zipData, type Data, type Named } from "./data";
 import { archiveDecoder } from "./encoding";
 
 export const enum EntryType {
@@ -251,10 +251,10 @@ export const mapClass = async (clazz: ClassMapping, mappings: MappingSet): Promi
 
     const parsedNames = parseName(clazz.deobfuscatedName + ".class");
 
-    const entryBytes = await entry.data.bytes()
-    const remappedData = await remap(entryBytes, mappings)
-    const newData = memoryData(parsedNames.name, remappedData)
-    const newNode = read(remappedData)
+    const entryBytes = await entry.data.bytes();
+    const remappedData = await remap(entryBytes, mappings);
+    const newData = memoryData(parsedNames.name, remappedData);
+    const newNode = read(remappedData);
 
     return {
         mapped: true,
@@ -265,9 +265,9 @@ export const mapClass = async (clazz: ClassMapping, mappings: MappingSet): Promi
             node: newNode,
             parent: undefined,
             state: AnalysisState.NONE,
-            data: newData
-        } as ClassEntry
-    }
+            data: newData,
+        } as ClassEntry,
+    };
 };
 
 // PWA file handler

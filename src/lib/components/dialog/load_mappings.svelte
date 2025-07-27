@@ -18,7 +18,7 @@
 
     interface Props extends ModalProps {
         detectedFormat: MappingFormat | null;
-        content: string
+        content: string;
         handler: EventHandler;
     }
 
@@ -44,7 +44,7 @@
 
         isOpen = false;
 
-        await handler.applyMappings(content, value as MappingFormat)
+        await handler.applyMappings(content, value as MappingFormat);
     };
 
     const triggerContent = $derived(
@@ -52,7 +52,6 @@
             ? displayNames[value as keyof typeof MappingFormat]
             : "Select a mapping format..."
     );
-
 </script>
 
 <Dialog bind:open={isOpen} onOpenChangeComplete={(open) => open || close()}>
@@ -74,7 +73,7 @@
                 <SelectContent>
                     {#each formats as format}
                         <SelectItem defaultSelected value={format}>
-                            <div class="flex flex-row gap-2 items-center justify-center">
+                            <div class="flex flex-row items-center justify-center gap-2">
                                 {displayNames[format]}
                                 {#if detectedFormat === format}
                                     <Badge variant="outline">Detected</Badge>

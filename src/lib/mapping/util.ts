@@ -77,22 +77,22 @@ export const tiny2Exception = (line: number, data: string): Error => {
 };
 
 export const putOrGetClass = (
-  names: string | string[],
-  classes: Map<string, ClassMapping>,
-  classMappings?: ClassMapping[]
+    names: string | string[],
+    classes: Map<string, ClassMapping>,
+    classMappings?: ClassMapping[]
 ): ClassMapping => {
-  const [obfName, deobfName] = typeof names === 'string' ? [names, names] : [names[0]!, names[1] ?? names[0]!];
+    const [obfName, deobfName] = typeof names === "string" ? [names, names] : [names[0]!, names[1] ?? names[0]!];
 
-  if (!classes.has(obfName)) {
-    const cls: ClassMapping = {
-      obfuscatedName: obfName,
-      deobfuscatedName: deobfName,
-      fields: [],
-      methods: [],
-    };
-    classes.set(obfName, cls);
-    classMappings?.push(cls);
-  }
+    if (!classes.has(obfName)) {
+        const cls: ClassMapping = {
+            obfuscatedName: obfName,
+            deobfuscatedName: deobfName,
+            fields: [],
+            methods: [],
+        };
+        classes.set(obfName, cls);
+        classMappings?.push(cls);
+    }
 
-  return classes.get(obfName)!;
+    return classes.get(obfName)!;
 };
