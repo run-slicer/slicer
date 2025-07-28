@@ -19,8 +19,11 @@ export interface TabData {
     active: boolean;
 }
 
+export type ProjectMode = "file" | "package";
+
 export const themeColor = persisted<string>(`${root}.theme.color`, "zinc");
 export const themeRadius = persisted<number>(`${root}.theme.radius`, 0.5);
+export const projectMode = persisted<ProjectMode>(`${root}.project.mode`, "file");
 export const workspaceEncoding = persisted<string>(`${root}.workspace.encoding`, "utf-8");
 export const workspaceArchiveEncoding = persisted<string>(`${root}.workspace.archive.encoding`, "utf-8");
 export const toolsDisasm = persisted<string>(`${root}.tools.disasm`, "vf" /* vf.id ($lib/disasm/builtin) */);

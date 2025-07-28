@@ -1,3 +1,16 @@
+<script lang="ts" module>
+    export const labels = [
+        {
+            label: "Files and directories",
+            value: "file",
+        },
+        {
+            label: "Packages",
+            value: "package",
+        },
+    ];
+</script>
+
 <script lang="ts">
     import { Plus } from "@lucide/svelte";
     import { Button } from "$lib/components/ui/button";
@@ -6,10 +19,12 @@
     import NodeMenu from "./menu.svelte";
     import type { PaneProps } from "$lib/components/pane";
     import type { Node } from "./node.svelte";
+    import { Select, SelectContent, SelectItem, SelectTrigger } from "$lib/components/ui/select";
+    import { type ProjectMode, projectMode } from "$lib/state";
 
     let { entries, handler }: PaneProps = $props();
 
-    const collapseSingleChildDirs = (node: Node) => {
+    const collapseSingleChildDirs = (node: Node, mode: ProjectMode) => {
         if (!node.nodes) return;
 
         for (let i = 0; i < node.nodes.length; i++) {
@@ -17,11 +32,11 @@
             while (child.nodes?.length === 1 && !child.entry && !child.nodes[0].entry) {
                 // collapse label
                 const next = child.nodes[0];
-                child.label += "/" + next.label;
+                child.label += (mode === "file" ? "/" : ".") + next.label;
                 child.nodes = next.nodes;
             }
 
-            collapseSingleChildDirs(child);
+            collapseSingleChildDirs(child, mode);
         }
     };
 
@@ -29,9 +44,18 @@
         const root: Node = { label: "<root>", nodes: [] };
 
         for (const entry of entries) {
-            let curr = root;
+            let name = entry.name;
+            if ($projectMode === "package") {
+                if (entry.extension !== "class") {
+                    // skip non-class entries in package mode
+                    continue;
+                }
 
-            for (const part of entry.name.split("/")) {
+                name = entry.name.replace(/\.class$/, ""); // remove .class extension for package mode
+            }
+
+            let curr = root;
+            for (const part of name.split("/")) {
                 if (!curr.nodes) curr.nodes = [];
 
                 let next = curr.nodes.find((n) => n.label === part);
@@ -48,7 +72,7 @@
 
         root.nodes?.sort((a, b) => +Boolean(b.nodes) - +Boolean(a.nodes)); // non-leaf nodes go first
 
-        collapseSingleChildDirs(root);
+        collapseSingleChildDirs(root, $projectMode);
 
         return root;
     });
@@ -85,6 +109,7 @@
                 <div class="scrollbar-thin flex w-full flex-col overflow-auto p-2 text-nowrap contain-strict">
                     {#each root.nodes as node (node.label)}
                         <TreeNode
+                            mode={$projectMode}
                             data={node}
                             onopen={open}
                             onmenu={(e, data) => {
@@ -110,3 +135,20 @@
         <NodeMenu node={menuData} {handler} />
     {/if}
 </ContextMenu>
+<Select type="single" bind:value={$projectMode}>
+    <SelectTrigger
+        class="border-t-border h-7 w-full rounded-none border-0 border-t text-xs [&_svg]:ml-2 [&_svg]:h-4 [&_svg]:w-4"
+    >
+        <span>
+            <span class="text-muted-foreground mr-2">Mode:</span>
+            {labels.find((l) => l.value === $projectMode)?.label}
+        </span>
+    </SelectTrigger>
+    <SelectContent side="top" align="center" class="[&>*]:min-w-[calc(var(--bits-select-anchor-width)-16px)]">
+        {#each labels as { label, value }}
+            <SelectItem {value} {label} class="text-xs">
+                {label}
+            </SelectItem>
+        {/each}
+    </SelectContent>
+</Select>

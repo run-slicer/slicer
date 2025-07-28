@@ -13,17 +13,19 @@
 <script lang="ts">
     import type { HTMLAttributes } from "svelte/elements";
     import TreeNode from "./node.svelte";
-    import { ChevronDown, ChevronRight, Folder } from "@lucide/svelte";
+    import { ChevronDown, ChevronRight, Folder, FolderDot } from "@lucide/svelte";
     import { cn } from "$lib/components/utils";
     import { entryIcon, fileIcon } from "$lib/components/icons";
+    import type { ProjectMode } from "$lib/state";
 
     interface Props extends HTMLAttributes<HTMLDivElement> {
         data: Node;
+        mode: ProjectMode;
         onopen?: (data: Node) => void;
         onmenu?: (e: MouseEvent, data: Node) => void;
     }
 
-    let { data = $bindable(), onopen, onmenu, ...rest }: Props = $props();
+    let { data = $bindable(), mode, onopen, onmenu, ...rest }: Props = $props();
     $effect(() => {
         // no children and not a leaf node, remove ourselves from the parent
         if (data.parent && !data.nodes && !data.entry) {
@@ -57,13 +59,15 @@
             {#if data.entry}
                 <FileIcon size={16} class={cn("my-auto mr-1 min-w-[16px]", classes)} />
             {:else}
-                <Folder size={16} class="fill-muted my-auto mr-1 min-w-[16px]" />
+                {@const FolderIcon = mode === "package" ? FolderDot : Folder}
+                <FolderIcon size={16} class="fill-muted my-auto mr-1 min-w-[16px]" />
             {/if}
             <span class="text-sm">{data.label}</span>
         </button>
         {#if expanded}
             {#each sortedNodes as node (node.label)}
                 <TreeNode
+                    {mode}
                     data={node}
                     {onopen}
                     {onmenu}
