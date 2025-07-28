@@ -1,5 +1,5 @@
 import type { Disassembler } from "$lib/disasm";
-import type { MappingFormat } from "$lib/mapping";
+import type { MappingFormat } from "java-remapper";
 import type { ProtoScript } from "$lib/script";
 import type { Tab, TabDefinition, TabPosition, TabType } from "$lib/tab";
 import type { Entry } from "$lib/workspace";

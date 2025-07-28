@@ -12,7 +12,7 @@
     import type { ModalProps } from "svelte-modals";
     import type { EventHandler } from "$lib/event";
     import { Select, SelectContent, SelectItem, SelectTrigger } from "../ui/select";
-    import { MappingFormat } from "$lib/mapping";
+    import { MappingFormat } from "java-remapper";
     import { cn } from "../utils";
     import Badge from "../ui/badge/badge.svelte";
 

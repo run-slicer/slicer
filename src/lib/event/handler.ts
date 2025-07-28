@@ -1,7 +1,7 @@
 import { LoadMappings } from "$lib/components/dialog";
 import { disassembleEntry, type Disassembler } from "$lib/disasm";
 import { error } from "$lib/log";
-import { detectMappingFormat, MappingFormat, parseMappings } from "$lib/mapping";
+import { detectMappingFormat, MappingFormat, parseMappings } from "java-remapper";
 import {
     load as loadScript,
     type ProtoScript,
