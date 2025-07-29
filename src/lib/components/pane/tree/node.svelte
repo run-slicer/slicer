@@ -7,6 +7,7 @@
         parent?: Node;
         nodes?: Node[];
         expanded?: boolean;
+        package?: boolean;
     }
 </script>
 
@@ -59,7 +60,7 @@
             {#if data.entry}
                 <FileIcon size={16} class={cn("my-auto mr-1 min-w-[16px]", classes)} />
             {:else}
-                {@const FolderIcon = mode === "package" ? FolderDot : Folder}
+                {@const FolderIcon = mode === "package" && data.package ? FolderDot : Folder}
                 <FolderIcon size={16} class="fill-muted my-auto mr-1 min-w-[16px]" />
             {/if}
             <span class="text-sm">{data.label}</span>

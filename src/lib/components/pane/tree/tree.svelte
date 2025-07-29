@@ -21,6 +21,7 @@
     import type { Node } from "./node.svelte";
     import { Select, SelectContent, SelectItem, SelectTrigger } from "$lib/components/ui/select";
     import { type ProjectMode, projectMode } from "$lib/state";
+    import { EntryType } from "$lib/workspace";
 
     let { entries, handler }: PaneProps = $props();
 
@@ -32,8 +33,17 @@
             while (child.nodes?.length === 1 && !child.entry && !child.nodes[0].entry) {
                 // collapse label
                 const next = child.nodes[0];
-                child.label += (mode === "file" ? "/" : ".") + next.label;
+                child.label += "/" + next.label;
                 child.nodes = next.nodes;
+            }
+
+            // convert valid Java package paths to package notation
+            if (mode === "package" && !child.label.includes(".")) {
+                const notation = child.label.replaceAll("/", ".");
+                if (notation.match(/^[a-z][a-z0-9_]*(?:\.[a-z0-9_]+)*[0-9a-z_]$/i)) {
+                    child.label = notation;
+                    child.package = true;
+                }
             }
 
             collapseSingleChildDirs(child, mode);
@@ -46,8 +56,9 @@
         for (const entry of entries) {
             let name = entry.name;
             if ($projectMode === "package") {
-                if (entry.extension !== "class") {
+                if (entry.extension !== "class" && entry.type !== EntryType.ARCHIVE) {
                     // skip non-class entries in package mode
+                    // allow archives, as they can contain class files
                     continue;
                 }
 
