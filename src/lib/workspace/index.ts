@@ -2,13 +2,14 @@ import { warn } from "$lib/log";
 import { analysisBackground } from "$lib/state";
 import { record } from "$lib/task";
 import { prettyMethodDesc } from "$lib/utils";
-import type { Member, Node } from "@run-slicer/asm";
-import type { UTF8Entry } from "@run-slicer/asm/pool";
+import { read, type Member, type Node } from "@run-slicer/asm";
+import { type UTF8Entry } from "@run-slicer/asm/pool";
 import type { Zip } from "@run-slicer/zip";
+import { remap, type ClassMapping, type MappingSet } from "java-remapper";
 import { derived, get, writable } from "svelte/store";
 import { AnalysisState, analyze, analyzeBackground, analyzeSchedule } from "./analysis";
 import { transform } from "./analysis/transform";
-import { type Data, fileData, memoryData, type Named, parseName, zipData } from "./data";
+import { fileData, memoryData, parseName, zipData, type Data, type Named } from "./data";
 import { archiveDecoder } from "./encoding";
 
 export const enum EntryType {
@@ -129,7 +130,14 @@ export interface LoadResult {
     created: boolean;
 }
 
+export interface MapClassResult {
+    mapped: boolean;
+    oldName: string;
+    entry?: ClassEntry;
+}
+
 export const ZIP_EXTENSIONS = new Set(["zip", "jar", "apk", "war", "ear", "jmod"]);
+export const MAPPINGS_EXTENSIONS = new Set(["srg", "csrg", "tsrg", "tiny", "txt", "xsrg"]);
 
 const load0 = async (entries: Map<string, Entry>, d: Data, parent?: Entry): Promise<LoadResult[]> => {
     const name = parent ? `${parent.name}/${d.name}` : d.name;
@@ -231,6 +239,35 @@ export const clear = () => {
         $entries.clear();
         return $entries;
     });
+};
+
+export const mapClass = async (clazz: ClassMapping, mappings: MappingSet): Promise<MapClassResult> => {
+    const entries0 = get(entries);
+
+    const fullName = clazz.obfuscatedName + ".class";
+
+    const entry = entries0.get(fullName) as ClassEntry;
+    if (!entry) return { mapped: false, oldName: fullName, entry: undefined };
+
+    const parsedNames = parseName(clazz.deobfuscatedName + ".class");
+
+    const entryBytes = await entry.data.bytes();
+    const remappedData = await remap(entryBytes, mappings);
+    const newData = memoryData(parsedNames.name, remappedData);
+    const newNode = read(remappedData);
+
+    return {
+        mapped: true,
+        oldName: fullName,
+        entry: {
+            ...entry,
+            ...parsedNames,
+            node: newNode,
+            parent: undefined,
+            state: AnalysisState.NONE,
+            data: newData,
+        } as ClassEntry,
+    };
 };
 
 // PWA file handler
