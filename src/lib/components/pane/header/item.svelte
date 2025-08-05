@@ -48,7 +48,7 @@
         <button
             bind:this={elem}
             class={cn(
-                "inline-flex h-full max-w-96 cursor-default items-center px-3",
+                "inline-flex h-full max-w-96 cursor-pointer items-center px-3",
                 !active || "border-t-primary bg-background border-t"
             )}
             aria-label={name}

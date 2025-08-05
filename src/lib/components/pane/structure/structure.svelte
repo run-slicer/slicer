@@ -67,29 +67,35 @@
 <div class="flex h-full w-full flex-col">
     {#if currentEntry}
         {@const { icon: EntryIcon, classes } = entryIcon(currentEntry)}
+        {@const hasSuperData = absData && (absData.superClass || absData.implementations.length > 0)}
         <!-- Class info -->
         <div class="bg-muted/20 border-b p-3">
-            <div class="mb-2 flex items-center gap-2">
+            {#if packageName}
+                <div class="text-muted-foreground mb-2 truncate text-xs" title={packageName}>
+                    {packageName}
+                </div>
+            {/if}
+            <div class={cn("mb-2 flex items-center gap-2", hasSuperData && "border-b-border border-b pb-2")}>
                 <EntryIcon class={cn(classes, "h-4 w-4")} />
                 <span class="text-sm font-medium">{simpleName}</span>
             </div>
-            <div class="text-muted-foreground text-xs">
-                {#if packageName}
-                    <div class="truncate" title={packageName}>Package: {packageName}</div>
-                {/if}
-                {#if absData}
+            {#if hasSuperData}
+                <div class="text-muted-foreground text-xs">
                     {#if absData.superClass}
                         <div class="truncate" title={absData.superClass}>
-                            Extends: {absData.superClass}
+                            extends <span class="text-secondary-foreground">{absData.superClass}</span>
                         </div>
                     {/if}
                     {#if absData.implementations.length > 0}
                         <div class="truncate" title={absData.implementations.join(", ")}>
-                            Implements: {absData.implementations.join(", ")}
+                            implements
+                            <span class="text-secondary-foreground">
+                                {absData.implementations.join(", ")}
+                            </span>
                         </div>
                     {/if}
-                {/if}
-            </div>
+                </div>
+            {/if}
         </div>
         <!-- Search -->
         <div class="border-b p-3">
