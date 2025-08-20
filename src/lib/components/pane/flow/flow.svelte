@@ -10,6 +10,8 @@
         Controls,
         SvelteFlow,
         SvelteFlowProvider,
+        type Edge,
+        type Node,
     } from "@xyflow/svelte";
     import { Select, SelectContent, SelectItem, SelectTrigger } from "$lib/components/ui/select";
     import { ContextMenu, ContextMenuTrigger } from "$lib/components/ui/context-menu";
@@ -19,7 +21,6 @@
     import FlowEdge from "./edge.svelte";
     import FlowMenu from "./menu.svelte";
     import { computeControlFlowGraph, computeHierarchyGraph } from "./graph";
-    import type { Edge, Node } from "@xyflow/svelte";
     import type { PaneProps } from "$lib/components/pane";
     import { cyrb53 } from "$lib/utils";
 
@@ -36,7 +37,10 @@
         return !method ? "<none>" : `${method.name.string}${method.type.string}`;
     };
 
-    let methodIndex = $state((member ? methods.indexOf(member) : -1).toString());
+    // hack createLabel for an unique identifier
+    let methodIndex = $state(
+        (member ? methods.findIndex((m) => createLabel(m) === createLabel(member)) : -1).toString()
+    );
     $effect(() => {
         const parsedId = parseInt(methodIndex);
         member = parsedId > -1 ? methods[parsedId] : null;
