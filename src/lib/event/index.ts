@@ -1,4 +1,5 @@
 import type { Disassembler } from "$lib/disasm";
+import type { MappingFormat } from "java-remapper";
 import type { ProtoScript } from "$lib/script";
 import type { Tab, TabDefinition, TabPosition, TabType } from "$lib/tab";
 import type { Entry } from "$lib/workspace";
@@ -9,6 +10,8 @@ type Awaitable<T> = T | PromiseLike<T>;
 
 export interface EventHandler {
     load(): Awaitable<void>;
+    loadMappings(entries: Entry[]): Awaitable<void>;
+    applyMappings(content: string, format: MappingFormat): Awaitable<void>;
     add(files?: File[]): Awaitable<void>;
     addRemote(url: string): Awaitable<void>;
     clear(): Awaitable<void>;
