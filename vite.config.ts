@@ -9,6 +9,9 @@ export default defineConfig({
     build: {
         sourcemap: "hidden",
     },
+    esbuild: {
+        legalComments: "none",
+    },
     server: {
         fs: {
             strict: false,
