@@ -116,7 +116,7 @@
 >
     <ContextMenuTrigger bind:ref={triggerElem} class="flex h-full w-full">
         <div class="flex h-full w-full" role="presentation" ondrop={handleDrop} ondragover={(e) => e.preventDefault()}>
-            {#if root.nodes && root.nodes.length > 0}
+            {#if root.nodes && entries.length > 0}
                 <div class="scrollbar-thin flex w-full flex-col overflow-auto p-2 text-nowrap contain-strict">
                     {#each root.nodes as node (node.label)}
                         <TreeNode
