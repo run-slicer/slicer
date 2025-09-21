@@ -9,6 +9,8 @@
     import { X } from "@lucide/svelte";
     import { untrack } from "svelte";
     import { groupBy } from "$lib/utils";
+    import { toast } from "svelte-sonner";
+    import { error } from "$lib/log";
 
     let { entries, handler }: PaneProps = $props();
 
@@ -42,9 +44,16 @@
                 time = Date.now() - start;
             }, 20);
 
-            await search(entries, { type, value, mode, ref }, (r) => {
-                results = [...results, r];
-            });
+            try {
+                await search(entries, { type, value, mode, ref }, (r) => {
+                    results = [...results, r];
+                });
+            } catch (e) {
+                error("failed to search", e);
+                toast.error("Error occurred", {
+                    description: `An error occurred while searching, check the console.`,
+                });
+            }
 
             clearInterval(intervalId);
             searching = false;
