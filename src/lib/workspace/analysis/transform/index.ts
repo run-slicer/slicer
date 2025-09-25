@@ -7,8 +7,8 @@ import type { ClassEntry } from "$lib/workspace";
 import { AnalysisState, analyze } from "$lib/workspace/analysis";
 import { transformData } from "$lib/workspace/data";
 import { get, writable, type Writable } from "svelte/store";
-import normalizationTransformers from "./normalization";
-import readabilityTransformers from "./readability";
+import normalizationTransformers from "./norm";
+import readabilityTransformers from "./read";
 
 export interface Transformer {
     id: string;
@@ -53,21 +53,24 @@ export const transform = async (entry: ClassEntry, data: Uint8Array): Promise<Cl
     const enabledTrfs = Array.from(get(transformers).values()).filter(enabled);
 
     const originalData = data;
+    const cloneEntry: ClassEntry = { ...entry, node: window.structuredClone(entry.node) };
     await recordProgress("transforming", entry.name, async (task) => {
         for (let i = 0; i < enabledTrfs.length; i++) {
             const transformer = enabledTrfs[i];
 
             log(`running transformer '${transformer.id}' on '${entry.name}'`);
-            data = await transformer.run(entry, data);
+            data = await transformer.run(cloneEntry, data);
             task.progress?.set((i + 1) / enabledTrfs.length);
         }
     });
 
     // create transformed entry only if a transformation happened
     if (data !== originalData) {
-        entry = { ...entry, data: transformData(entry.data, data), state: AnalysisState.NONE };
+        cloneEntry.data = transformData(cloneEntry.data, data);
+        cloneEntry.state = AnalysisState.NONE;
 
-        await analyze(entry, AnalysisState.FULL);
+        await analyze(cloneEntry, AnalysisState.FULL);
+        return cloneEntry;
     }
 
     return entry;

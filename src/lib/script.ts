@@ -33,7 +33,7 @@ import {
 } from "$lib/workspace";
 import { AnalysisState, analyze } from "$lib/workspace/analysis";
 import { DataType, memoryData, type MemoryData } from "$lib/workspace/data";
-import type { UTF8Entry } from "@run-slicer/asm/pool";
+import type { UTF8Entry } from "@katana-project/asm/pool";
 import type {
     DisassemblerContext,
     EditorContext,

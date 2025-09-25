@@ -1,10 +1,10 @@
 <script lang="ts">
-    import type { Node } from "@run-slicer/asm";
-    import type { UTF8Entry } from "@run-slicer/asm/pool";
+    import type { Node } from "@katana-project/asm";
+    import type { UTF8Entry } from "@katana-project/asm/pool";
     import { Table, TableCell, TableHead, TableRow } from "$lib/components/ui/table";
-    import { ElementType, formatMod } from "@run-slicer/asm/analysis/disasm";
-    import { AttributeType, Modifier, Version } from "@run-slicer/asm/spec";
-    import type { SignatureAttribute, SourceFileAttribute } from "@run-slicer/asm/attr";
+    import { ElementType, formatMod } from "@katana-project/asm/analysis/disasm";
+    import { AttributeType, Modifier, Version } from "@katana-project/asm/spec";
+    import type { SignatureAttribute, SourceFileAttribute } from "@katana-project/asm/attr";
 
     interface Props {
         node: Node;

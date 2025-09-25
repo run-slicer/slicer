@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { ElementType, formatMod, escapeLiteral } from "@run-slicer/asm/analysis/disasm";
+    import { ElementType, formatMod, escapeLiteral } from "@katana-project/asm/analysis/disasm";
     import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "$lib/components/ui/table";
     import {
         DropdownMenu,

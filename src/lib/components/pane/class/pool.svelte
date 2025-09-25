@@ -1,8 +1,8 @@
 <script lang="ts">
-    import type { Node } from "@run-slicer/asm";
-    import { ConstantType } from "@run-slicer/asm/spec";
+    import type { Node } from "@katana-project/asm";
+    import { ConstantType } from "@katana-project/asm/spec";
     import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "$lib/components/ui/table";
-    import { formatEntry } from "@run-slicer/asm/analysis/disasm";
+    import { formatEntry } from "@katana-project/asm/analysis/disasm";
 
     interface Props {
         node: Node;

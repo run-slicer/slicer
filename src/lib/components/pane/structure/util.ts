@@ -1,9 +1,9 @@
 import { type Modifiers, parseModifiers, prettyJavaType, prettyMethodDesc } from "$lib/utils";
 import { type ClassEntry, type Entry, EntryType, memberEntry } from "$lib/workspace";
-import type { Node } from "@run-slicer/asm";
-import type { InnerClassesAttribute } from "@run-slicer/asm/attr";
-import type { UTF8Entry } from "@run-slicer/asm/pool";
-import { AttributeType } from "@run-slicer/asm/spec";
+import type { Node } from "@katana-project/asm";
+import type { InnerClassesAttribute } from "@katana-project/asm/attr";
+import type { UTF8Entry } from "@katana-project/asm/pool";
+import { AttributeType } from "@katana-project/asm/spec";
 
 interface Method {
     name: string;

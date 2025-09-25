@@ -1,11 +1,11 @@
 import { prettyJavaType, prettyMethodDesc } from "$lib/utils";
 import { type ClassEntry, type Entry, EntryType, readDeferred } from "$lib/workspace";
-import type { Node as ClassNode, Member } from "@run-slicer/asm";
-import { escapeLiteral, formatEntry, formatInsn } from "@run-slicer/asm/analysis/disasm";
-import { computeGraph, EdgeType, type Node as GraphNode } from "@run-slicer/asm/analysis/graph";
-import type { CodeAttribute } from "@run-slicer/asm/attr";
-import type { Pool, UTF8Entry } from "@run-slicer/asm/pool";
-import { AttributeType } from "@run-slicer/asm/spec";
+import type { Node as ClassNode, Member } from "@katana-project/asm";
+import { escapeLiteral, formatEntry, formatInsn } from "@katana-project/asm/analysis/disasm";
+import { computeGraph, EdgeType, type Node as GraphNode } from "@katana-project/asm/analysis/graph";
+import type { CodeAttribute } from "@katana-project/asm/attr";
+import type { Pool, UTF8Entry } from "@katana-project/asm/pool";
+import { AttributeType } from "@katana-project/asm/spec";
 import type { Edge, MarkerType, Node } from "@xyflow/svelte";
 import ELK, { type ElkNode } from "elkjs/lib/elk-api";
 
@@ -227,14 +227,11 @@ export const computeHierarchyGraph = async (
     const edges: HierarchyEdge[] = [];
 
     const processed = new Set<string>();
-
-    // First, build a reverse lookup map for descendants
     const descendants = new Map<string, Set<string>>();
     for (const [className, entry] of classes) {
         if (entry.type === EntryType.CLASS) {
             const classNode = (entry as ClassEntry).node;
 
-            // Add superclass relationship
             if (classNode.superClass) {
                 const superName = (classNode.pool[classNode.superClass.name] as UTF8Entry).string;
                 if (withImplicitSuperTypes || !IMPLICIT_SUPER.has(superName)) {
@@ -245,7 +242,6 @@ export const computeHierarchyGraph = async (
                 }
             }
 
-            // Add interface relationships
             for (const itf of classNode.interfaces) {
                 const itfName = (classNode.pool[itf.name] as UTF8Entry).string;
                 if (!withImplicitSuperTypes && IMPLICIT_SUPER.has(itfName)) {
@@ -294,7 +290,6 @@ export const computeHierarchyGraph = async (
             await process(name, entry?.type === EntryType.CLASS ? (entry as ClassEntry).node : undefined);
         };
 
-        // Process superclass (walking up)
         if (node.superClass) {
             const superName = (node.pool[node.superClass.name] as UTF8Entry).string;
             if (withImplicitSuperTypes || !IMPLICIT_SUPER.has(superName)) {
@@ -306,7 +301,6 @@ export const computeHierarchyGraph = async (
             }
         }
 
-        // Process interfaces (walking up)
         for (const itf of node.interfaces) {
             const itfName = (node.pool[itf.name] as UTF8Entry).string;
             if (withImplicitSuperTypes || !IMPLICIT_SUPER.has(itfName)) {
@@ -318,7 +312,6 @@ export const computeHierarchyGraph = async (
             }
         }
 
-        // Process descendants (walking down)
         const childClasses = descendants.get(name);
         if (childClasses) {
             for (const childName of childClasses) {

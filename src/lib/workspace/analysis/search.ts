@@ -1,5 +1,5 @@
 import type { ClassEntry } from "$lib/workspace";
-import type { Member, Node } from "@run-slicer/asm";
+import type { Member, Node } from "@katana-project/asm";
 
 export enum QueryType {
     PSEUDOCODE = "pseudocode",

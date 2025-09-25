@@ -1,10 +1,10 @@
+import { type DirtyMarkable, type Node, write } from "@katana-project/asm";
+import type { Attributable, Attribute, CodeAttribute } from "@katana-project/asm/attr";
+import { AttributeType, Opcode } from "@katana-project/asm/spec";
 import { AtSign, BugOff, RefreshCwOff, Type, Variable, ZapOff } from "@lucide/svelte";
-import { type DirtyMarkable, type Node, write } from "@run-slicer/asm";
-import type { Attributable, Attribute, CodeAttribute } from "@run-slicer/asm/attr";
-import { AttributeType, Opcode } from "@run-slicer/asm/spec";
 import type { Transformer } from "./";
 
-// walking logic adapted from @run-slicer/asm/analysis/verify
+// walking logic adapted from @katana-project/asm/analysis/verify
 
 type CheckFunc = (attr: Attribute) => boolean;
 

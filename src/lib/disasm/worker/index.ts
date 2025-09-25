@@ -3,7 +3,7 @@ import { analysisJdkClasses } from "$lib/state";
 import { roundRobin } from "$lib/utils";
 import { classes } from "$lib/workspace";
 import { index } from "$lib/workspace/jdk";
-import type { UTF8Entry } from "@run-slicer/asm/pool";
+import type { UTF8Entry } from "@katana-project/asm/pool";
 import { proxy } from "comlink";
 import { get } from "svelte/store";
 import { type EntrySource, createSource } from "../source";

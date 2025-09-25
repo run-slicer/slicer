@@ -1,6 +1,6 @@
 /* array ops */
 
-import { Modifier } from "@run-slicer/asm/spec";
+import { Modifier } from "@katana-project/asm/spec";
 import { derived, type Readable, writable, type Writable } from "svelte/store";
 
 export const partition = <T>(arr: T[], func: (e: T) => boolean): [T[], T[]] => {

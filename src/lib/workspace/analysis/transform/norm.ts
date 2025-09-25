@@ -1,8 +1,8 @@
+import { type Member, write } from "@katana-project/asm";
+import type { CodeAttribute } from "@katana-project/asm/attr";
+import type { LoadStoreInstruction } from "@katana-project/asm/insn";
+import { AttributeType, Modifier, Opcode } from "@katana-project/asm/spec";
 import { Binary, Paintbrush, ShieldCheck, Variable, Zap } from "@lucide/svelte";
-import { type Member, write } from "@run-slicer/asm";
-import type { CodeAttribute } from "@run-slicer/asm/attr";
-import type { LoadStoreInstruction } from "@run-slicer/asm/insn";
-import { AttributeType, Modifier, Opcode } from "@run-slicer/asm/spec";
 import type { Transformer } from "./";
 
 const LOAD_OPCODES = new Set(Object.keys(Opcode).filter((o) => o.match(/^[ADFIL]LOAD(?:_[0-3])?$/)));
@@ -33,8 +33,8 @@ export default [
         group: "Normalization",
         icon: ShieldCheck,
         async run(entry, _data) {
-            const { verify } = await import("@run-slicer/asm/analysis/verify");
-            entry.node = verify(entry.node);
+            const { verify } = await import("@katana-project/asm/analysis/verify");
+            verify(entry.node);
 
             return write(entry.node);
         },
@@ -151,7 +151,7 @@ export default [
         group: "Normalization",
         icon: Paintbrush,
         async run(entry, _data) {
-            const { removeUnreachable } = await import("@run-slicer/asm/analysis/reach");
+            const { removeUnreachable } = await import("@katana-project/asm/analysis/reach");
             for (const method of entry.node.methods) {
                 const code = method.attrs.findIndex((a) => a.type === AttributeType.CODE);
                 if (code !== -1) {

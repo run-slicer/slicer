@@ -2,7 +2,7 @@ import { error } from "$lib/log";
 import { analysisBackground } from "$lib/state";
 import { recordProgress } from "$lib/task";
 import { rateLimit, roundRobin } from "$lib/utils";
-import { FLAG_SKIP_ATTR } from "@run-slicer/asm";
+import { FLAG_SKIP_ATTR } from "@katana-project/asm";
 import { wrap } from "comlink";
 import { get } from "svelte/store";
 import { type ClassEntry, type Entry, EntryType, type MemberEntry } from "../";

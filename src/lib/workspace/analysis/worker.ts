@@ -1,7 +1,7 @@
-import { type Member, type Node, read } from "@run-slicer/asm";
-import { escapeLiteral, formatEntry } from "@run-slicer/asm/analysis/disasm";
-import type { Entry, NameTypeEntry, Pool, UTF8Entry } from "@run-slicer/asm/pool";
-import { ConstantType } from "@run-slicer/asm/spec";
+import { type Member, type Node, read } from "@katana-project/asm";
+import { escapeLiteral, formatEntry } from "@katana-project/asm/analysis/disasm";
+import type { Entry, NameTypeEntry, Pool, UTF8Entry } from "@katana-project/asm/pool";
+import { ConstantType } from "@katana-project/asm/spec";
 import { expose } from "comlink";
 import { QueryType, type SearchData, SearchMode, type SearchResultData } from "./search";
 

@@ -11,7 +11,7 @@
     import { ContextMenu, ContextMenuTrigger } from "$lib/components/ui/context-menu";
     import { partition } from "$lib/utils";
     import { current as currentTab } from "$lib/tab";
-    import type { UTF8Entry } from "@run-slicer/asm/pool";
+    import type { UTF8Entry } from "@katana-project/asm/pool";
 
     let { handler, classes }: PaneProps = $props();
     let query = $state("");

@@ -1,7 +1,7 @@
 import type { Language } from "$lib/lang";
 import type { ClassEntry } from "$lib/workspace";
-import type { UTF8Entry } from "@run-slicer/asm/pool";
-import { ConstantType } from "@run-slicer/asm/spec";
+import type { UTF8Entry } from "@katana-project/asm/pool";
+import { ConstantType } from "@katana-project/asm/spec";
 import { wrap } from "comlink";
 import type { Disassembler } from "./";
 import { createFromWorker, type Worker } from "./worker";

@@ -1,6 +1,6 @@
 <script lang="ts">
-    import type { Node } from "@run-slicer/asm";
-    import { ElementType, formatMod, escapeLiteral } from "@run-slicer/asm/analysis/disasm";
+    import type { Node } from "@katana-project/asm";
+    import { ElementType, formatMod, escapeLiteral } from "@katana-project/asm/analysis/disasm";
     import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "$lib/components/ui/table";
 
     interface Props {

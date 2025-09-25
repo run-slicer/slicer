@@ -1,6 +1,7 @@
 import { TabPosition, TabType } from "$lib/tab";
 import { type Modifiers, parseModifiers } from "$lib/utils";
 import { type ClassEntry, type Entry, EntryType } from "$lib/workspace";
+import type { UTF8Entry } from "@katana-project/asm/pool";
 import {
     Braces,
     CodeXml,
@@ -25,7 +26,6 @@ import {
     Text,
     TextQuote,
 } from "@lucide/svelte";
-import type { UTF8Entry } from "@run-slicer/asm/pool";
 import type { Component } from "svelte";
 import Android from "./android.svelte";
 import GitHub from "./github.svelte";
