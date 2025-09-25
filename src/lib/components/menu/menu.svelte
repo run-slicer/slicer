@@ -183,6 +183,9 @@
                 <MenubarItem onclick={() => modals.open(LoadExternalDialog, { handler })} class="justify-between">
                     Add from URL
                 </MenubarItem>
+                <MenubarItem onclick={() => handler.loadMappings(entries)} disabled={entries.length === 0}>
+                    Open Mappings
+                </MenubarItem>
                 <MenubarItem disabled={entries.length === 0} onclick={() => modals.open(ClearDialog, { handler })}>
                     Clear all
                 </MenubarItem>
