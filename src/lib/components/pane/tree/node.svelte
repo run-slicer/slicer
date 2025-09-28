@@ -1,9 +1,9 @@
 <script lang="ts" module>
-    import type { Entry } from "$lib/workspace";
+    import type { EntryRef } from "$lib/workspace";
 
     export interface Node {
         label: string;
-        entry?: Entry;
+        entry?: EntryRef;
         parent?: Node;
         nodes?: Node[];
         expanded?: boolean;
@@ -34,7 +34,7 @@
         }
     });
 
-    const { icon: FileIcon, classes } = $derived(data.entry ? entryIcon(data.entry) : fileIcon(data.label));
+    const { icon: FileIcon, classes } = $derived(data.entry ? entryIcon(data.entry.value) : fileIcon(data.label));
 
     let expanded = $state(data.expanded === undefined ? (data.parent?.nodes?.length || 0) === 1 : data.expanded);
     $effect(() => {

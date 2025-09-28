@@ -18,6 +18,24 @@ export const enum EntryType {
     MEMBER = "member",
 }
 
+// reference to an entry, useful for sidestepping Svelte's reactivity
+export interface EntryRef {
+    name: string;
+    get value(): Entry;
+}
+
+export const entryRef = (entry: Entry): EntryRef => ({
+    name: entry.name,
+    get value() {
+        const entry = get(entries).get(this.name);
+        if (!entry) {
+            throw new Error(`Entry ${this.name} not found`);
+        }
+
+        return entry;
+    },
+});
+
 export interface Entry extends Named {
     type: EntryType;
     parent?: Entry;

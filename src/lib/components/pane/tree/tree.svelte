@@ -21,7 +21,7 @@
     import type { Node } from "./node.svelte";
     import { Select, SelectContent, SelectItem, SelectTrigger } from "$lib/components/ui/select";
     import { type ProjectMode, projectMode } from "$lib/state";
-    import { EntryType } from "$lib/workspace";
+    import { EntryType, entryRef } from "$lib/workspace";
 
     let { entries, handler }: PaneProps = $props();
 
@@ -78,7 +78,7 @@
                 curr = next;
             }
 
-            curr.entry = entry;
+            curr.entry = entryRef(entry);
         }
 
         root.nodes?.sort((a, b) => +Boolean(b.nodes) - +Boolean(a.nodes)); // non-leaf nodes go first
@@ -92,7 +92,7 @@
 
     let triggerElem: HTMLDivElement | null = $state(null);
 
-    const open = (data: Node) => handler.open(data.entry!);
+    const open = (data: Node) => handler.open(data.entry!.value);
 
     const handleDrop = async (e: DragEvent) => {
         e.preventDefault();
