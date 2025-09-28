@@ -23,7 +23,7 @@
         "@codemirror/search": "^6.5.11",
         "@codemirror/state": "^6.5.2",
         "@codemirror/view": "^6.38.2",
-        "@katana-project/asm": "^0.18.1",
+        "@katana-project/asm": "^0.19.0",
         "@lezer/highlight": "^1.2.1",
         "@run-slicer/cfr": "0.1.4-0.152",
         "@run-slicer/jasm": "0.4.3-2.8.0",
