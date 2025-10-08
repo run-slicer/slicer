@@ -1,18 +1,22 @@
 import type { Disassembler } from "$lib/disasm";
 import { analysisJdkClasses } from "$lib/state";
 import { roundRobin } from "$lib/utils";
-import { classes } from "$lib/workspace";
-import { index } from "$lib/workspace/jdk";
 import type { UTF8Entry } from "@katana-project/asm/pool";
 import { proxy } from "comlink";
 import { get } from "svelte/store";
-import { type EntrySource, createSource } from "../source";
+import { type EntrySource, createResources, createSource } from "../source";
 
 export type Options = Record<string, string>;
 
 export interface Worker {
     class(name: string, resources: string[], source: EntrySource, options?: Options): Promise<string>;
-    method(name: string, signature: string, source: EntrySource, options?: Options): Promise<string>;
+    method(
+        name: string,
+        signature: string,
+        resources: string[],
+        source: EntrySource,
+        options?: Options
+    ): Promise<string>;
 }
 
 export const createFromWorker = (
@@ -37,11 +41,11 @@ export const createFromWorker = (
 
         const worker = workerFunc();
 
-        const classes0 = get(classes);
+        const needJdk = get(analysisJdkClasses) && useJdkClasses;
         return await worker.class(
             name,
-            [...Array.from(classes0.keys()), ...Array.from(index.keys())],
-            proxy(createSource(classes0, name, buf, get(analysisJdkClasses) && useJdkClasses)),
+            createResources(needJdk),
+            proxy(createSource(name, buf, needJdk)),
             disasm.options
         );
     };
@@ -54,10 +58,13 @@ export const createFromWorker = (
             const signature = method.name.string + method.type.string;
 
             const worker = workerFunc();
+
+            const needJdk = get(analysisJdkClasses) && useJdkClasses;
             return await worker.method(
                 name,
                 signature,
-                proxy(createSource(get(classes), name, buf, get(analysisJdkClasses) && useJdkClasses)),
+                createResources(needJdk),
+                proxy(createSource(name, buf, needJdk)),
                 disasm.options
             );
         };

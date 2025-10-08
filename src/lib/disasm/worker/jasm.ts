@@ -17,7 +17,13 @@ expose({
         const { disassemble } = await import("@run-slicer/jasm");
         return disassemble(data, convertOpts(options));
     },
-    async method(name: string, signature: string, source: EntrySource, options?: Options): Promise<string> {
+    async method(
+        name: string,
+        signature: string,
+        _resources: string[],
+        source: EntrySource,
+        options?: Options
+    ): Promise<string> {
         const data = await source(name);
         if (!data) {
             throw new Error("Class not found");

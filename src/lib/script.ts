@@ -5,7 +5,7 @@ import {
     find as findDisasm,
     remove as removeDisasm,
 } from "$lib/disasm";
-import { createSource as createClassSource } from "$lib/disasm/source";
+import { createSource as createClassSource, createResources } from "$lib/disasm/source";
 import type { Language } from "$lib/lang";
 import { error, warn } from "$lib/log";
 import { analysisJdkClasses, scriptingScripts } from "$lib/state";
@@ -23,7 +23,6 @@ import {
 import { cyrb53 } from "$lib/utils";
 import {
     type ClassEntry,
-    classes,
     clear as clearWs,
     entries,
     type Entry,
@@ -214,7 +213,8 @@ const unwrapDisasm = (disasm: ScriptDisassembler): Disassembler => {
             const buf = await data.bytes();
             const name = (node.pool[node.thisClass.name] as UTF8Entry).string;
 
-            return disasm.class(name, createClassSource(get(classes), name, buf, get(analysisJdkClasses)));
+            const needJdk = get(analysisJdkClasses);
+            return disasm.class(name, createClassSource(name, buf, needJdk), createResources(needJdk));
         },
         method: disasm.method
             ? async (entry, method) => {
@@ -224,10 +224,12 @@ const unwrapDisasm = (disasm: ScriptDisassembler): Disassembler => {
                   const name = (node.pool[node.thisClass.name] as UTF8Entry).string;
                   const signature = method.name.string + method.type.string;
 
+                  const needJdk = get(analysisJdkClasses);
                   return disasm.method!(
                       name,
                       signature,
-                      createClassSource(get(classes), name, buf, get(analysisJdkClasses))
+                      createClassSource(name, buf, needJdk),
+                      createResources(needJdk)
                   );
               }
             : undefined,

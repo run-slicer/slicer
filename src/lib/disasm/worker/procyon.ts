@@ -8,7 +8,13 @@ expose({
 
         return decompile(name, { source, options });
     },
-    method(_name: string, _signature: string, _source: EntrySource, _options?: Options): Promise<string> {
+    method(
+        _name: string,
+        _signature: string,
+        _resources: string[],
+        _source: EntrySource,
+        _options?: Options
+    ): Promise<string> {
         throw new Error("Single-method disassembly not supported");
     },
 } satisfies Worker);
