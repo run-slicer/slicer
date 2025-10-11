@@ -14,7 +14,7 @@
 </script>
 
 <script lang="ts">
-    import type { SlurpEntry } from "$lib/hprof/reader";
+    import type { SlurpEntry } from "$lib/reader/hprof";
     import { humanSize, prettyJavaType } from "$lib/utils";
     import { Input } from "$lib/components/ui/input";
     import { Button } from "$lib/components/ui/button";

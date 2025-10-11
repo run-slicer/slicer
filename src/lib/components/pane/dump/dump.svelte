@@ -1,11 +1,11 @@
 <script lang="ts">
-    import { worker } from "$lib/hprof";
-    import type { SlurpResult } from "$lib/hprof/reader";
+    import { worker } from "$lib/reader";
+    import type { SlurpResult } from "$lib/reader/hprof";
     import Loading from "$lib/components/loading.svelte";
     import { Separator } from "$lib/components/ui/separator";
     import type { Entry } from "$lib/workspace";
     import { error } from "$lib/log";
-    import { FileQuestion } from "@lucide/svelte";
+    import { FileQuestionMark } from "@lucide/svelte";
     import Table from "./table.svelte";
     import { humanSize } from "$lib/utils";
     import type { PaneProps } from "$lib/components/pane";
@@ -15,7 +15,7 @@
 
     const readEntry = async (entry: Entry): Promise<SlurpResult> => {
         try {
-            return worker.read(await entry.data.blob());
+            return worker().hprof(await entry.data.blob());
         } catch (e) {
             error("failed to read heap dump", e);
 
@@ -46,7 +46,7 @@
     <Table class="h-full min-h-0 w-full p-2" entries={result.entries} />
 {:catch e}
     <div class="flex h-full w-full flex-col items-center justify-center">
-        <FileQuestion class="text-muted-foreground mb-4 animate-bounce" size={128} />
+        <FileQuestionMark class="text-muted-foreground mb-4 animate-bounce" size={128} />
         <p class="mb-1 text-2xl font-semibold">Is the file in HPROF format?</p>
         <p class="text-muted-foreground mb-32 text-sm">Failed to read heap dump.</p>
         <p class="text-muted-foreground text-xs">{e}</p>
