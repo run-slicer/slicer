@@ -61,7 +61,7 @@
         light: `${$theme.cssVars.light.background}`,
     }}
 />
-<Toaster position="bottom-right" offset={{ bottom: "2rem", right: "0.5rem" }} richColors />
+<Toaster position="bottom-right" offset={{ bottom: "2rem", right: "0.5rem" }} richColors closeButton />
 <Menu
     bind:panes={$panes}
     tab={$currentTab}
