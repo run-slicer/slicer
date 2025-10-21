@@ -42,6 +42,8 @@ export const canInterpret = (type: Interpretation, entry: Entry): boolean => {
     switch (type) {
         case Interpretation.CLASS:
             return entry.type === EntryType.CLASS || entry.type === EntryType.MEMBER;
+        case Interpretation.BINARY_XML:
+            return entry.type === EntryType.BINARY_XML;
     }
 
     return true;
