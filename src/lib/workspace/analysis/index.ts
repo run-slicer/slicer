@@ -61,7 +61,7 @@ export const analyze = async (entry: Entry, state: AnalysisState = AnalysisState
             const blob = await entry.data.blob();
             const magic = new DataView(await blob.slice(0, Math.min(8, blob.size)).arrayBuffer());
             if (magic.byteLength >= 8) {
-                if (magic.getUint16(0, true) === 0x0003 /* ChunkType.ResXml */) {
+                if (entry.extension?.includes("xml") && magic.getUint16(0, true) === 0x0003 /* ChunkType.ResXml */) {
                     entry.type = EntryType.BINARY_XML;
                 }
             } else if (magic.byteLength >= 4) {
