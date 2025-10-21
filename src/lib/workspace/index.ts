@@ -14,8 +14,11 @@ import { archiveDecoder } from "./encoding";
 export const enum EntryType {
     FILE = "file",
     ARCHIVE = "archive",
+
+    // post-analysis types
     CLASS = "class",
     MEMBER = "member",
+    BINARY_XML = "binary_xml",
 }
 
 // reference to an entry, useful for sidestepping Svelte's reactivity
@@ -147,7 +150,7 @@ export interface LoadResult {
     created: boolean;
 }
 
-export const ZIP_EXTENSIONS = new Set(["zip", "jar", "apk", "war", "ear", "jmod"]);
+export const ZIP_EXTENSIONS = new Set(["zip", "jar", "apk", "xapk", "war", "ear", "jmod"]);
 
 const load0 = async (entries: Map<string, Entry>, d: Data, parent?: Entry): Promise<LoadResult[]> => {
     const name = parent ? `${parent.name}/${d.name}` : d.name;
