@@ -5,6 +5,7 @@
         [Interpretation.CLASS]: "Disassembly",
         [Interpretation.HEX]: "Hexadecimal",
         [Interpretation.TEXT]: "Text",
+        [Interpretation.BINARY_XML]: "Binary XML",
     };
 </script>
 
@@ -118,7 +119,7 @@
                     <Select type="single" bind:value={interpType}>
                         <SelectTrigger class="h-7 w-full text-xs">
                             <span>
-                                {labels[interpType]}
+                                {labels[interpType] || interpType}
                                 {#if interpType === detectedInterp}
                                     <span class="text-muted-foreground">(detected)</span>
                                 {/if}
@@ -128,7 +129,7 @@
                             {#each Object.values(Interpretation) as type (type)}
                                 <SelectItem value={type} class="text-xs" disabled={!canInterpret(type, entry)}>
                                     <span>
-                                        {labels[type]}
+                                        {labels[type] || type}
                                         {#if type === detectedInterp}
                                             <span class="text-muted-foreground">(detected)</span>
                                         {/if}

@@ -151,6 +151,7 @@ export const fileIcon = (label: string): StyledIcon => {
             case "jar":
                 return { icon: FileArchive, classes: ["text-red-500"] };
             case "apk":
+            case "xapk":
                 return { icon: Android };
             case "zip":
             case "tar":
