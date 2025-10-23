@@ -41,6 +41,9 @@ importers:
       '@katana-project/asm':
         specifier: ^0.19.0
         version: 0.19.0
+      '@katana-project/zip':
+        specifier: ^0.5.4
+        version: 0.5.4
       '@lezer/highlight':
         specifier: ^1.2.1
         version: 1.2.1
@@ -59,9 +62,6 @@ importers:
       '@run-slicer/vf':
         specifier: 0.2.1-1.11.1
         version: 0.2.1-1.11.1
-      '@run-slicer/zip':
-        specifier: ^0.5.2
-        version: 0.5.2
       '@tanstack/table-core':
         specifier: ^8.21.3
         version: 8.21.3
@@ -706,6 +706,9 @@ packages:
   '@katana-project/asm@0.19.0':
     resolution: {integrity: sha512-GimTTnmknt9JbVKNgzO7JUa+guHIEaxnaXe5EN9QoT8PA+A4UREkmbmCqwE+ej8HR6NGG67LLVo2NSdSg8gYOw==}
 
+  '@katana-project/zip@0.5.4':
+    resolution: {integrity: sha512-FWD0Osa+dLM7V7Q52wwbPAWH9TmNiVzptxugyXAY7Xz26gc+RuHRqBgbSfGsJnDqvqOV3eX0we48t2a/Zw0hgQ==}
+
   '@lezer/common@1.2.3':
     resolution: {integrity: sha512-w7ojc8ejBqr2REPsWxJjrMFsA/ysDCFICn8zEOR9mrqzOu2amhITYuLD8ag6XZf0CFXDrhKqw7+tW8cX66NaDA==}
 
@@ -863,9 +866,6 @@ packages:
 
   '@run-slicer/vf@0.2.1-1.11.1':
     resolution: {integrity: sha512-7Bh3+XiBLuym2QEknLh1lt4xlXdymYiMGJxpuo9i3Itd64rgM2L+ico/ftCqMuOVkW+f+rJ/owuGSI7GvGiwrw==}
-
-  '@run-slicer/zip@0.5.2':
-    resolution: {integrity: sha512-LtdjIYj9Gx0N099/BvfjTcpzaZRznOUPujTiFNcHDOqTpr6ay99FKhVcy0WlfC8MzVy7VixccC1xkzAVdnIdUg==}
 
   '@sindresorhus/is@7.0.2':
     resolution: {integrity: sha512-d9xRovfKNz1SKieM0qJdO+PQonjnnIfSNWfHYnBSJ9hkjm0ZPw6HlxscDXYstp3z+7V2GOFHc+J0CYrYTjqCJw==}
@@ -2141,6 +2141,8 @@ snapshots:
 
   '@katana-project/asm@0.19.0': {}
 
+  '@katana-project/zip@0.5.4': {}
+
   '@lezer/common@1.2.3': {}
 
   '@lezer/highlight@1.2.1':
@@ -2265,8 +2267,6 @@ snapshots:
   '@run-slicer/script@0.12.0': {}
 
   '@run-slicer/vf@0.2.1-1.11.1': {}
-
-  '@run-slicer/zip@0.5.2': {}
 
   '@sindresorhus/is@7.0.2': {}
 

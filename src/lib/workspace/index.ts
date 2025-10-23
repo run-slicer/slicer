@@ -4,7 +4,7 @@ import { record } from "$lib/task";
 import { prettyMethodDesc } from "$lib/utils";
 import type { Member, Node } from "@katana-project/asm";
 import type { UTF8Entry } from "@katana-project/asm/pool";
-import type { Zip } from "@run-slicer/zip";
+import type { Zip } from "@katana-project/zip";
 import { derived, get, writable } from "svelte/store";
 import { AnalysisState, analyze, analyzeBackground, analyzeSchedule } from "./analysis";
 import { transform } from "./analysis/transform";
@@ -174,7 +174,7 @@ const load0 = async (entries: Map<string, Entry>, d: Data, parent?: Entry): Prom
         try {
             const archiveEntry = entry as ArchiveEntry;
 
-            const { readBlob } = await import("@run-slicer/zip");
+            const { readBlob } = await import("@katana-project/zip");
 
             // if we're loading a nested archive, hope it's uncompressed or pretty small
             // if it isn't, then we're loading the entire thing into memory!
@@ -222,7 +222,7 @@ export const loadFile = async (f: File): Promise<LoadResult[]> => {
 };
 
 export const loadZip = async (f: File): Promise<LoadResult[]> => {
-    const { readBlob } = await import("@run-slicer/zip");
+    const { readBlob } = await import("@katana-project/zip");
 
     return load(...(await zipData(await readBlob(f, { decoder: get(archiveDecoder) }))));
 };

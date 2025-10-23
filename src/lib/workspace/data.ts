@@ -1,5 +1,5 @@
 import { escapeNonPrintable, uniqueBy } from "$lib/utils";
-import type { Entry, Zip } from "@run-slicer/zip";
+import type { Entry, Zip } from "@katana-project/zip";
 import { get } from "svelte/store";
 import { decoder } from "./encoding";
 
@@ -142,7 +142,7 @@ export const memoryData = (
             return dataDecoder.decode(await this.bytes());
         },
         async blob(): Promise<Blob> {
-            return data instanceof Blob ? data : new Blob([data]);
+            return data instanceof Blob ? data : new Blob([data as Uint8Array<ArrayBuffer>]);
         },
     };
 };
