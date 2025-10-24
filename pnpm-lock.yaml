@@ -42,8 +42,8 @@ importers:
         specifier: ^0.19.0
         version: 0.19.0
       '@katana-project/zip':
-        specifier: ^0.5.4
-        version: 0.5.4
+        specifier: ^0.6.0
+        version: 0.6.0
       '@lezer/highlight':
         specifier: ^1.2.1
         version: 1.2.1
@@ -706,8 +706,8 @@ packages:
   '@katana-project/asm@0.19.0':
     resolution: {integrity: sha512-GimTTnmknt9JbVKNgzO7JUa+guHIEaxnaXe5EN9QoT8PA+A4UREkmbmCqwE+ej8HR6NGG67LLVo2NSdSg8gYOw==}
 
-  '@katana-project/zip@0.5.4':
-    resolution: {integrity: sha512-FWD0Osa+dLM7V7Q52wwbPAWH9TmNiVzptxugyXAY7Xz26gc+RuHRqBgbSfGsJnDqvqOV3eX0we48t2a/Zw0hgQ==}
+  '@katana-project/zip@0.6.0':
+    resolution: {integrity: sha512-G5UJIO6j1D47XgPUTUXAmEbZmqkb+yHh4PqL3NiGXKIUyCrDOsBGaMFQ+SAgDosdqf2EO4Mtut7d0ndC7y1z1w==}
 
   '@lezer/common@1.2.3':
     resolution: {integrity: sha512-w7ojc8ejBqr2REPsWxJjrMFsA/ysDCFICn8zEOR9mrqzOu2amhITYuLD8ag6XZf0CFXDrhKqw7+tW8cX66NaDA==}
@@ -2141,7 +2141,7 @@ snapshots:
 
   '@katana-project/asm@0.19.0': {}
 
-  '@katana-project/zip@0.5.4': {}
+  '@katana-project/zip@0.6.0': {}
 
   '@lezer/common@1.2.3': {}
 
