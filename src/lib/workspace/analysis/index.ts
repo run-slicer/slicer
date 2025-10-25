@@ -63,10 +63,13 @@ export const analyze = async (entry: Entry, state: AnalysisState = AnalysisState
             if (magic.byteLength >= 8) {
                 if (entry.extension?.includes("xml") && magic.getUint16(0, true) === 0x0003 /* ChunkType.ResXml */) {
                     entry.type = EntryType.BINARY_XML;
+                    break;
                 }
-            } else if (magic.byteLength >= 4) {
+            }
+            if (magic.byteLength >= 4) {
                 if (magic.getUint32(0, false) === 0xcafebabe) {
                     await analyzeClass(entry, false);
+                    break;
                 }
             }
             break;
