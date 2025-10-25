@@ -1,10 +1,10 @@
 import { warn } from "$lib/log";
-import { analysisBackground } from "$lib/state";
+import { analysisBackground, workspaceArchiveDuplicateHandling } from "$lib/state";
 import { record } from "$lib/task";
-import { prettyMethodDesc } from "$lib/utils";
+import { groupBy, prettyMethodDesc } from "$lib/utils";
 import type { Member, Node } from "@katana-project/asm";
 import type { UTF8Entry } from "@katana-project/asm/pool";
-import type { Zip } from "@katana-project/zip";
+import type { Zip, Entry as ZipEntry } from "@katana-project/zip";
 import { derived, get, writable } from "svelte/store";
 import { AnalysisState, analyze, analyzeBackground, analyzeSchedule } from "./analysis";
 import { transform } from "./analysis/transform";
@@ -152,6 +152,63 @@ export interface LoadResult {
 
 export const ZIP_EXTENSIONS = new Set(["zip", "jar", "apk", "xapk", "war", "ear", "jmod"]);
 
+const readZip = async (blob: Blob): Promise<Zip> => {
+    const { readBlob } = await import("@katana-project/zip");
+
+    const zip = await readBlob(blob, { decoder: get(archiveDecoder) });
+    const entries = groupBy(zip.entries, (e) => e.name);
+    switch (get(workspaceArchiveDuplicateHandling)) {
+        case "skip": {
+            // skip duplicates with nonsensical sizes
+            const toSkip = new Set<ZipEntry>();
+            for (const duplicates of Array.from(entries.values())) {
+                if (duplicates.length <= 1) {
+                    continue;
+                }
+
+                duplicates
+                    .filter((e) => e.compressedSize === 0 && e.compressedSize > blob.size)
+                    .forEach((e) => toSkip.add(e));
+            }
+
+            zip.entries = zip.entries.filter((e) => !toSkip.has(e));
+            break;
+        }
+        case "overwrite": {
+            // keep only the last duplicate
+            const toKeep = new Set<ZipEntry>();
+            for (const duplicates of Array.from(entries.values())) {
+                toKeep.add(duplicates[duplicates.length - 1]);
+            }
+
+            zip.entries = zip.entries.filter((e) => toKeep.has(e));
+            break;
+        }
+        case "rename": {
+            // rename duplicates
+            for (const duplicates of Array.from(entries.values())) {
+                if (duplicates.length <= 1) {
+                    continue;
+                }
+
+                for (let i = 0; i < duplicates.length; i++) {
+                    const e = duplicates[i];
+
+                    const dotIndex = e.name.lastIndexOf(".");
+                    if (dotIndex !== -1) {
+                        e.name = `${e.name.substring(0, dotIndex)}_${i}${e.name.substring(dotIndex)}`;
+                    } else {
+                        e.name = `${e.name}_${i}`;
+                    }
+                }
+            }
+            break;
+        }
+    }
+
+    return zip;
+};
+
 const load0 = async (entries: Map<string, Entry>, d: Data, parent?: Entry): Promise<LoadResult[]> => {
     const name = parent ? `${parent.name}/${d.name}` : d.name;
 
@@ -174,11 +231,9 @@ const load0 = async (entries: Map<string, Entry>, d: Data, parent?: Entry): Prom
         try {
             const archiveEntry = entry as ArchiveEntry;
 
-            const { readBlob } = await import("@katana-project/zip");
-
             // if we're loading a nested archive, hope it's uncompressed or pretty small
             // if it isn't, then we're loading the entire thing into memory!
-            archiveEntry.archive = await readBlob(await d.blob(), { decoder: get(archiveDecoder) });
+            archiveEntry.archive = await readZip(await d.blob());
             archiveEntry.state = AnalysisState.FULL;
             archiveEntry.type = EntryType.ARCHIVE;
 
@@ -222,9 +277,7 @@ export const loadFile = async (f: File): Promise<LoadResult[]> => {
 };
 
 export const loadZip = async (f: File): Promise<LoadResult[]> => {
-    const { readBlob } = await import("@katana-project/zip");
-
-    return load(...(await zipData(await readBlob(f, { decoder: get(archiveDecoder) }))));
+    return load(...(await zipData(await readZip(f))));
 };
 
 export const loadRemote = async (url: string, name?: string): Promise<LoadResult[]> => {

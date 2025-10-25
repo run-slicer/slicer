@@ -29,12 +29,13 @@
         load,
         save,
         interpHexRowBytes,
+        workspaceArchiveDuplicateHandling,
     } from "$lib/state";
     import { encodings } from "$lib/workspace/encoding";
     import { themes } from "$lib/theme";
     import type { PaneProps } from "$lib/components/pane";
     import { mode } from "mode-watcher";
-    import { downloadBlob, readFiles, timestampFile } from "$lib/utils";
+    import { capitalize, downloadBlob, readFiles, timestampFile } from "$lib/utils";
     import { toast } from "svelte-sonner";
     import { modals } from "svelte-modals";
     import PrefsClearDialog from "$lib/components/dialog/prefs_clear.svelte";
@@ -116,7 +117,7 @@
             <div id="theme" class="space-y-3">
                 <h2 class="border-b pb-2 text-lg font-semibold">Theme</h2>
                 <div class="grid gap-2">
-                    <div class="grid min-h-[2rem] grid-cols-[12rem_10rem_1fr] items-center gap-4">
+                    <div class="grid min-h-[2rem] grid-cols-[16rem_10rem_1fr] items-center gap-4">
                         <Label for="themeColor">Color</Label>
                         <Select type="single" bind:value={$themeColor}>
                             <SelectTrigger class="w-48">
@@ -137,7 +138,7 @@
                             </SelectContent>
                         </Select>
                     </div>
-                    <div class="grid min-h-[2.5rem] grid-cols-[12rem_10rem_1fr] items-center gap-4">
+                    <div class="grid min-h-[2.5rem] grid-cols-[16rem_10rem_1fr] items-center gap-4">
                         <TooltipProvider>
                             <div class="flex items-center gap-2">
                                 <Label for="themeRadius">Radius</Label>
@@ -165,7 +166,7 @@
             <div id="editor" class="space-y-3">
                 <h2 class="border-b pb-2 text-lg font-semibold">Editor</h2>
                 <div class="grid gap-2">
-                    <div class="grid min-h-[2.5rem] grid-cols-[12rem_10rem_1fr] items-center gap-4">
+                    <div class="grid min-h-[2.5rem] grid-cols-[16rem_10rem_1fr] items-center gap-4">
                         <TooltipProvider>
                             <div class="flex items-center gap-2">
                                 <Label for="editorWrap">Word wrap</Label>
@@ -179,7 +180,7 @@
                         </TooltipProvider>
                         <Switch id="editorWrap" bind:checked={$editorWrap} />
                     </div>
-                    <div class="grid min-h-[2.5rem] grid-cols-[12rem_10rem_1fr] items-center gap-4">
+                    <div class="grid min-h-[2.5rem] grid-cols-[16rem_10rem_1fr] items-center gap-4">
                         <TooltipProvider>
                             <div class="flex items-center gap-2">
                                 <Label for="editorTextSize">Text size</Label>
@@ -201,7 +202,7 @@
                             class="w-48"
                         />
                     </div>
-                    <div class="grid min-h-[2.5rem] grid-cols-[12rem_10rem_1fr] items-center gap-4">
+                    <div class="grid min-h-[2.5rem] grid-cols-[16rem_10rem_1fr] items-center gap-4">
                         <TooltipProvider>
                             <div class="flex items-center gap-2">
                                 <Label for="editorTextSizeSync">Sync text size</Label>
@@ -223,7 +224,7 @@
             <div id="workspace" class="space-y-3">
                 <h2 class="border-b pb-2 text-lg font-semibold">Workspace</h2>
                 <div class="grid gap-2">
-                    <div class="grid min-h-[2.5rem] grid-cols-[12rem_10rem_1fr] items-center gap-4">
+                    <div class="grid min-h-[2.5rem] grid-cols-[16rem_10rem_1fr] items-center gap-4">
                         <Label for="workspaceEncoding">File encoding</Label>
                         <Select type="single" bind:value={$workspaceEncoding}>
                             <SelectTrigger class="w-48">
@@ -238,7 +239,7 @@
                             </SelectContent>
                         </Select>
                     </div>
-                    <div class="grid min-h-[2.5rem] grid-cols-[12rem_10rem_1fr] items-center gap-4">
+                    <div class="grid min-h-[2.5rem] grid-cols-[16rem_10rem_1fr] items-center gap-4">
                         <TooltipProvider>
                             <div class="flex items-center gap-2">
                                 <Label for="workspaceArchiveEncoding">Archive encoding</Label>
@@ -263,6 +264,35 @@
                             </SelectContent>
                         </Select>
                     </div>
+                    <div class="grid min-h-[2.5rem] grid-cols-[16rem_10rem_1fr] items-center gap-4">
+                        <TooltipProvider>
+                            <div class="flex items-center gap-2">
+                                <Label for="workspaceArchiveEncoding">Duplicate archive entry handling</Label>
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <CircleQuestionMark class="text-muted-foreground h-4 w-4" />
+                                    </TooltipTrigger>
+                                    <TooltipContent side="right">
+                                        <p>Determines how duplicate entries in archives are managed.</p>
+                                        <br />
+                                        <p>Skip: Ignores duplicates with nonsensical values.</p>
+                                        <p>Overwrite: Keeps only the last duplicate entry.</p>
+                                        <p>Rename: Renames duplicates to ensure uniqueness.</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </div>
+                        </TooltipProvider>
+                        <Select type="single" bind:value={$workspaceArchiveDuplicateHandling}>
+                            <SelectTrigger class="w-48">
+                                {capitalize($workspaceArchiveDuplicateHandling)}
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="skip">Skip</SelectItem>
+                                <SelectItem value="overwrite">Overwrite</SelectItem>
+                                <SelectItem value="rename">Rename</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
 
                 <h2 class="border-b py-2 font-semibold">Interpretation</h2>
@@ -273,7 +303,7 @@
                             >Changes to these settings will cause all open entries to be reinterpreted!</AlertTitle
                         >
                     </Alert>
-                    <div class="grid min-h-[2.5rem] grid-cols-[12rem_10rem_1fr] items-center gap-4">
+                    <div class="grid min-h-[2.5rem] grid-cols-[16rem_10rem_1fr] items-center gap-4">
                         <TooltipProvider>
                             <div class="flex items-center gap-2">
                                 <Label for="bytesPerRow">Bytes per row</Label>
@@ -295,7 +325,7 @@
             <div id="analysis" class="space-y-3">
                 <h2 class="border-b pb-2 text-lg font-semibold">Analysis</h2>
                 <div class="grid gap-2">
-                    <div class="grid min-h-[2.5rem] grid-cols-[12rem_10rem_1fr] items-center gap-4">
+                    <div class="grid min-h-[2.5rem] grid-cols-[16rem_10rem_1fr] items-center gap-4">
                         <TooltipProvider>
                             <div class="flex items-center gap-2">
                                 <Label for="analysisBackground">Background analysis</Label>
@@ -311,7 +341,7 @@
                         </TooltipProvider>
                         <Switch id="analysisBackground" bind:checked={$analysisBackground} />
                     </div>
-                    <div class="grid min-h-[2.5rem] grid-cols-[12rem_10rem_1fr] items-center gap-4">
+                    <div class="grid min-h-[2.5rem] grid-cols-[16rem_10rem_1fr] items-center gap-4">
                         <TooltipProvider>
                             <div class="flex items-center gap-2">
                                 <Label for="analysisJdkClasses">Fetch JDK classes</Label>

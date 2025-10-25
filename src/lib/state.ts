@@ -20,12 +20,17 @@ export interface TabData {
 }
 
 export type ProjectMode = "file" | "package";
+export type DuplicateEntryHandling = "skip" | "overwrite" | "rename";
 
 export const themeColor = persisted<string>(`${root}.theme.color`, "zinc");
 export const themeRadius = persisted<number>(`${root}.theme.radius`, 0.5);
 export const projectMode = persisted<ProjectMode>(`${root}.project.mode`, "file");
 export const workspaceEncoding = persisted<string>(`${root}.workspace.encoding`, "utf-8");
 export const workspaceArchiveEncoding = persisted<string>(`${root}.workspace.archive.encoding`, "utf-8");
+export const workspaceArchiveDuplicateHandling = persisted<DuplicateEntryHandling>(
+    `${root}.workspace.archive.duplicate-handling`,
+    "skip"
+);
 export const toolsDisasm = persisted<string>(`${root}.tools.disasm`, "vf" /* vf.id ($lib/disasm/builtin) */);
 export const loggingMaxEntries = persisted<number>(`${root}.logging.max-entries`, 150);
 export const scriptingScripts = persisted<ScriptData[]>(`${root}.scripting.scripts`, []);
