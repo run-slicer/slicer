@@ -2,19 +2,17 @@
     import { themes } from "$lib/theme";
     import { mode } from "mode-watcher";
     import { Select, SelectContent, SelectItem, SelectTrigger } from "$lib/components/ui/select";
-    import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "$lib/components/ui/tooltip";
-    import { CircleQuestionMark } from "@lucide/svelte";
-    import { Label } from "$lib/components/ui/label";
     import { Slider } from "$lib/components/ui/slider";
     import { themeColor, themeRadius } from "$lib/state";
     import Section from "../section.svelte";
+    import Label from "../label.svelte";
 </script>
 
 <Section id="theme" label="Theme">
     <div class="grid min-h-[2rem] grid-cols-[16rem_10rem_1fr] items-center gap-4">
-        <Label for="themeColor">Color</Label>
+        <Label for="themeColor" text="Color" />
         <Select type="single" bind:value={$themeColor}>
-            <SelectTrigger class="w-48">
+            <SelectTrigger id="themeColor" class="w-48">
                 {themes.find((t) => t.name === $themeColor)?.label || $themeColor}
             </SelectTrigger>
             <SelectContent>
@@ -32,17 +30,7 @@
         </Select>
     </div>
     <div class="grid min-h-[2.5rem] grid-cols-[16rem_10rem_1fr] items-center gap-4">
-        <TooltipProvider>
-            <div class="flex items-center gap-2">
-                <Label for="themeRadius">Radius</Label>
-                <Tooltip>
-                    <TooltipTrigger>
-                        <CircleQuestionMark class="text-muted-foreground h-4 w-4" />
-                    </TooltipTrigger>
-                    <TooltipContent side="right">Alters the smoothness of UI corners.</TooltipContent>
-                </Tooltip>
-            </div>
-        </TooltipProvider>
+        <Label for="themeRadius" text="Radius">Alters the smoothness of UI corners.</Label>
         <Slider type="single" id="themeRadius" min={0} max={1} step={0.05} bind:value={$themeRadius} class="w-48" />
     </div>
 </Section>
