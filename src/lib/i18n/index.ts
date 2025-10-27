@@ -1,5 +1,5 @@
 import { locale } from "$lib/state";
-import { derived, get } from "svelte/store";
+import { derived, get, type Readable } from "svelte/store";
 import type { LocaleData } from "../../locale";
 
 export const locales = new Map(
@@ -25,3 +25,11 @@ export const t = derived(localeData, ($localeData): TranslationFunc => {
 });
 
 export const tl: TranslationFunc = (key, ...args) => get(t)(key, ...args);
+
+export const tls = (group: string): Readable<string[]> => {
+    return derived(localeData, ($localeData) => {
+        return Object.entries($localeData ?? {})
+            .filter(([key]) => key.startsWith(group))
+            .map(([, value]) => value);
+    });
+};
