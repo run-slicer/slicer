@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t } from "$lib/i18n";
     import { mode, userPrefersMode } from "mode-watcher";
     import { Separator } from "$lib/components/ui/separator";
     import { analysisTransformers, type PaneData, themeColor, themeRadius, workspaceEncoding } from "$lib/state";
@@ -107,7 +108,7 @@
 <Menubar class="window-controls justify-between rounded-none border-b border-none px-2 lg:px-4">
     <div class="flex flex-row">
         <MenubarMenu>
-            <MenubarTrigger class="font-bold">slicer</MenubarTrigger>
+            <MenubarTrigger class="font-bold">{$t("menu.brand")}</MenubarTrigger>
             <MenubarContent align="start">
                 <MenubarItem class="justify-between" onclick={() => modals.open(AboutDialog)}>
                     About <Info size={16} />
