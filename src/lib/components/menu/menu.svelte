@@ -108,20 +108,22 @@
 <Menubar class="window-controls justify-between rounded-none border-b border-none px-2 lg:px-4">
     <div class="flex flex-row">
         <MenubarMenu>
-            <MenubarTrigger class="font-bold">{$t("menu.brand")}</MenubarTrigger>
+            <MenubarTrigger class="font-bold">{$t("menu.root")}</MenubarTrigger>
             <MenubarContent align="start">
                 <MenubarItem class="justify-between" onclick={() => modals.open(AboutDialog)}>
-                    About <Info size={16} />
+                    {$t("menu.root.about")}
+                    <Info size={16} />
                 </MenubarItem>
                 <MenubarItem class="justify-between" onclick={() => window.open("https://docs.slicer.run/", "_blank")}>
-                    Documentation <BookOpen size={16} />
+                    {$t("menu.root.docs")}
+                    <BookOpen size={16} />
                 </MenubarItem>
                 <MenubarSeparator />
                 <MenubarSub>
-                    <MenubarSubTrigger>Theme</MenubarSubTrigger>
+                    <MenubarSubTrigger>{$t("menu.root.theme")}</MenubarSubTrigger>
                     <MenubarSubContent class="min-w-[12rem]" align="start">
                         <MenubarSub>
-                            <MenubarSubTrigger inset>Color</MenubarSubTrigger>
+                            <MenubarSubTrigger inset>{$t("menu.root.theme.color")}</MenubarSubTrigger>
                             <MenubarSubContent align="start">
                                 <MenubarRadioGroup bind:value={$themeColor}>
                                     {#each themes as theme (theme.name)}
@@ -139,36 +141,40 @@
                             </MenubarSubContent>
                         </MenubarSub>
                         <MenubarSub>
-                            <MenubarSubTrigger inset>Radius</MenubarSubTrigger>
+                            <MenubarSubTrigger inset>{$t("menu.root.theme.radius")}</MenubarSubTrigger>
                             <MenubarSubContent align="start">
                                 <MenubarRadioGroup
                                     value={$themeRadius.toString()}
                                     onValueChange={(v) => ($themeRadius = parseFloat(v || "0.5"))}
                                 >
-                                    <MenubarRadioItem value="0">None</MenubarRadioItem>
-                                    <MenubarRadioItem value="0.3">Small</MenubarRadioItem>
-                                    <MenubarRadioItem value="0.5">Normal</MenubarRadioItem>
-                                    <MenubarRadioItem value="0.75">Large</MenubarRadioItem>
-                                    <MenubarRadioItem value="1">Extra-large</MenubarRadioItem>
+                                    <MenubarRadioItem value="0">{$t("menu.root.theme.radius.none")}</MenubarRadioItem>
+                                    <MenubarRadioItem value="0.3">{$t("menu.root.theme.radius.sm")}</MenubarRadioItem>
+                                    <MenubarRadioItem value="0.5">{$t("menu.root.theme.radius.md")}</MenubarRadioItem>
+                                    <MenubarRadioItem value="0.75">{$t("menu.root.theme.radius.lg")}</MenubarRadioItem>
+                                    <MenubarRadioItem value="1">{$t("menu.root.theme.radius.xl")}</MenubarRadioItem>
                                 </MenubarRadioGroup>
                             </MenubarSubContent>
                         </MenubarSub>
                         <MenubarSeparator />
                         <MenubarRadioGroup bind:value={userPrefersMode.current}>
                             <MenubarRadioItem value="system" class="justify-between">
-                                System <Settings size={16} />
+                                {$t("menu.root.theme.system")}
+                                <Settings size={16} />
                             </MenubarRadioItem>
                             <MenubarRadioItem value="dark" class="justify-between">
-                                Dark <Moon size={16} />
+                                {$t("menu.root.theme.dark")}
+                                <Moon size={16} />
                             </MenubarRadioItem>
                             <MenubarRadioItem value="light" class="justify-between">
-                                Light <Sun size={16} />
+                                {$t("menu.root.theme.light")}
+                                <Sun size={16} />
                             </MenubarRadioItem>
                         </MenubarRadioGroup>
                     </MenubarSubContent>
                 </MenubarSub>
                 <MenubarItem class="justify-between" onclick={openPrefs}>
-                    Preferences <Settings size={16} />
+                    {$t("menu.root.prefs")}
+                    <Settings size={16} />
                 </MenubarItem>
             </MenubarContent>
         </MenubarMenu>
@@ -176,25 +182,32 @@
             <MenubarTrigger class="relative">File</MenubarTrigger>
             <MenubarContent align="start">
                 <MenubarItem onclick={() => handler.load()}>
-                    Open <Shortcut key="o" modifier={Modifier.CTRL} />
+                    {$t("menu.file.open")}
+                    <Shortcut key="o" modifier={Modifier.CTRL} />
                 </MenubarItem>
                 <MenubarItem onclick={() => handler.add()}>
-                    Add <Shortcut key="o" modifier={Modifier.CTRL | Modifier.SHIFT} />
+                    {$t("menu.file.add")}
+                    <Shortcut key="o" modifier={Modifier.CTRL | Modifier.SHIFT} />
                 </MenubarItem>
                 <MenubarItem onclick={() => modals.open(LoadExternalDialog, { handler })} class="justify-between">
-                    Add from URL
+                    {$t("menu.file.add-url")}
                 </MenubarItem>
                 <MenubarItem disabled={entries.length === 0} onclick={() => modals.open(ClearDialog, { handler })}>
-                    Clear all
+                    {$t("menu.file.clear")}
                 </MenubarItem>
                 <MenubarSub>
-                    <MenubarSubTrigger disabled={entries.length === 0}>Export all</MenubarSubTrigger>
+                    <MenubarSubTrigger disabled={entries.length === 0}>
+                        {$t("menu.file.export-all")}
+                    </MenubarSubTrigger>
                     <MenubarSubContent class="min-w-[12rem]" align="start">
                         <MenubarItem class="justify-between" onclick={() => exportEntries()}>
-                            Raw <Binary size={16} />
+                            {$t("menu.file.export-all.raw")}
+                            <Binary size={16} />
                         </MenubarItem>
                         <MenubarSub>
-                            <MenubarSubTrigger disabled={classes.length === 0}>Disassembled</MenubarSubTrigger>
+                            <MenubarSubTrigger disabled={classes.length === 0}>
+                                {$t("menu.file.export-all.disasm")}
+                            </MenubarSubTrigger>
                             <MenubarSubContent class="min-w-[12rem]" align="start">
                                 {#each disasms as dism}
                                     <MenubarItem class="justify-between" onclick={() => exportEntries(dism)}>
@@ -210,40 +223,45 @@
                 </MenubarSub>
                 <MenubarSeparator />
                 <MenubarItem disabled={!tab?.entry} onclick={() => handler.close()}>
-                    Close <Shortcut key="w" modifier={Modifier.CTRL | Modifier.ALT} />
+                    {$t("menu.file.close")}
+                    <Shortcut key="w" modifier={Modifier.CTRL | Modifier.ALT} />
                 </MenubarItem>
                 <MenubarItem disabled={!tab?.entry} onclick={exportEntry}>
-                    Export <Shortcut key="e" modifier={Modifier.CTRL} />
+                    {$t("menu.file.export")}
+                    <Shortcut key="e" modifier={Modifier.CTRL} />
                 </MenubarItem>
             </MenubarContent>
         </MenubarMenu>
         <MenubarMenu>
-            <MenubarTrigger class="relative">View</MenubarTrigger>
+            <MenubarTrigger class="relative">{$t("menu.view")}</MenubarTrigger>
             <MenubarContent align="start">
                 <MenubarItem
                     class="justify-between"
                     disabled={!tab?.entry || tab.type === TabType.CODE}
                     onclick={() => openEntry(TabType.CODE)}
                 >
-                    Code <Code size={16} />
+                    {$t("menu.view.code")}
+                    <Code size={16} />
                 </MenubarItem>
                 <MenubarItem
                     class="justify-between"
                     disabled={!tab?.entry || tab.entry.type === EntryType.ARCHIVE || tab.type === TabType.CLASS}
                     onclick={() => openEntry(TabType.CLASS)}
                 >
-                    Class <FileCode2 size={16} />
+                    {$t("menu.view.class")}
+                    <FileCode2 size={16} />
                 </MenubarItem>
                 <MenubarItem
                     class="justify-between"
                     disabled={!tab?.entry || tab.entry.type === EntryType.ARCHIVE || tab.type === TabType.GRAPH}
                     onclick={() => openEntry(TabType.GRAPH)}
                 >
-                    Graph <GitBranchPlus size={16} />
+                    {$t("menu.view.graph")}
+                    <GitBranchPlus size={16} />
                 </MenubarItem>
                 <MenubarSeparator />
                 <MenubarSub>
-                    <MenubarSubTrigger>Encoding</MenubarSubTrigger>
+                    <MenubarSubTrigger>{$t("menu.view.encoding")}</MenubarSubTrigger>
                     <MenubarSubContent class="min-w-[12rem]" align="start">
                         <MenubarRadioGroup bind:value={$workspaceEncoding}>
                             {#each Object.values(encodings) as encoding}
@@ -257,15 +275,16 @@
             </MenubarContent>
         </MenubarMenu>
         <MenubarMenu>
-            <MenubarTrigger class="relative">Analysis</MenubarTrigger>
+            <MenubarTrigger class="relative">{$t("menu.analysis")}</MenubarTrigger>
             <MenubarContent align="start">
                 <MenubarItem class="justify-between" onclick={openSearch}>
-                    Search <Shortcut key="f" modifier={Modifier.CTRL | Modifier.SHIFT} />
+                    {$t("menu.analysis.search")}
+                    <Shortcut key="f" modifier={Modifier.CTRL | Modifier.SHIFT} />
                 </MenubarItem>
                 <MenubarSeparator />
                 <MenubarSub>
                     <MenubarSubTrigger disabled={!transformers.some((t) => !t.internal)}>
-                        Transformers
+                        {$t("menu.analysis.transformers")}
                     </MenubarSubTrigger>
                     <MenubarSubContent class="min-w-[12rem]" align="start">
                         {@const groups = groupBy(
@@ -274,7 +293,9 @@
                         )}
                         {#each groups.entries() as [group, trfs]}
                             <MenubarSub>
-                                <MenubarSubTrigger>{group || "General"}</MenubarSubTrigger>
+                                <MenubarSubTrigger>
+                                    {group || $t("menu.analysis.transformers.general")}
+                                </MenubarSubTrigger>
                                 <MenubarSubContent class="min-w-[12rem]" align="start">
                                     {#each trfs as trf (trf.id)}
                                         {@const Icon = trf.icon}
@@ -295,16 +316,22 @@
             </MenubarContent>
         </MenubarMenu>
         <MenubarMenu>
-            <MenubarTrigger class="relative">Scripts</MenubarTrigger>
+            <MenubarTrigger class="relative">
+                {$t("menu.scripts")}
+            </MenubarTrigger>
             <MenubarContent align="start">
                 <MenubarSub>
-                    <MenubarSubTrigger>Import</MenubarSubTrigger>
+                    <MenubarSubTrigger>
+                        {$t("menu.scripts.import")}
+                    </MenubarSubTrigger>
                     <MenubarSubContent class="min-w-[12rem]" align="start">
                         <MenubarItem class="justify-between" onclick={() => modals.open(ScriptLoadDialog, { handler })}>
-                            From URL <Globe size={16} />
+                            {$t("menu.scripts.import.url")}
+                            <Globe size={16} />
                         </MenubarItem>
                         <MenubarItem class="justify-between" onclick={() => handler.addScript()}>
-                            From clipboard <Clipboard size={16} />
+                            {$t("menu.scripts.import.clipboard")}
+                            <Clipboard size={16} />
                         </MenubarItem>
                     </MenubarSubContent>
                 </MenubarSub>
@@ -319,7 +346,8 @@
                     class="justify-between"
                     onclick={() => window.open("https://docs.slicer.run/script/", "_blank")}
                 >
-                    Documentation <BookOpen size={16} />
+                    {$t("menu.scripts.docs")}
+                    <BookOpen size={16} />
                 </MenubarItem>
             </MenubarContent>
         </MenubarMenu>

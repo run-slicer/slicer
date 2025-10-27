@@ -10,7 +10,8 @@
         "build": "vite build",
         "preview": "vite preview",
         "check": "svelte-check --tsconfig ./tsconfig.json",
-        "format": "prettier . --write"
+        "format": "prettier . --write",
+        "types": "quicktype ./src/locale/en.json -o ./src/locale/index.ts --just-types --top-level LocaleData"
     },
     "dependencies": {
         "@codemirror/commands": "^6.8.1",
@@ -58,6 +59,7 @@
         "prettier-plugin-organize-imports": "^4.2.0",
         "prettier-plugin-svelte": "^3.4.0",
         "prettier-plugin-tailwindcss": "^0.6.14",
+        "quicktype": "^23.2.6",
         "svelte": "^5.38.10",
         "svelte-check": "^4.3.1",
         "svelte-dnd-action": "^0.9.65",

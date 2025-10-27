@@ -5,3 +5,6 @@ pnpm-lock.yaml
 components.json
 /src/lib/components/ui
 /src/lib/components/utils.ts
+
+# generated files
+/src/locale/index.ts

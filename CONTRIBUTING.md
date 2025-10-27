@@ -13,5 +13,7 @@ but we do have some guidelines that will help us keep things organized and make 
    If you need to show a UI response, do it in the component that calls the function or in the generalized UI handler in `$lib/event`.
 5. If you plan to implement a major feature, please open an issue/discussion about it first to discuss it.
    This will ensure that we're on the same page and that your work won't be wasted.
+6. If you're adding new translation keys, don't manually add them to `/src/locale/index.ts`, that file is auto-generated.
+   Instead, just add the keys to `/src/locale/en.json` and run `pnpm types` to update the types.
 
 That's it, have fun contributing! Make sure to check back periodically to see if there were any changes to these guidelines.

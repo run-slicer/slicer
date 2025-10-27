@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t } from "$lib/i18n";
     import {
         MenubarCheckboxItem,
         MenubarItem,
@@ -39,18 +40,20 @@
             disabled={proto.state === ScriptState.FAILED}
             onCheckedChange={handleEnabled}
         >
-            Enabled
+            {$t("menu.scripts.script.enabled")}
         </MenubarCheckboxItem>
         <MenubarSeparator />
         <MenubarItem inset class="justify-between" onclick={() => modals.open(ScriptDialog, { proto, handler })}>
-            Info <Info size={16} />
+            {$t("menu.scripts.script.info")}
+            <Info size={16} />
         </MenubarItem>
         <MenubarItem
             inset
             class="data-highlighted:bg-destructive data-highlighted:text-primary-foreground justify-between"
             onclick={() => modals.open(ScriptDeleteDialog, { proto, handler })}
         >
-            Delete <Trash2 size={16} />
+            {$t("menu.scripts.script.delete")}
+            <Trash2 size={16} />
         </MenubarItem>
         {#if proto.state === ScriptState.LOADED && script?.options}
             <MenubarSeparator />

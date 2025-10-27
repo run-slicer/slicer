@@ -1,13 +1,10 @@
 import { locale } from "$lib/state";
 import { derived, get } from "svelte/store";
-
-interface LocaleData {
-    "menu.brand": string;
-}
+import type { LocaleData } from "../../locale";
 
 export const locales = new Map(
-    Object.entries(import.meta.glob<{ default: LocaleData }>("../../locale/*.json")).map(([path, resolver]) => {
-        return [path.split("/").pop()!.split(".")[0], () => resolver().then((m) => m.default)];
+    Object.entries(import.meta.glob("../../locale/*.json", { import: "default" })).map(([path, resolver]) => {
+        return [path.split("/").pop()!.split(".")[0], resolver as () => Promise<LocaleData>];
     })
 );
 
