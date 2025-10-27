@@ -220,6 +220,20 @@ export const downloadBlob = (name: string, blob: Blob): Promise<void> => {
 
 /* formatting */
 
+// https://dev.to/jorik/country-code-to-flag-emoji-a21
+export const flagEmoji = (countryCode: string): string => {
+    const codePoints = countryCode
+        .toUpperCase()
+        .split("")
+        .map((char) => 127397 + char.charCodeAt(0));
+
+    return String.fromCodePoint(...codePoints);
+};
+
+export const languageToCountry = (languageCode: string): string => {
+    return new Intl.Locale(languageCode).maximize().region ?? "UN";
+};
+
 // https://stackoverflow.com/a/14919494
 
 /**

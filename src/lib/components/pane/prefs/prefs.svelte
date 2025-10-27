@@ -1,13 +1,13 @@
 <script lang="ts" module>
-    import { Paintbrush, Type, FolderOpen, SquareActivity } from "@lucide/svelte";
-    import ThemeSection from "./sections/theme.svelte";
+    import { Type, FolderOpen, SquareActivity, Settings } from "@lucide/svelte";
+    import GeneralSection from "./sections/general.svelte";
     import EditorSection from "./sections/editor.svelte";
     import WorkspaceSection from "./sections/workspace.svelte";
     import AnalysisSection from "./sections/analysis.svelte";
     import type { Component } from "svelte";
     import type { Icon } from "$lib/components/icons";
 
-    type SectionID = "theme" | "editor" | "workspace" | "analysis";
+    type SectionID = "general" | "editor" | "workspace" | "analysis";
     interface Section {
         id: SectionID;
         label: string;
@@ -16,7 +16,7 @@
     }
 
     const sections: Section[] = [
-        { id: "theme", label: "Theme", icon: Paintbrush, component: ThemeSection },
+        { id: "general", label: "General", icon: Settings, component: GeneralSection },
         { id: "editor", label: "Editor", icon: Type, component: EditorSection },
         { id: "workspace", label: "Workspace", icon: FolderOpen, component: WorkspaceSection },
         { id: "analysis", label: "Analysis", icon: SquareActivity, component: AnalysisSection },
@@ -36,7 +36,7 @@
     let _: PaneProps = $props();
 
     let sectionsElem: HTMLElement | undefined = $state();
-    let currentSection: SectionID | null = $state("theme");
+    let currentSection: SectionID | null = $state("general");
     const scrollToSection = (id: SectionID) => {
         currentSection = id;
         sectionsElem?.querySelector(`[data-section="${id}"]`)?.scrollIntoView({ behavior: "smooth" });

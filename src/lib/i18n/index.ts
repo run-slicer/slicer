@@ -5,7 +5,7 @@ interface LocaleData {
     "menu.brand": string;
 }
 
-const locales = new Map(
+export const locales = new Map(
     Object.entries(import.meta.glob<{ default: LocaleData }>("../../locale/*.json")).map(([path, resolver]) => {
         return [path.split("/").pop()!.split(".")[0], () => resolver().then((m) => m.default)];
     })
