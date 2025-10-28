@@ -59,4 +59,26 @@ export interface LocaleData {
     "pane.welcome.tips.1": string;
     "pane.welcome.tips.2": string;
     "pane.welcome.tips.3": string;
+    "command.placeholder": string;
+    "command.tabs": string;
+    "command.workspace": string;
+    "command.workspace.search": string;
+    "command.workspace.search.contextual": string;
+    "command.workspace.search.placeholder": string;
+    "command.workspace.search.no-entries": string;
+    "crumb.task": string;
+    "crumb.task.multiple": string;
+    "crumb.tasks": string;
+    "crumb.tasks.task": string;
+    "crumb.tasks.multiple": string;
+    "task.load": string;
+    "task.add": string;
+    "task.export": string;
+    "task.disasm": string;
+    "task.read": string;
+    "task.transform": string;
+    "task.analyze": string;
+    "task.search": string;
+    "task.fetch": string;
+    "task.script.import": string;
 }

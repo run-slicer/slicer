@@ -41,7 +41,7 @@ export const findClass = async (name: string): Promise<Uint8Array | null> => {
         return cacheData;
     }
 
-    return await record("fetching class", name, async () => {
+    return await record("task.fetch", name, async () => {
         const res = await fetch(url);
         if (!res.ok) {
             error(`failed to fetch class '${name}', status code ${res.status}`);

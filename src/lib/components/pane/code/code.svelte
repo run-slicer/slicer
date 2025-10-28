@@ -60,7 +60,7 @@
         })
     );
     $effect(() => {
-        record(interpType !== Interpretation.TEXT ? "disassembling" : "reading", entry.name, () => readPromise);
+        record(interpType !== Interpretation.TEXT ? "task.disasm" : "task.read", entry.name, () => readPromise);
     });
 </script>
 

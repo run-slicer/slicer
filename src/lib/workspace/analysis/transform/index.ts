@@ -54,7 +54,7 @@ export const transform = async (entry: ClassEntry, data: Uint8Array): Promise<Cl
 
     const originalData = data;
     const cloneEntry: ClassEntry = { ...entry, node: window.structuredClone(entry.node) };
-    await recordProgress("transforming", entry.name, async (task) => {
+    await recordProgress("task.transform", entry.name, async (task) => {
         for (let i = 0; i < enabledTrfs.length; i++) {
             const transformer = enabledTrfs[i];
 

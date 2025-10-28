@@ -33,3 +33,5 @@ export const tls = (group: string): Readable<string[]> => {
             .map(([, value]) => value);
     });
 };
+
+export type TranslationKey = keyof LocaleData;

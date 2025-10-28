@@ -89,7 +89,7 @@ export default {
 
         const results = await Promise.all(
             files.map((f) =>
-                recordTimed("loading", f.name, async () => {
+                recordTimed("task.load", f.name, async () => {
                     try {
                         return await loadZip(f);
                     } catch (e) {
@@ -138,7 +138,7 @@ export default {
             return;
         }
 
-        const results = await Promise.all(files.map((f) => recordTimed("adding", f.name, () => loadFile(f))));
+        const results = await Promise.all(files.map((f) => recordTimed("task.add", f.name, () => loadFile(f))));
 
         const time = results.reduce((acc, v) => acc + v.time, 0);
         const [created, skipped] = partition(
@@ -148,7 +148,7 @@ export default {
         await toastAdd(created, skipped, time);
     },
     async addRemote(url: string): Promise<void> {
-        const { time, result } = await recordTimed("adding", url, () => loadRemote(url));
+        const { time, result } = await recordTimed("task.add", url, () => loadRemote(url));
 
         const [created, skipped] = partition(result, (r) => r.created);
         await toastAdd(created, skipped, time);
@@ -196,11 +196,11 @@ export default {
         if (entries.length === 1) {
             const entry = entries[0];
 
-            return record("exporting", entry.name, async () => {
+            return record("task.export", entry.name, async () => {
                 try {
                     let entry0 = await readDeferred(entry);
                     if (entry.type === EntryType.CLASS && disasm) {
-                        entry0 = await record("disassembling", entry.name, () =>
+                        entry0 = await record("task.disasm", entry.name, () =>
                             disassembleEntry(entry as ClassEntry, disasm)
                         );
                     }
@@ -221,20 +221,20 @@ export default {
             entries = distribute(classes, others);
         }
 
-        return recordProgress("exporting", `${entries.length} entries`, async (exportTask) => {
+        return recordProgress("task.export", null, async (exportTask) => {
             const channel = new Channel<Data>();
             const chunks = chunk(entries, Math.ceil(entries.length / (disasm?.concurrency || 1)));
 
             let count = 0;
             const promises = chunks.map(async (chunk) => {
-                const task = addTask(createTask("reading", null));
+                const task = addTask(createTask("task.read", null));
 
                 for (let entry of chunk) {
                     entry = await readDeferred(entry);
 
                     const disassemble = disasm && entry.type === EntryType.CLASS;
                     task.desc.set(entry.name);
-                    task.name.set(disassemble ? "disassembling" : "reading");
+                    task.name.set(disassemble ? "task.disasm" : "task.read");
 
                     if (disassemble) {
                         entry = await disassembleEntry(entry as ClassEntry, disasm);
@@ -249,7 +249,7 @@ export default {
                         channel.push({ ...entry.data, name: entry.name }).then(); // we don't care about the result
                     }
 
-                    exportTask.desc.set(`${entries.length} entries (${entries.length - count} remaining)`);
+                    exportTask.desc.set(`${count}/${entries.length}`);
                     exportTask.progress?.set((count / entries.length) * 100);
                 }
 
@@ -264,7 +264,7 @@ export default {
                 });
             });
 
-            exportTask.desc.set(`${entries.length} entries`);
+            exportTask.desc.set(`${entries.length}`);
             return downloadBlob(`export-${disasm?.id || "raw"}-${timestampFile()}.zip`, blob);
         });
     },
@@ -298,7 +298,7 @@ export default {
             }
         }
 
-        const proto = await record("importing script", truncate(url, 120), () => readScript(url));
+        const proto = await record("task.script.import", truncate(url, 120), () => readScript(url));
         toast.success("Imported", {
             description: `Imported script ${proto.id}.`,
         });
