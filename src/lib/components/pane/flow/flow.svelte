@@ -23,6 +23,7 @@
     import { computeControlFlowGraph, computeHierarchyGraph } from "./graph";
     import type { PaneProps } from "$lib/components/pane";
     import { cyrb53 } from "$lib/utils";
+    import { t } from "$lib/i18n";
 
     let { tab, classes }: PaneProps = $props();
     const entry = tab.entry!;
@@ -33,13 +34,13 @@
     const methods = node ? node.methods : [];
 
     let member = $state(entry.type === EntryType.MEMBER ? (entry as MemberEntry).member : null);
-    const createLabel = (method: Member | null): string => {
-        return !method ? "<none>" : `${method.name.string}${method.type.string}`;
-    };
-
-    // hack createLabel for an unique identifier
     let methodIndex = $state(
-        (member ? methods.findIndex((m) => createLabel(m) === createLabel(member)) : -1).toString()
+        (member
+            ? methods.findIndex(
+                  (m) => `${m.name.string}${m.type.string}` === `${member!.name.string}${member!.type.string}`
+              )
+            : -1
+        ).toString()
     );
     $effect(() => {
         const parsedId = parseInt(methodIndex);
@@ -70,7 +71,7 @@
         <ContextMenu>
             <ContextMenuTrigger class="h-full w-full">
                 {#await computeGraph(member, showHandlerEdges, showImplicitSuperTypes)}
-                    <Loading value="Computing graph..." timed />
+                    <Loading value={$t("pane.graph.loading")} timed />
                 {:then [nodes, edges]}
                     <SvelteFlow
                         id={cyrb53(tab.id).toString(16)}
@@ -92,8 +93,8 @@
                                 <ControlButton
                                     class="svelte-flow__controls-interactive"
                                     onclick={() => (showHandlerEdges = !showHandlerEdges)}
-                                    title="toggle exception handler edges"
-                                    aria-label="toggle exception handler edges"
+                                    title={$t("pane.graph.controls.exceptions")}
+                                    aria-label={$t("pane.graph.controls.exceptions")}
                                 >
                                     {@const Icon = showHandlerEdges ? Zap : ZapOff}
                                     <Icon size={12} class="fill-none!" />
@@ -102,8 +103,8 @@
                                 <ControlButton
                                     class="svelte-flow__controls-interactive"
                                     onclick={() => (showImplicitSuperTypes = !showImplicitSuperTypes)}
-                                    title="toggle implicit super types"
-                                    aria-label="toggle implicit super types"
+                                    title={$t("pane.graph.controls.super")}
+                                    aria-label={$t("pane.graph.controls.super")}
                                 >
                                     {@const Icon = showImplicitSuperTypes ? Circle : CircleX}
                                     <Icon size={12} class="fill-none!" />
@@ -123,16 +124,20 @@
                     class="!bg-card h-7 max-w-[425px] text-xs whitespace-nowrap [&_svg]:ml-2 [&_svg]:h-4 [&_svg]:w-4"
                 >
                     <div class="overflow-hidden text-ellipsis">
-                        <span class="text-muted-foreground mr-2">Method: </span>
-                        <span class="font-mono tracking-tight">{createLabel(member)}</span>
+                        <span class="text-muted-foreground mr-2">
+                            {$t("pane.graph.method")}
+                        </span>
+                        <span class="font-mono tracking-tight">
+                            {!member ? $t("pane.graph.method.none") : `${member.name.string}${member.type.string}`}
+                        </span>
                     </div>
                 </SelectTrigger>
                 <SelectContent class="max-h-[240px] w-full overflow-scroll" side="top" align="start">
                     <SelectItem value="-1" label="<none>" class="font-mono text-xs tracking-tight">
-                        {"<none>"}
+                        {$t("pane.graph.method")}
                     </SelectItem>
                     {#each methods as mth, i}
-                        {@const label = createLabel(mth)}
+                        {@const label = !mth ? $t("pane.graph.method.none") : `${mth.name.string}${mth.type.string}`}
                         <SelectItem value={i.toString()} {label} class="font-mono text-xs tracking-tight break-all">
                             {label}
                         </SelectItem>

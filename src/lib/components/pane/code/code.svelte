@@ -1,19 +1,8 @@
-<script lang="ts" module>
-    import { Interpretation } from "./";
-
-    export const labels: Record<Interpretation, string> = {
-        [Interpretation.CLASS]: "Disassembly",
-        [Interpretation.HEX]: "Hexadecimal",
-        [Interpretation.TEXT]: "Text",
-        [Interpretation.BINARY_XML]: "Binary XML",
-    };
-</script>
-
 <script lang="ts">
     import { EntryType } from "$lib/workspace";
     import Loading from "$lib/components/loading.svelte";
     import { load as loadLanguage } from "$lib/lang";
-    import { detectLanguage, read, detectInterpretation, canInterpret } from "./";
+    import { detectLanguage, read, detectInterpretation, canInterpret, Interpretation } from "./";
     import CodeEditor from "$lib/components/editor/editor.svelte";
     import { Select, SelectContent, SelectItem, SelectTrigger } from "$lib/components/ui/select";
     import { Button } from "$lib/components/ui/button";
@@ -28,6 +17,7 @@
     import type { PaneProps } from "$lib/components/pane";
     import { cn } from "$lib/components/utils";
     import { interpHexRowBytes } from "$lib/state";
+    import { t } from "$lib/i18n";
 
     let { tab, disasms, handler }: PaneProps = $props();
     const entry = $derived(tab.entry!);
@@ -66,7 +56,10 @@
 
 <div class="scrollbar-thin relative basis-full overflow-hidden">
     {#await Promise.all([loadLanguage(language), readPromise])}
-        <Loading value={interpType !== Interpretation.TEXT ? "Disassembling..." : "Reading..."} timed />
+        <Loading
+            value={$t(interpType !== Interpretation.TEXT ? "pane.code.loading.disasm" : "pane.code.loading.read")}
+            timed
+        />
     {:then [lang, value]}
         <ContextMenu>
             <ContextMenuTrigger>
@@ -90,7 +83,9 @@
                 <SelectTrigger
                     class="!bg-card h-7 rounded-r-none border-r-0 text-xs [&_svg]:ml-2 [&_svg]:h-4 [&_svg]:w-4"
                 >
-                    <span class="text-muted-foreground mr-2">Disassembler: </span>
+                    <span class="text-muted-foreground mr-2">
+                        {$t("pane.code.disasm")}
+                    </span>
                     <span class="tracking-tight">{disasm.name || disasm.id}</span>
                 </SelectTrigger>
                 <SelectContent class="max-h-[240px] w-full overflow-scroll" side="top" align="end">
@@ -115,13 +110,15 @@
             </PopoverTrigger>
             <PopoverContent side="top" align="end" class="w-64">
                 <div class="flex flex-col gap-2">
-                    <div class="text-xs">Interpretation mode</div>
+                    <div class="text-xs">{$t("pane.code.interp")}</div>
                     <Select type="single" bind:value={interpType}>
                         <SelectTrigger class="h-7 w-full text-xs">
                             <span>
-                                {labels[interpType] || interpType}
+                                {$t(`pane.code.interp.${interpType}`)}
                                 {#if interpType === detectedInterp}
-                                    <span class="text-muted-foreground">(detected)</span>
+                                    <span class="text-muted-foreground">
+                                        {$t("pane.code.interp.detected")}
+                                    </span>
                                 {/if}
                             </span>
                         </SelectTrigger>
@@ -129,9 +126,11 @@
                             {#each Object.values(Interpretation) as type (type)}
                                 <SelectItem value={type} class="text-xs" disabled={!canInterpret(type, entry)}>
                                     <span>
-                                        {labels[type] || type}
+                                        {$t(`pane.code.interp.${type}`)}
                                         {#if type === detectedInterp}
-                                            <span class="text-muted-foreground">(detected)</span>
+                                            <span class="text-muted-foreground">
+                                                {$t("pane.code.interp.detected")}
+                                            </span>
                                         {/if}
                                     </span>
                                 </SelectItem>
