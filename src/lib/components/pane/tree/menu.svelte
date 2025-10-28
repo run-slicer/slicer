@@ -1,6 +1,7 @@
 <script lang="ts" module>
     import type { Node } from "./node.svelte";
     import type { Entry } from "$lib/workspace";
+    import { t } from "$lib/i18n";
 
     export const collectEntries = (node: Node): Entry[] => {
         const entries = node.entry ? [node.entry.value] : [];
@@ -43,45 +44,52 @@
     <ContextMenuSeparator />
     {#if entry}
         <ContextMenuSub>
-            <ContextMenuSubTrigger>Open as</ContextMenuSubTrigger>
+            <ContextMenuSubTrigger>{$t("pane.project.menu.open")}</ContextMenuSubTrigger>
             <ContextMenuSubContent class="w-48">
                 <ContextMenuItem class="flex justify-between" onclick={() => handler.open(entry.value, TabType.CODE)}>
-                    Code <Code size={16} />
+                    {$t("pane.project.menu.open.code")}
+                    <Code size={16} />
                 </ContextMenuItem>
                 <ContextMenuItem class="flex justify-between" onclick={() => handler.open(entry.value, TabType.IMAGE)}>
-                    Image <Image size={16} />
+                    {$t("pane.project.menu.open.image")}
+                    <Image size={16} />
                 </ContextMenuItem>
                 {#if entry.value.type !== EntryType.ARCHIVE}
                     <ContextMenuItem
                         class="flex justify-between"
                         onclick={() => handler.open(entry.value, TabType.GRAPH)}
                     >
-                        Graph <GitBranchPlus size={16} />
+                        {$t("pane.project.menu.open.graph")}
+                        <GitBranchPlus size={16} />
                     </ContextMenuItem>
                     <ContextMenuItem
                         class="flex justify-between"
                         onclick={() => handler.open(entry.value, TabType.CLASS)}
                     >
-                        Class <FileCode2 size={16} />
+                        {$t("pane.project.menu.open.class")}
+                        <FileCode2 size={16} />
                     </ContextMenuItem>
                 {/if}
                 <ContextMenuItem
                     class="flex justify-between"
                     onclick={() => handler.open(entry.value, TabType.HEAP_DUMP)}
                 >
-                    Heap dump <Gauge size={16} />
+                    {$t("pane.project.menu.open.dump")}
+                    <Gauge size={16} />
                 </ContextMenuItem>
             </ContextMenuSubContent>
         </ContextMenuSub>
         <ContextMenuSeparator />
         <ContextMenuItem class="flex justify-between" onclick={() => handler.export([entry.value])}>
-            Export <Download size={16} />
+            {$t("pane.project.menu.export")}
+            <Download size={16} />
         </ContextMenuItem>
     {/if}
     <ContextMenuItem
         class="data-highlighted:bg-destructive data-highlighted:text-primary-foreground flex justify-between"
         onclick={() => modals.open(DeleteDialog, { entries: collectEntries(node), handler })}
     >
-        Delete <Trash2 size={16} />
+        {$t("pane.project.menu.delete")}
+        <Trash2 size={16} />
     </ContextMenuItem>
 </ContextMenuContent>

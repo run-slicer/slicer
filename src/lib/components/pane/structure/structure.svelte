@@ -12,6 +12,7 @@
     import { partition } from "$lib/utils";
     import { current as currentTab } from "$lib/tab";
     import type { UTF8Entry } from "@katana-project/asm/pool";
+    import { t } from "$lib/i18n";
 
     let { handler, classes }: PaneProps = $props();
     let query = $state("");
@@ -68,7 +69,6 @@
     {#if currentEntry}
         {@const { icon: EntryIcon, classes } = entryIcon(currentEntry)}
         {@const hasSuperData = absData && (absData.superClass || absData.implementations.length > 0)}
-        <!-- Class info -->
         <div class="bg-muted/20 border-b p-3">
             {#if packageName}
                 <div class="text-muted-foreground mb-2 truncate text-xs" title={packageName}>
@@ -83,12 +83,13 @@
                 <div class="text-muted-foreground text-xs">
                     {#if absData.superClass}
                         <div class="truncate" title={absData.superClass}>
-                            extends <span class="text-secondary-foreground">{absData.superClass}</span>
+                            {$t("pane.structure.extends")}
+                            <span class="text-secondary-foreground">{absData.superClass}</span>
                         </div>
                     {/if}
                     {#if absData.implementations.length > 0}
                         <div class="truncate" title={absData.implementations.join(", ")}>
-                            implements
+                            {$t("pane.structure.implements")}
                             <span class="text-secondary-foreground">
                                 {absData.implementations.join(", ")}
                             </span>
@@ -97,22 +98,21 @@
                 </div>
             {/if}
         </div>
-        <!-- Search -->
         <div class="border-b p-3">
             <div class="relative">
                 <Search class="text-muted-foreground absolute top-2 left-2 h-4 w-4" />
-                <Input bind:value={query} placeholder="Search members..." class="h-8 pl-8" />
+                <Input bind:value={query} placeholder={$t("pane.structure.search.placeholder")} class="h-8 pl-8" />
             </div>
         </div>
 
-        <!-- Members list -->
         <div class="flex-1 overflow-y-auto">
             <div class="p-2">
-                <!-- Fields Section -->
                 {#if filteredFieldData.length > 0}
                     <div class="mb-4">
                         <div class="mb-2 flex items-center gap-2 px-2">
-                            <span class="text-muted-foreground text-sm font-medium">Fields ({fieldData.length})</span>
+                            <span class="text-muted-foreground text-sm font-medium">
+                                {$t("pane.structure.fields", fieldData.length)}
+                            </span>
                         </div>
                         {#each filteredFieldData as field}
                             {@const ModifierIcon = accessIcon(field.access)}
@@ -141,12 +141,11 @@
                     </div>
                 {/if}
 
-                <!-- Initializers Section -->
                 {#if filteredInitializerData.length > 0}
                     <div class="mb-4">
                         <div class="mb-2 flex items-center gap-2 px-2">
                             <span class="text-muted-foreground text-sm font-medium">
-                                Initializers ({initializerData.length})
+                                {$t("pane.structure.initializers", initializerData.length)}
                             </span>
                         </div>
                         {#each filteredInitializerData as initializer}
@@ -177,12 +176,11 @@
                     </div>
                 {/if}
 
-                <!-- Constructors Section -->
                 {#if filteredConstructorData.length > 0}
                     <div class="mb-4">
                         <div class="mb-2 flex items-center gap-2 px-2">
                             <span class="text-muted-foreground text-sm font-medium">
-                                Constructors ({constructorData.length})
+                                {$t("pane.structure.constructors", constructorData.length)}
                             </span>
                         </div>
                         {#each filteredConstructorData as constructor}
@@ -213,12 +211,11 @@
                     </div>
                 {/if}
 
-                <!-- Methods Section -->
                 {#if methodData.length > 0}
                     <div class="mb-4">
                         <div class="mb-2 flex items-center gap-2 px-2">
                             <span class="text-muted-foreground text-sm font-medium">
-                                Methods ({methodData.length})
+                                {$t("pane.structure.methods", methodData.length)}
                             </span>
                         </div>
                         {#each methodData as method}
@@ -254,12 +251,11 @@
                     </div>
                 {/if}
 
-                <!-- Inner Classes Section -->
                 {#if filteredInnerClassData.length > 0}
                     <div class="mb-4">
                         <div class="mb-2 flex items-center gap-2 px-2">
                             <span class="text-muted-foreground text-sm font-medium">
-                                Inner classes ({innerClassData.length})
+                                {$t("pane.structure.inner-classes", innerClassData.length)}
                             </span>
                         </div>
                         {#each filteredInnerClassData as innerClass}
@@ -286,14 +282,16 @@
                                             {#if innerClass.name}
                                                 <span class="truncate font-mono text-xs">{innerClass.name}</span>
                                             {:else}
-                                                <span class="text-muted-foreground text-xs">(anonymous)</span>
+                                                <span class="text-muted-foreground text-xs"
+                                                    >{$t("pane.structure.inner-classes.anonymous")}</span
+                                                >
                                             {/if}
                                         </div>
                                     </div>
                                 </ContextMenuTrigger>
                                 {#if innerClass.entry}
                                     <StructureMenu
-                                        title={innerClass.name ?? "anonymous class"}
+                                        title={innerClass.name ?? $t("pane.structure.inner-classes.anonymous")}
                                         {handler}
                                         entry={innerClass.entry}
                                     />
@@ -304,22 +302,25 @@
                 {/if}
 
                 {#if filteredMethodData.length === 0 && filteredConstructorData.length === 0 && filteredInitializerData.length === 0 && filteredFieldData.length === 0 && filteredInnerClassData.length === 0}
-                    <div class="text-muted-foreground py-8 text-center text-sm">No members found.</div>
+                    <div class="text-muted-foreground py-8 text-center text-sm">
+                        {$t("pane.structure.search.no-results")}
+                    </div>
                 {/if}
             </div>
         </div>
     {:else}
-        <!-- Empty State Content -->
         <div class="flex flex-1 items-center justify-center p-6">
             <div class="flex flex-col items-center justify-center p-8 text-center">
-                <!-- Icon -->
                 <div class="bg-muted/30 mb-4 flex h-16 w-16 items-center justify-center rounded-full">
                     <FileX2 class="text-muted-foreground h-8 w-8" />
                 </div>
 
-                <!-- Title and Subtitle -->
-                <h3 class="mb-2 text-lg font-semibold">Nothing to view.</h3>
-                <p class="text-muted-foreground text-sm">Open a Java class file to view its structure.</p>
+                <h3 class="mb-2 text-lg font-semibold">
+                    {$t("pane.structure.empty.title")}
+                </h3>
+                <p class="text-muted-foreground text-sm">
+                    {$t("pane.structure.empty.subtitle")}
+                </p>
             </div>
         </div>
     {/if}

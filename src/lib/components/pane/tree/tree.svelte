@@ -1,16 +1,3 @@
-<script lang="ts" module>
-    export const labels = [
-        {
-            label: "Files and directories",
-            value: "file",
-        },
-        {
-            label: "Packages",
-            value: "package",
-        },
-    ];
-</script>
-
 <script lang="ts">
     import { Plus } from "@lucide/svelte";
     import { Button } from "$lib/components/ui/button";
@@ -22,6 +9,7 @@
     import { Select, SelectContent, SelectItem, SelectTrigger } from "$lib/components/ui/select";
     import { type ProjectMode, projectMode } from "$lib/state";
     import { EntryType, entryRef } from "$lib/workspace";
+    import { t } from "$lib/i18n";
 
     let { entries, handler }: PaneProps = $props();
 
@@ -134,10 +122,15 @@
             {:else}
                 <div class="flex grow flex-col items-center justify-center gap-4">
                     <Button variant="outline" size="sm" onclick={() => handler.load()}>
-                        <Plus /> Open
+                        <Plus />
+                        {$t("pane.project.empty.open")}
                     </Button>
-                    <span class="text-muted-foreground text-xs">or</span>
-                    <span class="text-accent-foreground text-sm">drag n' drop</span>
+                    <span class="text-muted-foreground text-xs">
+                        {$t("pane.project.empty.or")}
+                    </span>
+                    <span class="text-accent-foreground text-sm">
+                        {$t("pane.project.empty.drag-drop")}
+                    </span>
                 </div>
             {/if}
         </div>
@@ -151,15 +144,16 @@
         class="border-t-border h-7 w-full rounded-none border-0 border-t text-xs [&_svg]:ml-2 [&_svg]:h-4 [&_svg]:w-4"
     >
         <span>
-            <span class="text-muted-foreground mr-2">Mode:</span>
-            {labels.find((l) => l.value === $projectMode)?.label}
+            <span class="text-muted-foreground mr-2">{$t("pane.project.mode")}</span>
+            {$t(`pane.project.mode.${$projectMode}`)}
         </span>
     </SelectTrigger>
     <SelectContent side="top" align="center" class="[&>*]:min-w-[calc(var(--bits-select-anchor-width)-16px)]">
-        {#each labels as { label, value }}
-            <SelectItem {value} {label} class="text-xs">
-                {label}
-            </SelectItem>
-        {/each}
+        <SelectItem value="file" label={$t("pane.project.mode.file")} class="text-xs">
+            {$t("pane.project.mode.file")}
+        </SelectItem>
+        <SelectItem value="package" label={$t("pane.project.mode.package")} class="text-xs">
+            {$t("pane.project.mode.package")}
+        </SelectItem>
     </SelectContent>
 </Select>
