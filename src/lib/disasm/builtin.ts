@@ -27,7 +27,7 @@ export const jasm: Disassembler = createFromWorker(
     {
         id: "jasm",
         name: "JASM",
-        version: "2.7.0",
+        version: "2.8.0",
         language: () => "jasm",
         concurrency: 5,
     },
