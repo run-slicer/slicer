@@ -17,7 +17,9 @@ const localeData = derived<typeof locale, LocaleData | null>(locale, ($locale, s
     }
 });
 
-type TranslationFunc = (key: keyof LocaleData, ...args: any[]) => string;
+export type TranslationKey = keyof LocaleData;
+
+type TranslationFunc = (key: TranslationKey, ...args: any[]) => string;
 export const t = derived(localeData, ($localeData): TranslationFunc => {
     return (key, ...args) => {
         return $localeData ? ($localeData[key]?.replace(/{(\d+)}/g, (m, i) => args[i]?.toString() ?? m) ?? key) : key;
@@ -33,5 +35,3 @@ export const tls = (group: string): Readable<string[]> => {
             .map(([, value]) => value);
     });
 };
-
-export type TranslationKey = keyof LocaleData;

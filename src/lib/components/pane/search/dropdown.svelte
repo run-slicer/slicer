@@ -1,26 +1,3 @@
-<script lang="ts" module>
-    import { QueryType } from "$lib/workspace/analysis";
-
-    export const types = [
-        {
-            value: QueryType.PSEUDOCODE,
-            label: "Pseudocode",
-        },
-        {
-            value: QueryType.STRING,
-            label: "Strings",
-        },
-        {
-            value: QueryType.FIELD,
-            label: "Fields",
-        },
-        {
-            value: QueryType.METHOD,
-            label: "Methods",
-        },
-    ];
-</script>
-
 <script lang="ts">
     import { buttonVariants } from "$lib/components/ui/button";
     import {
@@ -35,6 +12,8 @@
     import { cn } from "$lib/components/utils";
     import { SearchMode } from "$lib/workspace/analysis";
     import { ChevronsUpDown } from "@lucide/svelte";
+    import { QueryType } from "$lib/workspace/analysis/search";
+    import { t } from "$lib/i18n";
 
     interface Props {
         type: QueryType;
@@ -44,8 +23,6 @@
     }
 
     let { type = $bindable(), mode = $bindable(), ref = $bindable(), disabled }: Props = $props();
-
-    let currentType = $derived(types.find((t) => t.value === type)!);
 </script>
 
 <DropdownMenu>
@@ -53,13 +30,15 @@
         {disabled}
         class={cn(buttonVariants({ variant: "outline" }), "min-w-44 justify-between rounded-r-none border-r-0")}
     >
-        {currentType.label}
+        {$t(`pane.search.menu.type.${type}`)}
         <ChevronsUpDown class="opacity-50" />
     </DropdownMenuTrigger>
     <DropdownMenuContent class="w-44" align="start">
         <DropdownMenuRadioGroup bind:value={type}>
-            {#each types as type}
-                <DropdownMenuRadioItem value={type.value}>{type.label}</DropdownMenuRadioItem>
+            {#each Object.values(QueryType) as queryType}
+                <DropdownMenuRadioItem value={queryType}>
+                    {$t(`pane.search.menu.type.${queryType}`)}
+                </DropdownMenuRadioItem>
             {/each}
         </DropdownMenuRadioGroup>
         <DropdownMenuSeparator />
@@ -67,13 +46,15 @@
             bind:checked={ref}
             disabled={type === QueryType.PSEUDOCODE || type === QueryType.STRING}
         >
-            Reference
+            {$t("pane.search.menu.ref")}
         </DropdownMenuCheckboxItem>
         <DropdownMenuSeparator />
         <DropdownMenuRadioGroup bind:value={mode}>
-            <DropdownMenuRadioItem value={SearchMode.PARTIAL_MATCH}>Partial match</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value={SearchMode.EXACT_MATCH}>Exact match</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value={SearchMode.REGEXP}>RegExp match</DropdownMenuRadioItem>
+            {#each Object.values(SearchMode) as searchMode}
+                <DropdownMenuRadioItem value={searchMode}>
+                    {$t(`pane.search.menu.mode.${searchMode}`)}
+                </DropdownMenuRadioItem>
+            {/each}
         </DropdownMenuRadioGroup>
     </DropdownMenuContent>
 </DropdownMenu>

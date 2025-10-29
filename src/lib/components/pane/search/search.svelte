@@ -11,6 +11,7 @@
     import { groupBy } from "$lib/utils";
     import { toast } from "svelte-sonner";
     import { error } from "$lib/log";
+    import { t } from "$lib/i18n";
 
     let { entries, handler }: PaneProps = $props();
 
@@ -71,7 +72,7 @@
     <div class="flex w-full flex-row px-2 pt-2">
         <Dropdown bind:type bind:mode bind:ref disabled={searching} />
         <Input
-            placeholder="Search anything..."
+            placeholder={$t("pane.search.placeholder")}
             type="text"
             bind:value
             class="z-10 rounded-l-none rounded-r-none border-r-0"
@@ -90,13 +91,17 @@
     </div>
     <div class="border-b-border flex w-full flex-row justify-between border-b px-3 py-2 text-xs">
         {#if searching}
-            <span>Searching...</span>
-            <span class="text-muted-foreground">{results.length} result(s), elapsed {time}ms</span>
+            <span>{$t("pane.search.loading")}</span>
+            <span class="text-muted-foreground">
+                {$t("pane.search.results", results.length, time)}
+            </span>
         {:else if !searching && time > -1}
-            <span>Search finished.</span>
-            <span class="text-muted-foreground">{results.length} result(s), elapsed {time}ms</span>
+            <span>{$t("pane.search.loaded")}</span>
+            <span class="text-muted-foreground">
+                {$t("pane.search.results", results.length, time)}
+            </span>
         {:else}
-            <span class="text-muted-foreground">No results? Search something.</span>
+            <span class="text-muted-foreground">{$t("pane.search.no-results")}</span>
         {/if}
     </div>
     <VList data={resultsByEntry} class="flex h-full w-full flex-col" getKey={(_, i) => i}>

@@ -8,6 +8,7 @@
     import { Fullscreen, ZoomIn, ZoomOut } from "@lucide/svelte";
     import MenuButton from "./menu_button.svelte";
     import type { PaneProps } from "$lib/components/pane";
+    import { t } from "$lib/i18n";
 
     let { tab }: PaneProps = $props();
     const entry = $derived(tab.entry!);
@@ -100,14 +101,14 @@
 </script>
 
 {#await entry.data.blob()}
-    <Loading value="Reading..." timed />
+    <Loading value={$t("pane.image.loading")} timed />
 {:then blob}
     <div class="flex h-8 min-h-8 w-full flex-col">
         <div class="bg-background flex grow flex-row items-center justify-between px-2">
             <div class="flex gap-2">
-                <MenuButton icon={Fullscreen} label="Reset" onclick={reset} />
-                <MenuButton icon={ZoomIn} label="Zoom in" onclick={() => rescale((s) => s + 0.5)} />
-                <MenuButton icon={ZoomOut} label="Zoom out" onclick={() => rescale((s) => s - 0.5)} />
+                <MenuButton icon={Fullscreen} label={$t("pane.image.zoom.reset")} onclick={reset} />
+                <MenuButton icon={ZoomIn} label={$t("pane.image.zoom.in")} onclick={() => rescale((s) => s + 0.5)} />
+                <MenuButton icon={ZoomOut} label={$t("pane.image.zoom.out")} onclick={() => rescale((s) => s - 0.5)} />
             </div>
             <div class="text-xs">
                 {elem?.naturalWidth || 0}x{elem?.naturalHeight || 0}

@@ -1,3 +1,5 @@
+// This file is auto-generated, DO NOT EDIT!
+
 export interface LocaleData {
     "menu.root": string;
     "menu.root.about": string;
@@ -110,6 +112,38 @@ export interface LocaleData {
     "pane.graph.controls.super": string;
     "pane.graph.menu.title": string;
     "pane.graph.menu.export": string;
+    "pane.image.loading": string;
+    "pane.image.zoom.reset": string;
+    "pane.image.zoom.in": string;
+    "pane.image.zoom.out": string;
+    "pane.dump.loading": string;
+    "pane.dump.timestamp": string;
+    "pane.dump.id-size": string;
+    "pane.dump.id-size.bits": string;
+    "pane.dump.total-size": string;
+    "pane.dump.fail.title": string;
+    "pane.dump.fail.subtitle": string;
+    "pane.dump.table.total-size": string;
+    "pane.dump.table.instances": string;
+    "pane.dump.table.largest-size": string;
+    "pane.dump.table.name": string;
+    "pane.dump.table.order": string;
+    "pane.dump.table.page": string;
+    "pane.dump.table.filter.placeholder": string;
+    "pane.dump.table.filter.no-results": string;
+    "pane.search.placeholder": string;
+    "pane.search.loading": string;
+    "pane.search.loaded": string;
+    "pane.search.results": string;
+    "pane.search.no-results": string;
+    "pane.search.menu.type.pseudocode": string;
+    "pane.search.menu.type.string": string;
+    "pane.search.menu.type.method": string;
+    "pane.search.menu.type.field": string;
+    "pane.search.menu.ref": string;
+    "pane.search.menu.mode.partial": string;
+    "pane.search.menu.mode.exact": string;
+    "pane.search.menu.mode.regexp": string;
     "command.placeholder": string;
     "command.tabs": string;
     "command.workspace": string;
