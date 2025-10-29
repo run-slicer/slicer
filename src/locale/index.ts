@@ -1,6 +1,7 @@
 // This file is auto-generated, DO NOT EDIT!
 
 export interface LocaleData {
+    "locale.none": string;
     "menu.root": string;
     "menu.root.about": string;
     "menu.root.docs": string;

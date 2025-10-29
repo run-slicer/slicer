@@ -1,4 +1,5 @@
 {
+    "locale.none": "Robot",
     "menu.root": "slicer",
     "menu.root.about": "About",
     "menu.root.docs": "Documentation",

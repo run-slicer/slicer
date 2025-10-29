@@ -4,7 +4,7 @@
     import { Select, SelectContent, SelectItem, SelectTrigger } from "$lib/components/ui/select";
     import { Slider } from "$lib/components/ui/slider";
     import { locale, themeColor, themeRadius } from "$lib/state";
-    import { locales } from "$lib/i18n";
+    import { t, locales } from "$lib/i18n";
     import Section from "../section.svelte";
     import Label from "../label.svelte";
     import { flagEmoji, languageToCountry, tryOrNull } from "$lib/utils";
@@ -29,9 +29,9 @@
                         <span>{tryOrNull(() => languageNames?.of(localeCode)) ?? localeCode}</span>
                     </SelectItem>
                 {/each}
-                <SelectItem value="none" class="gap-2">
+                <SelectItem value="locale.none" class="gap-2">
                     <span>🤖</span>
-                    <span>None</span>
+                    <span>{$t("locale.none")}</span>
                 </SelectItem>
             </SelectContent>
         </Select>
