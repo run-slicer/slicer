@@ -13,6 +13,7 @@
     import type { Entry } from "$lib/workspace";
     import type { EventHandler } from "$lib/event";
     import type { ModalProps } from "svelte-modals";
+    import { t } from "$lib/i18n";
 
     interface Props extends ModalProps {
         entries: Entry[];
@@ -32,24 +33,17 @@
 <AlertDialog bind:open={isOpen} onOpenChangeComplete={(open) => open || close()}>
     <AlertDialogContent class="sm:max-w-[425px]">
         <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure, absolutely sure?</AlertDialogTitle>
+            <AlertDialogTitle>{$t("dialog.delete.title")}</AlertDialogTitle>
             <AlertDialogDescription>
-                This will permanently delete
-                <span class="break-all italic">
-                    {#if entries.length === 1}
-                        {entries[0].name}
-                    {:else}
-                        {entries.length} entries
-                    {/if}
-                </span>
-                from the workspace.
-                <p class="mt-2 font-semibold">This action cannot be undone.</p>
+                {@html entries.length === 1
+                    ? $t("dialog.delete.desc.single", entries[0].name)
+                    : $t("dialog.delete.desc.multiple", entries.length)}
             </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-            <AlertDialogCancel onclick={() => handle(false)}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel onclick={() => handle(false)}>{$t("dialog.delete.action.cancel")}</AlertDialogCancel>
             <AlertDialogAction class={buttonVariants({ variant: "destructive" })} onclick={() => handle(true)}>
-                Delete
+                {$t("dialog.delete.action.confirm")}
             </AlertDialogAction>
         </AlertDialogFooter>
     </AlertDialogContent>

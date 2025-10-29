@@ -12,6 +12,7 @@
     import { buttonVariants } from "$lib/components/ui/button";
     import type { EventHandler } from "$lib/event";
     import type { ModalProps } from "svelte-modals";
+    import { t } from "$lib/i18n";
 
     interface Props extends ModalProps {
         handler: EventHandler;
@@ -27,16 +28,15 @@
 <AlertDialog bind:open={isOpen} onOpenChangeComplete={(open) => open || close()}>
     <AlertDialogContent class="sm:max-w-[425px]">
         <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure, absolutely sure?</AlertDialogTitle>
+            <AlertDialogTitle>{$t("dialog.clear.title")}</AlertDialogTitle>
             <AlertDialogDescription>
-                This will permanently delete all entries from the workspace.
-                <p class="mt-2 font-semibold">This action cannot be undone.</p>
+                {@html $t("dialog.clear.desc")}
             </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{$t("dialog.clear.action.cancel")}</AlertDialogCancel>
             <AlertDialogAction class={buttonVariants({ variant: "destructive" })} onclick={handle}>
-                Delete
+                {$t("dialog.clear.action.confirm")}
             </AlertDialogAction>
         </AlertDialogFooter>
     </AlertDialogContent>

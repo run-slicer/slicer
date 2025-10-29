@@ -13,6 +13,7 @@
     import { cn } from "$lib/components/utils";
     import type { ModalProps } from "svelte-modals";
     import type { EventHandler } from "$lib/event";
+    import { t } from "$lib/i18n";
 
     interface Props extends ModalProps {
         handler: EventHandler;
@@ -37,14 +38,13 @@
 <Dialog bind:open={isOpen} onOpenChangeComplete={(open) => open || close()}>
     <DialogContent>
         <DialogHeader>
-            <DialogTitle>Add remote file</DialogTitle>
+            <DialogTitle>{$t("dialog.load-external.title")}</DialogTitle>
             <DialogDescription>
-                Import a file from an arbitrary URL here.
-                <p class="mt-2 italic">The serving HTTP server has to have CORS enabled for this to work.</p>
+                {@html $t("dialog.load-external.desc")}
             </DialogDescription>
         </DialogHeader>
         <div class="grid grid-cols-6 items-center gap-4">
-            <Label for="name" class="text-right">URL</Label>
+            <Label for="name" class="text-right">{$t("dialog.load-external.url")}</Label>
             <Input
                 id="name"
                 placeholder="https://..."
@@ -54,7 +54,9 @@
             />
         </div>
         <DialogFooter>
-            <Button type="submit" onclick={loadFile}>Import</Button>
+            <Button type="submit" onclick={loadFile}>
+                {$t("dialog.load-external.action.confirm")}
+            </Button>
         </DialogFooter>
     </DialogContent>
 </Dialog>

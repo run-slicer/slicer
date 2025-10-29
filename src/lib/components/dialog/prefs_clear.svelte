@@ -12,6 +12,7 @@
     import { buttonVariants } from "$lib/components/ui/button";
     import type { ModalProps } from "svelte-modals";
     import { clear } from "$lib/state";
+    import { t } from "$lib/i18n";
 
     let { isOpen, close }: ModalProps = $props();
     const handle = async () => {
@@ -23,16 +24,15 @@
 <AlertDialog bind:open={isOpen} onOpenChangeComplete={(open) => open || close()}>
     <AlertDialogContent class="sm:max-w-[425px]">
         <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure, absolutely sure?</AlertDialogTitle>
+            <AlertDialogTitle>{$t("dialog.prefs-clear.title")}</AlertDialogTitle>
             <AlertDialogDescription>
-                This will permanently undo all your customizations.
-                <p class="mt-2 font-semibold">This action cannot be undone.</p>
+                {@html $t("dialog.prefs-clear.desc")}
             </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{$t("dialog.prefs-clear.action.cancel")}</AlertDialogCancel>
             <AlertDialogAction class={buttonVariants({ variant: "destructive" })} onclick={handle}>
-                Clear
+                {$t("dialog.prefs-clear.action.confirm")}
             </AlertDialogAction>
         </AlertDialogFooter>
     </AlertDialogContent>

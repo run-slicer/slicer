@@ -1,6 +1,7 @@
 <script lang="ts">
     import { Dialog, DialogContent } from "$lib/components/ui/dialog";
     import type { ModalProps } from "svelte-modals";
+    import { t } from "$lib/i18n";
 
     let { isOpen, close }: ModalProps = $props();
 
@@ -23,11 +24,13 @@
             </div>
             <div>
                 <p class="text-2xl">
-                    <button class="mr-1 cursor-help font-semibold" onclick={changeImage}>slicer</button>
+                    <button class="mr-1 cursor-help font-semibold" onclick={changeImage}>
+                        {$t("dialog.about.brand")}
+                    </button>
                 </p>
                 <p class="text-sm">
                     {#if import.meta.env.DEV}
-                        development build
+                        {$t("dialog.about.build.dev")}
                     {:else}
                         {@const commit = import.meta.env.WORKERS_CI_COMMIT_SHA || "0".repeat(40)}
                         <!-- this is ugly, but I don't want a space before the comma -->
@@ -35,7 +38,7 @@
                             href={`https://github.com/run-slicer/slicer/commit/${commit}`}
                             target="_blank"
                             class="hover:text-blue-700 hover:underline">{commit.substring(0, 7)}</a
-                        >, branch {import.meta.env.WORKERS_CI_BRANCH || "unknown"}
+                        >{$t("dialog.about.build.branch", import.meta.env.WORKERS_CI_BRANCH || "unknown")}
                     {/if}
                 </p>
                 <p class="mt-6 font-mono text-sm">
@@ -44,11 +47,7 @@
             </div>
         </div>
         <p class="text-muted-foreground mt-2 text-center text-sm">
-            Open-source ❤️
-            <span class="mx-2">@</span>
-            <a href="https://github.com/run-slicer/slicer" class="text-blue-600 hover:text-blue-700 hover:underline">
-                run-slicer/slicer
-            </a>
+            {@html $t("dialog.about.footer")}
         </p>
     </DialogContent>
 </Dialog>
