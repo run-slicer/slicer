@@ -7,9 +7,9 @@
     import { locales } from "$lib/i18n";
     import Section from "../section.svelte";
     import Label from "../label.svelte";
-    import { flagEmoji, languageToCountry } from "$lib/utils";
+    import { flagEmoji, languageToCountry, tryOrNull } from "$lib/utils";
 
-    let languageNames = $derived(new Intl.DisplayNames($locale, { type: "language" }));
+    let languageNames = $derived(tryOrNull(() => new Intl.DisplayNames($locale, { type: "language" })));
 </script>
 
 <Section id="general" labelKey="pane.prefs.section.general">
@@ -17,15 +17,19 @@
         <Label for="locale" textKey="pane.prefs.general.language" />
         <Select type="single" bind:value={$locale}>
             <SelectTrigger id="locale" class="w-48">
-                {languageNames.of($locale)}
+                {tryOrNull(() => languageNames?.of($locale)) ?? $locale}
             </SelectTrigger>
             <SelectContent>
                 {#each locales.keys() as localeCode (localeCode)}
                     <SelectItem value={localeCode} class="gap-2">
                         <span>{flagEmoji(languageToCountry(localeCode))}</span>
-                        <span>{languageNames.of(localeCode)}</span>
+                        <span>{tryOrNull(() => languageNames?.of(localeCode)) ?? localeCode}</span>
                     </SelectItem>
                 {/each}
+                <SelectItem value="none" class="gap-2">
+                    <span>🤖</span>
+                    <span>None</span>
+                </SelectItem>
             </SelectContent>
         </Select>
     </div>

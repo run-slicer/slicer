@@ -179,7 +179,7 @@
             </MenubarContent>
         </MenubarMenu>
         <MenubarMenu>
-            <MenubarTrigger class="relative">File</MenubarTrigger>
+            <MenubarTrigger class="relative">{$t("menu.file")}</MenubarTrigger>
             <MenubarContent align="start">
                 <MenubarItem onclick={() => handler.load()}>
                     {$t("menu.file.open")}
@@ -294,7 +294,7 @@
                         {#each groups.entries() as [group, trfs]}
                             <MenubarSub>
                                 <MenubarSubTrigger>
-                                    {group || $t("menu.analysis.transformers.general")}
+                                    {$t(`transformer.group.${group ?? "general"}`)}
                                 </MenubarSubTrigger>
                                 <MenubarSubContent class="min-w-[12rem]" align="start">
                                     {#each trfs as trf (trf.id)}
@@ -304,7 +304,7 @@
                                             checked={$analysisTransformers.includes(trf.id)}
                                             onCheckedChange={(checked) => toggleTransformer(trf, checked)}
                                         >
-                                            {trf.name || trf.id}
+                                            {$t(`transformer.${trf.id}`)}
                                             {#if Icon}<Icon size={16} class="ml-3" />{/if}
                                         </MenubarCheckboxItem>
                                     {/each}

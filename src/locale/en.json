@@ -32,7 +32,6 @@
     "menu.analysis": "Analysis",
     "menu.analysis.search": "Search",
     "menu.analysis.transformers": "Transformers",
-    "menu.analysis.transformers.general": "General",
     "menu.scripts": "Scripts",
     "menu.scripts.import": "Import",
     "menu.scripts.import.url": "From URL",
@@ -325,5 +324,19 @@
     "toast.info.title.duplicate.single": "Duplicate entry",
     "toast.info.title.duplicate.multiple": "Duplicate entries",
     "toast.info.duplicate.single": "Skipped adding {0}, as it is already present in the workspace.",
-    "toast.info.duplicate.multiple": "Skipped adding {0} entries, as they were already present in the workspace."
+    "toast.info.duplicate.multiple": "Skipped adding {0} entries, as they were already present in the workspace.",
+    "transformer.group.general": "General",
+    "transformer.group.norm": "Normalization",
+    "transformer.group.read": "Readability",
+    "transformer.norm.verify": "Verify attributes",
+    "transformer.norm.modifier": "Remove unnecessary modifiers",
+    "transformer.norm.try-catch": "Remove unnecessary try-catches",
+    "transformer.norm.lvt": "Remove unused local variables",
+    "transformer.norm.unreachable": "No-op unreachable code",
+    "transformer.read.annotation": "Strip annotations",
+    "transformer.read.try-catch": "Strip try-catches",
+    "transformer.read.monitor": "Strip synchronized blocks",
+    "transformer.read.lvt": "Strip local variables",
+    "transformer.read.signature": "Strip generic signatures",
+    "transformer.read.debug": "Strip debug information"
 }

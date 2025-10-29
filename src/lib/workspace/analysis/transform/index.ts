@@ -12,7 +12,6 @@ import readabilityTransformers from "./read";
 
 export interface Transformer {
     id: string;
-    name?: string;
     group?: string;
     icon?: Icon;
 
@@ -28,7 +27,6 @@ export const transformers: Writable<Transformer[]> = writable([
     // script transforms should be processed last
     {
         id: "script",
-        name: "Scripts",
         internal: true,
         async run(entry, data) {
             return (await rootContext.dispatchEvent({ type: "preload", name: entry.name, data })).data;

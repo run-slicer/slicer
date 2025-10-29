@@ -110,6 +110,14 @@ export const rateLimit = <T extends (...args: any[]) => Promise<any>>(
     };
 };
 
+export const tryOrNull = <T>(func: () => T): T | null => {
+    try {
+        return func();
+    } catch {}
+
+    return null;
+};
+
 export const uniqueBy = <T, K>(arr: T[], func: (e: T) => K): T[] => {
     const seen = new Map<K, T>();
     for (let i = arr.length - 1; i >= 0; i--) {
@@ -231,7 +239,7 @@ export const flagEmoji = (countryCode: string): string => {
 };
 
 export const languageToCountry = (languageCode: string): string => {
-    return new Intl.Locale(languageCode).maximize().region ?? "UN";
+    return tryOrNull(() => new Intl.Locale(languageCode).maximize().region) ?? "UN";
 };
 
 // https://stackoverflow.com/a/14919494

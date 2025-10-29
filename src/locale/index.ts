@@ -34,7 +34,6 @@ export interface LocaleData {
     "menu.analysis": string;
     "menu.analysis.search": string;
     "menu.analysis.transformers": string;
-    "menu.analysis.transformers.general": string;
     "menu.scripts": string;
     "menu.scripts.import": string;
     "menu.scripts.import.url": string;
@@ -328,4 +327,18 @@ export interface LocaleData {
     "toast.info.title.duplicate.multiple": string;
     "toast.info.duplicate.single": string;
     "toast.info.duplicate.multiple": string;
+    "transformer.group.general": string;
+    "transformer.group.norm": string;
+    "transformer.group.read": string;
+    "transformer.norm.verify": string;
+    "transformer.norm.modifier": string;
+    "transformer.norm.try-catch": string;
+    "transformer.norm.lvt": string;
+    "transformer.norm.unreachable": string;
+    "transformer.read.annotation": string;
+    "transformer.read.try-catch": string;
+    "transformer.read.monitor": string;
+    "transformer.read.lvt": string;
+    "transformer.read.signature": string;
+    "transformer.read.debug": string;
 }

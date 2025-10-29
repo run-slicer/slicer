@@ -1,6 +1,5 @@
 <script lang="ts">
     import { encodings } from "$lib/workspace/encoding";
-    import { capitalize } from "$lib/utils";
     import { Alert, AlertTitle } from "$lib/components/ui/alert";
     import { Select, SelectContent, SelectItem, SelectTrigger } from "$lib/components/ui/select";
     import { Input } from "$lib/components/ui/input";
@@ -59,7 +58,7 @@
         />
         <Select type="single" bind:value={$workspaceArchiveDuplicateHandling}>
             <SelectTrigger id="workspaceArchiveDuplicateHandling" class="w-48">
-                {capitalize($workspaceArchiveDuplicateHandling)}
+                {$t(`pane.prefs.workspace.duplicate-handling.${$workspaceArchiveDuplicateHandling}`)}
             </SelectTrigger>
             <SelectContent>
                 <SelectItem value="skip">{$t("pane.prefs.workspace.duplicate-handling.skip")}</SelectItem>
