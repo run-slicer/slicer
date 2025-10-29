@@ -61,7 +61,7 @@
                                     </Button>
                                 {/snippet}
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent class="w-48" align="end">
+                            <DropdownMenuContent class="min-w-48" align="end">
                                 <DropdownMenuItem
                                     class="justify-between"
                                     onclick={() => handler.open(memberEntry(entry, method), TabType.CODE)}

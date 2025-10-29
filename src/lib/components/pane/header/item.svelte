@@ -73,7 +73,7 @@
             {/if}
         </button>
     </ContextMenuTrigger>
-    <ContextMenuContent class="w-48">
+    <ContextMenuContent class="min-w-48">
         <ContextMenuLabel>{name}</ContextMenuLabel>
         <ContextMenuSeparator />
         <ContextMenuItem onclick={(e) => handleClose(e, "self")} class="justify-between">

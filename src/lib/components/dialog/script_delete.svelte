@@ -31,7 +31,7 @@
 </script>
 
 <AlertDialog bind:open={isOpen} onOpenChangeComplete={(open) => open || close()}>
-    <AlertDialogContent class="sm:max-w-[425px]">
+    <AlertDialogContent>
         <AlertDialogHeader>
             <AlertDialogTitle>{$t("dialog.script-delete.title")}</AlertDialogTitle>
             <AlertDialogDescription>

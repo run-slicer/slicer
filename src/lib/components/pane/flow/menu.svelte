@@ -74,12 +74,12 @@
     };
 </script>
 
-<ContextMenuContent class="w-48">
+<ContextMenuContent class="min-w-48">
     <ContextMenuLabel>{$t("pane.graph.menu.title")}</ContextMenuLabel>
     <ContextMenuSeparator />
     <ContextMenuSub>
         <ContextMenuSubTrigger>{$t("pane.graph.menu.export")}</ContextMenuSubTrigger>
-        <ContextMenuSubContent class="w-48">
+        <ContextMenuSubContent class="min-w-48">
             <ContextMenuItem class="flex justify-between" onclick={() => exportImage("svg")}>
                 SVG <CodeXml size={16} />
             </ContextMenuItem>

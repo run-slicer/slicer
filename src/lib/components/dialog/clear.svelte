@@ -26,7 +26,7 @@
 </script>
 
 <AlertDialog bind:open={isOpen} onOpenChangeComplete={(open) => open || close()}>
-    <AlertDialogContent class="sm:max-w-[425px]">
+    <AlertDialogContent>
         <AlertDialogHeader>
             <AlertDialogTitle>{$t("dialog.clear.title")}</AlertDialogTitle>
             <AlertDialogDescription>

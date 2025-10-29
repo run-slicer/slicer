@@ -31,7 +31,7 @@
     let entry = $derived(tab.entry!);
 </script>
 
-<ContextMenuContent class="w-48">
+<ContextMenuContent class="min-w-48">
     <ContextMenuLabel inset>{$t("pane.code.menu.editor")}</ContextMenuLabel>
     <ContextMenuSeparator />
     <ContextMenuCheckboxItem class="justify-between" bind:checked={wrap}>
@@ -47,7 +47,7 @@
     <ContextMenuSeparator />
     <ContextMenuSub>
         <ContextMenuSubTrigger inset>{$t("pane.code.menu.file.export")}</ContextMenuSubTrigger>
-        <ContextMenuSubContent class="w-48">
+        <ContextMenuSubContent class="min-w-48">
             <ContextMenuItem class="flex justify-between" onclick={() => handler.export([entry])}>
                 {$t("pane.code.menu.file.export.raw")}
                 <Binary size={16} />

@@ -39,13 +39,13 @@
     let entry = $derived(node.entry);
 </script>
 
-<ContextMenuContent class="w-48">
+<ContextMenuContent class="max-w-56 min-w-48">
     <ContextMenuLabel>{node.label}</ContextMenuLabel>
     <ContextMenuSeparator />
     {#if entry}
         <ContextMenuSub>
             <ContextMenuSubTrigger>{$t("pane.project.menu.open")}</ContextMenuSubTrigger>
-            <ContextMenuSubContent class="w-48">
+            <ContextMenuSubContent class="min-w-48">
                 <ContextMenuItem class="flex justify-between" onclick={() => handler.open(entry.value, TabType.CODE)}>
                     {$t("pane.project.menu.open.code")}
                     <Code size={16} />
