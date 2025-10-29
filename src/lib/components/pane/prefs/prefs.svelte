@@ -32,6 +32,7 @@
     import { toast } from "svelte-sonner";
     import { modals } from "svelte-modals";
     import { PrefsClearDialog } from "$lib/components/dialog";
+    import { tl } from "$lib/i18n";
 
     let _: PaneProps = $props();
 
@@ -69,8 +70,8 @@
                         `slicer-${timestampFile()}.json`,
                         new Blob([save()], { type: "application/json" })
                     );
-                    toast.success("Exported", {
-                        description: `Preferences exported successfully.`,
+                    toast.success(tl("toast.success.title.export"), {
+                        description: tl("toast.success.prefs-export"),
                     });
                 }}
             >
@@ -83,8 +84,8 @@
                 onclick={async () => {
                     const files = await readFiles(".json", false);
                     if (files.length > 0 && !load(await files[0].text())) {
-                        toast.error("Error occurred", {
-                            description: `Could not import preferences, failed to read file.`,
+                        toast.error(tl("toast.error.title.generic"), {
+                            description: tl("toast.error.prefs-import"),
                         });
                     }
                 }}

@@ -391,8 +391,8 @@ const read0 = async (url: string): Promise<ProtoScript> => {
     } catch (e) {
         error("failed to read script", e);
 
-        toast.error("Script failed", {
-            description: `Failed to read script ${id}, check the console.`,
+        toast.error(tl("toast.error.title.script.generic"), {
+            description: tl("toast.error.script.read", id),
         });
     }
 
@@ -423,8 +423,8 @@ export const load = async (def: ProtoScript): Promise<void> => {
         error("failed to load script", e);
         def.state = ScriptState.FAILED;
 
-        toast.error("Script failed", {
-            description: `Failed to load script ${def.id}, check the console.`,
+        toast.error(tl("toast.error.title.script.generic"), {
+            description: tl("toast.error.script.load", def.id),
         });
     }
 
@@ -447,8 +447,8 @@ export const unload = async (def: ProtoScript): Promise<void> => {
         error("failed to unload script", e);
         def.state = ScriptState.FAILED;
 
-        toast.error("Script failed", {
-            description: `Failed to unload script ${def.id}, check the console.`,
+        toast.error(tl("toast.error.title.script.generic"), {
+            description: tl("toast.error.script.unload", def.id),
         });
     }
 

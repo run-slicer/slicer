@@ -11,7 +11,7 @@
     import { groupBy } from "$lib/utils";
     import { toast } from "svelte-sonner";
     import { error } from "$lib/log";
-    import { t } from "$lib/i18n";
+    import { t, tl } from "$lib/i18n";
 
     let { entries, handler }: PaneProps = $props();
 
@@ -51,8 +51,8 @@
                 });
             } catch (e) {
                 error("failed to search", e);
-                toast.error("Error occurred", {
-                    description: `An error occurred while searching, check the console.`,
+                toast.error(tl("toast.error.generic"), {
+                    description: tl("toast.error.search"),
                 });
             }
 
