@@ -1,20 +1,22 @@
 import { locale } from "$lib/state";
 import { derived, get, type Readable } from "svelte/store";
-import type { LocaleData } from "../../locale";
+import type { LocaleData } from "../locale";
 
 export const locales = new Map(
-    Object.entries(import.meta.glob("../../locale/*.json", { import: "default" })).map(([path, resolver]) => {
+    Object.entries(import.meta.glob("../locale/*.json", { import: "default" })).map(([path, resolver]) => {
         return [path.split("/").pop()!.split(".")[0], resolver as () => Promise<LocaleData>];
     })
 );
 
 const localeData = derived<typeof locale, LocaleData | null>(locale, ($locale, set) => {
-    const resolve = locales.get($locale);
-    if (resolve) {
-        resolve().then(set);
-    } else {
-        set(null); // invalid locale
+    if ($locale === "locale.none") {
+        // robot language
+        set(null);
+        return;
     }
+
+    // try user locale, fallback to English
+    (locales.get($locale) ?? locales.get("en")!)().then(set);
 });
 
 export type TranslationKey = keyof LocaleData;
