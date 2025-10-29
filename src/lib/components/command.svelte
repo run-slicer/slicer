@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { t } from "$lib/i18n";
     import { CommandDialog, CommandGroup, CommandInput, CommandItem, CommandList } from "$lib/components/ui/command";
     import { onMount } from "svelte";
     import type { Entry } from "$lib/workspace";
@@ -57,7 +58,10 @@
         }
     }}
 >
-    <CommandInput bind:value={search} placeholder={searchWorkspace ? "Search files..." : "Type a command..."} />
+    <CommandInput
+        bind:value={search}
+        placeholder={$t(searchWorkspace ? "command.workspace.search.placeholder" : "command.placeholder")}
+    />
     <CommandList class={cn(!searchWorkspace || "h-[80vh] max-h-[80vh] [&>div]:contents")}>
         {#if searchWorkspace}
             {#if entries.length > 0}
@@ -80,11 +84,11 @@
                 {/key}
             {:else}
                 <p class="text-muted-foreground py-4 text-center text-sm">
-                    There's nothing here? Add something to the workspace.
+                    {$t("command.workspace.search.no-entries")}
                 </p>
             {/if}
         {:else}
-            <CommandGroup heading="Tabs">
+            <CommandGroup heading={$t("command.tabs")}>
                 {#each tabDefs as def}
                     {@const Icon = def.icon}
                     <CommandItem
@@ -95,17 +99,21 @@
                         }}
                     >
                         <Icon />
-                        {def.name}
+                        {$t(`tab.${def.type}`)}
                     </CommandItem>
                 {/each}
             </CommandGroup>
-            <CommandGroup forceMount heading="Workspace">
-                <CommandItem forceMount value="Search workspace" onSelect={() => (searchWorkspace = true)}>
+            <CommandGroup forceMount heading={$t("command.workspace")}>
+                <CommandItem
+                    forceMount
+                    value={$t("command.workspace.search")}
+                    onSelect={() => (searchWorkspace = true)}
+                >
                     <Search />
                     {#if search}
-                        <span>Search '{search}' in workspace</span>
+                        <span>{$t("command.workspace.search.contextual", search)}</span>
                     {:else}
-                        <span>Search workspace</span>
+                        <span>{$t("command.workspace.search")}</span>
                     {/if}
                 </CommandItem>
             </CommandGroup>

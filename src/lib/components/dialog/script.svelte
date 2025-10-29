@@ -3,6 +3,7 @@
     import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "$lib/components/ui/dialog";
     import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "$lib/components/ui/table";
     import type { ModalProps } from "svelte-modals";
+    import { t } from "$lib/i18n";
 
     interface Props extends ModalProps {
         proto: ProtoScript;
@@ -17,24 +18,30 @@
             <DialogHeader>
                 <DialogTitle>{proto.script?.name || proto.id}</DialogTitle>
                 <DialogDescription>
-                    Information about the <span class="italic">{proto.id}</span> script.
+                    {@html $t("dialog.script.desc", proto.id)}
                 </DialogDescription>
             </DialogHeader>
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead>ID</TableHead>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Description</TableHead>
-                        <TableHead>Version</TableHead>
+                        <TableHead>{$t("dialog.script.table.id")}</TableHead>
+                        <TableHead>{$t("dialog.script.table.name")}</TableHead>
+                        <TableHead>{$t("dialog.script.table.desc")}</TableHead>
+                        <TableHead>{$t("dialog.script.table.version")}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     <TableRow>
                         <TableCell class="font-medium break-all">{proto.id}</TableCell>
-                        <TableCell class="break-anywhere">{proto.script?.name || "<unknown>"}</TableCell>
-                        <TableCell class="break-anywhere">{proto.script?.description || "<unknown>"}</TableCell>
-                        <TableCell class="break-all">{proto.script?.version || "<unknown>"}</TableCell>
+                        <TableCell class="break-anywhere"
+                            >{proto.script?.name || $t("dialog.script.table.unknown")}</TableCell
+                        >
+                        <TableCell class="break-anywhere"
+                            >{proto.script?.description || $t("dialog.script.table.unknown")}</TableCell
+                        >
+                        <TableCell class="break-all"
+                            >{proto.script?.version || $t("dialog.script.table.unknown")}</TableCell
+                        >
                     </TableRow>
                 </TableBody>
             </Table>

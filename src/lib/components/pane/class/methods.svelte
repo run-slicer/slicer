@@ -12,6 +12,7 @@
     import { type ClassEntry, memberEntry } from "$lib/workspace";
     import { TabType } from "$lib/tab";
     import type { EventHandler } from "$lib/event";
+    import { t } from "$lib/i18n";
 
     interface Props {
         entry: ClassEntry;
@@ -25,10 +26,10 @@
 <Table>
     <TableHeader class="bg-background sticky top-0 z-10 shadow-lg">
         <TableRow>
-            <TableHead>Index</TableHead>
-            <TableHead>Modifiers</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Type</TableHead>
+            <TableHead>{$t("pane.class.methods.index")}</TableHead>
+            <TableHead>{$t("pane.class.methods.modifiers")}</TableHead>
+            <TableHead>{$t("pane.class.methods.name")}</TableHead>
+            <TableHead>{$t("pane.class.methods.type")}</TableHead>
             <TableHead></TableHead>
         </TableRow>
     </TableHeader>
@@ -40,7 +41,7 @@
                     <TableCell class="font-medium">{i}</TableCell>
                     <TableCell>
                         <span class="break-anywhere font-mono tracking-tight">
-                            {mods || "<none>"}
+                            {mods || $t("pane.class.methods.none")}
                         </span>
                         ({method.access})
                     </TableCell>
@@ -60,18 +61,20 @@
                                     </Button>
                                 {/snippet}
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent class="w-48" align="end">
+                            <DropdownMenuContent class="min-w-48" align="end">
                                 <DropdownMenuItem
                                     class="justify-between"
                                     onclick={() => handler.open(memberEntry(entry, method), TabType.CODE)}
                                 >
-                                    Disassemble <Code size={16} />
+                                    {$t("pane.class.menu.disasm")}
+                                    <Code size={16} />
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                     class="justify-between"
                                     onclick={() => handler.open(memberEntry(entry, method), TabType.GRAPH)}
                                 >
-                                    View flow graph <GitBranchPlus size={16} />
+                                    {$t("pane.class.menu.graph")}
+                                    <GitBranchPlus size={16} />
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
@@ -80,7 +83,7 @@
             {/each}
         {:else}
             <TableRow>
-                <TableCell colspan={5} class="h-24 text-center">No methods.</TableCell>
+                <TableCell colspan={5} class="h-24 text-center">{$t("pane.class.methods.no-methods")}</TableCell>
             </TableRow>
         {/if}
     </TableBody>

@@ -1,5 +1,6 @@
 <script lang="ts">
     import { ArrowDown, ArrowUp, ArrowUpDown } from "@lucide/svelte";
+    import { t } from "$lib/i18n";
 
     interface Props {
         text: string;
@@ -16,7 +17,7 @@
     <span>{text}</span>
     <button
         type="button"
-        aria-label="Toggle ordering"
+        aria-label={$t("pane.dump.table.order")}
         class="hover:text-accent-foreground ml-2 cursor-pointer"
         {onclick}
     >

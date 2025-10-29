@@ -14,6 +14,7 @@
     import type { EventHandler } from "$lib/event";
     import { Switch } from "$lib/components/ui/switch";
     import type { ModalProps } from "svelte-modals";
+    import { t } from "$lib/i18n";
 
     interface Props extends ModalProps {
         handler: EventHandler;
@@ -39,12 +40,14 @@
 <Dialog bind:open={isOpen} onOpenChangeComplete={(open) => open || close()}>
     <DialogContent>
         <DialogHeader>
-            <DialogTitle>Import script</DialogTitle>
-            <DialogDescription>Import a script from an arbitrary URL here.</DialogDescription>
+            <DialogTitle>{$t("dialog.script-load.title")}</DialogTitle>
+            <DialogDescription>{$t("dialog.script-load.desc")}</DialogDescription>
         </DialogHeader>
         <div class="grid gap-4 py-2">
             <div class="grid grid-cols-4 items-center gap-4">
-                <Label for="url" class="text-right">URL</Label>
+                <Label for="url" class="text-right">
+                    {$t("dialog.script-load.url")}
+                </Label>
                 <Input
                     id="url"
                     placeholder="https://..."
@@ -54,12 +57,12 @@
                 />
             </div>
             <div class="grid grid-cols-4 items-center gap-4">
-                <Label for="enabled" class="text-right">Enable</Label>
+                <Label for="enabled" class="text-right">{$t("dialog.script-load.enable")}</Label>
                 <Switch id="enabled" class="col-span-3" bind:checked={enabled} />
             </div>
         </div>
         <DialogFooter>
-            <Button type="submit" onclick={loadScript}>Import</Button>
+            <Button type="submit" onclick={loadScript}>{$t("dialog.script-load.action.confirm")}</Button>
         </DialogFooter>
     </DialogContent>
 </Dialog>

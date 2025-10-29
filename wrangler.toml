@@ -1,5 +1,6 @@
 name = "slicer"
 compatibility_date = "2025-04-01"
+preview_urls = true
 
 [assets]
 directory = "./dist/"

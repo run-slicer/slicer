@@ -1,4 +1,5 @@
 import { disassembleEntry, type Disassembler } from "$lib/disasm";
+import { tl } from "$lib/i18n";
 import { error } from "$lib/log";
 import {
     load as loadScript,
@@ -57,20 +58,24 @@ const toastAdd = async (created: LoadResult[], skipped: LoadResult[], time: numb
     if (skipped.length > 0) {
         if (skipped.length <= 5) {
             for (const result of skipped) {
-                toast.info("Duplicate entry", {
-                    description: `Skipped adding ${result.entry.name}, as it is already present in the workspace.`,
+                toast.info(tl("toast.info.title.duplicate.single"), {
+                    description: tl("toast.info.duplicate.single", result.entry.name),
                 });
             }
         } else {
             // don't spam toasts for more than 5 entries
-            toast.info("Duplicate entries", {
-                description: `Skipped adding ${skipped.length} entries, as they were already present in the workspace.`,
+            toast.info(tl("toast.info.title.duplicate.multiple"), {
+                description: tl("toast.info.duplicate.multiple", skipped.length),
             });
         }
     }
     if (created.length > 0) {
-        toast.success("Added", {
-            description: `Added ${created.length} ${created.length === 1 ? "entry" : "entries"} in ${time}ms.`,
+        toast.success(tl("toast.success.title.add"), {
+            description: tl(
+                created.length === 1 ? "toast.success.add.single" : "toast.success.add.multiple",
+                created.length,
+                time
+            ),
         });
     }
 };
@@ -89,13 +94,13 @@ export default {
 
         const results = await Promise.all(
             files.map((f) =>
-                recordTimed("loading", f.name, async () => {
+                recordTimed("task.load", f.name, async () => {
                     try {
                         return await loadZip(f);
                     } catch (e) {
                         error(`failed to read zip ${f.name}`, e);
-                        toast.error("Error occurred", {
-                            description: `Could not read ZIP ${f.name}, check the console.`,
+                        toast.error(tl("toast.error.title.generic"), {
+                            description: tl("toast.error.load", f.name),
                         });
                     }
 
@@ -112,20 +117,24 @@ export default {
         if (skipped.length > 0) {
             if (skipped.length <= 5) {
                 for (const result of skipped) {
-                    toast.info("Duplicate entry", {
-                        description: `Skipped adding ${result.entry.shortName}, as it is already present in the workspace.`,
+                    toast.info(tl("toast.info.title.duplicate.single"), {
+                        description: tl("toast.info.duplicate.single", result.entry.name),
                     });
                 }
             } else {
                 // don't spam toasts for more than 5 entries
-                toast.info("Duplicate entries", {
-                    description: `Skipped adding ${skipped.length} entries, as they were already present in the workspace.`,
+                toast.info(tl("toast.info.title.duplicate.multiple"), {
+                    description: tl("toast.info.duplicate.multiple", skipped.length),
                 });
             }
         }
         if (created.length > 0) {
-            toast.success("Loaded", {
-                description: `Loaded ${created.length} ${created.length === 1 ? "entry" : "entries"} in ${time}ms.`,
+            toast.success(tl("toast.success.title.load"), {
+                description: tl(
+                    created.length === 1 ? "toast.success.load.single" : "toast.success.load.multiple",
+                    created.length,
+                    time
+                ),
             });
         }
     },
@@ -138,7 +147,7 @@ export default {
             return;
         }
 
-        const results = await Promise.all(files.map((f) => recordTimed("adding", f.name, () => loadFile(f))));
+        const results = await Promise.all(files.map((f) => recordTimed("task.add", f.name, () => loadFile(f))));
 
         const time = results.reduce((acc, v) => acc + v.time, 0);
         const [created, skipped] = partition(
@@ -148,7 +157,7 @@ export default {
         await toastAdd(created, skipped, time);
     },
     async addRemote(url: string): Promise<void> {
-        const { time, result } = await recordTimed("adding", url, () => loadRemote(url));
+        const { time, result } = await recordTimed("task.add", url, () => loadRemote(url));
 
         const [created, skipped] = partition(result, (r) => r.created);
         await toastAdd(created, skipped, time);
@@ -157,8 +166,8 @@ export default {
         try {
             await openTab(entry, tabType);
         } catch (e) {
-            toast.error("Error occurred", {
-                description: `Could not read ${entry.name}, check the console.`,
+            toast.error(tl("toast.error.title.generic"), {
+                description: tl("toast.error.open", entry.name),
             });
         }
     },
@@ -179,8 +188,11 @@ export default {
             }
         }
 
-        toast.success("Deleted", {
-            description: `Deleted ${entries.length === 1 ? `entry ${entries[0].shortName}` : `${entries.length} entries`}.`,
+        toast.success(tl("toast.success.title.delete"), {
+            description:
+                entries.length === 1
+                    ? tl("toast.success.delete.single", entries[0].name)
+                    : tl("toast.success.delete.multiple", entries.length),
         });
     },
     async export(entries?: Entry[], disasm?: Disassembler): Promise<void> {
@@ -196,11 +208,11 @@ export default {
         if (entries.length === 1) {
             const entry = entries[0];
 
-            return record("exporting", entry.name, async () => {
+            return record("task.export", entry.name, async () => {
                 try {
                     let entry0 = await readDeferred(entry);
                     if (entry.type === EntryType.CLASS && disasm) {
-                        entry0 = await record("disassembling", entry.name, () =>
+                        entry0 = await record("task.disasm", entry.name, () =>
                             disassembleEntry(entry as ClassEntry, disasm)
                         );
                     }
@@ -208,8 +220,8 @@ export default {
                     return downloadBlob(entry0.shortName, await entry0.data.blob());
                 } catch (e) {
                     error(`failed to read entry ${entry.name}`, e);
-                    toast.error("Error occurred", {
-                        description: `Could not read entry ${entry.name}, check the console.`,
+                    toast.error(tl("toast.error.title.generic"), {
+                        description: tl("toast.error.read", entry.name),
                     });
                 }
             });
@@ -221,20 +233,20 @@ export default {
             entries = distribute(classes, others);
         }
 
-        return recordProgress("exporting", `${entries.length} entries`, async (exportTask) => {
+        return recordProgress("task.export", null, async (exportTask) => {
             const channel = new Channel<Data>();
             const chunks = chunk(entries, Math.ceil(entries.length / (disasm?.concurrency || 1)));
 
             let count = 0;
             const promises = chunks.map(async (chunk) => {
-                const task = addTask(createTask("reading", null));
+                const task = addTask(createTask("task.read", null));
 
                 for (let entry of chunk) {
                     entry = await readDeferred(entry);
 
                     const disassemble = disasm && entry.type === EntryType.CLASS;
                     task.desc.set(entry.name);
-                    task.name.set(disassemble ? "disassembling" : "reading");
+                    task.name.set(disassemble ? "task.disasm" : "task.read");
 
                     if (disassemble) {
                         entry = await disassembleEntry(entry as ClassEntry, disasm);
@@ -249,7 +261,7 @@ export default {
                         channel.push({ ...entry.data, name: entry.name }).then(); // we don't care about the result
                     }
 
-                    exportTask.desc.set(`${entries.length} entries (${entries.length - count} remaining)`);
+                    exportTask.desc.set(`${count}/${entries.length}`);
                     exportTask.progress?.set((count / entries.length) * 100);
                 }
 
@@ -259,12 +271,12 @@ export default {
             Promise.all(promises).finally(() => channel.return());
             const blob = await download(channel, (data, e) => {
                 error(`failed to read entry ${data.name}`, e);
-                toast.error("Error occurred", {
-                    description: `Could not read entry ${data.name}, check the console.`,
+                toast.error(tl("toast.error.title.generic"), {
+                    description: tl("toast.error.read", data.name),
                 });
             });
 
-            exportTask.desc.set(`${entries.length} entries`);
+            exportTask.desc.set(`${entries.length}`);
             return downloadBlob(`export-${disasm?.id || "raw"}-${timestampFile()}.zip`, blob);
         });
     },
@@ -280,8 +292,8 @@ export default {
     async addScript(url?: string, load?: boolean): Promise<void> {
         if (!url) {
             if (!navigator.clipboard) {
-                toast.error("Error occurred", {
-                    description: `Could not copy from clipboard, feature not available.`,
+                toast.error(tl("toast.error.title.generic"), {
+                    description: tl("toast.error.clipboard.unsupported"),
                 });
                 return;
             }
@@ -291,14 +303,14 @@ export default {
 
                 url = `data:text/javascript;base64,${window.btoa(data)}`;
             } catch (e) {
-                toast.error("Error occurred", {
-                    description: `Could not copy from clipboard, access denied.`,
+                toast.error(tl("toast.error.title.generic"), {
+                    description: tl("toast.error.clipboard.denied"),
                 });
                 return;
             }
         }
 
-        const proto = await record("importing script", truncate(url, 120), () => readScript(url));
+        const proto = await record("task.script.import", truncate(url, 120), () => readScript(url));
         toast.success("Imported", {
             description: `Imported script ${proto.id}.`,
         });

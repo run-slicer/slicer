@@ -13,6 +13,7 @@
     import { truncate } from "$lib/utils";
     import { buttonVariants } from "$lib/components/ui/button";
     import type { ModalProps } from "svelte-modals";
+    import { t } from "$lib/i18n";
 
     interface Props extends ModalProps {
         url: string;
@@ -32,23 +33,21 @@
 <AlertDialog bind:open={isOpen} onOpenChangeComplete={(open) => open || close()}>
     <AlertDialogContent>
         <AlertDialogHeader>
-            <AlertDialogTitle>Import script</AlertDialogTitle>
+            <AlertDialogTitle>{$t("dialog.script-load-share.title")}</AlertDialogTitle>
             <AlertDialogDescription>
-                Import a script from
-                <span class="p-0.5 font-mono text-xs" title={url}>
-                    {truncate(url, 120)}
-                </span>?
-                <p class="mt-2 font-semibold">
-                    Scripts have <span class="text-destructive">full access</span> to slicer, be aware of what you import!
-                </p>
+                {@html $t("dialog.script-load-share.title", url, truncate(url, 120))}
             </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-            <AlertDialogCancel onclick={() => handle(false, false)}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel onclick={() => handle(false, false)}>
+                {$t("dialog.script-load-share.action.cancel")}
+            </AlertDialogCancel>
             <AlertDialogAction class={buttonVariants({ variant: "secondary" })} onclick={() => handle(true, false)}>
-                Import
+                {$t("dialog.script-load-share.action.confirm.secondary")}
             </AlertDialogAction>
-            <AlertDialogAction onclick={() => handle(true, true)}>Import & enable</AlertDialogAction>
+            <AlertDialogAction onclick={() => handle(true, true)}>
+                {$t("dialog.script-load-share.action.confirm")}
+            </AlertDialogAction>
         </AlertDialogFooter>
     </AlertDialogContent>
 </AlertDialog>

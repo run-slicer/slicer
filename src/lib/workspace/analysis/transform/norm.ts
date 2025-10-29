@@ -28,9 +28,8 @@ const checkAccess = (member: Member, field: boolean) => {
 
 export default [
     {
-        id: "norm-verify",
-        name: "Verify attributes",
-        group: "Normalization",
+        id: "norm.verify",
+        group: "norm",
         icon: ShieldCheck,
         async run(entry, _data) {
             const { verify } = await import("@katana-project/asm/analysis/verify");
@@ -40,9 +39,8 @@ export default [
         },
     },
     {
-        id: "norm-modifiers",
-        name: "Remove unnecessary modifiers",
-        group: "Normalization",
+        id: "norm.modifier",
+        group: "norm",
         icon: Binary,
         async run(entry, _data) {
             for (const field of entry.node.fields) {
@@ -57,9 +55,8 @@ export default [
     },
     // adapted from https://github.com/GraxCode/threadtear/blob/master/core/src/main/java/me/nov/threadtear/execution/generic/TryCatchObfuscationRemover.java
     {
-        id: "norm-try-catch",
-        name: "Remove unnecessary try-catches",
-        group: "Normalization",
+        id: "norm.try-catch",
+        group: "norm",
         icon: Zap,
         async run(entry, _data) {
             for (const method of entry.node.methods) {
@@ -90,9 +87,8 @@ export default [
     },
     // adapted from https://github.com/GraxCode/threadtear/blob/master/core/src/main/java/me/nov/threadtear/execution/cleanup/remove/RemoveUnusedVariables.java
     {
-        id: "norm-lvt",
-        name: "Remove unused local variables",
-        group: "Normalization",
+        id: "norm.lvt",
+        group: "norm",
         icon: Variable,
         async run(entry, _data) {
             for (const method of entry.node.methods) {
@@ -146,9 +142,8 @@ export default [
         },
     },
     {
-        id: "norm-unreachable",
-        name: "No-op unreachable code",
-        group: "Normalization",
+        id: "norm.unreachable",
+        group: "norm",
         icon: Paintbrush,
         async run(entry, _data) {
             const { removeUnreachable } = await import("@katana-project/asm/analysis/reach");

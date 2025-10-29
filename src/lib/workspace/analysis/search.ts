@@ -9,8 +9,8 @@ export enum QueryType {
 }
 
 export enum SearchMode {
-    PARTIAL_MATCH = "partial_match",
-    EXACT_MATCH = "exact_match",
+    PARTIAL_MATCH = "partial",
+    EXACT_MATCH = "exact",
     REGEXP = "regexp",
 }
 

@@ -5,6 +5,7 @@
     import type { EventHandler } from "$lib/event";
     import { TabType } from "$lib/tab";
     import type { Entry } from "$lib/workspace";
+    import { t } from "$lib/i18n";
 
     interface Props {
         title: string;
@@ -19,9 +20,11 @@
     <ContextMenuLabel>{title}</ContextMenuLabel>
     <ContextMenuSeparator />
     <ContextMenuItem class="justify-between" onclick={() => handler.open(entry, TabType.CODE)}>
-        Disassemble <Code size={16} />
+        {$t("pane.structure.menu.disasm")}
+        <Code size={16} />
     </ContextMenuItem>
     <ContextMenuItem class="justify-between" onclick={() => handler.open(entry, TabType.GRAPH)}>
-        View graph <GitBranchPlus size={16} />
+        {$t("pane.structure.menu.graph")}
+        <GitBranchPlus size={16} />
     </ContextMenuItem>
 </ContextMenuContent>

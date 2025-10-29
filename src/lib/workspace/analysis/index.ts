@@ -90,7 +90,7 @@ export const analyzeBackground = async () => {
 
     if (!get(analysisBackground) || $queue.length === 0) return;
 
-    await recordProgress("analyzing", null, async (task) => {
+    await recordProgress("task.analyze", null, async (task) => {
         let completed = 0;
         await Promise.all(
             $queue.map(
@@ -98,13 +98,13 @@ export const analyzeBackground = async () => {
                     await analyze(entry);
 
                     completed++;
-                    task.desc.set(`${$queue.length} entries (${$queue.length - completed} remaining)`);
+                    task.desc.set(`${completed}/${$queue.length}`);
                     task.progress?.set((completed / $queue.length) * 100);
                 }, MAX_CONCURRENT)
             )
         );
 
-        task.desc.set(`${$queue.length} entries`);
+        task.desc.set(`${$queue.length}`);
     });
 };
 
@@ -113,7 +113,7 @@ export { QueryType, SearchMode, type SearchQuery, type SearchResult };
 export const search = async (entries: Entry[], query: SearchQuery, onResult: (result: SearchResult) => void) => {
     entries = entries.filter((e) => e.type === EntryType.CLASS);
 
-    await recordProgress("searching", null, async (task) => {
+    await recordProgress("task.search", null, async (task) => {
         let completed = 0;
         await Promise.all(
             (entries as ClassEntry[]).map(
@@ -123,12 +123,12 @@ export const search = async (entries: Entry[], query: SearchQuery, onResult: (re
                     );
 
                     completed++;
-                    task.desc.set(`${entries.length} entries (${entries.length - completed} remaining)`);
+                    task.desc.set(`${completed}/${entries.length}`);
                     task.progress?.set((completed / entries.length) * 100);
                 }, MAX_CONCURRENT)
             )
         );
 
-        task.desc.set(`${entries.length} entries`);
+        task.desc.set(`${entries.length}`);
     });
 };

@@ -2,31 +2,31 @@
     import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "$lib/components/ui/tooltip";
     import { Label } from "$lib/components/ui/label";
     import { CircleQuestionMark } from "@lucide/svelte";
-    import type { Snippet } from "svelte";
+    import { t, type TranslationKey } from "$lib/i18n";
 
     interface Props {
         for: string;
-        text: string;
-        children?: Snippet;
+        textKey: TranslationKey;
+        descKey?: TranslationKey;
     }
 
-    let { for: forId, text, children }: Props = $props();
+    let { for: forId, textKey, descKey }: Props = $props();
 </script>
 
-{#if children}
+{#if descKey}
     <TooltipProvider>
         <div class="flex items-center gap-2">
-            <Label for={forId}>{text}</Label>
+            <Label for={forId}>{$t(textKey)}</Label>
             <Tooltip>
                 <TooltipTrigger class="cursor-pointer">
                     <CircleQuestionMark class="text-muted-foreground h-4 w-4" />
                 </TooltipTrigger>
                 <TooltipContent side="right">
-                    {@render children()}
+                    {@html $t(descKey)}
                 </TooltipContent>
             </Tooltip>
         </div>
     </TooltipProvider>
 {:else}
-    <Label for={forId}>{text}</Label>
+    <Label for={forId}>{$t(textKey)}</Label>
 {/if}

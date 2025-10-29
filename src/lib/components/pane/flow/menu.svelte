@@ -15,6 +15,7 @@
     import type { UTF8Entry } from "@katana-project/asm/pool";
     import { CodeXml, Image } from "@lucide/svelte";
     import { checkDims } from "./canvas";
+    import { t } from "$lib/i18n";
 
     interface Props {
         node: Node | null;
@@ -73,12 +74,12 @@
     };
 </script>
 
-<ContextMenuContent class="w-48">
-    <ContextMenuLabel>Flow chart</ContextMenuLabel>
+<ContextMenuContent class="min-w-48">
+    <ContextMenuLabel>{$t("pane.graph.menu.title")}</ContextMenuLabel>
     <ContextMenuSeparator />
     <ContextMenuSub>
-        <ContextMenuSubTrigger>Export</ContextMenuSubTrigger>
-        <ContextMenuSubContent class="w-48">
+        <ContextMenuSubTrigger>{$t("pane.graph.menu.export")}</ContextMenuSubTrigger>
+        <ContextMenuSubContent class="min-w-48">
             <ContextMenuItem class="flex justify-between" onclick={() => exportImage("svg")}>
                 SVG <CodeXml size={16} />
             </ContextMenuItem>

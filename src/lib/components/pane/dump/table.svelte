@@ -35,6 +35,7 @@
         getSortedRowModel,
         getFilteredRowModel,
     } from "@tanstack/table-core";
+    import { t } from "$lib/i18n";
 
     interface Props extends HTMLAttributes<HTMLDivElement> {
         entries: SlurpEntry[];
@@ -55,7 +56,7 @@
             accessorKey: "totalSize",
             header: ({ column }) =>
                 renderComponent(TableHeaderComponent, {
-                    text: "Total size",
+                    text: $t("pane.dump.table.total-size"),
                     order: column.getIsSorted() || undefined,
                     onclick: () => column.toggleSorting(nextDirection(column.getIsSorted())),
                 }),
@@ -66,7 +67,7 @@
             accessorKey: "count",
             header: ({ column }) =>
                 renderComponent(TableHeaderComponent, {
-                    text: "Instances",
+                    text: $t("pane.dump.table.instances"),
                     order: column.getIsSorted() || undefined,
                     onclick: () => column.toggleSorting(nextDirection(column.getIsSorted())),
                 }),
@@ -76,7 +77,7 @@
             accessorKey: "largestSize",
             header: ({ column }) =>
                 renderComponent(TableHeaderComponent, {
-                    text: "Largest",
+                    text: $t("pane.dump.table.largest-size"),
                     order: column.getIsSorted() || undefined,
                     onclick: () => column.toggleSorting(nextDirection(column.getIsSorted())),
                 }),
@@ -88,7 +89,7 @@
             accessorFn: ({ name }) => (name ? prettyJavaType(name) : "<unknown>"),
             header: ({ column }) =>
                 renderComponent(TableHeaderComponent, {
-                    text: "Name",
+                    text: $t("pane.dump.table.name"),
                     order: column.getIsSorted() || undefined,
                     onclick: () => column.toggleSorting(nextDirection(column.getIsSorted())),
                 }),
@@ -149,7 +150,7 @@
     <div class="flex items-center justify-between pb-2">
         <Input
             class="max-w-sm"
-            placeholder="Filter classes..."
+            placeholder={$t("pane.dump.table.filter.placeholder")}
             type="text"
             value={table.getColumn("name")?.getFilterValue() ?? ""}
             onchange={(e) => {
@@ -161,7 +162,7 @@
         />
         <div class="flex items-center space-x-4">
             <div class="text-muted-foreground text-sm">
-                {pageSize * pageIndex + 1}-{pageSize * (pageIndex + 1)} of {entries.length} items
+                {$t("pane.dump.table.page", pageSize * pageIndex + 1, pageSize * (pageIndex + 1), entries.length)}
             </div>
             <Button
                 variant="outline"
@@ -205,7 +206,9 @@
                     </TableRow>
                 {:else}
                     <TableRow>
-                        <TableCell colspan={columns.length} class="h-24 text-center">No results.</TableCell>
+                        <TableCell colspan={columns.length} class="h-24 text-center">
+                            {$t("pane.dump.table.filter.no-results")}
+                        </TableCell>
                     </TableRow>
                 {/each}
             </TableBody>

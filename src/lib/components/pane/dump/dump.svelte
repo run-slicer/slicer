@@ -9,6 +9,7 @@
     import Table from "./table.svelte";
     import { humanSize } from "$lib/utils";
     import type { PaneProps } from "$lib/components/pane";
+    import { t } from "$lib/i18n";
 
     let { tab }: PaneProps = $props();
     const entry = $derived(tab.entry!);
@@ -25,17 +26,23 @@
 </script>
 
 {#await readEntry(entry)}
-    <Loading value="Reading..." timed />
+    <Loading value={$t("pane.dump.loading")} timed />
 {:then result}
     <div class="flex h-8 min-h-8 w-full flex-col">
         <div class="bg-background flex grow flex-row items-center gap-4 px-2 text-xs">
-            <p>timestamp: <span class="text-muted-foreground">{result.timestamp.toLocaleString()}</span></p>
             <p>
-                identifier size:
-                <span class="text-muted-foreground">{result.idSize} ({(result.idSize || 0) * 8}-bit)</span>
+                {$t("pane.dump.timestamp")}
+                <span class="text-muted-foreground">{result.timestamp.toLocaleString()}</span>
             </p>
             <p>
-                total size:
+                {$t("pane.dump.id-size")}
+                <span class="text-muted-foreground">
+                    {result.idSize}
+                    {$t("pane.dump.id-size.bits", (result.idSize || 0) * 8)}
+                </span>
+            </p>
+            <p>
+                {$t("pane.dump.total-size")}
                 <span class="text-muted-foreground">
                     {humanSize(result.entries.reduce((acc, v) => acc + v.totalSize, 0))}
                 </span>
@@ -47,8 +54,12 @@
 {:catch e}
     <div class="flex h-full w-full flex-col items-center justify-center">
         <FileQuestionMark class="text-muted-foreground mb-4 animate-bounce" size={128} />
-        <p class="mb-1 text-2xl font-semibold">Is the file in HPROF format?</p>
-        <p class="text-muted-foreground mb-32 text-sm">Failed to read heap dump.</p>
+        <p class="mb-1 text-2xl font-semibold">
+            {$t("pane.dump.fail.title")}
+        </p>
+        <p class="text-muted-foreground mb-32 text-sm">
+            {$t("pane.dump.fail.subtitle")}
+        </p>
         <p class="text-muted-foreground text-xs">{e}</p>
     </div>
 {/await}

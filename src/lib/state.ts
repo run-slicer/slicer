@@ -22,6 +22,7 @@ export interface TabData {
 export type ProjectMode = "file" | "package";
 export type DuplicateEntryHandling = "skip" | "overwrite" | "rename";
 
+export const locale = persisted<string>(`${root}.locale`, "en");
 export const themeColor = persisted<string>(`${root}.theme.color`, "zinc");
 export const themeRadius = persisted<number>(`${root}.theme.radius`, 0.5);
 export const projectMode = persisted<ProjectMode>(`${root}.project.mode`, "file");

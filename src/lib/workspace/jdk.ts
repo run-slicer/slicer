@@ -1,3 +1,4 @@
+import { tl } from "$lib/i18n";
 import { error } from "$lib/log";
 import { record } from "$lib/task";
 import { toast } from "svelte-sonner";
@@ -17,8 +18,8 @@ const fetchIndex = async (url: string): Promise<DataIndex> => {
         }
     } catch (e) {
         error("failed to fetch class index", e);
-        toast.error("Error occurred", {
-            description: "Failed to fetch the class index, check the console.",
+        toast.error(tl("toast.error.title.generic"), {
+            description: tl("toast.error.class-index"),
         });
     }
 
@@ -41,7 +42,7 @@ export const findClass = async (name: string): Promise<Uint8Array | null> => {
         return cacheData;
     }
 
-    return await record("fetching class", name, async () => {
+    return await record("task.fetch", name, async () => {
         const res = await fetch(url);
         if (!res.ok) {
             error(`failed to fetch class '${name}', status code ${res.status}`);

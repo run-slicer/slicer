@@ -13,6 +13,7 @@
     import type { ProtoScript } from "$lib/script";
     import type { EventHandler } from "$lib/event";
     import type { ModalProps } from "svelte-modals";
+    import { t } from "$lib/i18n";
 
     interface Props extends ModalProps {
         proto: ProtoScript;
@@ -30,19 +31,19 @@
 </script>
 
 <AlertDialog bind:open={isOpen} onOpenChangeComplete={(open) => open || close()}>
-    <AlertDialogContent class="sm:max-w-[425px]">
+    <AlertDialogContent>
         <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure, absolutely sure?</AlertDialogTitle>
+            <AlertDialogTitle>{$t("dialog.script-delete.title")}</AlertDialogTitle>
             <AlertDialogDescription>
-                This will permanently delete the
-                <span class="break-all italic">{proto.id}</span> script.
-                <p class="mt-2 font-semibold">This action cannot be undone.</p>
+                {@html $t("dialog.script-delete.desc", proto.id)}
             </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-            <AlertDialogCancel onclick={() => handle(false)}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel onclick={() => handle(false)}>
+                {$t("dialog.script-delete.action.cancel")}
+            </AlertDialogCancel>
             <AlertDialogAction class={buttonVariants({ variant: "destructive" })} onclick={() => handle(true)}>
-                Delete
+                {$t("dialog.script-delete.action.confirm")}
             </AlertDialogAction>
         </AlertDialogFooter>
     </AlertDialogContent>

@@ -315,7 +315,7 @@ if (window.launchQueue) {
         if (launchParams.files) {
             for (const handle of launchParams.files) {
                 if (handle.kind === "file") {
-                    handle.getFile().then((f: File) => record("loading", f.name, () => loadFile(f)));
+                    handle.getFile().then((f: File) => record("task.load", f.name, () => loadFile(f)));
                 }
             }
         }

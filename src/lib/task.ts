@@ -1,10 +1,11 @@
+import type { TranslationKey } from "$lib/i18n";
 import { log } from "$lib/log";
 import { cyrb53 } from "$lib/utils";
 import { get, type Writable, writable } from "svelte/store";
 
 export interface Task {
     id: string;
-    name: Writable<string>;
+    name: Writable<TranslationKey>;
     desc: Writable<string | null>;
     start?: number;
     progress?: Writable<number>; // 0-100
@@ -30,7 +31,7 @@ export const add = (task: Task): Task => {
     return task;
 };
 
-export const create = (name: string, desc: string | null, indeterminate: boolean = true): Task => {
+export const create = (name: TranslationKey, desc: string | null, indeterminate: boolean = true): Task => {
     return {
         id: (cyrb53(name + desc) + Math.floor(Math.random() * 65536)).toString(16),
         name: writable(name),
@@ -42,7 +43,14 @@ export const create = (name: string, desc: string | null, indeterminate: boolean
 export const phase = (task: Task): TaskResult => {
     const time = Date.now() - (task.start || 0);
     const desc = get(task.desc);
-    log(`task ${get(task.name)}${desc ? ` (${desc})` : ""} took ${time}ms`);
+
+    let name: string = get(task.name);
+    if (name.startsWith("task.")) {
+        // prettify translation key
+        name = name.substring(5);
+    }
+
+    log(`task ${name}${desc ? ` (${desc})` : ""} took ${time}ms`);
 
     task.start = Date.now(); // reset
 
@@ -67,7 +75,7 @@ export interface TimedResult<T> {
 }
 
 export const recordTimed = async <T>(
-    name: string,
+    name: TranslationKey,
     desc: string | null,
     call: TaskAction<T>
 ): Promise<TimedResult<T>> => {
@@ -85,7 +93,7 @@ export const recordTimed = async <T>(
     return { result, time };
 };
 
-export const recordProgress = async <T>(name: string, desc: string | null, call: TaskAction<T>): Promise<T> => {
+export const recordProgress = async <T>(name: TranslationKey, desc: string | null, call: TaskAction<T>): Promise<T> => {
     const task = create(name, desc, false);
 
     try {
@@ -95,6 +103,6 @@ export const recordProgress = async <T>(name: string, desc: string | null, call:
     }
 };
 
-export const record = async <T>(name: string, desc: string | null, call: TaskAction<T>): Promise<T> => {
+export const record = async <T>(name: TranslationKey, desc: string | null, call: TaskAction<T>): Promise<T> => {
     return (await recordTimed(name, desc, call)).result;
 };

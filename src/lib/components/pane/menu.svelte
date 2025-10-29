@@ -14,6 +14,7 @@
     import { type TabPosition, tabDefs } from "$lib/tab";
     import type { Snippet } from "svelte";
     import { cn } from "$lib/components/utils";
+    import { t } from "$lib/i18n";
 
     interface Props {
         position: TabPosition;
@@ -41,16 +42,17 @@
                     role="combobox"
                     aria-expanded={open}
                 >
-                    Select a tab... <ChevronsUpDown class="opacity-50" />
+                    {$t("pane.header.open.placeholder")}
+                    <ChevronsUpDown class="opacity-50" />
                 </Button>
             {/if}
         {/snippet}
     </PopoverTrigger>
     <PopoverContent {align} class={cn("w-[180px] p-0", !offset || "mr-1")}>
         <Command>
-            <CommandInput placeholder="Search tab..." />
+            <CommandInput placeholder={$t("pane.header.open.placeholder")} />
             <CommandList>
-                <CommandEmpty>No tab found.</CommandEmpty>
+                <CommandEmpty>{$t("pane.header.open.no-results")}</CommandEmpty>
                 <CommandGroup>
                     {#each tabDefs as def}
                         {@const Icon = def.icon}
@@ -62,7 +64,7 @@
                             }}
                         >
                             <Icon />
-                            {def.name}
+                            {$t(`tab.${def.type}`)}
                         </CommandItem>
                     {/each}
                 </CommandGroup>

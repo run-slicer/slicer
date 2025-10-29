@@ -6,13 +6,13 @@
     import Label from "../label.svelte";
 </script>
 
-<Section id="editor" label="Editor">
+<Section id="editor" labelKey="pane.prefs.section.editor">
     <div class="grid min-h-[2.5rem] grid-cols-[16rem_10rem_1fr] items-center gap-4">
-        <Label for="editorWrap" text="Word wrap">Wraps long lines in the editor.</Label>
+        <Label for="editorWrap" textKey="pane.prefs.editor.word-wrap" descKey="pane.prefs.editor.word-wrap.desc" />
         <Switch id="editorWrap" bind:checked={$editorWrap} />
     </div>
     <div class="grid min-h-[2.5rem] grid-cols-[16rem_10rem_1fr] items-center gap-4">
-        <Label for="editorTextSize" text="Text size">Adjusts the default editor font size.</Label>
+        <Label for="editorTextSize" textKey="pane.prefs.editor.text-size" descKey="pane.prefs.editor.text-size.desc" />
         <Slider
             type="single"
             id="editorTextSize"
@@ -24,7 +24,11 @@
         />
     </div>
     <div class="grid min-h-[2.5rem] grid-cols-[16rem_10rem_1fr] items-center gap-4">
-        <Label for="editorTextSizeSync" text="Sync text size">Synchronizes text size across all editors.</Label>
+        <Label
+            for="editorTextSizeSync"
+            textKey="pane.prefs.editor.sync-text-size"
+            descKey="pane.prefs.editor.sync-text-size.desc"
+        />
         <Switch id="editorTextSizeSync" bind:checked={$editorTextSizeSync} />
     </div>
 </Section>

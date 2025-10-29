@@ -5,17 +5,21 @@
     import Label from "../label.svelte";
 </script>
 
-<Section id="analysis" label="Analysis">
+<Section id="analysis" labelKey="pane.prefs.section.analysis">
     <div class="grid min-h-[2.5rem] grid-cols-[16rem_10rem_1fr] items-center gap-4">
-        <Label for="analysisBackground" text="Background analysis">
-            Whether analysis should run in the background or on-demand.
-        </Label>
+        <Label
+            for="analysisBackground"
+            textKey="pane.prefs.analysis.background"
+            descKey="pane.prefs.analysis.background.desc"
+        />
         <Switch id="analysisBackground" bind:checked={$analysisBackground} />
     </div>
     <div class="grid min-h-[2.5rem] grid-cols-[16rem_10rem_1fr] items-center gap-4">
-        <Label for="analysisJdkClasses" text="Fetch JDK classes">
-            Whether JDK classes should be made available to disassemblers (improves output quality).
-        </Label>
+        <Label
+            for="analysisJdkClasses"
+            textKey="pane.prefs.analysis.jdk-classes"
+            descKey="pane.prefs.analysis.jdk-classes.desc"
+        />
         <Switch id="analysisJdkClasses" bind:checked={$analysisJdkClasses} />
     </div>
 </Section>

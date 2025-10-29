@@ -46,9 +46,8 @@ const checkNode = (node: Node, func: CheckFunc): Node => {
 
 export default [
     {
-        id: "remove-annotations",
-        name: "Strip annotations",
-        group: "Readability",
+        id: "read.annotation",
+        group: "read",
         icon: AtSign,
         async run(entry, _data) {
             entry.node = checkNode(entry.node, (attr) => !attr.name?.string?.includes("Annotation"));
@@ -57,9 +56,8 @@ export default [
         },
     },
     {
-        id: "remove-try-catch",
-        name: "Strip try-catches",
-        group: "Readability",
+        id: "read.try-catch",
+        group: "read",
         icon: ZapOff,
         async run(entry, _data) {
             for (const method of entry.node.methods) {
@@ -77,9 +75,8 @@ export default [
         },
     },
     {
-        id: "remove-monitors",
-        name: "Strip synchronized blocks",
-        group: "Readability",
+        id: "read.monitor",
+        group: "read",
         icon: RefreshCwOff,
         async run(entry, _data) {
             for (const method of entry.node.methods) {
@@ -99,9 +96,8 @@ export default [
         },
     },
     {
-        id: "remove-lvt",
-        name: "Strip local variables",
-        group: "Readability",
+        id: "read.lvt",
+        group: "read",
         icon: Variable,
         async run(entry, _data) {
             for (const method of entry.node.methods) {
@@ -122,9 +118,8 @@ export default [
         },
     },
     {
-        id: "remove-signatures",
-        name: "Strip generic signatures",
-        group: "Readability",
+        id: "read.signature",
+        group: "read",
         icon: Type,
         async run(entry, _data) {
             entry.node = checkNode(entry.node, (attr) => attr.name?.string !== AttributeType.SIGNATURE);
@@ -133,9 +128,8 @@ export default [
         },
     },
     {
-        id: "remove-debug",
-        name: "Strip debug information",
-        group: "Readability",
+        id: "read.debug",
+        group: "read",
         icon: BugOff,
         async run(entry, _data) {
             entry.node = checkNode(entry.node, (attr) => {

@@ -9,7 +9,7 @@ export enum Interpretation {
     TEXT = "text",
     HEX = "hex",
     CLASS = "class",
-    BINARY_XML = "binary_xml",
+    BINARY_XML = "binary-xml",
 }
 
 export interface InterpretationOptions {

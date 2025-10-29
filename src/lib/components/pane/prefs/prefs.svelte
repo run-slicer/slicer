@@ -1,25 +1,25 @@
 <script lang="ts" module>
-    import { Paintbrush, Type, FolderOpen, SquareActivity } from "@lucide/svelte";
-    import ThemeSection from "./sections/theme.svelte";
+    import { Type, FolderOpen, SquareActivity, Settings } from "@lucide/svelte";
+    import GeneralSection from "./sections/general.svelte";
     import EditorSection from "./sections/editor.svelte";
     import WorkspaceSection from "./sections/workspace.svelte";
     import AnalysisSection from "./sections/analysis.svelte";
     import type { Component } from "svelte";
     import type { Icon } from "$lib/components/icons";
+    import { t } from "$lib/i18n";
 
-    type SectionID = "theme" | "editor" | "workspace" | "analysis";
+    type SectionID = "general" | "editor" | "workspace" | "analysis";
     interface Section {
         id: SectionID;
-        label: string;
         icon: Icon;
         component: Component;
     }
 
     const sections: Section[] = [
-        { id: "theme", label: "Theme", icon: Paintbrush, component: ThemeSection },
-        { id: "editor", label: "Editor", icon: Type, component: EditorSection },
-        { id: "workspace", label: "Workspace", icon: FolderOpen, component: WorkspaceSection },
-        { id: "analysis", label: "Analysis", icon: SquareActivity, component: AnalysisSection },
+        { id: "general", icon: Settings, component: GeneralSection },
+        { id: "editor", icon: Type, component: EditorSection },
+        { id: "workspace", icon: FolderOpen, component: WorkspaceSection },
+        { id: "analysis", icon: SquareActivity, component: AnalysisSection },
     ];
 </script>
 
@@ -32,11 +32,12 @@
     import { toast } from "svelte-sonner";
     import { modals } from "svelte-modals";
     import { PrefsClearDialog } from "$lib/components/dialog";
+    import { tl } from "$lib/i18n";
 
     let _: PaneProps = $props();
 
     let sectionsElem: HTMLElement | undefined = $state();
-    let currentSection: SectionID | null = $state("theme");
+    let currentSection: SectionID | null = $state("general");
     const scrollToSection = (id: SectionID) => {
         currentSection = id;
         sectionsElem?.querySelector(`[data-section="${id}"]`)?.scrollIntoView({ behavior: "smooth" });
@@ -53,7 +54,7 @@
                         size="icon"
                         variant={currentSection === section.id ? "secondary" : "ghost"}
                         onclick={() => scrollToSection(section.id)}
-                        title={section.label}
+                        title={$t(`pane.prefs.section.${section.id}`)}
                     >
                         <SectionIcon />
                     </Button>
@@ -62,36 +63,41 @@
         </ul>
         <div class="flex flex-col gap-2">
             <Button
-                title="Export"
+                title={tl("pane.prefs.button.export")}
                 size="icon"
                 onclick={async () => {
                     await downloadBlob(
                         `slicer-${timestampFile()}.json`,
                         new Blob([save()], { type: "application/json" })
                     );
-                    toast.success("Exported", {
-                        description: `Preferences exported successfully.`,
+                    toast.success(tl("toast.success.title.export"), {
+                        description: tl("toast.success.prefs-export"),
                     });
                 }}
             >
                 <Download />
             </Button>
             <Button
-                title="Import"
+                title={tl("pane.prefs.button.import")}
                 size="icon"
                 variant="secondary"
                 onclick={async () => {
                     const files = await readFiles(".json", false);
                     if (files.length > 0 && !load(await files[0].text())) {
-                        toast.error("Error occurred", {
-                            description: `Could not import preferences, failed to read file.`,
+                        toast.error(tl("toast.error.title.generic"), {
+                            description: tl("toast.error.prefs-import"),
                         });
                     }
                 }}
             >
                 <Upload />
             </Button>
-            <Button title="Clear" size="icon" variant="destructive" onclick={() => modals.open(PrefsClearDialog)}>
+            <Button
+                title={tl("pane.prefs.button.clear")}
+                size="icon"
+                variant="destructive"
+                onclick={() => modals.open(PrefsClearDialog)}
+            >
                 <Eraser />
             </Button>
         </div>

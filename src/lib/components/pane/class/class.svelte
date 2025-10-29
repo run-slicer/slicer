@@ -15,6 +15,7 @@
     } from "$lib/components/ui/dropdown-menu";
     import { Button } from "$lib/components/ui/button";
     import type { PaneProps } from "$lib/components/pane";
+    import { t } from "$lib/i18n";
 
     let { tab, handler }: PaneProps = $props();
 
@@ -26,10 +27,10 @@
     <Tabs value="overview" class="flex h-full w-full flex-col p-2">
         <div class="flex flex-row gap-1">
             <TabsList class="grid w-full grid-cols-4">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="constant_pool">Constant pool</TabsTrigger>
-                <TabsTrigger value="fields">Fields</TabsTrigger>
-                <TabsTrigger value="methods">Methods</TabsTrigger>
+                <TabsTrigger value="overview">{$t("pane.class.tab.overview")}</TabsTrigger>
+                <TabsTrigger value="constant_pool">{$t("pane.class.tab.constant-pool")}</TabsTrigger>
+                <TabsTrigger value="fields">{$t("pane.class.tab.fields")}</TabsTrigger>
+                <TabsTrigger value="methods">{$t("pane.class.tab.methods")}</TabsTrigger>
             </TabsList>
             <DropdownMenu>
                 <DropdownMenuTrigger>
@@ -40,12 +41,14 @@
                         </Button>
                     {/snippet}
                 </DropdownMenuTrigger>
-                <DropdownMenuContent class="w-48" align="end">
+                <DropdownMenuContent class="min-w-48" align="end">
                     <DropdownMenuItem class="justify-between" onclick={() => handler.open(entry, TabType.CODE)}>
-                        Disassemble <Code size={16} />
+                        {$t("pane.class.menu.disasm")}
+                        <Code size={16} />
                     </DropdownMenuItem>
                     <DropdownMenuItem class="justify-between" onclick={() => handler.open(entry, TabType.GRAPH)}>
-                        View graph <GitBranchPlus size={16} />
+                        {$t("pane.class.menu.graph")}
+                        <GitBranchPlus size={16} />
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
@@ -67,7 +70,7 @@
 {:else}
     <div class="flex h-full w-full flex-col items-center justify-center">
         <FileQuestion class="mb-4 animate-bounce text-red-600" size={128} />
-        <p class="mb-1 text-2xl font-semibold">Is the file a class file?</p>
-        <p class="text-muted-foreground mb-32 text-sm">Failed to read ClassFile structures.</p>
+        <p class="mb-1 text-2xl font-semibold">{$t("pane.class.fail.title")}</p>
+        <p class="text-muted-foreground mb-32 text-sm">{$t("pane.class.fail.subtitle")}</p>
     </div>
 {/if}

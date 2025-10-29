@@ -12,7 +12,6 @@ import readabilityTransformers from "./read";
 
 export interface Transformer {
     id: string;
-    name?: string;
     group?: string;
     icon?: Icon;
 
@@ -28,7 +27,6 @@ export const transformers: Writable<Transformer[]> = writable([
     // script transforms should be processed last
     {
         id: "script",
-        name: "Scripts",
         internal: true,
         async run(entry, data) {
             return (await rootContext.dispatchEvent({ type: "preload", name: entry.name, data })).data;
@@ -54,7 +52,7 @@ export const transform = async (entry: ClassEntry, data: Uint8Array): Promise<Cl
 
     const originalData = data;
     const cloneEntry: ClassEntry = { ...entry, node: window.structuredClone(entry.node) };
-    await recordProgress("transforming", entry.name, async (task) => {
+    await recordProgress("task.transform", entry.name, async (task) => {
         for (let i = 0; i < enabledTrfs.length; i++) {
             const transformer = enabledTrfs[i];
 
