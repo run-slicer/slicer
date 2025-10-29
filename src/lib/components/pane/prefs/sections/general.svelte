@@ -7,7 +7,7 @@
     import { t, locales } from "$lib/i18n";
     import Section from "../section.svelte";
     import Label from "../label.svelte";
-    import { flagEmoji, languageToCountry, tryOrNull } from "$lib/utils";
+    import { capitalize, flagEmoji, languageToCountry, tryOrNull } from "$lib/utils";
 
     let languageNames = $derived(tryOrNull(() => new Intl.DisplayNames($locale, { type: "language" })));
 </script>
@@ -17,16 +17,18 @@
         <Label for="locale" textKey="pane.prefs.general.language" />
         <Select type="single" bind:value={$locale}>
             <SelectTrigger id="locale" class="w-48">
+                {@const name = tryOrNull(() => languageNames?.of($locale))}
                 <span class="inline-flex gap-2">
                     <span>{flagEmoji(languageToCountry($locale))}</span>
-                    <span>{tryOrNull(() => languageNames?.of($locale)) ?? $locale}</span>
+                    <span>{name ? capitalize(name) : $locale}</span>
                 </span>
             </SelectTrigger>
             <SelectContent>
                 {#each locales.keys() as localeCode (localeCode)}
                     <SelectItem value={localeCode} class="gap-2">
+                        {@const name = tryOrNull(() => languageNames?.of(localeCode))}
                         <span>{flagEmoji(languageToCountry(localeCode))}</span>
-                        <span>{tryOrNull(() => languageNames?.of(localeCode)) ?? localeCode}</span>
+                        <span>{name ? capitalize(name) : localeCode}</span>
                     </SelectItem>
                 {/each}
                 <SelectItem value="locale.none" class="gap-2">
