@@ -17,7 +17,10 @@
         <Label for="locale" textKey="pane.prefs.general.language" />
         <Select type="single" bind:value={$locale}>
             <SelectTrigger id="locale" class="w-48">
-                {tryOrNull(() => languageNames?.of($locale)) ?? $locale}
+                <span class="inline-flex gap-2">
+                    <span>{flagEmoji(languageToCountry($locale))}</span>
+                    <span>{tryOrNull(() => languageNames?.of($locale)) ?? $locale}</span>
+                </span>
             </SelectTrigger>
             <SelectContent>
                 {#each locales.keys() as localeCode (localeCode)}
@@ -37,7 +40,16 @@
         <Label for="themeColor" textKey="pane.prefs.general.color" />
         <Select type="single" bind:value={$themeColor}>
             <SelectTrigger id="themeColor" class="w-48">
-                {themes.find((t) => t.name === $themeColor)?.label || $themeColor}
+                {@const theme = themes.find((t) => t.name === $themeColor)}
+                {@const cssVars = mode.current === "light" ? theme?.cssVars?.light : theme?.cssVars?.dark}
+                <span class="inline-flex items-center gap-2">
+                    <span
+                        class="size-4 rounded-full"
+                        style="background: conic-gradient({cssVars?.primary ?? 'white'}, {cssVars?.secondary ??
+                            'black'});"
+                    ></span>
+                    <span>{theme?.label || $themeColor}</span>
+                </span>
             </SelectTrigger>
             <SelectContent>
                 {#each themes as theme (theme.name)}
