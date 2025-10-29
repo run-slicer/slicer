@@ -1,5 +1,5 @@
 import { type Icon, type StyledIcon, tabIcon } from "$lib/components/icons";
-import { tl } from "$lib/i18n";
+import { t } from "$lib/i18n";
 import { error } from "$lib/log";
 import { analysisTransformers, panes, workspaceEncoding } from "$lib/state";
 import { type Entry, EntryType, readDeferred } from "$lib/workspace";
@@ -147,12 +147,12 @@ export const current = derived(tabs, ($tabs) => {
 });
 
 // set window name based on currently opened tab
-current.subscribe(($current) => {
+derived([current, t], (a) => a).subscribe(([$current, $t]) => {
     // PWAs don't need the app name reiterated
     if (window.matchMedia("not (display-mode: browser)").matches) {
-        document.title = $current ? ($current.name ?? tl(`tab.${$current.type}`)) : "slicer";
+        document.title = $current ? ($current.name ?? $t(`tab.${$current.type}`)) : "slicer";
     } else {
-        document.title = $current ? `${$current.name ?? tl(`tab.${$current.type}`)} | slicer` : "slicer";
+        document.title = $current ? `${$current.name ?? $t(`tab.${$current.type}`)} | slicer` : "slicer";
     }
 });
 

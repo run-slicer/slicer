@@ -28,12 +28,14 @@
 
     const checkboxOption = $derived(option as CheckboxOption);
     const handleCheckbox = (checked: boolean | "indeterminate") => {
+        // @ts-ignore
         checkboxOption.checked = Boolean(checked);
         proto.context?.dispatchEvent({ type: "option_change", option });
     };
 
     const radioOption = $derived(option as RadioOption);
     const handleRadio = (value: string | undefined) => {
+        // @ts-ignore
         radioOption.selected = value!;
         proto.context?.dispatchEvent({ type: "option_change", option });
     };

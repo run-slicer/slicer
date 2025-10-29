@@ -12,9 +12,9 @@
     let languageNames = $derived(new Intl.DisplayNames($locale, { type: "language" }));
 </script>
 
-<Section id="general" label="General">
+<Section id="general" labelKey="pane.prefs.section.general">
     <div class="grid min-h-[2rem] grid-cols-[16rem_10rem_1fr] items-center gap-4">
-        <Label for="locale" text="Language" />
+        <Label for="locale" textKey="pane.prefs.general.language" />
         <Select type="single" bind:value={$locale}>
             <SelectTrigger id="locale" class="w-48">
                 {languageNames.of($locale)}
@@ -30,7 +30,7 @@
         </Select>
     </div>
     <div class="grid min-h-[2rem] grid-cols-[16rem_10rem_1fr] items-center gap-4">
-        <Label for="themeColor" text="Color" />
+        <Label for="themeColor" textKey="pane.prefs.general.color" />
         <Select type="single" bind:value={$themeColor}>
             <SelectTrigger id="themeColor" class="w-48">
                 {themes.find((t) => t.name === $themeColor)?.label || $themeColor}
@@ -50,7 +50,7 @@
         </Select>
     </div>
     <div class="grid min-h-[2.5rem] grid-cols-[16rem_10rem_1fr] items-center gap-4">
-        <Label for="themeRadius" text="Radius">Alters the smoothness of UI corners.</Label>
+        <Label for="themeRadius" textKey="pane.prefs.general.radius" descKey="pane.prefs.general.radius.desc" />
         <Slider type="single" id="themeRadius" min={0} max={1} step={0.05} bind:value={$themeRadius} class="w-48" />
     </div>
 </Section>

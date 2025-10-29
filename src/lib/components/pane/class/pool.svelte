@@ -3,6 +3,7 @@
     import { ConstantType } from "@katana-project/asm/spec";
     import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "$lib/components/ui/table";
     import { formatEntry } from "@katana-project/asm/analysis/disasm";
+    import { t } from "$lib/i18n";
 
     interface Props {
         node: Node;
@@ -14,9 +15,9 @@
 <Table>
     <TableHeader class="bg-background sticky top-0 z-10 shadow-lg">
         <TableRow>
-            <TableHead>Index</TableHead>
-            <TableHead>Type</TableHead>
-            <TableHead>Value</TableHead>
+            <TableHead>{$t("pane.class.pool.index")}</TableHead>
+            <TableHead>{$t("pane.class.pool.type")}</TableHead>
+            <TableHead>{$t("pane.class.pool.value")}</TableHead>
         </TableRow>
     </TableHeader>
     <TableBody>
@@ -26,7 +27,9 @@
                     <TableRow>
                         <TableCell class="font-medium">{i}</TableCell>
                         <TableCell>
-                            <span class="font-mono tracking-tight">{ConstantType[entry.type] || "<unknown>"}</span>
+                            <span class="font-mono tracking-tight"
+                                >{ConstantType[entry.type] || $t("pane.class.pool.unknown")}</span
+                            >
                             ({entry.type})
                         </TableCell>
                         <TableCell class="break-anywhere font-mono tracking-tight whitespace-normal">
@@ -37,7 +40,7 @@
             {/each}
         {:else}
             <TableRow>
-                <TableCell colspan={3} class="h-24 text-center">No constant pool entries.</TableCell>
+                <TableCell colspan={3} class="h-24 text-center">{$t("pane.class.pool.no-entries")}</TableCell>
             </TableRow>
         {/if}
     </TableBody>
