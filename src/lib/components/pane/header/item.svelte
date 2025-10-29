@@ -16,6 +16,7 @@
     import { Modifier } from "$lib/shortcut";
     import Shortcut from "$lib/components/menu/shortcut.svelte";
     import ContextMenuLabel from "$lib/components/menu_label.svelte";
+    import { t } from "$lib/i18n";
 
     interface Props {
         name?: string;
@@ -76,10 +77,17 @@
         <ContextMenuLabel>{name}</ContextMenuLabel>
         <ContextMenuSeparator />
         <ContextMenuItem onclick={(e) => handleClose(e, "self")} class="justify-between">
-            Close {#if active}<Shortcut key="w" modifier={Modifier.CTRL | Modifier.ALT} />{/if}
+            {$t("pane.header.menu.close.self")}
+            {#if active}<Shortcut key="w" modifier={Modifier.CTRL | Modifier.ALT} />{/if}
         </ContextMenuItem>
-        <ContextMenuItem onclick={(e) => handleClose(e, "others")}>Close others</ContextMenuItem>
-        <ContextMenuItem onclick={(e) => handleClose(e, "right")}>Close to the right</ContextMenuItem>
-        <ContextMenuItem onclick={(e) => handleClose(e, "all")}>Close all</ContextMenuItem>
+        <ContextMenuItem onclick={(e) => handleClose(e, "others")}>
+            {$t("pane.header.menu.close.others")}
+        </ContextMenuItem>
+        <ContextMenuItem onclick={(e) => handleClose(e, "right")}>
+            {$t("pane.header.menu.close.right")}
+        </ContextMenuItem>
+        <ContextMenuItem onclick={(e) => handleClose(e, "all")}>
+            {$t("pane.header.menu.close.all")}
+        </ContextMenuItem>
     </ContextMenuContent>
 </ContextMenu>

@@ -60,6 +60,10 @@ export interface LocaleData {
     "pane.empty.subtitle": string;
     "pane.header.open.placeholder": string;
     "pane.header.open.no-results": string;
+    "pane.header.menu.close.self": string;
+    "pane.header.menu.close.others": string;
+    "pane.header.menu.close.right": string;
+    "pane.header.menu.close.all": string;
     "pane.welcome.title": string;
     "pane.welcome.get-started": string;
     "pane.welcome.get-started.open": string;
