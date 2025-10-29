@@ -1,4 +1,5 @@
 import { type Icon, type StyledIcon, tabIcon } from "$lib/components/icons";
+import { tl } from "$lib/i18n";
 import { error } from "$lib/log";
 import { analysisTransformers, panes, workspaceEncoding } from "$lib/state";
 import { type Entry, EntryType, readDeferred } from "$lib/workspace";
@@ -18,7 +19,7 @@ export enum TabType {
     GRAPH = "graph",
     CLASS = "class",
     IMAGE = "image",
-    HEAP_DUMP = "heap_dump",
+    HEAP_DUMP = "dump",
     STRUCTURE = "structure",
 }
 
@@ -32,7 +33,7 @@ export enum TabPosition {
 export interface Tab {
     id: string;
     type: TabType;
-    name: string;
+    name?: string;
     position: TabPosition;
     active?: boolean;
     closeable: boolean;
@@ -45,7 +46,6 @@ export interface Tab {
 
 export interface TabDefinition {
     type: TabType;
-    name: string;
     icon: Icon;
 }
 
@@ -53,37 +53,30 @@ export interface TabDefinition {
 export const tabDefs: TabDefinition[] = [
     {
         type: TabType.PROJECT,
-        name: "Project",
         icon: Folders,
     },
     {
         type: TabType.LOGGING,
-        name: "Logging",
         icon: ScrollText,
     },
     {
         type: TabType.WELCOME,
-        name: "Welcome",
         icon: Sparkles,
     },
     {
         type: TabType.PLAYGROUND,
-        name: "Playground",
         icon: Box,
     },
     {
         type: TabType.SEARCH,
-        name: "Search",
         icon: Search,
     },
     {
         type: TabType.STRUCTURE,
-        name: "Structure",
         icon: LayoutList,
     },
     {
         type: TabType.PREFS,
-        name: "Preferences",
         icon: Settings,
     },
 ];
@@ -100,7 +93,6 @@ export const tabs = writable<Map<string, Tab>>(
                 {
                     id: `${def!.type}:slicer`,
                     type: def!.type,
-                    name: def!.name,
                     position,
                     active: tab.active,
                     closeable: true,
@@ -158,9 +150,9 @@ export const current = derived(tabs, ($tabs) => {
 current.subscribe(($current) => {
     // PWAs don't need the app name reiterated
     if (window.matchMedia("not (display-mode: browser)").matches) {
-        document.title = $current ? $current.name : "slicer";
+        document.title = $current ? ($current.name ?? tl(`tab.${$current.type}`)) : "slicer";
     } else {
-        document.title = $current ? `${$current.name} | slicer` : "slicer";
+        document.title = $current ? `${$current.name ?? tl(`tab.${$current.type}`)} | slicer` : "slicer";
     }
 });
 
@@ -364,7 +356,6 @@ export const openUnscoped = (def: TabDefinition, position: TabPosition = TabPosi
         tab = update({
             id: `${def.type}:slicer`,
             type: def.type,
-            name: def.name,
             position,
             closeable: true,
             icon: { icon: def.icon, classes: ["text-muted-foreground"] },

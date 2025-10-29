@@ -99,7 +99,7 @@
                         }}
                     >
                         <Icon />
-                        {def.name}
+                        {$t(`tab.${def.type}`)}
                     </CommandItem>
                 {/each}
             </CommandGroup>

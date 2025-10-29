@@ -6,6 +6,7 @@ import {
     remove as removeDisasm,
 } from "$lib/disasm";
 import { createSource as createClassSource, createResources } from "$lib/disasm/source";
+import { tl } from "$lib/i18n";
 import type { Language } from "$lib/lang";
 import { error, warn } from "$lib/log";
 import { analysisJdkClasses, scriptingScripts } from "$lib/state";
@@ -95,7 +96,7 @@ const wrapTab = (t: Tab): ScriptTab => {
     return {
         type: t.type,
         id: t.id,
-        label: t.name,
+        label: t.name ?? tl(`tab.${t.type}`),
         get position() {
             return t.position;
         },

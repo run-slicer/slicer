@@ -12,6 +12,7 @@
     import { paneIcon } from "$lib/components/icons";
     import type { PaneAPI } from "paneforge";
     import type { CloseType } from "./header/item.svelte";
+    import { t } from "$lib/i18n";
 
     interface Props {
         tabs: Tab[];
@@ -104,7 +105,7 @@
             >
                 {#each localTabs as tab0 (tab0.id)}
                     <PaneHeaderItem
-                        name={tab0.name}
+                        name={tab0.name ?? $t(`tab.${tab0.type}`)}
                         active={posCurrent?.id === tab0.id}
                         icon={tab0.icon}
                         closeable={tab0.closeable}
@@ -135,8 +136,8 @@
                 <div class="flex w-2/3 flex-col justify-center gap-6">
                     <div>
                         <Icon size={24} class="mb-4" />
-                        <p class="mb-0.5 text-lg">Nothing here...</p>
-                        <p class="text-muted-foreground text-sm">Open a new tab or move an existing one here.</p>
+                        <p class="mb-0.5 text-lg">{$t("pane.empty.title")}</p>
+                        <p class="text-muted-foreground text-sm">{$t("pane.empty.subtitle")}</p>
                     </div>
                     <PaneMenu align="start" {position} {handler} />
                 </div>
