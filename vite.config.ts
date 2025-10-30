@@ -12,6 +12,10 @@ export default defineConfig({
     esbuild: {
         legalComments: "none",
     },
+    optimizeDeps: {
+        // Vite doesn't like WASM fetches
+        exclude: ["@run-slicer/jasm", "@run-slicer/vf"],
+    },
     server: {
         fs: {
             strict: false,

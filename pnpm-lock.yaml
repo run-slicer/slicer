@@ -60,8 +60,8 @@ importers:
         specifier: ^0.12.0
         version: 0.12.0
       '@run-slicer/vf':
-        specifier: 0.2.1-1.11.1
-        version: 0.2.1-1.11.1
+        specifier: 0.2.2-1.11.1
+        version: 0.2.2-1.11.1
       '@tanstack/table-core':
         specifier: ^8.21.3
         version: 8.21.3
@@ -864,8 +864,8 @@ packages:
   '@run-slicer/script@0.12.0':
     resolution: {integrity: sha512-g53Lw3qOlgQYyHI5SJe0GKm8cm3mx87b8yMFflaS3bV22BsvwdKZEwzpntPqzjc9DSwQa2CbQtKE4nTqeuPjpw==}
 
-  '@run-slicer/vf@0.2.1-1.11.1':
-    resolution: {integrity: sha512-7Bh3+XiBLuym2QEknLh1lt4xlXdymYiMGJxpuo9i3Itd64rgM2L+ico/ftCqMuOVkW+f+rJ/owuGSI7GvGiwrw==}
+  '@run-slicer/vf@0.2.2-1.11.1':
+    resolution: {integrity: sha512-1vYnP3pfV7dzwvGXA6oX1d3RebsaRaU72K4s9g2D2OKauhIXlwEKA0BUGv1woiXKMJ+2f2k+J+sBpIOD8PIHZA==}
 
   '@sindresorhus/is@7.0.2':
     resolution: {integrity: sha512-d9xRovfKNz1SKieM0qJdO+PQonjnnIfSNWfHYnBSJ9hkjm0ZPw6HlxscDXYstp3z+7V2GOFHc+J0CYrYTjqCJw==}
@@ -2266,7 +2266,7 @@ snapshots:
 
   '@run-slicer/script@0.12.0': {}
 
-  '@run-slicer/vf@0.2.1-1.11.1': {}
+  '@run-slicer/vf@0.2.2-1.11.1': {}
 
   '@sindresorhus/is@7.0.2': {}
 

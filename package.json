@@ -31,7 +31,7 @@
         "@run-slicer/jasm": "0.4.3-2.8.0",
         "@run-slicer/procyon": "0.1.1-0.6.0",
         "@run-slicer/script": "^0.12.0",
-        "@run-slicer/vf": "0.2.1-1.11.1",
+        "@run-slicer/vf": "0.2.2-1.11.1",
         "@tanstack/table-core": "^8.21.3",
         "@xyflow/svelte": "1.2.4",
         "client-zip": "^2.5.0",
