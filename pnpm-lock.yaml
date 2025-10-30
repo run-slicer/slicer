@@ -51,8 +51,8 @@ importers:
         specifier: 0.1.4-0.152
         version: 0.1.4-0.152
       '@run-slicer/jasm':
-        specifier: 0.4.3-2.8.0
-        version: 0.4.3-2.8.0
+        specifier: 0.4.4-2.8.0
+        version: 0.4.4-2.8.0
       '@run-slicer/procyon':
         specifier: 0.1.1-0.6.0
         version: 0.1.1-0.6.0
@@ -60,8 +60,8 @@ importers:
         specifier: ^0.12.0
         version: 0.12.0
       '@run-slicer/vf':
-        specifier: 0.2.2-1.11.1
-        version: 0.2.2-1.11.1
+        specifier: 0.2.3-1.11.1
+        version: 0.2.3-1.11.1
       '@tanstack/table-core':
         specifier: ^8.21.3
         version: 8.21.3
@@ -855,8 +855,8 @@ packages:
   '@run-slicer/cfr@0.1.4-0.152':
     resolution: {integrity: sha512-k0OIMP4J4f7LZ0UX7+FT6zjtuDjuN6G0pvb1VRtMEPt9pYJgzRgnP3s7bfk8lh9PuAmD7IN9Heyzq/TyUf0Duw==}
 
-  '@run-slicer/jasm@0.4.3-2.8.0':
-    resolution: {integrity: sha512-zBnROTN3z6W9MJ8q3RgWXFVzBTNMXDvja9aa542x921NXfyExZhYSsrcKXZH1cR9t35uyvC8cCeVXDu7obv7hA==}
+  '@run-slicer/jasm@0.4.4-2.8.0':
+    resolution: {integrity: sha512-P/edUOQwusfu80QQ9Bj/RTgG1aExPwE16aSOjzgtTwcHtEIgBPJ58ok2YGKLb3OVTtVKHbRH+QVU91dY+sopjQ==}
 
   '@run-slicer/procyon@0.1.1-0.6.0':
     resolution: {integrity: sha512-LoWGZwtAvmnaW0dXShyXw/aPyznLgQNwBwZwHvOJIlntYkkJ6IOY3E47qB+BgI5coUK8Xb/ahonLX93wsWNF6A==}
@@ -864,8 +864,8 @@ packages:
   '@run-slicer/script@0.12.0':
     resolution: {integrity: sha512-g53Lw3qOlgQYyHI5SJe0GKm8cm3mx87b8yMFflaS3bV22BsvwdKZEwzpntPqzjc9DSwQa2CbQtKE4nTqeuPjpw==}
 
-  '@run-slicer/vf@0.2.2-1.11.1':
-    resolution: {integrity: sha512-1vYnP3pfV7dzwvGXA6oX1d3RebsaRaU72K4s9g2D2OKauhIXlwEKA0BUGv1woiXKMJ+2f2k+J+sBpIOD8PIHZA==}
+  '@run-slicer/vf@0.2.3-1.11.1':
+    resolution: {integrity: sha512-FRZSZuDU44TzZrIFwptcsT5FlZrBc2iIosq+pXpfzJtJ85DrAxQnHP+q3mOsrpdoVqzLE/VqQ/xfJpE3KEUneA==}
 
   '@sindresorhus/is@7.0.2':
     resolution: {integrity: sha512-d9xRovfKNz1SKieM0qJdO+PQonjnnIfSNWfHYnBSJ9hkjm0ZPw6HlxscDXYstp3z+7V2GOFHc+J0CYrYTjqCJw==}
@@ -2260,13 +2260,13 @@ snapshots:
 
   '@run-slicer/cfr@0.1.4-0.152': {}
 
-  '@run-slicer/jasm@0.4.3-2.8.0': {}
+  '@run-slicer/jasm@0.4.4-2.8.0': {}
 
   '@run-slicer/procyon@0.1.1-0.6.0': {}
 
   '@run-slicer/script@0.12.0': {}
 
-  '@run-slicer/vf@0.2.2-1.11.1': {}
+  '@run-slicer/vf@0.2.3-1.11.1': {}
 
   '@sindresorhus/is@7.0.2': {}
 
