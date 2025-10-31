@@ -26,8 +26,8 @@ const fetchIndex = async (url: string): Promise<DataIndex> => {
     return index;
 };
 
-// use the OpenJDK 21 index globally
-export const index = await fetchIndex("https://data.slicer.run/21");
+// use the OpenJDK 25 index globally
+export const index = await fetchIndex("https://data.slicer.run/25");
 
 // shouldn't be too big, the entire class library is around a hundred MB
 const cache = new Map<string, Uint8Array>();
