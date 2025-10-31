@@ -93,16 +93,29 @@ export const recordTimed = async <T>(
     return { result, time };
 };
 
-export const recordProgress = async <T>(name: TranslationKey, desc: string | null, call: TaskAction<T>): Promise<T> => {
+export const recordTimedProgress = async <T>(
+    name: TranslationKey,
+    desc: string | null,
+    call: TaskAction<T>
+): Promise<TimedResult<T>> => {
     const task = create(name, desc, false);
 
+    let result: T;
     try {
-        return await call(add(task));
-    } finally {
+        result = await call(add(task));
+    } catch (e) {
         remove(task);
+        throw e;
     }
+
+    const { time } = remove(task);
+    return { result, time };
 };
 
 export const record = async <T>(name: TranslationKey, desc: string | null, call: TaskAction<T>): Promise<T> => {
     return (await recordTimed(name, desc, call)).result;
+};
+
+export const recordProgress = async <T>(name: TranslationKey, desc: string | null, call: TaskAction<T>): Promise<T> => {
+    return (await recordTimedProgress(name, desc, call)).result;
 };

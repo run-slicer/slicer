@@ -30,9 +30,10 @@ import {
     record,
     recordProgress,
     recordTimed,
+    recordTimedProgress,
     remove as removeTask,
 } from "$lib/task";
-import { chunk, distribute, downloadBlob, partition, readFiles, timestampFile, truncate } from "$lib/utils";
+import { chunk, distribute, downloadBlob, humanSize, partition, readFiles, timestampFile, truncate } from "$lib/utils";
 import {
     type ClassEntry,
     clear as clearWs,
@@ -157,7 +158,18 @@ export default {
         await toastAdd(created, skipped, time);
     },
     async addRemote(url: string): Promise<void> {
-        const { time, result } = await recordTimed("task.add", url, () => loadRemote(url));
+        const { time, result } = await recordTimedProgress("task.add", url, (task) => {
+            return loadRemote(url, null, (loaded, total) => {
+                if (total === -1) {
+                    // total size unknown
+                    task.desc.set(`${url} (${humanSize(loaded)})`);
+                    task.progress = undefined; // indeterminate
+                } else {
+                    task.desc.set(`${url} (${humanSize(loaded)}/${humanSize(total)})`);
+                    task.progress?.set((loaded / total) * 100);
+                }
+            });
+        });
 
         const [created, skipped] = partition(result, (r) => r.created);
         await toastAdd(created, skipped, time);

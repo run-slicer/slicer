@@ -1,7 +1,7 @@
 import { warn } from "$lib/log";
 import { analysisBackground, workspaceArchiveDuplicateHandling } from "$lib/state";
 import { record } from "$lib/task";
-import { groupBy, prettyMethodDesc } from "$lib/utils";
+import { fetchProgress, groupBy, prettyMethodDesc } from "$lib/utils";
 import type { Member, Node } from "@katana-project/asm";
 import type { UTF8Entry } from "@katana-project/asm/pool";
 import type { Zip, Entry as ZipEntry } from "@katana-project/zip";
@@ -280,17 +280,21 @@ export const loadZip = async (f: File): Promise<LoadResult[]> => {
     return load(...(await zipData(await readZip(f))));
 };
 
-export const loadRemote = async (url: string, name?: string): Promise<LoadResult[]> => {
-    const res = await fetch(url);
+export const loadRemote = async (
+    url: string,
+    name: string | null = null,
+    onProgress: (loaded: number, total: number) => void = () => {}
+): Promise<LoadResult[]> => {
+    const res = await fetchProgress(url, onProgress);
     if (!name) {
-        name = new URL(url).pathname.split("/").pop();
+        name = new URL(url).pathname.split("/").pop() ?? null;
         if (!name?.includes(".")) {
             // no extension
             name = "input.jar";
         }
     }
 
-    return load(memoryData(name, await res.blob()));
+    return load(memoryData(name, res));
 };
 
 export const remove = (name: string) => {

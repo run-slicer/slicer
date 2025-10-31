@@ -58,7 +58,7 @@ export const transform = async (entry: ClassEntry, data: Uint8Array): Promise<Cl
 
             log(`running transformer '${transformer.id}' on '${entry.name}'`);
             data = await transformer.run(cloneEntry, data);
-            task.progress?.set((i + 1) / enabledTrfs.length);
+            task.progress?.set(((i + 1) / enabledTrfs.length) * 100);
         }
     });
 

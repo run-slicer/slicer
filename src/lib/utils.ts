@@ -226,6 +226,38 @@ export const downloadBlob = (name: string, blob: Blob): Promise<void> => {
     });
 };
 
+export const fetchProgress = async (
+    url: string,
+    onProgress: (loaded: number, total: number) => void
+): Promise<Blob> => {
+    const res = await fetch(url);
+    if (!res.body) {
+        return new Blob();
+    }
+
+    const contentLength = res.headers.get("Content-Length");
+    const total = contentLength ? parseInt(contentLength, 10) : -1;
+
+    const reader = res.body.getReader();
+    const chunks: Uint8Array<ArrayBuffer>[] = [];
+    let loaded = 0;
+
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done) {
+            break;
+        }
+
+        if (value) {
+            chunks.push(value);
+            loaded += value.length;
+            onProgress(loaded, total);
+        }
+    }
+
+    return new Blob(chunks, { type: res.headers.get("Content-Type") ?? undefined });
+};
+
 /* formatting */
 
 // https://dev.to/jorik/country-code-to-flag-emoji-a21
