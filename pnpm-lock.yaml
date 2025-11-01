@@ -48,8 +48,8 @@ importers:
         specifier: ^1.2.1
         version: 1.2.1
       '@run-slicer/cfr':
-        specifier: 0.1.4-0.152
-        version: 0.1.4-0.152
+        specifier: 0.1.5-0.152
+        version: 0.1.5-0.152
       '@run-slicer/jasm':
         specifier: 0.4.4-2.8.0
         version: 0.4.4-2.8.0
@@ -852,8 +852,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@run-slicer/cfr@0.1.4-0.152':
-    resolution: {integrity: sha512-k0OIMP4J4f7LZ0UX7+FT6zjtuDjuN6G0pvb1VRtMEPt9pYJgzRgnP3s7bfk8lh9PuAmD7IN9Heyzq/TyUf0Duw==}
+  '@run-slicer/cfr@0.1.5-0.152':
+    resolution: {integrity: sha512-+dMKVeBwkhaGyToHnON6mAKW7bW+aay/VA8wI8lIyGEpNm5f5DFPw1SqvqN24Djs5NUxCKctcLL//JdXMoWDxQ==}
 
   '@run-slicer/jasm@0.4.4-2.8.0':
     resolution: {integrity: sha512-P/edUOQwusfu80QQ9Bj/RTgG1aExPwE16aSOjzgtTwcHtEIgBPJ58ok2YGKLb3OVTtVKHbRH+QVU91dY+sopjQ==}
@@ -2258,7 +2258,7 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.50.1':
     optional: true
 
-  '@run-slicer/cfr@0.1.4-0.152': {}
+  '@run-slicer/cfr@0.1.5-0.152': {}
 
   '@run-slicer/jasm@0.4.4-2.8.0': {}
 
