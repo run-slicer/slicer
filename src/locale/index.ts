@@ -237,6 +237,13 @@ export interface LocaleData {
     "pane.prefs.analysis.background.desc": string;
     "pane.prefs.analysis.jdk-classes": string;
     "pane.prefs.analysis.jdk-classes.desc": string;
+    "editor.search.placeholder": string;
+    "editor.search.case-sensitive": string;
+    "editor.search.whole-word": string;
+    "editor.search.regex": string;
+    "editor.search.next": string;
+    "editor.search.previous": string;
+    "editor.search.close": string;
     "command.placeholder": string;
     "command.tabs": string;
     "command.workspace": string;

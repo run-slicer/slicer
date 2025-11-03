@@ -21,6 +21,8 @@
     } from "@codemirror/language";
     import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
     import { highlightSelectionMatches, search, searchKeymap } from "@codemirror/search";
+    import SearchPanel from "./search.svelte";
+    import { mount, unmount } from "svelte";
 
     export const basicSetup: Extension = (() => [
         lineNumbers(),
@@ -32,7 +34,19 @@
         dropCursor(),
         EditorState.allowMultipleSelections.of(true),
         indentOnInput(),
-        search({ top: true }),
+        search({
+            createPanel: (view) => {
+                const target = document.createElement("div");
+                const component = mount(SearchPanel, { target, props: { view } });
+                return {
+                    dom: target,
+                    top: true,
+                    destroy() {
+                        unmount(component);
+                    },
+                };
+            },
+        }),
         syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
         bracketMatching(),
         rectangularSelection(),
@@ -71,22 +85,6 @@
             "background-color": "var(--background)",
             // fix overlapping
             "z-index": "auto",
-        },
-        ".cm-search": {
-            // fix alignment on search panel
-            display: "flex",
-            "align-items": "center",
-        },
-        ".cm-button": {
-            // fix color on search button
-            "border-color": "var(--secondary)",
-            "border-radius": "0.25rem", // rounded
-            "background-image": "unset",
-        },
-        ".cm-button:active": {
-            // fix color on search button
-            "background-color": "var(--secondary)",
-            "background-image": "unset",
         },
     });
 </script>
