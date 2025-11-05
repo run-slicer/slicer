@@ -17,7 +17,6 @@ export const cfr: Disassembler = createFromWorker(
         name: "CFR",
         version: "0.152",
         language: () => "java",
-        concurrency: 5,
     },
     () => wrap<Worker>(new CFRWorker()),
     false
@@ -29,7 +28,6 @@ export const jasm: Disassembler = createFromWorker(
         name: "JASM",
         version: "2.8.0",
         language: () => "jasm",
-        concurrency: 5,
     },
     () => wrap<Worker>(new JASMWorker()),
     true
@@ -40,7 +38,6 @@ export const vf: Disassembler = createFromWorker(
         id: "vf",
         name: "Vineflower",
         version: "1.11.2",
-        concurrency: 5,
         language(entry?: ClassEntry): Language {
             if (!entry) {
                 return "java";
@@ -65,7 +62,6 @@ export const procyon: Disassembler = createFromWorker(
         name: "Procyon",
         version: "0.6.0",
         language: () => "java",
-        concurrency: 5,
     },
     () => wrap<Worker>(new ProcyonWorker()),
     false,
@@ -77,7 +73,6 @@ export const slicer: Disassembler = createFromWorker(
         id: "slicer",
         name: "slicer",
         language: () => "java",
-        concurrency: 5,
     },
     () => wrap<Worker>(new SlicerWorker()),
     true

@@ -10,7 +10,6 @@ export interface Disassembler {
     id: string;
     name?: string;
     version?: string;
-    concurrency?: number;
     options?: Record<string, string>;
 
     language: (entry?: ClassEntry) => Language;

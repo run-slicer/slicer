@@ -8,5 +8,6 @@ export interface Worker {
     hprof(blob: Blob): Promise<SlurpResult>;
 }
 
-// maximum concurrency of 5
-export const worker = roundRobin(5, () => wrap<Worker>(new ReaderWorker()));
+const MAX_CONCURRENT = Math.max(1, Math.floor(navigator.hardwareConcurrency / 2));
+
+export const worker = roundRobin(MAX_CONCURRENT, () => wrap<Worker>(new ReaderWorker()));

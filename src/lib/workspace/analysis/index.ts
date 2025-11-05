@@ -16,7 +16,7 @@ export const enum AnalysisState {
     FULL,
 }
 
-const MAX_CONCURRENT = 5;
+const MAX_CONCURRENT = Math.max(1, Math.floor(navigator.hardwareConcurrency / 2));
 
 const worker = roundRobin(MAX_CONCURRENT, () => wrap<AnalysisWorker>(new Worker()));
 const analyzeClass = async (entry: Entry, skipAttr: boolean) => {

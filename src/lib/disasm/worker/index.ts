@@ -6,6 +6,8 @@ import { proxy } from "comlink";
 import { get } from "svelte/store";
 import { type EntrySource, createResources, createSource } from "../source";
 
+export const MAX_CONCURRENT = Math.max(1, Math.floor(navigator.hardwareConcurrency / 2));
+
 export type Options = Record<string, string>;
 
 export interface Worker {
@@ -25,8 +27,8 @@ export const createFromWorker = (
     method: boolean,
     useJdkClasses: boolean = true
 ): Disassembler => {
-    if ((disasm.concurrency ?? 1) > 1) {
-        workerFunc = roundRobin(disasm.concurrency!, workerFunc);
+    if (MAX_CONCURRENT > 1) {
+        workerFunc = roundRobin(MAX_CONCURRENT, workerFunc);
     } else {
         // use only one worker
         const worker = workerFunc();
