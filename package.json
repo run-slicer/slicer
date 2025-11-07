@@ -52,7 +52,7 @@
         "@tailwindcss/vite": "^4.1.13",
         "@tsconfig/svelte": "^5.0.5",
         "@types/node": "^24.3.3",
-        "bits-ui": "2.9.8",
+        "bits-ui": "2.14.2",
         "mode-watcher": "^1.1.0",
         "paneforge": "1.0.2",
         "prettier": "^3.6.2",
