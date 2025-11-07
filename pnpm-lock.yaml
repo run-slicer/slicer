@@ -48,11 +48,11 @@ importers:
         specifier: ^1.2.1
         version: 1.2.1
       '@run-slicer/cfr':
-        specifier: 0.1.5-0.152
-        version: 0.1.5-0.152
+        specifier: 0.1.6-0.152
+        version: 0.1.6-0.152
       '@run-slicer/jasm':
-        specifier: 0.4.4-2.8.0
-        version: 0.4.4-2.8.0
+        specifier: 0.4.5-2.8.0
+        version: 0.4.5-2.8.0
       '@run-slicer/procyon':
         specifier: 0.1.1-0.6.0
         version: 0.1.1-0.6.0
@@ -60,8 +60,8 @@ importers:
         specifier: ^0.12.0
         version: 0.12.0
       '@run-slicer/vf':
-        specifier: 0.2.3-1.11.2
-        version: 0.2.3-1.11.2
+        specifier: 0.2.4-1.11.2
+        version: 0.2.4-1.11.2
       '@tanstack/table-core':
         specifier: ^8.21.3
         version: 8.21.3
@@ -852,11 +852,11 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@run-slicer/cfr@0.1.5-0.152':
-    resolution: {integrity: sha512-+dMKVeBwkhaGyToHnON6mAKW7bW+aay/VA8wI8lIyGEpNm5f5DFPw1SqvqN24Djs5NUxCKctcLL//JdXMoWDxQ==}
+  '@run-slicer/cfr@0.1.6-0.152':
+    resolution: {integrity: sha512-aZa6UsxGCw0xIxB2Phz74V69kuXvrBJgUZLqcQSLDY2reRQihciGmirT7X4QWR/UUz8Swd6zpOSPGToJnAHw1w==}
 
-  '@run-slicer/jasm@0.4.4-2.8.0':
-    resolution: {integrity: sha512-P/edUOQwusfu80QQ9Bj/RTgG1aExPwE16aSOjzgtTwcHtEIgBPJ58ok2YGKLb3OVTtVKHbRH+QVU91dY+sopjQ==}
+  '@run-slicer/jasm@0.4.5-2.8.0':
+    resolution: {integrity: sha512-J/NyVKwgJb3J9G7lOYACiE0Yba0LyaWDyBCvKe4gPrDWEydAOxutKU7NxheKdDCw7EPprNddMNy9DsYATQAs4Q==}
 
   '@run-slicer/procyon@0.1.1-0.6.0':
     resolution: {integrity: sha512-LoWGZwtAvmnaW0dXShyXw/aPyznLgQNwBwZwHvOJIlntYkkJ6IOY3E47qB+BgI5coUK8Xb/ahonLX93wsWNF6A==}
@@ -864,8 +864,8 @@ packages:
   '@run-slicer/script@0.12.0':
     resolution: {integrity: sha512-g53Lw3qOlgQYyHI5SJe0GKm8cm3mx87b8yMFflaS3bV22BsvwdKZEwzpntPqzjc9DSwQa2CbQtKE4nTqeuPjpw==}
 
-  '@run-slicer/vf@0.2.3-1.11.2':
-    resolution: {integrity: sha512-AHn6vL495p/KEhJIVDu4lJ1I4whFFbvUtFeH7JQtACIKYfYfUV6wzJ1vuXYnsMYx2JqJlNwhbyIy+twe57REQQ==}
+  '@run-slicer/vf@0.2.4-1.11.2':
+    resolution: {integrity: sha512-sQSb7xLMgJ6/D8WYe+cuBFn4N03jce1S3aWQT9GsOafeyJyImYj/hJuqOk0iNVP0pUJlhTalFfCgDV9oGuC0Nw==}
 
   '@sindresorhus/is@7.0.2':
     resolution: {integrity: sha512-d9xRovfKNz1SKieM0qJdO+PQonjnnIfSNWfHYnBSJ9hkjm0ZPw6HlxscDXYstp3z+7V2GOFHc+J0CYrYTjqCJw==}
@@ -2258,15 +2258,15 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.50.1':
     optional: true
 
-  '@run-slicer/cfr@0.1.5-0.152': {}
+  '@run-slicer/cfr@0.1.6-0.152': {}
 
-  '@run-slicer/jasm@0.4.4-2.8.0': {}
+  '@run-slicer/jasm@0.4.5-2.8.0': {}
 
   '@run-slicer/procyon@0.1.1-0.6.0': {}
 
   '@run-slicer/script@0.12.0': {}
 
-  '@run-slicer/vf@0.2.3-1.11.2': {}
+  '@run-slicer/vf@0.2.4-1.11.2': {}
 
   '@sindresorhus/is@7.0.2': {}
 
