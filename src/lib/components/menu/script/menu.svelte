@@ -34,7 +34,7 @@
 
 <MenubarSub>
     <MenubarSubTrigger>{script?.name || proto.id}</MenubarSubTrigger>
-    <MenubarSubContent class="min-w-48">
+    <MenubarSubContent class="max-h-96 min-w-48 overflow-y-auto">
         <MenubarCheckboxItem
             checked={proto.state === ScriptState.LOADED}
             disabled={proto.state === ScriptState.FAILED}

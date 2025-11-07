@@ -18,7 +18,7 @@
         option: Option;
     }
 
-    let { inset = false, proto, option }: Props = $props();
+    let { inset, proto, option }: Props = $props();
 
     const groupOption = $derived(option as GroupOption);
 
@@ -42,10 +42,11 @@
 </script>
 
 {#if option.type === "group"}
-    {@const hasCheckbox = groupOption.options.some((o) => o.type === "checkbox")}
+    <!-- weird inset behavior/bug, false doesn't make the inset go away, but undefined does -->
+    {@const hasCheckbox = groupOption.options.some((o) => o.type === "checkbox") ? true : undefined}
     <MenubarSub>
         <MenubarSubTrigger {inset}>{option.label || option.id}</MenubarSubTrigger>
-        <MenubarSubContent class="min-w-48">
+        <MenubarSubContent class="max-h-96 min-w-48 overflow-y-auto">
             {#each groupOption.options as subOption (subOption.id)}
                 <ScriptOption inset={hasCheckbox} {proto} option={subOption} />
             {/each}
@@ -60,7 +61,7 @@
 {:else if option.type === "radio"}
     <MenubarSub>
         <MenubarSubTrigger {inset}>{option.label || option.id}</MenubarSubTrigger>
-        <MenubarSubContent class="min-w-48">
+        <MenubarSubContent class="max-h-96 min-w-48 overflow-y-auto">
             <MenubarRadioGroup value={radioOption.selected} onValueChange={handleRadio}>
                 {#each radioOption.items as subOption (subOption.id)}
                     <MenubarRadioItem value={subOption.id}>{subOption.label || subOption.id}</MenubarRadioItem>
