@@ -75,7 +75,7 @@ const toastAdd = async (created: LoadResult[], skipped: LoadResult[], time: numb
         toast.success(tl("toast.success.title.add"), {
             description: tl(
                 created.length === 1 ? "toast.success.add.single" : "toast.success.add.multiple",
-                created.length,
+                created.length === 1 ? created[0].entry.name : created.length,
                 time
             ),
         });
