@@ -38,10 +38,16 @@ export const chunk = <T>(arr: T[], size: number): T[][] => {
     return chunks;
 };
 
-// https://stackoverflow.com/a/66358141
+// https://stackoverflow.com/a/66358141 - without recursion
 
-// xs has the smaller length
-const _distribute = <T>(xs: T[], ys: T[]): T[] => {
+export const distribute = <T>(xs: T[], ys: T[]): T[] => {
+    if (xs.length > ys.length) {
+        // swap, so xs has the smaller length
+        const oldXs = xs;
+        xs = ys;
+        ys = oldXs;
+    }
+
     if (xs.length === 0) {
         return [...ys];
     }
@@ -70,9 +76,6 @@ const _distribute = <T>(xs: T[], ys: T[]): T[] => {
 
     return result;
 };
-
-export const distribute = <T>(xs: T[], ys: T[]): T[] =>
-    xs.length > ys.length ? _distribute(ys, xs) : _distribute(xs, ys);
 
 export const roundRobin = <T>(size: number, func: () => T): (() => T) => {
     const items = new Array<T>(size);
