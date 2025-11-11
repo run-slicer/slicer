@@ -41,8 +41,35 @@ export const chunk = <T>(arr: T[], size: number): T[][] => {
 // https://stackoverflow.com/a/66358141
 
 // xs has the smaller length
-const _distribute = <T>(xs: T[], ys: T[], count: number = Math.round(ys.length / (xs.length + 1))): T[] =>
-    xs.length == 0 ? [...ys] : [...ys.slice(0, count), xs[0], ..._distribute(xs.slice(1), ys.slice(count))];
+const _distribute = <T>(xs: T[], ys: T[]): T[] => {
+    if (xs.length === 0) {
+        return [...ys];
+    }
+
+    const result = new Array<T>(xs.length + ys.length);
+    let resultIndex = 0;
+
+    let xIndex = 0,
+        yIndex = 0,
+        count = 0;
+    while (xIndex < xs.length) {
+        count = Math.round((ys.length - yIndex) / (xs.length - xIndex + 1));
+
+        const endIndex = Math.min(yIndex + count, ys.length);
+        for (let i = yIndex; i < endIndex; i++) {
+            result[resultIndex++] = ys[i];
+        }
+        yIndex = endIndex;
+
+        result[resultIndex++] = xs[xIndex++];
+    }
+
+    for (let i = yIndex; i < ys.length; i++) {
+        result[resultIndex++] = ys[i];
+    }
+
+    return result;
+};
 
 export const distribute = <T>(xs: T[], ys: T[]): T[] =>
     xs.length > ys.length ? _distribute(ys, xs) : _distribute(xs, ys);
