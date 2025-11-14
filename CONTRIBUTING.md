@@ -15,5 +15,7 @@ but we do have some guidelines that will help us keep things organized and make 
    This will ensure that we're on the same page and that your work won't be wasted.
 6. If you're adding new translation keys, don't manually add them to `/src/locale/index.ts`, that file is auto-generated.
    Instead, just add the keys to `/src/locale/en.json` and run `pnpm types` to update the types.
+7. If you want to translate slicer to another language, please do so at the [Crowdin project](https://crowdin.com/project/slicer).
+   We will periodically sync the translations from Crowdin to the repository. If a language is missing, please open an issue.
 
 That's it, have fun contributing! Make sure to check back periodically to see if there were any changes to these guidelines.
