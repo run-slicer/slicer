@@ -128,7 +128,7 @@
     "pane.graph.method": "Method:",
     "pane.graph.method.none": "<none>",
     "pane.graph.controls.exceptions": "toggle exception handler edges",
-    "pane.graph.controls.super": "toggle implicit super types",
+    "pane.graph.controls.subtypes": "toggle subtypes",
     "pane.graph.menu.title": "Control flow graph",
     "pane.graph.menu.export": "Export",
     "pane.image.loading": "Reading...",

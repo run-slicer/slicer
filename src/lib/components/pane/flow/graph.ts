@@ -1,5 +1,5 @@
 import { prettyJavaType, prettyMethodDesc } from "$lib/utils";
-import { type ClassEntry, type Entry, EntryType, readDeferred } from "$lib/workspace";
+import type { InheritanceGraph } from "$lib/workspace/analysis/graph";
 import type { Node as ClassNode, Member } from "@katana-project/asm";
 import { escapeLiteral, formatEntry, formatInsn } from "@katana-project/asm/analysis/disasm";
 import { computeGraph, EdgeType, type Node as GraphNode } from "@katana-project/asm/analysis/graph";
@@ -198,15 +198,8 @@ interface MemberData {
 
 interface HierarchyNode {
     name: string;
-    node?: ClassNode;
     fields: MemberData[];
     methods: MemberData[];
-}
-
-interface HierarchyEdge {
-    parent: string;
-    child: string;
-    itf: boolean;
 }
 
 const IMPLICIT_SUPER = new Set([
@@ -218,122 +211,38 @@ const IMPLICIT_SUPER = new Set([
 
 export const computeHierarchyGraph = async (
     node: ClassNode,
-    classes: Map<string, Entry>,
-    withImplicitSuperTypes: boolean
+    inheritanceGraph: InheritanceGraph,
+    withSubtypes: boolean
 ): Promise<[Node[], Edge[]]> => {
     const currentName = (node.pool[node.thisClass.name] as UTF8Entry).string;
-
-    const nodes: HierarchyNode[] = [];
-    const edges: HierarchyEdge[] = [];
-
-    const processed = new Set<string>();
-    const descendants = new Map<string, Set<string>>();
-    for (const [className, entry] of classes) {
-        if (entry.type === EntryType.CLASS) {
-            const classNode = (entry as ClassEntry).node;
-
-            if (classNode.superClass) {
-                const superName = (classNode.pool[classNode.superClass.name] as UTF8Entry).string;
-                if (withImplicitSuperTypes || !IMPLICIT_SUPER.has(superName)) {
-                    if (!descendants.has(superName)) {
-                        descendants.set(superName, new Set());
-                    }
-                    descendants.get(superName)!.add(className);
-                }
-            }
-
-            for (const itf of classNode.interfaces) {
-                const itfName = (classNode.pool[itf.name] as UTF8Entry).string;
-                if (!withImplicitSuperTypes && IMPLICIT_SUPER.has(itfName)) {
-                    continue;
-                }
-
-                if (!descendants.has(itfName)) {
-                    descendants.set(itfName, new Set());
-                }
-                descendants.get(itfName)!.add(className);
-            }
-        }
+    const currentNode = inheritanceGraph[currentName];
+    if (!currentNode) {
+        return [[], []]; // class not found in graph
     }
 
-    const process = async (name: string, node?: ClassNode) => {
-        processed.add(name);
-        if (!withImplicitSuperTypes && IMPLICIT_SUPER.has(name)) {
-            return; // don't include implicit parent
-        }
+    const graphNodes = currentNode.relations(
+        withSubtypes ? inheritanceGraph : null,
+        (n) => !IMPLICIT_SUPER.has(n.name)
+    );
 
-        nodes.push({
-            name,
-            node,
-            fields:
-                node?.fields?.map((f) => ({
-                    type: prettyJavaType(f.type.string, true),
-                    descriptor: escapeLiteral(f.name.string),
-                })) || [],
-            methods:
-                node?.methods?.map((m) => ({
-                    type: prettyJavaType(m.type.string.substring(m.type.string.lastIndexOf(")") + 1), true),
-                    descriptor: escapeLiteral(m.name.string) + prettyMethodDesc(m.type.string),
-                })) || [],
-        });
+    // make sure we have both sides of the edge
+    const edges = graphNodes
+        .flatMap((n) => n.edges)
+        .filter((e) => graphNodes.includes(e.from) && graphNodes.includes(e.to));
 
-        if (!node) {
-            return; // need the node for super type examination
-        }
-
-        const processRelated = async (name: string, analyze: boolean = true) => {
-            let entry = classes.get(name);
-            if (entry && analyze) {
-                entry = await readDeferred(entry);
-            }
-
-            await process(name, entry?.type === EntryType.CLASS ? (entry as ClassEntry).node : undefined);
-        };
-
-        if (node.superClass) {
-            const superName = (node.pool[node.superClass.name] as UTF8Entry).string;
-            if (withImplicitSuperTypes || !IMPLICIT_SUPER.has(superName)) {
-                edges.push({ parent: superName, child: name, itf: false });
-
-                if (!processed.has(superName)) {
-                    await processRelated(superName);
-                }
-            }
-        }
-
-        for (const itf of node.interfaces) {
-            const itfName = (node.pool[itf.name] as UTF8Entry).string;
-            if (withImplicitSuperTypes || !IMPLICIT_SUPER.has(itfName)) {
-                edges.push({ parent: itfName, child: name, itf: true });
-
-                if (!processed.has(itfName)) {
-                    await processRelated(itfName);
-                }
-            }
-        }
-
-        const childClasses = descendants.get(name);
-        if (childClasses) {
-            for (const childName of childClasses) {
-                if (!processed.has(childName)) {
-                    const childEntry = classes.get(childName);
-                    if (childEntry?.type === EntryType.CLASS) {
-                        const childNode = (childEntry as ClassEntry).node;
-
-                        // Determine if this is an interface relationship
-                        const isInterfaceRelation = childNode.interfaces.some(
-                            (itf) => (childNode.pool[itf.name] as UTF8Entry).string === name
-                        );
-
-                        edges.push({ parent: name, child: childName, itf: isInterfaceRelation });
-                        await processRelated(childName, false);
-                    }
-                }
-            }
-        }
-    };
-
-    await process(currentName, node);
+    const nodes = graphNodes.map<HierarchyNode>((node) => ({
+        name: node.name,
+        fields:
+            node.entry?.node?.fields?.map((f) => ({
+                type: prettyJavaType(f.type.string, true),
+                descriptor: escapeLiteral(f.name.string),
+            })) || [],
+        methods:
+            node.entry?.node?.methods?.map((m) => ({
+                type: prettyJavaType(m.type.string.substring(m.type.string.lastIndexOf(")") + 1), true),
+                descriptor: escapeLiteral(m.name.string) + prettyMethodDesc(m.type.string),
+            })) || [],
+    }));
 
     const data: HierarchyNodeData[] = nodes.map((node) => {
         const metrics = computeTextSize(node.name, `400 12px / 18px ${monoFF}`);
@@ -360,9 +269,9 @@ export const computeHierarchyGraph = async (
             height: d.height,
         })),
         edges: edges.map((e) => ({
-            id: `${e.parent}-${e.child}`,
-            targets: [`${e.parent}`],
-            sources: [`${e.child}`],
+            id: `${e.from.name}-${e.to.name}`,
+            targets: [`${e.from.name}`],
+            sources: [`${e.to.name}`],
         })),
     };
 
@@ -384,15 +293,15 @@ export const computeHierarchyGraph = async (
             };
         }),
         edges.map((edge) => ({
-            id: `${edge.parent}-${edge.child}`,
+            id: `${edge.from.name}-${edge.to.name}`,
             type: "auto-edge",
-            source: edge.child,
-            target: edge.parent,
+            source: edge.to.name,
+            target: edge.from.name,
             animated: edge.itf,
             markerEnd: {
                 type: "arrowclosed" as MarkerType /* skip non-type import */,
             },
-            data: layout.edges?.find((e) => e.id === `${edge.parent}-${edge.child}`)! as unknown as Record<
+            data: layout.edges?.find((e) => e.id === `${edge.from.name}-${edge.to.name}`)! as unknown as Record<
                 string,
                 unknown
             >,

@@ -130,7 +130,7 @@ export interface LocaleData {
     "pane.graph.method": string;
     "pane.graph.method.none": string;
     "pane.graph.controls.exceptions": string;
-    "pane.graph.controls.super": string;
+    "pane.graph.controls.subtypes": string;
     "pane.graph.menu.title": string;
     "pane.graph.menu.export": string;
     "pane.image.loading": string;

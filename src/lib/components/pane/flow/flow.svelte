@@ -24,8 +24,9 @@
     import type { PaneProps } from "$lib/components/pane";
     import { cyrb53 } from "$lib/utils";
     import { t } from "$lib/i18n";
+    import { graph, type InheritanceGraph } from "$lib/workspace/analysis/graph";
 
-    let { tab, classes }: PaneProps = $props();
+    let { tab }: PaneProps = $props();
     const entry = tab.entry!;
 
     const node = "node" in entry ? (entry as ClassEntry).node : null;
@@ -50,11 +51,12 @@
     let parentElem: HTMLElement | undefined = $state();
 
     let showHandlerEdges = $state(false);
-    let showImplicitSuperTypes = $state(false);
+    let showSubtypes = $state(false);
     const computeGraph = async (
         member: Member | null,
+        inheritanceGraph: InheritanceGraph,
         showHandlerEdges: boolean,
-        showImplicitSuperTypes: boolean
+        showSubtypes: boolean
     ): Promise<[Node[], Edge[]]> => {
         if (!node) {
             return [[], []]; // not a class
@@ -62,7 +64,7 @@
 
         return member
             ? computeControlFlowGraph(member, pool, showHandlerEdges)
-            : computeHierarchyGraph(node, classes, showImplicitSuperTypes);
+            : computeHierarchyGraph(node, inheritanceGraph, showSubtypes);
     };
 </script>
 
@@ -70,7 +72,7 @@
     <SvelteFlowProvider>
         <ContextMenu>
             <ContextMenuTrigger class="h-full w-full">
-                {#await computeGraph(member, showHandlerEdges, showImplicitSuperTypes)}
+                {#await computeGraph(member, $graph, showHandlerEdges, showSubtypes)}
                     <Loading value={$t("pane.graph.loading")} timed />
                 {:then [nodes, edges]}
                     <SvelteFlow
@@ -102,11 +104,11 @@
                             {:else}
                                 <ControlButton
                                     class="svelte-flow__controls-interactive"
-                                    onclick={() => (showImplicitSuperTypes = !showImplicitSuperTypes)}
-                                    title={$t("pane.graph.controls.super")}
-                                    aria-label={$t("pane.graph.controls.super")}
+                                    onclick={() => (showSubtypes = !showSubtypes)}
+                                    title={$t("pane.graph.controls.subtypes")}
+                                    aria-label={$t("pane.graph.controls.subtypes")}
                                 >
-                                    {@const Icon = showImplicitSuperTypes ? Circle : CircleX}
+                                    {@const Icon = showSubtypes ? Circle : CircleX}
                                     <Icon size={12} class="fill-none!" />
                                 </ControlButton>
                             {/if}
