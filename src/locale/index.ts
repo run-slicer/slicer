@@ -244,6 +244,8 @@ export interface LocaleData {
     "editor.search.next": string;
     "editor.search.previous": string;
     "editor.search.close": string;
+    "editor.search.matches": string;
+    "editor.search.no-matches": string;
     "command.placeholder": string;
     "command.tabs": string;
     "command.workspace": string;

@@ -242,6 +242,8 @@
     "editor.search.next": "Next match",
     "editor.search.previous": "Previous match",
     "editor.search.close": "Close search",
+    "editor.search.matches": "{0}/{1}",
+    "editor.search.no-matches": "0 results",
     "command.placeholder": "Type a command...",
     "command.tabs": "Tabs",
     "command.workspace": "Workspace",

@@ -242,6 +242,8 @@
     "editor.search.next": "Další shoda",
     "editor.search.previous": "Předchozí shoda",
     "editor.search.close": "Zavřít vyhledávání",
+    "editor.search.matches": "{0}/{1}",
+    "editor.search.no-matches": "0 shod",
     "command.placeholder": "Napište příkaz...",
     "command.tabs": "Karty",
     "command.workspace": "Pracovní prostor",
