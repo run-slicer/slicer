@@ -128,7 +128,7 @@
     "pane.graph.method": "Metoda:",
     "pane.graph.method.none": "<žádná>",
     "pane.graph.controls.exceptions": "přepnout hrany obsluhy výjimek",
-    "pane.graph.controls.super": "přepnout implicitní nadtypy",
+    "pane.graph.controls.subtypes": "přepnout podtypy",
     "pane.graph.menu.title": "Graf řídícího toku",
     "pane.graph.menu.export": "Exportovat",
     "pane.image.loading": "Čtu...",
