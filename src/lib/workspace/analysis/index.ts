@@ -2,10 +2,10 @@ import { error } from "$lib/log";
 import { analysisBackground } from "$lib/state";
 import { recordProgress } from "$lib/task";
 import { rateLimit, roundRobin } from "$lib/utils";
+import { type ClassEntry, entries, type Entry, EntryType, type MemberEntry } from "$lib/workspace";
 import { FLAG_SKIP_ATTR } from "@katana-project/asm";
 import { wrap } from "comlink";
 import { get } from "svelte/store";
-import { type ClassEntry, type Entry, EntryType, type MemberEntry } from "../";
 import { QueryType, SearchMode, type SearchQuery, type SearchResult } from "./search";
 import type { Worker as AnalysisWorker } from "./worker";
 import Worker from "./worker?worker";
@@ -81,7 +81,7 @@ export const analyze = async (entry: Entry, state: AnalysisState = AnalysisState
 
 let queue: Entry[] = [];
 
-export const analyzeSchedule = (entry: Entry) => queue.push(entry);
+export const analyzeSchedule = (...entries: Entry[]) => queue.push(...entries);
 
 export const analyzeBackground = async () => {
     // snapshot queue
@@ -106,6 +106,9 @@ export const analyzeBackground = async () => {
 
         task.desc.set(`${$queue.length}`);
     });
+
+    // very hacky, but we need to trigger post-analysis updates to entries -> classes -> consumers
+    entries.update(($entries) => $entries);
 };
 
 export { QueryType, SearchMode, type SearchQuery, type SearchResult };

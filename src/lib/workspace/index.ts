@@ -121,10 +121,7 @@ export const entries = writable<Map<string, Entry>>(new Map());
 // background analysis state updated, reanalyze
 analysisBackground.subscribe(($analysisBackground) => {
     if ($analysisBackground) {
-        for (const entry of get(entries).values()) {
-            analyzeSchedule(entry);
-        }
-
+        analyzeSchedule(...Array.from(get(entries).values()));
         analyzeBackground().then();
     }
 });
