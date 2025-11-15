@@ -64,11 +64,21 @@ export const innerClasses = (node: Node, classes: Map<string, Entry>): InnerClas
         return [];
     }
 
+    const thisClass = (node.pool[node.thisClass.name] as UTF8Entry).string;
     return (attr as InnerClassesAttribute).classes
         .map((klass) => {
             const poolEntry = klass.innerEntry;
             if (!poolEntry) {
                 return null;
+            }
+
+            const outerEntry = klass.outerEntry;
+            if (outerEntry) {
+                const outerName = (node.pool[outerEntry.name] as UTF8Entry).string;
+                if (outerName !== thisClass) {
+                    // not an inner class of this class
+                    return null;
+                }
             }
 
             let entry = classes.get((node.pool[poolEntry.name] as UTF8Entry).string) as ClassEntry | undefined;
