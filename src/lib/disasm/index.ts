@@ -6,13 +6,15 @@ import type { Member } from "@katana-project/asm";
 import { get, writable } from "svelte/store";
 import { cfr, jasm, procyon, slicer, vf } from "./builtin";
 
+export type DisassemblerOptions = Record<string, string>;
 export interface Disassembler {
     id: string;
     name?: string;
     version?: string;
-    options?: Record<string, string>;
 
-    language: (entry?: ClassEntry) => Language;
+    get options(): DisassemblerOptions;
+    set options(options: DisassemblerOptions);
+    language(entry?: ClassEntry): Language;
 
     class: (entry: ClassEntry) => Promise<string>;
     method?: (entry: ClassEntry, method: Member) => Promise<string>;

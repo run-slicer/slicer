@@ -202,7 +202,7 @@ const unwrapDisasm = (disasm: ScriptDisassembler): Disassembler => {
             return disasm.language as Language;
         },
         get options() {
-            return disasm.options;
+            return disasm.options ?? {};
         },
         set options(options) {
             disasm.options = options;

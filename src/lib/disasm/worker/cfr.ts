@@ -1,10 +1,16 @@
+import { decompile } from "@run-slicer/cfr";
 import { expose } from "comlink";
+import type { DisassemblerOptions } from "../";
 import type { EntrySource } from "../source";
-import type { Options, Worker } from "./";
+import type { Worker } from "./";
 
 expose({
-    async class(name: string, _resources: string[], source: EntrySource, options?: Options): Promise<string> {
-        const { decompile } = await import("@run-slicer/cfr");
+    async class(
+        name: string,
+        _resources: string[],
+        source: EntrySource,
+        options?: DisassemblerOptions
+    ): Promise<string> {
         const output = await decompile(name, { source, options });
 
         // output postprocessing - remove header comment
@@ -16,13 +22,7 @@ expose({
         }
         return output;
     },
-    method(
-        _name: string,
-        _signature: string,
-        _resources: string[],
-        _source: EntrySource,
-        _options?: Options
-    ): Promise<string> {
+    method(): Promise<string> {
         throw new Error("Single-method disassembly not supported");
     },
 } satisfies Worker);

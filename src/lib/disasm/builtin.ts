@@ -49,7 +49,7 @@ export const vf: Disassembler = createFromWorker(
             const hasMeta = pool.some((e) => {
                 return e?.type === ConstantType.UTF8 && (e as UTF8Entry).string === "Lkotlin/Metadata;";
             });
-            return (this.options?.["kt-enable"] ?? "1") === "1" && hasMeta ? "kotlin" : "java";
+            return ((this as Disassembler).options["kt-enable"] ?? "1") === "1" && hasMeta ? "kotlin" : "java";
         },
     },
     () => wrap<Worker>(new VFWorker()),

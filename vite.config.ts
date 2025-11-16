@@ -14,7 +14,7 @@ export default defineConfig({
     },
     optimizeDeps: {
         // Vite doesn't like WASM fetches
-        exclude: ["@run-slicer/jasm", "@run-slicer/vf", "@run-slicer/cfr"],
+        exclude: ["@run-slicer/jasm", "@run-slicer/vf", "@run-slicer/cfr", "@run-slicer/procyon"],
     },
     server: {
         fs: {
