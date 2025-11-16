@@ -208,7 +208,8 @@ export interface LocaleData {
     "pane.prefs.section.editor": string;
     "pane.prefs.section.workspace": string;
     "pane.prefs.section.analysis": string;
-    "pane.prefs.section.interpretation": string;
+    "pane.prefs.section.disasm": string;
+    "pane.prefs.section.interp": string;
     "pane.prefs.button.export": string;
     "pane.prefs.button.import": string;
     "pane.prefs.button.clear": string;
@@ -236,6 +237,14 @@ export interface LocaleData {
     "pane.prefs.analysis.background": string;
     "pane.prefs.analysis.background.desc": string;
     "pane.prefs.analysis.jdk-classes": string;
+    "pane.prefs.disasm.options": string;
+    "pane.prefs.disasm.options.desc": string;
+    "pane.prefs.disasm.options.placeholder": string;
+    "pane.prefs.disasm.options.none": string;
+    "pane.prefs.disasm.options.add": string;
+    "pane.prefs.disasm.options.remove": string;
+    "pane.prefs.disasm.options.key": string;
+    "pane.prefs.disasm.options.value": string;
     "pane.prefs.analysis.jdk-classes.desc": string;
     "editor.search.placeholder": string;
     "editor.search.case-sensitive": string;

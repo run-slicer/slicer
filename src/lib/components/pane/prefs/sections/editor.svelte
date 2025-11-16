@@ -4,6 +4,9 @@
     import { editorWrap, editorTextSize, editorTextSizeSync } from "$lib/state";
     import Section from "../section.svelte";
     import Label from "../label.svelte";
+    import type { PaneProps } from "$lib/components/pane";
+
+    let _: PaneProps = $props();
 </script>
 
 <Section id="editor" labelKey="pane.prefs.section.editor">

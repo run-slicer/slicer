@@ -16,7 +16,7 @@
     import { record } from "$lib/task";
     import type { PaneProps } from "$lib/components/pane";
     import { cn } from "$lib/components/utils";
-    import { interpHexRowBytes } from "$lib/state";
+    import { interpHexRowBytes, toolsDisasmOptions } from "$lib/state";
     import { t } from "$lib/i18n";
 
     let { tab, disasms, handler }: PaneProps = $props();
@@ -47,6 +47,7 @@
     let readPromise = $derived(
         read(interpType, entry, disasm, {
             hexRowBytes: $interpHexRowBytes,
+            disasmOptions: $toolsDisasmOptions,
         })
     );
     $effect(() => {

@@ -8,6 +8,9 @@
     import Section from "../section.svelte";
     import Label from "../label.svelte";
     import { capitalize, flagEmoji, languageToCountry, tryOrNull } from "$lib/utils";
+    import type { PaneProps } from "$lib/components/pane";
+
+    let _: PaneProps = $props();
 
     let languageNames = $derived(tryOrNull(() => new Intl.DisplayNames($locale, { type: "language" })));
 </script>

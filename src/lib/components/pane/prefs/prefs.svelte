@@ -1,14 +1,15 @@
 <script lang="ts" module>
-    import { Type, FolderOpen, SquareActivity, Settings } from "@lucide/svelte";
+    import { Type, FolderOpen, SquareActivity, Settings, SquareCode } from "@lucide/svelte";
     import GeneralSection from "./sections/general.svelte";
     import EditorSection from "./sections/editor.svelte";
     import WorkspaceSection from "./sections/workspace.svelte";
     import AnalysisSection from "./sections/analysis.svelte";
+    import InterpSection from "./sections/interp.svelte";
     import type { Component } from "svelte";
     import type { Icon } from "$lib/components/icons";
     import { t } from "$lib/i18n";
 
-    type SectionID = "general" | "editor" | "workspace" | "analysis";
+    type SectionID = "general" | "editor" | "workspace" | "analysis" | "interp";
     interface Section {
         id: SectionID;
         icon: Icon;
@@ -20,6 +21,7 @@
         { id: "editor", icon: Type, component: EditorSection },
         { id: "workspace", icon: FolderOpen, component: WorkspaceSection },
         { id: "analysis", icon: SquareActivity, component: AnalysisSection },
+        { id: "interp", icon: SquareCode, component: InterpSection },
     ];
 </script>
 
@@ -34,7 +36,7 @@
     import { PrefsClearDialog } from "$lib/components/dialog";
     import { tl } from "$lib/i18n";
 
-    let _: PaneProps = $props();
+    let props: PaneProps = $props();
 
     let sectionsElem: HTMLElement | undefined = $state();
     let currentSection: SectionID | null = $state("general");
@@ -106,7 +108,7 @@
     <div class="flex-1 scroll-p-8 overflow-y-auto p-8" bind:this={sectionsElem}>
         <div class="flex flex-col gap-6">
             {#each sections as { component: SectionComponent }}
-                <SectionComponent />
+                <SectionComponent {...props} />
             {/each}
         </div>
     </div>

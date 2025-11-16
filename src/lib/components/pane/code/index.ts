@@ -1,4 +1,4 @@
-import { disassemble, disassembleMethod, type Disassembler } from "$lib/disasm";
+import { disassemble, disassembleMethod, type Disassembler, type DisassemblerOptions } from "$lib/disasm";
 import { fromExtension, type Language } from "$lib/lang";
 import { error } from "$lib/log";
 import { worker } from "$lib/reader";
@@ -14,6 +14,7 @@ export enum Interpretation {
 
 export interface InterpretationOptions {
     hexRowBytes: number;
+    disasmOptions: Record<string, DisassemblerOptions>;
 }
 
 // prettier-ignore

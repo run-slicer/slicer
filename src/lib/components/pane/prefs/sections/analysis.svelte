@@ -3,6 +3,9 @@
     import { analysisBackground, analysisJdkClasses } from "$lib/state";
     import Section from "../section.svelte";
     import Label from "../label.svelte";
+    import type { PaneProps } from "$lib/components/pane";
+
+    let _: PaneProps = $props();
 </script>
 
 <Section id="analysis" labelKey="pane.prefs.section.analysis">
