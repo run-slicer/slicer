@@ -35,21 +35,21 @@
 
     const detectedInterp = detectInterpretation(entry);
     let interpType = $state(detectedInterp);
+    let interpOptions = $derived({
+        type: interpType,
+        hexRowBytes: $interpHexRowBytes,
+        disasmOptions: $toolsDisasmOptions,
+    });
 
     let disasm = $derived(
         usableDisasms.find((d) => d.id === disasmId) || (entry.type === EntryType.MEMBER ? jasm : vf)
     );
-    let language = $derived(detectLanguage(interpType, entry, disasm));
+    let language = $derived(detectLanguage(entry, disasm, interpOptions));
     let textSize = $derived(
         $editorTextSizeSync ? editorTextSize : writable(get(editorTextSize) /* immediate value, no subscription */)
     );
 
-    let readPromise = $derived(
-        read(interpType, entry, disasm, {
-            hexRowBytes: $interpHexRowBytes,
-            disasmOptions: $toolsDisasmOptions,
-        })
-    );
+    let readPromise = $derived(read(entry, disasm, interpOptions));
     $effect(() => {
         record(interpType !== Interpretation.TEXT ? "task.disasm" : "task.read", entry.name, () => readPromise);
     });
@@ -125,7 +125,7 @@
                         </SelectTrigger>
                         <SelectContent side="top" align="end">
                             {#each Object.values(Interpretation) as type (type)}
-                                <SelectItem value={type} class="text-xs" disabled={!canInterpret(type, entry)}>
+                                <SelectItem value={type} class="text-xs" disabled={!canInterpret(entry, interpOptions)}>
                                     <span>
                                         {$t(`pane.code.interp.${type}`)}
                                         {#if type === detectedInterp}

@@ -13,6 +13,8 @@ export enum Interpretation {
 }
 
 export interface InterpretationOptions {
+    type: Interpretation;
+
     hexRowBytes: number;
     disasmOptions: Record<string, DisassemblerOptions>;
 }
@@ -39,8 +41,8 @@ export const detectInterpretation = (entry: Entry): Interpretation => {
     return entry.extension ? typesByExts.get(entry.extension) || Interpretation.TEXT : Interpretation.TEXT;
 };
 
-export const canInterpret = (type: Interpretation, entry: Entry): boolean => {
-    switch (type) {
+export const canInterpret = (entry: Entry, options: InterpretationOptions): boolean => {
+    switch (options.type) {
         case Interpretation.CLASS:
             return entry.type === EntryType.CLASS || entry.type === EntryType.MEMBER;
         case Interpretation.BINARY_XML:
@@ -50,8 +52,8 @@ export const canInterpret = (type: Interpretation, entry: Entry): boolean => {
     return true;
 };
 
-export const detectLanguage = (type: Interpretation, entry: Entry, disasm: Disassembler): Language => {
-    switch (type) {
+export const detectLanguage = (entry: Entry, disasm: Disassembler, options: InterpretationOptions): Language => {
+    switch (options.type) {
         case Interpretation.CLASS:
             return disasm.language(entry as ClassEntry) || "plaintext";
         case Interpretation.HEX:
@@ -63,13 +65,8 @@ export const detectLanguage = (type: Interpretation, entry: Entry, disasm: Disas
     return entry.extension ? fromExtension(entry.extension) : "plaintext";
 };
 
-export const read = async (
-    type: Interpretation,
-    entry: Entry,
-    disasm: Disassembler,
-    options: InterpretationOptions
-): Promise<string> => {
-    switch (type) {
+export const read = async (entry: Entry, disasm: Disassembler, options: InterpretationOptions): Promise<string> => {
+    switch (options.type) {
         case Interpretation.CLASS:
             if (entry.type === EntryType.MEMBER) {
                 const memberEntry = entry as MemberEntry;
