@@ -9,7 +9,7 @@
 </script>
 
 <Section id="analysis" labelKey="pane.prefs.section.analysis">
-    <div class="grid min-h-[2.5rem] grid-cols-[16rem_10rem_1fr] items-center gap-4">
+    <div class="grid min-h-[2.5rem] grid-cols-[minmax(auto,1fr)_auto] items-center gap-4">
         <Label
             for="analysisBackground"
             textKey="pane.prefs.analysis.background"
@@ -17,7 +17,7 @@
         />
         <Switch id="analysisBackground" bind:checked={$analysisBackground} />
     </div>
-    <div class="grid min-h-[2.5rem] grid-cols-[16rem_10rem_1fr] items-center gap-4">
+    <div class="grid min-h-[2.5rem] grid-cols-[minmax(auto,1fr)_auto] items-center gap-4">
         <Label
             for="analysisJdkClasses"
             textKey="pane.prefs.analysis.jdk-classes"

@@ -50,11 +50,11 @@
 </script>
 
 <Section id="interp" labelKey="pane.prefs.section.interp">
-    <Alert variant="destructive" class="w-fit">
+    <Alert variant="destructive" class="w-full">
         <CircleAlert />
         <AlertTitle>{$t("pane.prefs.workspace.interp.alert")}</AlertTitle>
     </Alert>
-    <div class="grid min-h-[2.5rem] grid-cols-[16rem_10rem_1fr] items-center gap-4">
+    <div class="grid min-h-[2.5rem] grid-cols-[minmax(auto,1fr)_auto] items-center gap-4">
         <Label
             for="bytesPerRow"
             textKey="pane.prefs.workspace.interp.bytes-per-row"
@@ -64,7 +64,7 @@
     </div>
 
     <Section id="disasm" labelKey="pane.prefs.section.disasm" small>
-        <div class="grid min-h-[2.5rem] grid-cols-[16rem_10rem_1fr] items-center gap-4">
+        <div class="grid min-h-[2.5rem] grid-cols-[minmax(auto,1fr)_auto] items-center gap-4">
             <Label for="disasmSelect" textKey="pane.prefs.disasm.options" descKey="pane.prefs.disasm.options.desc" />
             <Select type="single" bind:value={selectedDisasm}>
                 <SelectTrigger id="disasmSelect" class="w-48">
@@ -84,7 +84,7 @@
 
         {#if selectedDisasm}
             <Card
-                class="w-fit"
+                class="w-full"
                 {@attach (e) => {
                     selectedDisasm; // update on change
                     e.scrollIntoView({ behavior: "smooth" });
@@ -104,9 +104,9 @@
                                 {#each currentOptions as [key, value] (key)}
                                     <TableRow>
                                         <TableCell class="font-mono tracking-tight">{key}</TableCell>
-                                        <TableCell class="break-anywhere font-mono tracking-tight whitespace-normal"
-                                            >{value.replaceAll("\n", "\\n")}</TableCell
-                                        >
+                                        <TableCell class="break-anywhere font-mono tracking-tight whitespace-normal">
+                                            {value.replaceAll("\n", "\\n")}
+                                        </TableCell>
                                         <TableCell>
                                             <div class="inline-flex w-full justify-end">
                                                 <Button

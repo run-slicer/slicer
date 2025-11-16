@@ -10,11 +10,11 @@
 </script>
 
 <Section id="editor" labelKey="pane.prefs.section.editor">
-    <div class="grid min-h-[2.5rem] grid-cols-[16rem_10rem_1fr] items-center gap-4">
+    <div class="grid min-h-[2.5rem] grid-cols-[minmax(auto,1fr)_auto] items-center gap-4">
         <Label for="editorWrap" textKey="pane.prefs.editor.word-wrap" descKey="pane.prefs.editor.word-wrap.desc" />
         <Switch id="editorWrap" bind:checked={$editorWrap} />
     </div>
-    <div class="grid min-h-[2.5rem] grid-cols-[16rem_10rem_1fr] items-center gap-4">
+    <div class="grid min-h-[2.5rem] grid-cols-[minmax(auto,1fr)_auto] items-center gap-4">
         <Label for="editorTextSize" textKey="pane.prefs.editor.text-size" descKey="pane.prefs.editor.text-size.desc" />
         <Slider
             type="single"
@@ -26,7 +26,7 @@
             class="w-48"
         />
     </div>
-    <div class="grid min-h-[2.5rem] grid-cols-[16rem_10rem_1fr] items-center gap-4">
+    <div class="grid min-h-[2.5rem] grid-cols-[minmax(auto,1fr)_auto] items-center gap-4">
         <Label
             for="editorTextSizeSync"
             textKey="pane.prefs.editor.sync-text-size"
