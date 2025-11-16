@@ -238,7 +238,7 @@
     "pane.prefs.disasm.options": "Možnosti",
     "pane.prefs.disasm.options.desc": "Vyberte disassembler pro konfiguraci jeho možností.",
     "pane.prefs.disasm.options.placeholder": "Vyberte...",
-    "pane.prefs.disasm.options.none": "Pro tento disassembler nejsou nakonfigurovány žádné možnosti.",
+    "pane.prefs.disasm.options.none": "Pro tento disassembler nejsou nakonfigurovány žádné možnosti, koukněte se do <a href=\"https://docs.slicer.run/reference/disasm\" class=\"text-primary hover:text-muted-foreground underline\">dokumentace</a>?",
     "pane.prefs.disasm.options.add": "Přidat možnost",
     "pane.prefs.disasm.options.remove": "Odstranit možnost",
     "pane.prefs.disasm.options.key": "Klíč",
