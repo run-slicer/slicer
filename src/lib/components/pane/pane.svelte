@@ -93,7 +93,7 @@
     <div class="flex h-full w-full flex-col">
         <PaneHeader>
             <div
-                class={cn("flex flex-row", posTabs.length > 0 || "w-full")}
+                class={cn("flex w-full flex-row")}
                 use:dndzone={{
                     items: localTabs,
                     dropTargetStyle: {},
@@ -114,7 +114,7 @@
                     />
                 {/each}
             </div>
-            <PaneMenu offset {position} {handler}>
+            <PaneMenu align="end" offset {position} {handler}>
                 {#snippet children(props)}
                     <div
                         {...props}
