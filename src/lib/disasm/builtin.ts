@@ -19,7 +19,7 @@ export const cfr: Disassembler = createFromWorker(
         language: () => "java",
     },
     () => wrap<Worker>(new CFRWorker()),
-    false
+    true
 );
 
 export const jasm: Disassembler = createFromWorker(
