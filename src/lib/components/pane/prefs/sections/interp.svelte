@@ -124,7 +124,9 @@
                             </TableBody>
                         </Table>
                     {:else}
-                        <p class="text-muted-foreground text-sm">{$t("pane.prefs.disasm.options.none")}</p>
+                        <p class="text-muted-foreground text-sm">
+                            {@html $t("pane.prefs.disasm.options.none")}
+                        </p>
                     {/if}
                 </CardContent>
                 <div class="bg-border h-px"></div>

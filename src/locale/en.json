@@ -238,7 +238,7 @@
     "pane.prefs.disasm.options": "Options",
     "pane.prefs.disasm.options.desc": "Select a disassembler to configure its options.",
     "pane.prefs.disasm.options.placeholder": "Choose...",
-    "pane.prefs.disasm.options.none": "No options configured for this disassembler.",
+    "pane.prefs.disasm.options.none": "No options configured for this disassembler, check <a href=\"https://docs.slicer.run/reference/disasm\" class=\"text-primary hover:text-muted-foreground underline\">the documentation</a>?",
     "pane.prefs.disasm.options.add": "Add option",
     "pane.prefs.disasm.options.remove": "Remove option",
     "pane.prefs.disasm.options.key": "Key",
