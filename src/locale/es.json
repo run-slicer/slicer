@@ -156,6 +156,8 @@
     "pane.search.loaded": "Search finished.",
     "pane.search.results": "{0} result(s), elapsed {1}ms",
     "pane.search.no-results": "No results? Search something.",
+    "pane.search.result.menu.disasm": "Disassemble",
+    "pane.search.result.menu.graph": "View graph",
     "pane.search.menu.type.pseudocode": "Pseudocode",
     "pane.search.menu.type.string": "Strings",
     "pane.search.menu.type.method": "Methods",
