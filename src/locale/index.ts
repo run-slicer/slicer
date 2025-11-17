@@ -152,6 +152,7 @@ export interface LocaleData {
     "pane.dump.table.page": string;
     "pane.dump.table.filter.placeholder": string;
     "pane.dump.table.filter.no-results": string;
+    "pane.search.welcome": string;
     "pane.search.placeholder": string;
     "pane.search.loading": string;
     "pane.search.loaded": string;

@@ -6,7 +6,7 @@
     import Dropdown from "./dropdown.svelte";
     import { VList } from "virtua/svelte";
     import { Button } from "$lib/components/ui/button";
-    import { X } from "@lucide/svelte";
+    import { SearchCode, X } from "@lucide/svelte";
     import { untrack } from "svelte";
     import { groupBy } from "$lib/utils";
     import { toast } from "svelte-sonner";
@@ -104,9 +104,19 @@
             <span class="text-muted-foreground">{$t("pane.search.no-results")}</span>
         {/if}
     </div>
-    <VList data={resultsByEntry} class="flex h-full w-full flex-col" getKey={(_, i) => i}>
-        {#snippet children([entryName, entryResults])}
-            <ResultGroup name={entryName} results={entryResults} {handler} />
-        {/snippet}
-    </VList>
+    {#if !searching && time < 0}
+        <div class="flex h-full w-full flex-col items-center justify-center gap-4">
+            <div class="bg-muted/30 flex h-16 w-16 animate-bounce items-center justify-center rounded-full">
+                <SearchCode class="text-muted-foreground h-8 w-8" />
+            </div>
+            <p class="bg-border h-px w-1/3"></p>
+            <p class="text-muted-foreground text-center text-xs">{@html $t("pane.search.welcome")}</p>
+        </div>
+    {:else}
+        <VList data={resultsByEntry} class="flex h-full w-full flex-col" getKey={(_, i) => i}>
+            {#snippet children([entryName, entryResults])}
+                <ResultGroup name={entryName} results={entryResults} {handler} />
+            {/snippet}
+        </VList>
+    {/if}
 </div>
