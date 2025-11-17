@@ -156,6 +156,8 @@
     "pane.search.loaded": "Vyhledávání dokončeno.",
     "pane.search.results": "{0} výsledků, trvalo {1}ms",
     "pane.search.no-results": "Žádné výsledky? Vyhledejte něco.",
+    "pane.search.result.menu.disasm": "Přeložit",
+    "pane.search.result.menu.graph": "Zobrazit graf",
     "pane.search.menu.type.pseudocode": "Pseudokód",
     "pane.search.menu.type.string": "Řetězce",
     "pane.search.menu.type.method": "Metody",

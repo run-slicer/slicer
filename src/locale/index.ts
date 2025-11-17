@@ -158,6 +158,8 @@ export interface LocaleData {
     "pane.search.loaded": string;
     "pane.search.results": string;
     "pane.search.no-results": string;
+    "pane.search.result.menu.disasm": string;
+    "pane.search.result.menu.graph": string;
     "pane.search.menu.type.pseudocode": string;
     "pane.search.menu.type.string": string;
     "pane.search.menu.type.method": string;

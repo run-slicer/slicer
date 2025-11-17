@@ -8,23 +8,22 @@
     import { t } from "$lib/i18n";
 
     interface Props {
-        title: string;
         entry: Entry;
         handler: EventHandler;
     }
 
-    let { handler, entry, title }: Props = $props();
+    let { handler, entry }: Props = $props();
 </script>
 
 <ContextMenuContent class="max-w-56 min-w-48">
-    <ContextMenuLabel>{title}</ContextMenuLabel>
+    <ContextMenuLabel>{entry.shortName}</ContextMenuLabel>
     <ContextMenuSeparator />
     <ContextMenuItem class="justify-between" onclick={() => handler.open(entry, TabType.CODE)}>
-        {$t("pane.structure.menu.disasm")}
+        {$t("pane.search.result.menu.disasm")}
         <Code size={16} />
     </ContextMenuItem>
     <ContextMenuItem class="justify-between" onclick={() => handler.open(entry, TabType.GRAPH)}>
-        {$t("pane.structure.menu.graph")}
+        {$t("pane.search.result.menu.graph")}
         <GitBranchPlus size={16} />
     </ContextMenuItem>
 </ContextMenuContent>

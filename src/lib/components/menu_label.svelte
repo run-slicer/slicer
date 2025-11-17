@@ -10,6 +10,11 @@
     let { inset, children }: Props = $props();
 </script>
 
-<div class={cn("text-foreground overflow-hidden px-2 py-1.5 text-sm font-semibold text-ellipsis", inset && "pl-8")}>
+<div
+    class={cn(
+        "text-foreground overflow-hidden px-2 py-1.5 text-sm font-semibold text-ellipsis whitespace-nowrap",
+        inset && "pl-8"
+    )}
+>
     {@render children?.()}
 </div>

@@ -2,8 +2,9 @@
     import type { SearchResult } from "$lib/workspace/analysis";
     import type { EventHandler } from "$lib/event";
     import { memberEntry } from "$lib/workspace";
-    import { TabType } from "$lib/tab";
     import { cn } from "$lib/components/utils";
+    import { ContextMenu, ContextMenuTrigger } from "$lib/components/ui/context-menu";
+    import ResultMenu from "./menu.svelte";
 
     interface Props {
         result: SearchResult;
@@ -11,24 +12,33 @@
     }
 
     let { result, handler }: Props = $props();
-    let isMember = $derived(result.member?.type?.string?.charAt(0) === "(");
+    let entry = $derived(
+        result.member?.type?.string?.charAt(0) === "(" ? memberEntry(result.entry, result.member!) : null
+    );
 
     const handleOpen = async () => {
-        if (isMember) {
-            await handler.open(memberEntry(result.entry, result.member!), TabType.CODE);
+        if (entry) {
+            await handler.open(entry);
         }
     };
 </script>
 
-<div
-    role="button"
-    tabindex="-1"
-    class={cn(
-        "hover:bg-muted flex justify-between py-1 pr-4 pl-8 text-xs",
-        isMember ? "cursor-pointer" : "cursor-not-allowed"
-    )}
-    onclick={handleOpen}
-    onkeydown={handleOpen}
->
-    <span class="break-anywhere font-mono">{result.value}</span>
-</div>
+<ContextMenu>
+    <ContextMenuTrigger>
+        <div
+            role="button"
+            tabindex="-1"
+            class={cn(
+                "hover:bg-muted flex justify-between py-1 pr-4 pl-8 text-xs",
+                entry ? "cursor-pointer" : "cursor-not-allowed"
+            )}
+            onclick={handleOpen}
+            onkeydown={handleOpen}
+        >
+            <span class="break-anywhere font-mono">{result.value}</span>
+        </div>
+    </ContextMenuTrigger>
+    {#if entry}
+        <ResultMenu {entry} {handler} />
+    {/if}
+</ContextMenu>

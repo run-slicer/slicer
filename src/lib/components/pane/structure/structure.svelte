@@ -117,7 +117,7 @@
                         {#each filteredFieldData as field}
                             {@const ModifierIcon = accessIcon(field.access)}
                             <div
-                                class="hover:bg-muted/50 inline-flex h-8 w-full shrink-0 items-center justify-start gap-2 rounded-md px-2 text-sm font-medium whitespace-nowrap transition-all outline-none"
+                                class="hover:bg-muted/50 inline-flex h-8 w-full shrink-0 cursor-pointer items-center justify-start gap-2 rounded-md px-2 text-sm font-medium whitespace-nowrap transition-all outline-none"
                             >
                                 <div class="flex w-full items-center gap-2">
                                     <div class="flex items-center gap-1">
@@ -153,7 +153,7 @@
                             <ContextMenu>
                                 <ContextMenuTrigger>
                                     <div
-                                        class="hover:bg-muted/50 inline-flex h-8 w-full shrink-0 items-center justify-start gap-2 rounded-md px-2 text-sm font-medium whitespace-nowrap transition-all outline-none"
+                                        class="hover:bg-muted/50 inline-flex h-8 w-full shrink-0 cursor-pointer items-center justify-start gap-2 rounded-md px-2 text-sm font-medium whitespace-nowrap transition-all outline-none"
                                     >
                                         <div class="flex w-full items-center gap-2">
                                             <div class="flex items-center gap-1">
@@ -188,7 +188,7 @@
                             <ContextMenu>
                                 <ContextMenuTrigger>
                                     <div
-                                        class="hover:bg-muted/50 inline-flex h-8 w-full shrink-0 items-center justify-start gap-2 rounded-md px-2 text-sm font-medium whitespace-nowrap transition-all outline-none"
+                                        class="hover:bg-muted/50 inline-flex h-8 w-full shrink-0 cursor-pointer items-center justify-start gap-2 rounded-md px-2 text-sm font-medium whitespace-nowrap transition-all outline-none"
                                     >
                                         <div class="flex w-full items-center gap-2">
                                             <div class="flex items-center gap-1">
@@ -224,7 +224,7 @@
                             <ContextMenu>
                                 <ContextMenuTrigger>
                                     <div
-                                        class="hover:bg-muted/50 inline-flex h-8 w-full shrink-0 items-center justify-start gap-2 rounded-md px-2 text-sm font-medium whitespace-nowrap transition-all outline-none"
+                                        class="hover:bg-muted/50 inline-flex h-8 w-full shrink-0 cursor-pointer items-center justify-start gap-2 rounded-md px-2 text-sm font-medium whitespace-nowrap transition-all outline-none"
                                     >
                                         <div class="flex w-full items-center gap-2">
                                             <div class="flex items-center gap-1">
@@ -264,7 +264,10 @@
                             <ContextMenu>
                                 <ContextMenuTrigger>
                                     <div
-                                        class="hover:bg-muted/50 inline-flex h-8 w-full shrink-0 items-center justify-start gap-2 rounded-md px-2 text-sm font-medium whitespace-nowrap transition-all outline-none"
+                                        class={cn(
+                                            "hover:bg-muted/50 inline-flex h-8 w-full shrink-0 items-center justify-start gap-2 rounded-md px-2 text-sm font-medium whitespace-nowrap transition-all outline-none",
+                                            innerClass.entry ? "cursor-pointer" : "cursor-not-allowed"
+                                        )}
                                     >
                                         <div class="flex w-full items-center gap-2">
                                             <div class="flex items-center gap-1">
@@ -282,9 +285,9 @@
                                             {#if innerClass.name}
                                                 <span class="truncate font-mono text-xs">{innerClass.name}</span>
                                             {:else}
-                                                <span class="text-muted-foreground text-xs"
-                                                    >{$t("pane.structure.inner-classes.anonymous")}</span
-                                                >
+                                                <span class="text-muted-foreground text-xs">
+                                                    {$t("pane.structure.inner-classes.anonymous")}
+                                                </span>
                                             {/if}
                                         </div>
                                     </div>
