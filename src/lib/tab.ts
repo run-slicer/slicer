@@ -299,7 +299,9 @@ workspaceEncoding.subscribe(() => {
 
 // hard-refresh tabs on transformer change
 analysisTransformers.subscribe(() => {
-    refreshIf(({ entry }) => entry?.type === EntryType.CLASS || entry?.type === EntryType.MEMBER, true).then();
+    refreshIf(({ entry }) => {
+        return entry !== undefined && (entry.type === EntryType.CLASS || entry.type === EntryType.MEMBER);
+    }, true).then();
 });
 
 // prettier-ignore

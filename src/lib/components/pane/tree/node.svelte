@@ -2,6 +2,7 @@
     import type { EntryRef } from "$lib/workspace";
 
     export interface Node {
+        id: string;
         label: string;
         entry?: EntryRef;
         parent?: Node;
@@ -30,7 +31,7 @@
     $effect(() => {
         // no children and not a leaf node, remove ourselves from the parent
         if (data.parent && !data.nodes && !data.entry) {
-            data.parent.nodes = data.parent?.nodes?.filter((n) => n.label === data.label);
+            data.parent.nodes = data.parent?.nodes?.filter((n) => n.id !== data.id);
         }
     });
 
@@ -66,7 +67,7 @@
             <span class="text-sm">{data.label}</span>
         </button>
         {#if expanded}
-            {#each sortedNodes as node (node.label)}
+            {#each sortedNodes as node (node.id)}
                 <TreeNode
                     {mode}
                     data={node}

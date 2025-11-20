@@ -2,14 +2,16 @@
     import { Plus } from "@lucide/svelte";
     import { Button } from "$lib/components/ui/button";
     import { ContextMenu, ContextMenuTrigger } from "$lib/components/ui/context-menu";
+    import type { Node } from "./node.svelte";
     import TreeNode from "./node.svelte";
     import NodeMenu from "./menu.svelte";
     import type { PaneProps } from "$lib/components/pane";
-    import type { Node } from "./node.svelte";
     import { Select, SelectContent, SelectItem, SelectTrigger } from "$lib/components/ui/select";
     import { type ProjectMode, projectMode } from "$lib/state";
-    import { EntryType, entryRef } from "$lib/workspace";
+    import { type ClassEntry, type Entry, entryRef, EntryType } from "$lib/workspace";
     import { t } from "$lib/i18n";
+    import { groupBy } from "$lib/utils";
+    import type { UTF8Entry } from "@katana-project/asm/pool";
 
     let { entries, handler }: PaneProps = $props();
 
@@ -22,6 +24,7 @@
                 // collapse label
                 const next = child.nodes[0];
                 child.label += "/" + next.label;
+                child.id = child.label;
                 child.nodes = next.nodes;
             }
 
@@ -38,28 +41,64 @@
         }
     };
 
-    let root: Node = $derived.by(() => {
-        const root: Node = { label: "<root>", nodes: [] };
+    const entryName = (e: Entry): string => {
+        if (e.extension === "class") {
+            if (e.type === EntryType.CLASS) {
+                const { node } = e as ClassEntry;
+                return (node.pool[node.thisClass.name] as UTF8Entry).string;
+            }
 
+            return e.data.name.replace(/\.class$/, "");
+        }
+
+        return e.name;
+    };
+    const canHaveChildren = (e: Entry): boolean => {
+        return e.type === EntryType.ARCHIVE;
+    };
+    let root: Node = $derived.by(() => {
+        const root: Node = { id: "root", label: "<root>", nodes: [] };
+
+        const duplicates = groupBy(
+            entries.filter((e) => e.extension === "class"),
+            entryName
+        );
         for (const entry of entries) {
             let name = entry.name;
             if ($projectMode === "package") {
-                if (entry.extension !== "class" && entry.type !== EntryType.ARCHIVE) {
+                if (entry.extension !== "class") {
                     // skip non-class entries in package mode
-                    // allow archives, as they can contain class files
                     continue;
                 }
 
-                name = entry.name.replace(/\.class$/, ""); // remove .class extension for package mode
+                name = entryName(entry);
+                if (duplicates.get(name)!.length > 1) {
+                    // use full path to disambiguate
+                    name = entry.name.replace(/\.class$/, "");
+                }
             }
 
             let curr = root;
-            for (const part of name.split("/")) {
-                if (!curr.nodes) curr.nodes = [];
+            const parts = name.split("/");
+            for (let i = 0; i < parts.length; i++) {
+                const part = parts[i];
+                if (!curr.nodes) {
+                    curr.nodes = [];
+                }
 
-                let next = curr.nodes.find((n) => n.label === part);
+                const notLast = i < parts.length - 1;
+                let next = curr.nodes.find(
+                    (n) =>
+                        n.label === part &&
+                        (notLast ? !n.entry || canHaveChildren(n.entry.value) : !n.nodes || canHaveChildren(entry))
+                );
                 if (!next) {
-                    next = { label: part, parent: curr };
+                    next = {
+                        // disambiguate IDs for directories vs. files with the same name
+                        id: `${notLast ? "dir" : "ent"}:${part}`,
+                        label: part,
+                        parent: curr,
+                    };
                     curr.nodes.push(next);
                 }
 
@@ -106,7 +145,7 @@
         <div class="flex h-full w-full" role="presentation" ondrop={handleDrop} ondragover={(e) => e.preventDefault()}>
             {#if root.nodes && entries.length > 0}
                 <div class="scrollbar-thin flex w-full flex-col overflow-auto p-2 text-nowrap contain-strict">
-                    {#each root.nodes as node (node.label)}
+                    {#each root.nodes as node (node.id)}
                         <TreeNode
                             mode={$projectMode}
                             data={node}
