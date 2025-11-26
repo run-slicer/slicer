@@ -324,8 +324,8 @@ export default {
         }
 
         const proto = await record("task.script.import", truncate(url, 120), () => readScript(url));
-        toast.success("Imported", {
-            description: `Imported script ${proto.id}.`,
+        toast.success(tl("toast.success.import-script"), {
+            description: tl("toast.success.import-script", proto.id),
         });
 
         if (load) {
@@ -336,8 +336,8 @@ export default {
     unloadScript,
     async removeScript(proto: ProtoScript): Promise<void> {
         await removeScript(proto);
-        toast.success("Deleted", {
-            description: `Deleted script ${proto.id}.`,
+        toast.success(tl("toast.success.title.delete"), {
+            description: tl("toast.success.delete-script", proto.id),
         });
     },
 } satisfies EventHandler;

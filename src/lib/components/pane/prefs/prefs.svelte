@@ -73,7 +73,7 @@
                         new Blob([save()], { type: "application/json" })
                     );
                     toast.success(tl("toast.success.title.export"), {
-                        description: tl("toast.success.prefs-export"),
+                        description: tl("toast.success.export-prefs"),
                     });
                 }}
             >

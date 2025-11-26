@@ -344,7 +344,10 @@ export interface LocaleData {
     "toast.success.delete.single": string;
     "toast.success.delete.multiple": string;
     "toast.success.title.export": string;
-    "toast.success.prefs-export": string;
+    "toast.success.title.import": string;
+    "toast.success.export-prefs": string;
+    "toast.success.import-script": string;
+    "toast.success.delete-script": string;
     "toast.info.title.duplicate.single": string;
     "toast.info.title.duplicate.multiple": string;
     "toast.info.duplicate.single": string;
