@@ -1,6 +1,6 @@
 import { type Buffer, EOF, wrap } from "./buffer";
 
-// based on https://github.com/run-slicer/hprof, but stripped of unused code
+// based on https://github.com/katana-project/hprof, but stripped of unused code
 // SpiderMonkey's JIT is not very good at optimizing the library, so we need to do it like this
 
 // https://github.com/openjdk/jdk/blob/master/src/jdk.hotspot.agent/share/classes/sun/jvm/hotspot/utilities/HeapHprofBinWriter.java

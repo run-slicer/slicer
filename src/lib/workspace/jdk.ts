@@ -3,7 +3,7 @@ import { error } from "$lib/log";
 import { record } from "$lib/task";
 import { toast } from "svelte-sonner";
 
-// JDK indexes are produced by the ojdk utility (https://github.com/run-slicer/ojdk)
+// JDK indexes are produced by the ojdk utility (https://github.com/katana-project/ojdk)
 
 type DataIndex = Map<string, string>; // [class name -> url]
 const fetchIndex = async (url: string): Promise<DataIndex> => {

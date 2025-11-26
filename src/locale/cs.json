@@ -281,7 +281,7 @@
     "dialog.about.brand": "slicer",
     "dialog.about.build.dev": "vývojová verze",
     "dialog.about.build.branch": ", větev {0}",
-    "dialog.about.footer": "Open-source ❤\uFE0F <span class=\"mx-2\">@</span> <a href=\"https://github.com/run-slicer/slicer\" target=\"_blank\" class=\"text-blue-600 hover:text-blue-700 hover:underline\">run-slicer/slicer</a>",
+    "dialog.about.footer": "Open-source ❤\uFE0F <span class=\"mx-2\">@</span> <a href=\"https://github.com/katana-project/slicer\" target=\"_blank\" class=\"text-blue-600 hover:text-blue-700 hover:underline\">katana-project/slicer</a>",
     "dialog.clear.title": "Jste si jisti, naprosto jisti?",
     "dialog.clear.desc": "Toto trvale smaže všechny položky z pracovního prostoru. <p class=\"mt-2 font-semibold\">Tuto akci nelze vrátit zpět.</p>",
     "dialog.clear.action.cancel": "Zrušit",

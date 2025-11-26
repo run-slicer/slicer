@@ -35,7 +35,7 @@
                         {@const commit = import.meta.env.WORKERS_CI_COMMIT_SHA || "0".repeat(40)}
                         <!-- this is ugly, but I don't want a space before the comma -->
                         <a
-                            href={`https://github.com/run-slicer/slicer/commit/${commit}`}
+                            href={`https://github.com/katana-project/slicer/commit/${commit}`}
                             target="_blank"
                             class="hover:text-blue-700 hover:underline">{commit.substring(0, 7)}</a
                         >{$t("dialog.about.build.branch", import.meta.env.WORKERS_CI_BRANCH || "unknown")}

@@ -47,7 +47,7 @@
                     <Button
                         variant="link"
                         class="h-8 !p-0"
-                        onclick={() => window.open("https://github.com/run-slicer/slicer")}
+                        onclick={() => window.open("https://github.com/katana-project/slicer")}
                     >
                         <GitHub />
                         {$t("pane.welcome.help.contribute")}
@@ -111,7 +111,7 @@
                 {@html $tips[tip]}
             </button>
             <a
-                href="https://github.com/run-slicer/slicer"
+                href="https://github.com/katana-project/slicer"
                 target="_blank"
                 aria-label="GitHub"
                 class="hover:text-blue-600 hover:underline"
