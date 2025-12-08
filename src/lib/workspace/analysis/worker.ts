@@ -1,7 +1,9 @@
 import { type Member, type Node, read } from "@katana-project/asm";
-import { escapeLiteral, formatEntry } from "@katana-project/asm/analysis/disasm";
+import { escapeLiteral, formatEntry, formatInsn } from "@katana-project/asm/analysis/disasm";
+import type { CodeAttribute } from "@katana-project/asm/attr";
+import { readCode } from "@katana-project/asm/attr/code";
 import type { Entry, NameTypeEntry, Pool, UTF8Entry } from "@katana-project/asm/pool";
-import { ConstantType } from "@katana-project/asm/spec";
+import { AttributeType, ConstantType } from "@katana-project/asm/spec";
 import { expose } from "comlink";
 import { QueryType, type SearchData, SearchMode, type SearchResultData } from "./search";
 
@@ -59,11 +61,32 @@ expose({
 
         switch (type) {
             case QueryType.PSEUDOCODE:
-                // TODO: more pseudocode, currently just constant pool
-                return node.pool
-                    .filter((e) => e !== null)
-                    .map((e) => ({ value: `${ConstantType[e.type]} ${formatEntry(e, node.pool)}` }))
-                    .filter((e) => comparator(e.value));
+                const code = [
+                    ...node.methods.flatMap((member) =>
+                        member.attrs
+                            .filter((a) => a.name?.string === AttributeType.CODE)
+                            .map((attr) => {
+                                try {
+                                    return attr.type === AttributeType.CODE
+                                        ? (attr as CodeAttribute)
+                                        : readCode(attr, node.pool);
+                                } catch (e) {}
+                                return null;
+                            })
+                            .filter((i) => i !== null)
+                            .flatMap((code) =>
+                                code.insns.map((i) => ({
+                                    member,
+                                    value: formatInsn(code, i, node.pool, true),
+                                }))
+                            )
+                    ),
+                    ...node.pool
+                        .filter((e) => e !== null)
+                        .map((e) => ({ value: `${ConstantType[e.type]} ${formatEntry(e, node.pool)}` })),
+                ];
+
+                return code.filter((e) => comparator(e.value));
             case QueryType.STRING:
                 return searchPoolEntries(node.pool, comparator, (e) => e.type === ConstantType.STRING);
             case QueryType.FIELD:

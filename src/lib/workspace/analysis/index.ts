@@ -3,10 +3,10 @@ import { analysisBackground } from "$lib/state";
 import { recordProgress } from "$lib/task";
 import { rateLimit, roundRobin } from "$lib/utils";
 import { type ClassEntry, entries, type Entry, EntryType, type MemberEntry } from "$lib/workspace";
-import { FLAG_SKIP_ATTR, FLAG_SLICE_BUFFER } from "@katana-project/asm";
+import { FLAG_SKIP_ATTR_PARSE, FLAG_SLICE_BUFFER } from "@katana-project/asm";
 import { wrap } from "comlink";
 import { get } from "svelte/store";
-import { QueryType, SearchMode, type SearchQuery, type SearchResult } from "./search";
+import { QueryType, SearchMode, type SearchQuery, type SearchResult, type SearchTask } from "./search";
 import type { Worker as AnalysisWorker } from "./worker";
 import Worker from "./worker?worker";
 
@@ -25,7 +25,7 @@ const analyzeClass = async (entry: Entry, skipAttr: boolean) => {
     try {
         const classEntry = entry as ClassEntry;
 
-        classEntry.node = await worker().read(buffer, skipAttr ? FLAG_SKIP_ATTR | FLAG_SLICE_BUFFER : 0);
+        classEntry.node = await worker().read(buffer, skipAttr ? FLAG_SKIP_ATTR_PARSE | FLAG_SLICE_BUFFER : 0);
         if (entry.type === EntryType.MEMBER) {
             const memberEntry = entry as MemberEntry;
 
@@ -111,27 +111,37 @@ export const analyzeBackground = async () => {
     entries.update(($entries) => $entries);
 };
 
-export { QueryType, SearchMode, type SearchQuery, type SearchResult };
+export { QueryType, SearchMode, type SearchQuery, type SearchResult, type SearchTask };
 
-export const search = async (entries: Entry[], query: SearchQuery, onResult: (result: SearchResult) => void) => {
+export const search = (entries: Entry[], query: SearchQuery, onResult: (result: SearchResult) => void): SearchTask => {
     entries = entries.filter((e) => e.type === EntryType.CLASS);
 
-    await recordProgress("task.search", null, async (task) => {
-        let completed = 0;
-        await Promise.all(
-            (entries as ClassEntry[]).map(
-                rateLimit(async (entry) => {
-                    (await worker().search({ ...query, node: entry.node })).forEach((res) =>
-                        onResult({ ...res, entry })
-                    );
+    let cancelled = false;
+    return {
+        promise: recordProgress("task.search", null, async (task) => {
+            let completed = 0;
+            await Promise.all(
+                (entries as ClassEntry[]).map(
+                    rateLimit(async (entry) => {
+                        if (cancelled) {
+                            return;
+                        }
 
-                    completed++;
-                    task.desc.set(`${completed}/${entries.length}`);
-                    task.progress?.set((completed / entries.length) * 100);
-                }, MAX_CONCURRENT)
-            )
-        );
+                        (await worker().search({ ...query, node: entry.node })).forEach((res) =>
+                            onResult({ ...res, entry })
+                        );
 
-        task.desc.set(`${entries.length}`);
-    });
+                        completed++;
+                        task.desc.set(`${completed}/${entries.length}`);
+                        task.progress?.set((completed / entries.length) * 100);
+                    }, MAX_CONCURRENT)
+                )
+            );
+
+            task.desc.set(`${completed}`);
+        }),
+        cancel() {
+            cancelled = true;
+        },
+    };
 };

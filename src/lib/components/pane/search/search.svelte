@@ -12,6 +12,7 @@
     import { toast } from "svelte-sonner";
     import { error } from "$lib/log";
     import { t } from "$lib/i18n";
+    import { cn } from "$lib/components/utils";
 
     let { entries, handler }: PaneProps = $props();
 
@@ -19,6 +20,7 @@
 
     let searching = $state(false);
     let time = $state(-1);
+    let cancelSearch: (() => void) | null = $state(null);
 
     let type = $state(QueryType.STRING);
     let mode = $state(SearchMode.PARTIAL_MATCH);
@@ -46,9 +48,15 @@
             }, 20);
 
             try {
-                await search(entries, { type, value, mode, ref }, (r) => {
+                const task = search(entries, { type, value, mode, ref }, (r) => {
                     results = [...results, r];
                 });
+
+                cancelSearch = () => {
+                    task.cancel();
+                    cancelSearch = null;
+                };
+                await task.promise;
             } catch (e) {
                 error("failed to search", e);
                 toast.error($t("toast.error.title.generic"), {
@@ -61,10 +69,14 @@
         }
     };
     const handleClear = () => {
-        results = [];
-        value = "";
-        time = -1;
-        searching = false;
+        if (searching) {
+            cancelSearch?.();
+        } else {
+            results = [];
+            value = "";
+            time = -1;
+            searching = false;
+        }
     };
 </script>
 
@@ -82,9 +94,8 @@
         <Button
             variant="outline"
             size="icon"
-            class="min-w-10 rounded-l-none border-l-0"
+            class={cn("min-w-10 rounded-l-none border-l-0", searching && "opacity-50")}
             onclick={handleClear}
-            disabled={searching}
         >
             <X />
         </Button>

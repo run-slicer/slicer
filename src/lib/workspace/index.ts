@@ -306,6 +306,9 @@ export const clear = () => {
         $entries.clear();
         return $entries;
     });
+
+    // force Svelte to dump derived store values?
+    entries.update(($entries) => $entries);
 };
 
 // PWA file handler

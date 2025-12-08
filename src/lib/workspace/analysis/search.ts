@@ -27,6 +27,11 @@ export interface SearchResult {
     member?: Member;
 }
 
+export interface SearchTask {
+    promise: Promise<void>;
+    cancel(): void;
+}
+
 // for marshalling over the worker barrier
 
 export interface SearchData extends SearchQuery {

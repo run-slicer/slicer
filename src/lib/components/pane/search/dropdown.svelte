@@ -10,9 +10,8 @@
         DropdownMenuCheckboxItem,
     } from "$lib/components/ui/dropdown-menu";
     import { cn } from "$lib/components/utils";
-    import { SearchMode } from "$lib/workspace/analysis";
+    import { SearchMode, QueryType } from "$lib/workspace/analysis";
     import { ChevronsUpDown } from "@lucide/svelte";
-    import { QueryType } from "$lib/workspace/analysis/search";
     import { t } from "$lib/i18n";
 
     interface Props {
