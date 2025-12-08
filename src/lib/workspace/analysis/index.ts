@@ -3,7 +3,7 @@ import { analysisBackground } from "$lib/state";
 import { recordProgress } from "$lib/task";
 import { rateLimit, roundRobin } from "$lib/utils";
 import { type ClassEntry, entries, type Entry, EntryType, type MemberEntry } from "$lib/workspace";
-import { FLAG_SKIP_ATTR } from "@katana-project/asm";
+import { FLAG_SKIP_ATTR, FLAG_SLICE_BUFFER } from "@katana-project/asm";
 import { wrap } from "comlink";
 import { get } from "svelte/store";
 import { QueryType, SearchMode, type SearchQuery, type SearchResult } from "./search";
@@ -25,7 +25,7 @@ const analyzeClass = async (entry: Entry, skipAttr: boolean) => {
     try {
         const classEntry = entry as ClassEntry;
 
-        classEntry.node = await worker().read(buffer, skipAttr ? FLAG_SKIP_ATTR : 0);
+        classEntry.node = await worker().read(buffer, skipAttr ? FLAG_SKIP_ATTR | FLAG_SLICE_BUFFER : 0);
         if (entry.type === EntryType.MEMBER) {
             const memberEntry = entry as MemberEntry;
 
