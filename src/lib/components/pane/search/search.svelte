@@ -63,7 +63,7 @@
                     task.cancel();
                     cancelSearch = null;
                 };
-                await task.promise;
+                await task;
             } catch (e) {
                 error("failed to search", e);
                 toast.error($t("toast.error.title.generic"), {

@@ -1,12 +1,12 @@
 import { error } from "$lib/log";
 import { analysisBackground } from "$lib/state";
 import { recordProgress } from "$lib/task";
-import { rateLimit, roundRobin } from "$lib/utils";
+import { cancellable, type Cancellable, rateLimit, roundRobin } from "$lib/utils";
 import { type ClassEntry, entries, type Entry, EntryType, type MemberEntry } from "$lib/workspace";
 import { FLAG_SKIP_ATTR_PARSE, FLAG_SLICE_BUFFER } from "@katana-project/asm";
 import { wrap } from "comlink";
 import { get } from "svelte/store";
-import { QueryType, SearchMode, type SearchQuery, type SearchResult, type SearchTask } from "./search";
+import { QueryType, SearchMode, type SearchQuery, type SearchResult } from "./search";
 import type { Worker as AnalysisWorker } from "./worker";
 import Worker from "./worker?worker";
 
@@ -111,19 +111,22 @@ export const analyzeBackground = async () => {
     entries.update(($entries) => $entries);
 };
 
-export { QueryType, SearchMode, type SearchQuery, type SearchResult, type SearchTask };
+export { QueryType, SearchMode, type SearchQuery, type SearchResult };
 
-export const search = (entries: Entry[], query: SearchQuery, onResult: (result: SearchResult) => void): SearchTask => {
+export const search = (
+    entries: Entry[],
+    query: SearchQuery,
+    onResult: (result: SearchResult) => void
+): Cancellable<void> => {
     entries = entries.filter((e) => e.type === EntryType.CLASS);
 
-    let cancelled = false;
-    return {
-        promise: recordProgress("task.search", null, async (task) => {
+    return cancellable((isCancelled) =>
+        recordProgress("task.search", null, async (task) => {
             let completed = 0;
             await Promise.all(
                 (entries as ClassEntry[]).map(
                     rateLimit(async (entry) => {
-                        if (cancelled) {
+                        if (isCancelled()) {
                             return;
                         }
 
@@ -139,9 +142,6 @@ export const search = (entries: Entry[], query: SearchQuery, onResult: (result: 
             );
 
             task.desc.set(`${completed}`);
-        }),
-        cancel() {
-            cancelled = true;
-        },
-    };
+        })
+    );
 };

@@ -140,6 +140,31 @@ export const rateLimit = <T extends (...args: any[]) => Promise<any>>(
     };
 };
 
+export interface Cancellable<T> extends PromiseLike<T> {
+    cancel(): void;
+}
+
+export const cancellable = <T>(
+    func: (isCancelled: () => boolean, onCancel: (f: () => void) => void) => PromiseLike<T>
+): Cancellable<T> => {
+    let cancelled = false;
+    const onCancelCallbacks: (() => void)[] = [];
+
+    const promise = func(
+        () => cancelled,
+        (f) => onCancelCallbacks.push(f)
+    );
+    return {
+        then(onfulfilled, onrejected) {
+            return promise.then(onfulfilled, onrejected);
+        },
+        cancel() {
+            cancelled = true;
+            onCancelCallbacks.forEach((f) => f());
+        },
+    };
+};
+
 export const tryOrNull = <T>(func: () => T): T | null => {
     try {
         return func();
