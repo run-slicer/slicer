@@ -16,7 +16,7 @@
     const readTask = $derived(
         workers.instance().cancellable(async (w) => {
             try {
-                return w.hprof(await entry.data.blob());
+                return await w.hprof(await entry.data.blob());
             } catch (e) {
                 error("failed to read heap dump", e);
 

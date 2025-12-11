@@ -83,7 +83,7 @@ export const read = (entry: Entry, disasm: Disassembler, options: Interpretation
         case Interpretation.BINARY_XML: {
             return workers.instance().cancellable(async (w) => {
                 try {
-                    return w.axml(await entry.data.bytes());
+                    return await w.axml(await entry.data.bytes());
                 } catch (e) {
                     error("failed to interpret entry as binary XML", e);
                     return `<!-- Failed to parse. (${e!.toString()}) -->`;
