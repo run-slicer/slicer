@@ -140,7 +140,7 @@
                         </SelectTrigger>
                         <SelectContent side="top" align="end">
                             {#each Object.values(Interpretation) as type (type)}
-                                <SelectItem value={type} class="text-xs" disabled={!canInterpret(entry, interpOptions)}>
+                                <SelectItem value={type} class="text-xs" disabled={!canInterpret(entry, type)}>
                                     <span>
                                         {$t(`pane.code.interp.${type}`)}
                                         {#if type === detectedInterp}

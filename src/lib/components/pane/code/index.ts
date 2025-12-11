@@ -41,8 +41,8 @@ export const detectInterpretation = (entry: Entry): Interpretation => {
     return entry.extension ? typesByExts.get(entry.extension) || Interpretation.TEXT : Interpretation.TEXT;
 };
 
-export const canInterpret = (entry: Entry, options: InterpretationOptions): boolean => {
-    switch (options.type) {
+export const canInterpret = (entry: Entry, type: Interpretation): boolean => {
+    switch (type) {
         case Interpretation.CLASS:
             return entry.type === EntryType.CLASS || entry.type === EntryType.MEMBER;
         case Interpretation.BINARY_XML:
