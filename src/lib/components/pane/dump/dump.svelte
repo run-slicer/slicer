@@ -1,31 +1,36 @@
 <script lang="ts">
-    import { worker } from "$lib/reader";
-    import type { SlurpResult } from "$lib/reader/hprof";
+    import { workers } from "$lib/reader";
     import Loading from "$lib/components/loading.svelte";
     import { Separator } from "$lib/components/ui/separator";
-    import type { Entry } from "$lib/workspace";
     import { error } from "$lib/log";
     import { FileQuestionMark } from "@lucide/svelte";
     import Table from "./table.svelte";
     import { humanSize } from "$lib/utils";
     import type { PaneProps } from "$lib/components/pane";
     import { t } from "$lib/i18n";
+    import { onDestroy } from "svelte";
 
     let { tab }: PaneProps = $props();
     const entry = $derived(tab.entry!);
 
-    const readEntry = async (entry: Entry): Promise<SlurpResult> => {
-        try {
-            return worker().hprof(await entry.data.blob());
-        } catch (e) {
-            error("failed to read heap dump", e);
+    const readTask = $derived(
+        workers.instance().cancellable(async (w) => {
+            try {
+                return w.hprof(await entry.data.blob());
+            } catch (e) {
+                error("failed to read heap dump", e);
 
-            throw e;
-        }
-    };
+                throw e;
+            }
+        })
+    );
+
+    onDestroy(() => {
+        readTask.cancel();
+    });
 </script>
 
-{#await readEntry(entry)}
+{#await readTask}
     <Loading value={$t("pane.dump.loading")} timed />
 {:then result}
     <div class="flex h-8 min-h-8 w-full flex-col">

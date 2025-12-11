@@ -1,8 +1,8 @@
 import { disassemble, disassembleMethod, type Disassembler, type DisassemblerOptions } from "$lib/disasm";
 import { fromExtension, type Language } from "$lib/lang";
 import { error } from "$lib/log";
-import { worker } from "$lib/reader";
-import { formatHex } from "$lib/utils";
+import { workers } from "$lib/reader";
+import { cancellable, type Cancellable } from "$lib/utils";
 import { type ClassEntry, type Entry, EntryType, type MemberEntry } from "$lib/workspace";
 
 export enum Interpretation {
@@ -65,27 +65,32 @@ export const detectLanguage = (entry: Entry, disasm: Disassembler, options: Inte
     return entry.extension ? fromExtension(entry.extension) : "plaintext";
 };
 
-export const read = async (entry: Entry, disasm: Disassembler, options: InterpretationOptions): Promise<string> => {
+export const read = (entry: Entry, disasm: Disassembler, options: InterpretationOptions): Cancellable<string> => {
     switch (options.type) {
         case Interpretation.CLASS:
-            if (entry.type === EntryType.MEMBER) {
-                const memberEntry = entry as MemberEntry;
+            // TODO: disassembler support for cancellation
+            return cancellable(() => {
+                if (entry.type === EntryType.MEMBER) {
+                    const memberEntry = entry as MemberEntry;
 
-                return disassembleMethod(memberEntry, memberEntry.member, disasm);
-            }
+                    return disassembleMethod(memberEntry, memberEntry.member, disasm);
+                }
 
-            return disassemble(entry as ClassEntry, disasm);
+                return disassemble(entry as ClassEntry, disasm);
+            });
         case Interpretation.HEX:
-            return formatHex(await entry.data.bytes(), options.hexRowBytes);
+            return workers.instance().cancellable(async (w) => w.hex(await entry.data.bytes(), options.hexRowBytes));
         case Interpretation.BINARY_XML: {
-            try {
-                return await worker().axml(await entry.data.bytes());
-            } catch (e) {
-                error("failed to interpret entry as binary XML", e);
-                return `<!-- Failed to parse. (${e!.toString()}) -->`;
-            }
+            return workers.instance().cancellable(async (w) => {
+                try {
+                    return w.axml(await entry.data.bytes());
+                } catch (e) {
+                    error("failed to interpret entry as binary XML", e);
+                    return `<!-- Failed to parse. (${e!.toString()}) -->`;
+                }
+            });
         }
     }
 
-    return entry.data.text();
+    return cancellable(() => entry.data.text());
 };

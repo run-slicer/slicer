@@ -7,7 +7,7 @@ import { AttributeType, ConstantType } from "@katana-project/asm/spec";
 import { expose } from "comlink";
 import { QueryType, type SearchData, SearchMode, type SearchResultData } from "./search";
 
-export interface Worker {
+export interface AnalysisWorker {
     read(data: Uint8Array, flags: number): Promise<Node>;
     search(data: SearchData): Promise<SearchResultData[]>;
 }
@@ -103,4 +103,4 @@ expose({
                     : searchMembers(node.methods, comparator);
         }
     },
-} satisfies Worker);
+} satisfies AnalysisWorker);

@@ -1,11 +1,17 @@
+import { formatHex } from "$lib/utils";
 import { expose } from "comlink";
-import type { Worker } from "./";
+import type { Reader } from "./";
 import { read as axml } from "./axml";
 import { read as hprof } from "./hprof";
 
 expose({
-    hprof,
-    async axml(bytes: Uint8Array): Promise<string> {
+    async hex(bytes, rowBytes) {
+        return formatHex(bytes, rowBytes);
+    },
+    hprof(blob) {
+        return hprof(blob);
+    },
+    async axml(bytes) {
         return axml(bytes);
     },
-} satisfies Worker);
+} satisfies Reader);

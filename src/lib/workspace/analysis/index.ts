@@ -1,13 +1,13 @@
 import { error } from "$lib/log";
 import { analysisBackground } from "$lib/state";
 import { recordProgress } from "$lib/task";
-import { cancellable, type Cancellable, rateLimit, roundRobin } from "$lib/utils";
+import { cancellable, type Cancellable, rateLimit } from "$lib/utils";
+import { createDefaultWorkerPool } from "$lib/worker";
 import { type ClassEntry, entries, type Entry, EntryType, type MemberEntry } from "$lib/workspace";
 import { FLAG_SKIP_ATTR_PARSE, FLAG_SLICE_BUFFER } from "@katana-project/asm";
-import { wrap } from "comlink";
 import { get } from "svelte/store";
 import { QueryType, SearchMode, type SearchQuery, type SearchResult } from "./search";
-import type { Worker as AnalysisWorker } from "./worker";
+import type { AnalysisWorker } from "./worker";
 import Worker from "./worker?worker";
 
 export const enum AnalysisState {
@@ -16,16 +16,17 @@ export const enum AnalysisState {
     FULL,
 }
 
-const MAX_CONCURRENT = Math.max(1, Math.floor(navigator.hardwareConcurrency / 2));
-
-const worker = roundRobin(MAX_CONCURRENT, () => wrap<AnalysisWorker>(new Worker()));
+const workers = createDefaultWorkerPool<AnalysisWorker>(() => new Worker());
 const analyzeClass = async (entry: Entry, skipAttr: boolean) => {
     const buffer = await entry.data.bytes();
 
     try {
         const classEntry = entry as ClassEntry;
 
-        classEntry.node = await worker().read(buffer, skipAttr ? FLAG_SKIP_ATTR_PARSE | FLAG_SLICE_BUFFER : 0);
+        classEntry.node = await workers
+            .instance()
+            .worker()
+            .read(buffer, skipAttr ? FLAG_SKIP_ATTR_PARSE | FLAG_SLICE_BUFFER : 0);
         if (entry.type === EntryType.MEMBER) {
             const memberEntry = entry as MemberEntry;
 
@@ -100,7 +101,7 @@ export const analyzeBackground = async () => {
                     completed++;
                     task.desc.set(`${completed}/${$queue.length}`);
                     task.progress?.set((completed / $queue.length) * 100);
-                }, MAX_CONCURRENT)
+                }, workers.size)
             )
         );
 
@@ -130,14 +131,17 @@ export const search = (
                             return;
                         }
 
-                        (await worker().search({ ...query, node: entry.node })).forEach((res) =>
-                            onResult({ ...res, entry })
-                        );
+                        (
+                            await workers
+                                .instance()
+                                .worker()
+                                .search({ ...query, node: entry.node })
+                        ).forEach((res) => onResult({ ...res, entry }));
 
                         completed++;
                         task.desc.set(`${completed}/${entries.length}`);
                         task.progress?.set((completed / entries.length) * 100);
-                    }, MAX_CONCURRENT)
+                    }, workers.size)
                 )
             );
 

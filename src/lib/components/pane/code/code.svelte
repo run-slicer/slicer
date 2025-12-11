@@ -18,6 +18,8 @@
     import { cn } from "$lib/components/utils";
     import { interpHexRowBytes, toolsDisasmOptions } from "$lib/state";
     import { t } from "$lib/i18n";
+    import { onDestroy } from "svelte";
+    import type { Cancellable } from "$lib/utils";
 
     let { tab, disasms, handler }: PaneProps = $props();
     const entry = $derived(tab.entry!);
@@ -49,7 +51,20 @@
         $editorTextSizeSync ? editorTextSize : writable(get(editorTextSize) /* immediate value, no subscription */)
     );
 
-    let readPromise = $derived(read(entry, disasm, interpOptions));
+    let prevReadTask: Cancellable<string> | null = null;
+    let readTask = $derived.by(() => {
+        // cancel previous read task
+        prevReadTask?.cancel?.();
+
+        return (prevReadTask = read(entry, disasm, interpOptions));
+    });
+
+    onDestroy(() => {
+        // cancel read task if still running
+        readTask.cancel?.();
+    });
+
+    let readPromise = $derived(readTask.then(null, () => "")); // swallow errors, this is probably just a CancelledError
     $effect(() => {
         record(interpType !== Interpretation.TEXT ? "task.disasm" : "task.read", entry.name, () => readPromise);
     });

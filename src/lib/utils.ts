@@ -140,6 +140,13 @@ export const rateLimit = <T extends (...args: any[]) => Promise<any>>(
     };
 };
 
+export class CancelledError extends Error {
+    constructor(message: string = "Operation cancelled") {
+        super(message);
+        this.name = "CancelledError";
+    }
+}
+
 export interface Cancellable<T> extends PromiseLike<T> {
     cancel(): void;
 }
