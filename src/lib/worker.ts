@@ -4,7 +4,7 @@ import { type Remote, wrap } from "comlink";
 type WorkerTask<T, R> = (w: Remote<T>) => R | PromiseLike<R>;
 
 export interface WorkerLike<T> {
-    worker<R>(task: WorkerTask<T, R>): Promise<R>;
+    task<R>(task: WorkerTask<T, R>): Promise<R>;
     cancellable<R>(func: WorkerTask<T, R>): Cancellable<R>;
 }
 
@@ -75,7 +75,7 @@ export const createWorker = <T>(factory: () => Worker): WorkerLike<T> => {
             this.processing = false;
         },
 
-        worker(func) {
+        task(func) {
             return new Promise((resolve, reject) => {
                 this.queue.push({ func, resolve, reject });
                 this.processQueue().then();
