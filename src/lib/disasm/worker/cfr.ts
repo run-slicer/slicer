@@ -2,7 +2,7 @@ import { decompile } from "@run-slicer/cfr";
 import { expose } from "comlink";
 import type { DisassemblerOptions } from "../";
 import type { EntrySource } from "../source";
-import type { Worker } from "./";
+import type { DisassemblyWorker } from "./";
 
 const removeHeader = (output: string): string => {
     const start = output.indexOf("/*\n");
@@ -32,4 +32,4 @@ expose({
 
         return removeHeader(await decompile(name, { source, options }));
     },
-} satisfies Worker);
+} satisfies DisassemblyWorker);

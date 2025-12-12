@@ -2,9 +2,8 @@ import type { Language } from "$lib/lang";
 import type { ClassEntry } from "$lib/workspace";
 import type { UTF8Entry } from "@katana-project/asm/pool";
 import { ConstantType } from "@katana-project/asm/spec";
-import { wrap } from "comlink";
 import type { Disassembler } from "./";
-import { createFromWorker, type Worker } from "./worker";
+import { createFromWorker } from "./worker";
 import CFRWorker from "./worker/cfr?worker";
 import JASMWorker from "./worker/jasm?worker";
 import ProcyonWorker from "./worker/procyon?worker";
@@ -18,7 +17,7 @@ export const cfr: Disassembler = createFromWorker(
         version: "0.152",
         language: () => "java",
     },
-    () => wrap<Worker>(new CFRWorker()),
+    () => new CFRWorker(),
     true
 );
 
@@ -29,7 +28,7 @@ export const jasm: Disassembler = createFromWorker(
         version: "2.8.0",
         language: () => "jasm",
     },
-    () => wrap<Worker>(new JASMWorker()),
+    () => new JASMWorker(),
     true
 );
 
@@ -52,7 +51,7 @@ export const vf: Disassembler = createFromWorker(
             return ((this as Disassembler).options["kt-enable"] ?? "1") === "1" && hasMeta ? "kotlin" : "java";
         },
     },
-    () => wrap<Worker>(new VFWorker()),
+    () => new VFWorker(),
     false
 );
 
@@ -63,7 +62,7 @@ export const procyon: Disassembler = createFromWorker(
         version: "0.6.0",
         language: () => "java",
     },
-    () => wrap<Worker>(new ProcyonWorker()),
+    () => new ProcyonWorker(),
     false,
     false // Procyon is weird and wants to scan the entire JDK
 );
@@ -74,6 +73,6 @@ export const slicer: Disassembler = createFromWorker(
         name: "slicer",
         language: () => "java",
     },
-    () => wrap<Worker>(new SlicerWorker()),
+    () => new SlicerWorker(),
     true
 );

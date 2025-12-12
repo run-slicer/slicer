@@ -1,6 +1,6 @@
 import { type Language, toExtension } from "$lib/lang";
 import { error } from "$lib/log";
-import { prettyError } from "$lib/utils";
+import { cancellable, type Cancellable, CancelledError, prettyError } from "$lib/utils";
 import { type ClassEntry, type Entry, transformEntry } from "$lib/workspace";
 import type { Member } from "@katana-project/asm";
 import { get, writable } from "svelte/store";
@@ -11,13 +11,13 @@ export interface Disassembler {
     id: string;
     name?: string;
     version?: string;
+    concurrency?: number;
+    options: DisassemblerOptions;
 
-    get options(): DisassemblerOptions;
-    set options(options: DisassemblerOptions);
     language(entry?: ClassEntry): Language;
 
-    class: (entry: ClassEntry) => Promise<string>;
-    method?: (entry: ClassEntry, method: Member) => Promise<string>;
+    class: (entry: ClassEntry) => Cancellable<string>;
+    method?: (entry: ClassEntry, method: Member) => Cancellable<string>;
 }
 
 export const all = writable<Map<string, Disassembler>>(
@@ -48,31 +48,37 @@ export const remove = (id: string) => {
     });
 };
 
-export const disassemble = async (entry: ClassEntry, disasm: Disassembler): Promise<string> => {
-    try {
-        return await disasm.class(entry);
-    } catch (e: any) {
-        error(`failed to disassemble ${entry.name}`, e);
-
-        return `// Failed to disassemble ${entry.name}; disassembler threw error.\n${prettyError(e).replaceAll(/^/gm, "// ")}`;
-    }
-};
-
-export const disassembleMethod = async (entry: ClassEntry, method: Member, disasm: Disassembler): Promise<string> => {
-    try {
-        if (!disasm.method) {
-            throw new Error("Disassembler does not support single-method disassembly");
+export const disassemble = (entry: ClassEntry, disasm: Disassembler): Cancellable<string> => {
+    return disasm.class(entry).map(null, (e) => {
+        if (e instanceof CancelledError) {
+            return "";
         }
 
-        return await disasm.method(entry, method);
-    } catch (e: any) {
-        const signature = method.name.string + method.type.string;
-        error(`failed to disassemble ${entry.name}#${signature} method`, e);
-
-        return `// Failed to disassemble ${entry.name}#${signature}; disassembler threw error.\n${prettyError(e).replaceAll(/^/gm, "// ")}`;
-    }
+        error(`failed to disassemble ${entry.name}`, e);
+        return `// Failed to disassemble ${entry.name}; disassembler threw error.\n${prettyError(e).replaceAll(/^/gm, "// ")}`;
+    });
 };
 
-export const disassembleEntry = async (entry: ClassEntry, disasm: Disassembler): Promise<Entry> => {
-    return transformEntry(entry, toExtension(disasm.language(entry) || "plaintext"), await disassemble(entry, disasm));
+export const disassembleMethod = (entry: ClassEntry, method: Member, disasm: Disassembler): Cancellable<string> => {
+    if (!disasm.method) {
+        return cancellable(() => {
+            throw new Error("Disassembler does not support single-method disassembly");
+        });
+    }
+
+    return disasm.method(entry, method).map(null, (e) => {
+        if (e instanceof CancelledError) {
+            return "";
+        }
+
+        const signature = method.name.string + method.type.string;
+        error(`failed to disassemble ${entry.name}#${signature} method`, e);
+        return `// Failed to disassemble ${entry.name}#${signature}; disassembler threw error.\n${prettyError(e).replaceAll(/^/gm, "// ")}`;
+    });
+};
+
+export const disassembleEntry = (entry: ClassEntry, disasm: Disassembler): Cancellable<Entry> => {
+    return disassemble(entry, disasm).map((output) =>
+        transformEntry(entry, toExtension(disasm.language(entry) || "plaintext"), output)
+    );
 };

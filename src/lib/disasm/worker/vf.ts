@@ -2,7 +2,7 @@ import { decompile } from "@run-slicer/vf";
 import { expose } from "comlink";
 import type { DisassemblerOptions } from "../";
 import type { EntrySource } from "../source";
-import type { Worker } from "./";
+import type { DisassemblyWorker } from "./";
 
 expose({
     async class(
@@ -16,4 +16,4 @@ expose({
     method(): Promise<string> {
         throw new Error("Single-method disassembly not supported");
     },
-} satisfies Worker);
+} satisfies DisassemblyWorker);

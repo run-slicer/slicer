@@ -68,16 +68,13 @@ export const detectLanguage = (entry: Entry, disasm: Disassembler, options: Inte
 export const read = (entry: Entry, disasm: Disassembler, options: InterpretationOptions): Cancellable<string> => {
     switch (options.type) {
         case Interpretation.CLASS:
-            // TODO: disassembler support for cancellation
-            return cancellable(() => {
-                if (entry.type === EntryType.MEMBER) {
-                    const memberEntry = entry as MemberEntry;
+            if (entry.type === EntryType.MEMBER) {
+                const memberEntry = entry as MemberEntry;
 
-                    return disassembleMethod(memberEntry, memberEntry.member, disasm);
-                }
+                return disassembleMethod(memberEntry, memberEntry.member, disasm);
+            }
 
-                return disassemble(entry as ClassEntry, disasm);
-            });
+            return disassemble(entry as ClassEntry, disasm);
         case Interpretation.HEX:
             return workers.instance().cancellable(async (w) => w.hex(await entry.data.bytes(), options.hexRowBytes));
         case Interpretation.BINARY_XML: {

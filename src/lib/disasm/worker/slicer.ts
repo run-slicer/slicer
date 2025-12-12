@@ -3,7 +3,7 @@ import { read } from "@katana-project/asm";
 import { disassemble, disassembleMethod, type DisassemblyOptions } from "@katana-project/asm/analysis/disasm";
 import { expose } from "comlink";
 import type { DisassemblerOptions } from "../";
-import type { Worker } from "./";
+import type { DisassemblyWorker } from "./";
 
 const convertOpts = (options?: DisassemblerOptions): DisassemblyOptions => ({
     indent: options?.indent ?? " ".repeat(4),
@@ -45,4 +45,4 @@ expose({
 
         return disassembleMethod(node, method, convertOpts(options));
     },
-} satisfies Worker);
+} satisfies DisassemblyWorker);

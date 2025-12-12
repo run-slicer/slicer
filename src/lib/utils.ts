@@ -148,6 +148,11 @@ export class CancelledError extends Error {
 }
 
 export interface Cancellable<T> extends PromiseLike<T> {
+    map<TResult1 = T, TResult2 = never>(
+        onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null,
+        onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null
+    ): Cancellable<TResult1 | TResult2>;
+
     cancel(): void;
 }
 
@@ -168,6 +173,12 @@ export const cancellable = <T>(
         () => (completed = true)
     );
     return {
+        map(onfulfilled, onrejected) {
+            return cancellable((_, onCancel) => {
+                onCancel(() => this.cancel());
+                return this.then(onfulfilled, onrejected);
+            });
+        },
         then(onfulfilled, onrejected) {
             return promise.then(onfulfilled, onrejected);
         },
