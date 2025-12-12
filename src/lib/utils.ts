@@ -154,20 +154,28 @@ export interface Cancellable<T> extends PromiseLike<T> {
 export const cancellable = <T>(
     func: (isCancelled: () => boolean, onCancel: (f: () => void) => void) => PromiseLike<T>
 ): Cancellable<T> => {
-    let cancelled = false;
+    let cancelled = false,
+        completed = false;
     const onCancelCallbacks: (() => void)[] = [];
 
     const promise = func(
         () => cancelled,
         (f) => onCancelCallbacks.push(f)
     );
+
+    promise.then(
+        () => (completed = true),
+        () => (completed = true)
+    );
     return {
         then(onfulfilled, onrejected) {
             return promise.then(onfulfilled, onrejected);
         },
         cancel() {
-            cancelled = true;
-            onCancelCallbacks.forEach((f) => f());
+            if (!completed && !cancelled) {
+                cancelled = true;
+                onCancelCallbacks.forEach((f) => f());
+            }
         },
     };
 };
