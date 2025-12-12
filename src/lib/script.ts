@@ -21,7 +21,7 @@ import {
     tabs,
     TabType,
 } from "$lib/tab";
-import { cyrb53 } from "$lib/utils";
+import { cancellable, cyrb53 } from "$lib/utils";
 import {
     type ClassEntry,
     clear as clearWs,
@@ -208,30 +208,34 @@ const unwrapDisasm = (disasm: ScriptDisassembler): Disassembler => {
             disasm.options = options;
         },
 
-        async class(entry: ClassEntry): Promise<string> {
-            const { node, data } = entry;
+        class(entry) {
+            return cancellable(async () => {
+                const { node, data } = entry;
 
-            const buf = await data.bytes();
-            const name = (node.pool[node.thisClass.name] as UTF8Entry).string;
+                const buf = await data.bytes();
+                const name = (node.pool[node.thisClass.name] as UTF8Entry).string;
 
-            const needJdk = get(analysisJdkClasses);
-            return disasm.class(name, createClassSource(name, buf, needJdk), createResources(needJdk));
+                const needJdk = get(analysisJdkClasses);
+                return disasm.class(name, createClassSource(name, buf, needJdk), createResources(needJdk));
+            });
         },
         method: disasm.method
-            ? async (entry, method) => {
-                  const { node, data } = entry;
+            ? (entry, method) => {
+                  return cancellable(async () => {
+                      const { node, data } = entry;
 
-                  const buf = await data.bytes();
-                  const name = (node.pool[node.thisClass.name] as UTF8Entry).string;
-                  const signature = method.name.string + method.type.string;
+                      const buf = await data.bytes();
+                      const name = (node.pool[node.thisClass.name] as UTF8Entry).string;
+                      const signature = method.name.string + method.type.string;
 
-                  const needJdk = get(analysisJdkClasses);
-                  return disasm.method!(
-                      name,
-                      signature,
-                      createClassSource(name, buf, needJdk),
-                      createResources(needJdk)
-                  );
+                      const needJdk = get(analysisJdkClasses);
+                      return disasm.method!(
+                          name,
+                          signature,
+                          createClassSource(name, buf, needJdk),
+                          createResources(needJdk)
+                      );
+                  });
               }
             : undefined,
     };

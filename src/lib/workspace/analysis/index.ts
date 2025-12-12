@@ -25,8 +25,7 @@ const analyzeClass = async (entry: Entry, skipAttr: boolean) => {
 
         classEntry.node = await workers
             .instance()
-            .worker()
-            .read(buffer, skipAttr ? FLAG_SKIP_ATTR_PARSE | FLAG_SLICE_BUFFER : 0);
+            .task((w) => w.read(buffer, skipAttr ? FLAG_SKIP_ATTR_PARSE | FLAG_SLICE_BUFFER : 0));
         if (entry.type === EntryType.MEMBER) {
             const memberEntry = entry as MemberEntry;
 
@@ -131,12 +130,9 @@ export const search = (
                             return;
                         }
 
-                        (
-                            await workers
-                                .instance()
-                                .worker()
-                                .search({ ...query, node: entry.node })
-                        ).forEach((res) => onResult({ ...res, entry }));
+                        (await workers.instance().task((w) => w.search({ ...query, node: entry.node }))).forEach(
+                            (res) => onResult({ ...res, entry })
+                        );
 
                         completed++;
                         task.desc.set(`${completed}/${entries.length}`);

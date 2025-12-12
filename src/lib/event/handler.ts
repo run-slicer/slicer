@@ -1,5 +1,4 @@
 import { disassembleEntry, type Disassembler } from "$lib/disasm";
-import { MAX_CONCURRENT } from "$lib/disasm/worker";
 import { tl } from "$lib/i18n";
 import { error } from "$lib/log";
 import {
@@ -248,7 +247,7 @@ export default {
 
         return recordProgress("task.export", null, async (exportTask) => {
             const channel = new Channel<Data>();
-            const chunks = chunk(entries, Math.ceil(entries.length / MAX_CONCURRENT));
+            const chunks = chunk(entries, Math.ceil(entries.length / (disasm?.concurrency ?? 1)));
 
             let count = 0;
             const promises = chunks.map(async (chunk) => {

@@ -2,7 +2,7 @@ import { disassemble, type DisassemblyConfig } from "@run-slicer/jasm";
 import { expose } from "comlink";
 import type { DisassemblerOptions } from "../";
 import type { EntrySource } from "../source";
-import type { Worker } from "./";
+import type { DisassemblyWorker } from "./";
 
 const convertOpts = (options?: DisassemblerOptions): DisassemblyConfig => ({
     indent: options?.indent,
@@ -36,4 +36,4 @@ expose({
 
         return disassemble(data, { ...convertOpts(options), signature });
     },
-} satisfies Worker);
+} satisfies DisassemblyWorker);
