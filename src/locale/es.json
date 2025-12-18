@@ -1,9 +1,9 @@
 {
     "locale.none": "Robot",
     "menu.root": "slicer",
-    "menu.root.about": "About",
-    "menu.root.docs": "Documentation",
-    "menu.root.theme": "Theme",
+    "menu.root.about": "Acerca de",
+    "menu.root.docs": "Documentación",
+    "menu.root.theme": "Tema",
     "menu.root.theme.color": "Color",
     "menu.root.theme.radius": "Radius",
     "menu.root.theme.radius.none": "None",
