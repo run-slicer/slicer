@@ -30,7 +30,7 @@ interface InternalWorker<T> extends WorkerLike<T> {
     processQueue(): Promise<void>;
 }
 
-export const createWorker = <T>(factory: () => Worker): WorkerLike<T> => {
+export const createWorker = <T>(factory: () => Worker): InternalWorker<T> => {
     return {
         proxy: null,
         current: null,
@@ -113,17 +113,17 @@ export const createWorker = <T>(factory: () => Worker): WorkerLike<T> => {
                 });
             });
         },
-    } as InternalWorker<T>;
+    };
 };
 
-const DEFAULT_SIZE = Math.max(1, Math.floor(navigator.hardwareConcurrency / 2));
+const DEFAULT_SIZE = Math.max(1, navigator.hardwareConcurrency);
 
 export const createDefaultWorkerPool = <T>(factory: () => Worker): WorkerPool<T> => {
     return createWorkerPool<T>(DEFAULT_SIZE, factory);
 };
 
 export const createWorkerPool = <T>(count: number, factory: () => Worker): WorkerPool<T> => {
-    const pool = new Array<WorkerLike<T>>(count);
+    const pool = new Array<InternalWorker<T>>(count);
     for (let i = 0; i < count; i++) {
         pool[i] = createWorker(factory);
     }
@@ -132,6 +132,14 @@ export const createWorkerPool = <T>(count: number, factory: () => Worker): Worke
     return {
         size: count,
         instance() {
+            for (const worker of pool) {
+                // find an idle worker
+                if (!worker.processing && worker.queue.length === 0) {
+                    return worker;
+                }
+            }
+
+            // all busy, use round-robin
             const worker = pool[currWorker++];
             if (currWorker >= pool.length) {
                 currWorker = 0; // wrap around
