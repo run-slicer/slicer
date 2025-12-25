@@ -24,7 +24,7 @@
         "@codemirror/search": "^6.5.11",
         "@codemirror/state": "^6.5.2",
         "@codemirror/view": "^6.38.8",
-        "@katana-project/asm": "^0.22.0",
+        "@katana-project/asm": "^0.23.0",
         "@katana-project/zip": "^0.7.1",
         "@lezer/highlight": "^1.2.3",
         "@run-slicer/cfr": "0.1.6-0.152",

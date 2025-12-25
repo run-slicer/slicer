@@ -1,15 +1,19 @@
 <script lang="ts">
     import type { Node } from "@katana-project/asm";
-    import { ConstantType } from "@katana-project/asm/spec";
+    import { AttributeType, ConstantType } from "@katana-project/asm/spec";
     import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "$lib/components/ui/table";
     import { formatEntry } from "@katana-project/asm/analysis/disasm";
     import { t } from "$lib/i18n";
+    import type { BootstrapMethodsAttribute } from "@katana-project/asm/attr";
 
     interface Props {
         node: Node;
     }
 
     let { node }: Props = $props();
+    let bsmAttr = $derived(
+        node.attrs.find((e) => e?.type === AttributeType.BOOTSTRAP_METHODS) as BootstrapMethodsAttribute | undefined
+    );
 </script>
 
 <Table>
@@ -27,13 +31,13 @@
                     <TableRow>
                         <TableCell class="font-medium">{i}</TableCell>
                         <TableCell>
-                            <span class="font-mono tracking-tight"
-                                >{ConstantType[entry.type] || $t("pane.class.pool.unknown")}</span
-                            >
+                            <span class="font-mono tracking-tight">
+                                {ConstantType[entry.type] || $t("pane.class.pool.unknown")}
+                            </span>
                             ({entry.type})
                         </TableCell>
                         <TableCell class="break-anywhere font-mono tracking-tight whitespace-normal">
-                            {formatEntry(entry, node.pool)}
+                            {formatEntry(entry, node.pool, bsmAttr)}
                         </TableCell>
                     </TableRow>
                 {/if}

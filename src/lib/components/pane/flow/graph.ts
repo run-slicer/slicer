@@ -3,7 +3,7 @@ import type { InheritanceGraph } from "$lib/workspace/analysis/graph";
 import type { Node as ClassNode, Member } from "@katana-project/asm";
 import { escapeLiteral, formatEntry, formatInsn } from "@katana-project/asm/analysis/disasm";
 import { computeGraph, EdgeType, type Node as GraphNode } from "@katana-project/asm/analysis/graph";
-import type { CodeAttribute } from "@katana-project/asm/attr";
+import type { BootstrapMethodsAttribute, CodeAttribute } from "@katana-project/asm/attr";
 import type { Pool, UTF8Entry } from "@katana-project/asm/pool";
 import { AttributeType } from "@katana-project/asm/spec";
 import type { Edge, MarkerType, Node } from "@xyflow/svelte";
@@ -61,6 +61,7 @@ const hierarchyLayoutOptions = {
 const elk = new ELK({ workerFactory: () => new Worker(new URL("elkjs/lib/elk-worker.js", import.meta.url)) });
 
 export const computeControlFlowGraph = async (
+    node: ClassNode,
     method: Member,
     pool: Pool,
     withExcHandlers: boolean
@@ -74,6 +75,9 @@ export const computeControlFlowGraph = async (
 
     const { nodes, edges } = computeGraph(code);
 
+    const bsmAttr = node.attrs.find((a) => a.type === AttributeType.BOOTSTRAP_METHODS) as
+        | BootstrapMethodsAttribute
+        | undefined;
     const excEdges = (withExcHandlers ? nodes : []).flatMap((node) => {
         return code.exceptionTable
             .filter((e) => node.offset >= e.startPC && node.insns[node.insns.length - 1].offset < e.endPC)
@@ -81,12 +85,12 @@ export const computeControlFlowGraph = async (
                 source: node.offset,
                 target: e.handlerPC,
                 // https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-4.html#jvms-4.7.3 (exception_table[] -> catch_type)
-                catchType: e.catchType === 0 ? "*" : formatEntry(pool[e.catchType]!, pool),
+                catchType: e.catchType === 0 ? "*" : formatEntry(pool[e.catchType]!, pool, bsmAttr),
             }));
     });
 
     const data: ControlFlowNodeData[] = nodes.map((node) => {
-        const lines = node.insns.map((i) => formatInsn(code, i, pool, false));
+        const lines = node.insns.map((i) => formatInsn(code, bsmAttr ?? null, i, pool, false));
         const metrics = computeTextSize(
             lines.reduce((a, b) => (a.length > b.length ? a : b)),
             `400 12px / 18px ${monoFF}`

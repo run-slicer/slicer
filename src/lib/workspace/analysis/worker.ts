@@ -1,6 +1,7 @@
 import { type Member, type Node, read } from "@katana-project/asm";
 import { escapeLiteral, formatEntry, formatInsn } from "@katana-project/asm/analysis/disasm";
-import type { CodeAttribute } from "@katana-project/asm/attr";
+import type { BootstrapMethodsAttribute, CodeAttribute } from "@katana-project/asm/attr";
+import { readBootstrapMethods } from "@katana-project/asm/attr/bsm";
 import { readCode } from "@katana-project/asm/attr/code";
 import type { Entry, NameTypeEntry, Pool, UTF8Entry } from "@katana-project/asm/pool";
 import { AttributeType, ConstantType } from "@katana-project/asm/spec";
@@ -25,14 +26,26 @@ const createComparator = (value: string, mode: SearchMode): Comparator => {
     }
 };
 
+const readBsm = (node: Node): BootstrapMethodsAttribute | null => {
+    const attr = node.attrs.find((a) => a.name?.string === AttributeType.BOOTSTRAP_METHODS);
+    if (attr) {
+        try {
+            return readBootstrapMethods(attr, node.pool);
+        } catch (e) {}
+    }
+
+    return null;
+};
+
 const searchPoolEntries = (
-    pool: Pool,
+    node: Node,
     comparator: Comparator,
     filterFn: (entry: Entry) => boolean
 ): SearchResultData[] => {
-    return pool
+    const bsmAttr = readBsm(node);
+    return node.pool
         .filter((e) => e !== null && filterFn(e))
-        .map((e) => ({ value: formatEntry(e!, pool) }))
+        .map((e) => ({ value: formatEntry(e!, node.pool, bsmAttr ?? undefined) }))
         .filter((e) => comparator(e.value));
 };
 
@@ -61,6 +74,7 @@ expose({
 
         switch (type) {
             case QueryType.PSEUDOCODE:
+                const bsmAttr = readBsm(node);
                 const code = [
                     ...node.methods.flatMap((member) =>
                         member.attrs
@@ -77,29 +91,31 @@ expose({
                             .flatMap((code) =>
                                 code.insns.map((i) => ({
                                     member,
-                                    value: formatInsn(code, i, node.pool, true),
+                                    value: formatInsn(code, bsmAttr, i, node.pool, true),
                                 }))
                             )
                     ),
                     ...node.pool
                         .filter((e) => e !== null)
-                        .map((e) => ({ value: `${ConstantType[e.type]} ${formatEntry(e, node.pool)}` })),
+                        .map((e) => ({
+                            value: `${ConstantType[e.type]} ${formatEntry(e, node.pool, bsmAttr ?? undefined)}`,
+                        })),
                 ];
 
                 return code.filter((e) => comparator(e.value));
             case QueryType.STRING:
-                return searchPoolEntries(node.pool, comparator, (e) => e.type === ConstantType.STRING);
+                return searchPoolEntries(node, comparator, (e) => e.type === ConstantType.STRING);
             case QueryType.FIELD:
                 return ref
                     ? searchPoolEntries(
-                          node.pool,
+                          node,
                           comparator,
                           (e) => e.type === ConstantType.NAME_AND_TYPE && !isMethodNameType(e, node.pool)
                       )
                     : searchMembers(node.fields, comparator);
             case QueryType.METHOD:
                 return ref
-                    ? searchPoolEntries(node.pool, comparator, (e) => isMethodNameType(e, node.pool))
+                    ? searchPoolEntries(node, comparator, (e) => isMethodNameType(e, node.pool))
                     : searchMembers(node.methods, comparator);
         }
     },

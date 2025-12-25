@@ -39,8 +39,8 @@ importers:
         specifier: ^6.38.8
         version: 6.38.8
       '@katana-project/asm':
-        specifier: ^0.22.0
-        version: 0.22.0
+        specifier: ^0.23.0
+        version: 0.23.0
       '@katana-project/zip':
         specifier: ^0.7.1
         version: 0.7.1
@@ -705,8 +705,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
 
-  '@katana-project/asm@0.22.0':
-    resolution: {integrity: sha512-2Wyf0KLcnyepLR3YgA3Qv3OJGL764jTVH/lZSDcJLrz0cjq0aUnUT+JD9YYaf8kK517s4+Ho2ZXkXdZ/kg2USQ==}
+  '@katana-project/asm@0.23.0':
+    resolution: {integrity: sha512-5X3TSwimYZJ2AasqqiXSplrp/f+NcBcQgklkic0PLqgcvLXn/RsBPMdaWNYeYQM/BtJHLeV9SLnKI3iFArV62Q==}
 
   '@katana-project/zip@0.7.1':
     resolution: {integrity: sha512-yRoiCt7H6o9ayFHLBBbTczmlqcy8UHNjKOpHgB2OYZMNG2gVpCXa7vSwFTo9Tal0R0SSDaudhLn+B6m3BOH+mA==}
@@ -2131,7 +2131,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@katana-project/asm@0.22.0': {}
+  '@katana-project/asm@0.23.0': {}
 
   '@katana-project/zip@0.7.1': {}
 
