@@ -4,7 +4,7 @@ import type { Node as ClassNode, Member } from "@katana-project/asm";
 import { escapeLiteral, formatEntry, formatInsn } from "@katana-project/asm/analysis/disasm";
 import { computeGraph, EdgeType, type Node as GraphNode } from "@katana-project/asm/analysis/graph";
 import type { BootstrapMethodsAttribute, CodeAttribute } from "@katana-project/asm/attr";
-import type { Pool, UTF8Entry } from "@katana-project/asm/pool";
+import type { UTF8Entry } from "@katana-project/asm/pool";
 import { AttributeType } from "@katana-project/asm/spec";
 import type { Edge, MarkerType, Node } from "@xyflow/svelte";
 import ELK, { type ElkNode } from "elkjs/lib/elk-api";
@@ -63,7 +63,6 @@ const elk = new ELK({ workerFactory: () => new Worker(new URL("elkjs/lib/elk-wor
 export const computeControlFlowGraph = async (
     node: ClassNode,
     method: Member,
-    pool: Pool,
     withExcHandlers: boolean
 ): Promise<[Node[], Edge[]]> => {
     const attr = method.attrs.find((a) => a.type === AttributeType.CODE);
@@ -72,12 +71,13 @@ export const computeControlFlowGraph = async (
     }
 
     const code = attr as CodeAttribute;
-
     const { nodes, edges } = computeGraph(code);
 
+    const pool = node.pool;
     const bsmAttr = node.attrs.find((a) => a.type === AttributeType.BOOTSTRAP_METHODS) as
         | BootstrapMethodsAttribute
         | undefined;
+
     const excEdges = (withExcHandlers ? nodes : []).flatMap((node) => {
         return code.exceptionTable
             .filter((e) => node.offset >= e.startPC && node.insns[node.insns.length - 1].offset < e.endPC)

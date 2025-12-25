@@ -63,7 +63,7 @@
         }
 
         return member
-            ? computeControlFlowGraph(member, pool, showHandlerEdges)
+            ? computeControlFlowGraph(node, member, showHandlerEdges)
             : computeHierarchyGraph(node, inheritanceGraph, showSubtypes);
     };
 </script>
