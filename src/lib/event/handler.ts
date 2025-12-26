@@ -323,7 +323,7 @@ export default {
         }
 
         const proto = await record("task.script.import", truncate(url, 120), () => readScript(url));
-        toast.success(tl("toast.success.import-script"), {
+        toast.success(tl("toast.success.title.import"), {
             description: tl("toast.success.import-script", proto.id),
         });
 

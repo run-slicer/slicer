@@ -18,7 +18,8 @@
     import { register as registerShortcuts } from "$lib/shortcut";
     import { onMount } from "svelte";
     import { transformers } from "$lib/workspace/analysis/transform";
-    import { Modals } from "svelte-modals";
+    import { modals, Modals } from "svelte-modals";
+    import { ScriptLoadShareDialog } from "$lib/components/dialog";
 
     let tabs0 = $derived(Array.from($tabs.values()));
     let entries0 = $derived(Array.from($entries.values()));
@@ -26,14 +27,6 @@
     let tasks0 = $derived(Array.from($tasks.values()));
     let disasms0 = $derived(Array.from($disasms.values()));
     let transformers0 = $derived(Array.from($transformers.values()));
-
-    // HTTP file share handler
-    const url = new URL(window.location.href);
-    if (url.searchParams.has("url")) {
-        const fetchUrl = url.searchParams.get("url")!;
-
-        $handler.addRemote(fetchUrl);
-    }
 
     onMount(registerShortcuts);
 
@@ -50,6 +43,20 @@
 
         window.addEventListener("contextmenu", handler);
         return () => window.removeEventListener("contextmenu", handler);
+    });
+
+    onMount(() => {
+        const url = new URL(window.location.href);
+        if (url.searchParams.has("url")) {
+            // HTTP file share handler
+            const fetchUrl = url.searchParams.get("url")!;
+
+            $handler.addRemote(fetchUrl);
+        }
+        if (url.searchParams.has("script")) {
+            // script load share handler
+            modals.open(ScriptLoadShareDialog, { url: url.searchParams.get("script")!, handler: $handler });
+        }
     });
 </script>
 

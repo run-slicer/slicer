@@ -27,6 +27,11 @@
         if (accepted) {
             await handler.addScript(url, enabled);
         }
+
+        // clear search params on dialog close
+        const windowUrl = new URL(window.location.href);
+        windowUrl.searchParams.delete("script");
+        window.history.replaceState(null, "", windowUrl);
     };
 </script>
 
@@ -35,7 +40,7 @@
         <AlertDialogHeader>
             <AlertDialogTitle>{$t("dialog.script-load-share.title")}</AlertDialogTitle>
             <AlertDialogDescription>
-                {@html $t("dialog.script-load-share.title", url, truncate(url, 120))}
+                {@html $t("dialog.script-load-share.desc", url, truncate(url, 120))}
             </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

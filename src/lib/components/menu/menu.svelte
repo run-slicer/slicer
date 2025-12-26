@@ -77,16 +77,6 @@
 
     let entry = $derived(tab?.entry);
 
-    let scriptShareUrl: string | null = $state(new URL(window.location.href).searchParams.get("script"));
-    $effect(() => {
-        if (!scriptShareUrl) {
-            // clear search params on dialog close
-            const url = new URL(window.location.href);
-            url.searchParams.delete("script");
-            window.history.replaceState(null, "", url);
-        }
-    });
-
     const openEntry = (tabType: TabType) => handler.open(entry!, tabType);
 
     const exportEntry = async () => {
