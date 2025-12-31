@@ -35,6 +35,7 @@ export interface Tab {
     type: TabType;
     name?: string;
     position: TabPosition;
+    index: number;
     active?: boolean;
     closeable: boolean;
     icon?: StyledIcon;
@@ -86,17 +87,28 @@ const typedDefs = new Map(tabDefs.map((d) => [d.type, d]));
 export const tabs = writable<Map<string, Tab>>(
     new Map(
         get(panes)
-            .flatMap(({ position, tabs }) => tabs.map((tab) => ({ position, tab, def: typedDefs.get(tab.type) })))
+            .flatMap(({ position, tabs }) =>
+                tabs.map((tab, index) => ({
+                    position,
+                    tab,
+                    index,
+                    def: typedDefs.get(tab.type),
+                }))
+            )
             .filter(({ def }) => def !== undefined)
-            .map(({ position, tab, def }) => [
+            .map(({ position, tab, index, def }) => [
                 `${def!.type}:slicer`,
                 {
                     id: `${def!.type}:slicer`,
                     type: def!.type,
                     position,
+                    index,
                     active: tab.active,
                     closeable: true,
-                    icon: { icon: def!.icon, classes: ["text-muted-foreground"] },
+                    icon: {
+                        icon: def!.icon,
+                        classes: ["text-muted-foreground"],
+                    },
                     internalId: {},
                 },
             ])
@@ -228,11 +240,14 @@ export const refreshIf = async (func: (tab: Tab) => boolean, hard: boolean = fal
 
 // gets the preceding tab or null if there's only one in position
 const nextTab = (tab: Tab): Tab | null => {
-    const all = Array.from(get(tabs).values()).filter((t) => t.position === tab.position);
-    const tabIndex = all.findIndex((t) => t.id === tab.id);
-    const nextTab = all.length > 1 ? (tabIndex > 0 ? tabIndex - 1 : all.length - 1) : -1;
+    const all = Array.from(get(tabs).values())
+        .filter((t) => t.position === tab.position)
+        .sort((a, b) => a.index - b.index);
 
-    return nextTab < 0 ? null : all[nextTab];
+    const i = all.findIndex((t) => t.id === tab.id);
+    if (i === -1 || all.length <= 1) return null;
+
+    return all[i > 0 ? i - 1 : all.length - 1];
 };
 
 export const remove = (tab: Tab) => {
@@ -274,7 +289,9 @@ export const clear = () => {
         }
 
         for (const pos of Object.values(TabPosition)) {
-            const posTabs = Array.from($tabs.values()).filter((t) => t.position === pos);
+            const posTabs = Array.from($tabs.values())
+                .filter((t) => t.position === pos)
+                .sort((a, b) => a.index - b.index);
 
             if (posTabs.length > 0 && !posTabs.some((t) => t.active)) {
                 // no active tab for position, make the last one active
@@ -329,11 +346,14 @@ export const open = async (entry: Entry, type: TabType = detectType(entry)): Pro
     if (!tab) {
         // tab doesn't exist, create
         try {
+            const existing = Array.from(get(tabs).values()).filter((t) => t.position === TabPosition.PRIMARY_CENTER);
+
             tab = update({
                 id,
                 type,
                 name: entry.shortName,
                 position: TabPosition.PRIMARY_CENTER,
+                index: existing.length,
                 closeable: true,
                 entry: await readDeferred(entry),
                 icon: tabIcon(type, entry),
@@ -353,10 +373,19 @@ export const open = async (entry: Entry, type: TabType = detectType(entry)): Pro
 export const openUnscoped = (def: TabDefinition, position: TabPosition = TabPosition.PRIMARY_CENTER): Tab => {
     let tab = Array.from(get(tabs).values()).find((t) => t.type === def.type);
     if (!tab) {
+        const maxIndex =
+            Math.max(
+                -1,
+                ...Array.from(get(tabs).values())
+                    .filter((t) => t.position === position)
+                    .map((t) => t.index ?? 0)
+            ) + 1;
+
         tab = update({
             id: `${def.type}:slicer`,
             type: def.type,
             position,
+            index: maxIndex,
             closeable: true,
             icon: { icon: def.icon, classes: ["text-muted-foreground"] },
         });

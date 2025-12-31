@@ -46,9 +46,10 @@
         const items = e.detail.items;
         localTabs = items;
 
-        for (const tab of items) {
+        items.forEach((tab, index) => {
+            tab.index = index;
             move(tab, position);
-        }
+        });
     };
 
     let Icon = $derived(paneIcon(position, false));
@@ -68,18 +69,23 @@
     const handleClose = (type: CloseType, tab: Tab) => {
         if (!tabs) return;
 
-        const samePosition = (t: Tab) => t.position === tab.position;
-        const filteredTabs = tabs.filter(samePosition);
+        // Tabs in same pane, ordered by index
+        const samePositionTabs = tabs
+            .filter((t) => t.position === tab.position)
+            .slice()
+            .sort((a, b) => a.index - b.index);
 
-        const localIndex = filteredTabs.findIndex((t) => t.id === tab.id);
+        const currentIndex = samePositionTabs.findIndex((t) => t.id === tab.id);
 
-        const isLast = localIndex === filteredTabs.length - 1;
+        if (currentIndex === -1) return;
+
+        const isLast = currentIndex === samePositionTabs.length - 1;
 
         const targets = {
             self: [tab],
-            others: filteredTabs.filter((t) => t.id !== tab.id),
-            right: isLast || localIndex === -1 ? [] : filteredTabs.slice(localIndex + 1),
-            all: filteredTabs,
+            others: samePositionTabs.filter((t) => t.id !== tab.id),
+            right: isLast ? [] : samePositionTabs.slice(currentIndex + 1),
+            all: samePositionTabs,
         } as const;
 
         const toClose = targets[type] ?? [];
