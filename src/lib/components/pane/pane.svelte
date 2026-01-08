@@ -72,7 +72,7 @@
         // Tabs in same pane, ordered by index
         const samePositionTabs = tabs
             .filter((t) => t.position === tab.position)
-            .sort((a, b) => a.index - b.index);
+            .sort((a, b) => (a.index ?? 0) - (b.index ?? 0));
 
         const currentIndex = samePositionTabs.findIndex((t) => t.id === tab.id);
 

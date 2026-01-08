@@ -35,7 +35,7 @@ export interface Tab {
     type: TabType;
     name?: string;
     position: TabPosition;
-    index: number;
+    index: number | null;
     active?: boolean;
     closeable: boolean;
     icon?: StyledIcon;
@@ -204,6 +204,15 @@ export const update = (tab: Tab): Tab => {
         tab.internalId = {}; // fill in missing id
     }
 
+    if (tab.index == null) {
+        tab.index = Math.max(
+                -1,
+                ...Array.from(get(tabs).values())
+                    .filter((t) => t.position === TabPosition.PRIMARY_CENTER)
+                    .map((t) => t.index ?? 0)
+            ) + 1;
+    }
+
     tabs.update(($tabs) => {
         $tabs.set(tab.id, tab);
         return $tabs;
@@ -242,7 +251,7 @@ export const refreshIf = async (func: (tab: Tab) => boolean, hard: boolean = fal
 const nextTab = (tab: Tab): Tab | null => {
     const all = Array.from(get(tabs).values())
         .filter((t) => t.position === tab.position)
-        .sort((a, b) => a.index - b.index);
+        .sort((a, b) => (a.index ?? 0) - (b.index ?? 0));
 
     const i = all.findIndex((t) => t.id === tab.id);
     if (i === -1 || all.length <= 1) return null;
@@ -291,7 +300,7 @@ export const clear = () => {
         for (const pos of Object.values(TabPosition)) {
             const posTabs = Array.from($tabs.values())
                 .filter((t) => t.position === pos)
-                .sort((a, b) => a.index - b.index);
+                .sort((a, b) => (a.index ?? 0) - (b.index ?? 0));
 
             if (posTabs.length > 0 && !posTabs.some((t) => t.active)) {
                 // no active tab for position, make the last one active
@@ -346,14 +355,12 @@ export const open = async (entry: Entry, type: TabType = detectType(entry)): Pro
     if (!tab) {
         // tab doesn't exist, create
         try {
-            const existing = Array.from(get(tabs).values()).filter((t) => t.position === TabPosition.PRIMARY_CENTER);
-
             tab = update({
                 id,
                 type,
                 name: entry.shortName,
                 position: TabPosition.PRIMARY_CENTER,
-                index: existing.length,
+                index: null,
                 closeable: true,
                 entry: await readDeferred(entry),
                 icon: tabIcon(type, entry),
@@ -373,19 +380,11 @@ export const open = async (entry: Entry, type: TabType = detectType(entry)): Pro
 export const openUnscoped = (def: TabDefinition, position: TabPosition = TabPosition.PRIMARY_CENTER): Tab => {
     let tab = Array.from(get(tabs).values()).find((t) => t.type === def.type);
     if (!tab) {
-        const maxIndex =
-            Math.max(
-                -1,
-                ...Array.from(get(tabs).values())
-                    .filter((t) => t.position === position)
-                    .map((t) => t.index ?? 0)
-            ) + 1;
-
         tab = update({
             id: `${def.type}:slicer`,
             type: def.type,
             position,
-            index: maxIndex,
+            index: null,
             closeable: true,
             icon: { icon: def.icon, classes: ["text-muted-foreground"] },
         });
