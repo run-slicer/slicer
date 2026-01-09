@@ -6,6 +6,7 @@
         highlightActiveLine,
         highlightActiveLineGutter,
         highlightSpecialChars,
+        hoverTooltip,
         keymap,
         lineNumbers,
         rectangularSelection,
@@ -18,13 +19,16 @@
         foldKeymap,
         indentOnInput,
         syntaxHighlighting,
+        syntaxTree,
     } from "@codemirror/language";
     import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
     import { highlightSelectionMatches, search, searchKeymap } from "@codemirror/search";
+    import { type SyntaxNode, Tree } from "@lezer/common";
     import SearchPanel from "./search.svelte";
     import { mount, unmount } from "svelte";
+    import { mostRelevantNode } from "./ast";
 
-    export const basicSetup: Extension = (() => [
+    export const extensions: Extension = (() => [
         lineNumbers(),
         highlightActiveLineGutter(),
         highlightSpecialChars(),
@@ -54,6 +58,38 @@
         highlightActiveLine(),
         highlightSelectionMatches(),
         keymap.of([...defaultKeymap, ...searchKeymap, ...historyKeymap, ...foldKeymap]),
+        hoverTooltip((view, pos) => {
+            const tree = syntaxTree(view.state);
+            if (tree === Tree.empty) {
+                return null;
+            }
+
+            const node = mostRelevantNode(tree, pos);
+            if (!node) {
+                return null;
+            }
+
+            let nodePath = [];
+            let currentNode: SyntaxNode | null = node;
+            while (currentNode) {
+                nodePath.push(currentNode.type.name);
+                currentNode = currentNode.parent;
+            }
+
+            return {
+                pos: node.from,
+                end: node.to,
+                clip: false,
+                arrow: true,
+                create() {
+                    let dom = document.createElement("div");
+                    dom.style.padding = "0.25rem";
+                    dom.style.whiteSpace = "pre";
+                    dom.textContent = `${nodePath.join("\nat ")}\n\n${view.state.doc.sliceString(node.from, node.to)}`;
+                    return { dom };
+                },
+            };
+        }),
     ])();
 
     export const styles: Extension = EditorView.theme({
@@ -148,7 +184,7 @@
             state: EditorState.create({
                 doc: value,
                 extensions: [
-                    basicSetup,
+                    extensions,
                     readOnlyStore.of(EditorState.readOnly.of(readonly)),
                     themeStore.of(mode.current === "dark" ? dark : light),
                     langStore.of(lang || []),
