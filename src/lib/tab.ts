@@ -204,16 +204,17 @@ export const update = (tab: Tab): Tab => {
         tab.internalId = {}; // fill in missing id
     }
 
-    if (tab.index == null) {
-        tab.index = Math.max(
-                -1,
-                ...Array.from(get(tabs).values())
-                    .filter((t) => t.position === TabPosition.PRIMARY_CENTER)
-                    .map((t) => t.index ?? 0)
-            ) + 1;
-    }
 
     tabs.update(($tabs) => {
+        if (tab.index == null) {
+            tab.index = Math.max(
+                    -1,
+                    ...Array.from($tabs.values())
+                        .filter((t) => t.position === tab.position)
+                        .map((t) => t.index ?? 0)
+                ) + 1;
+        }
+
         $tabs.set(tab.id, tab);
         return $tabs;
     });
