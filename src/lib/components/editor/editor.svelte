@@ -19,14 +19,17 @@
         foldKeymap,
         indentOnInput,
         syntaxHighlighting,
-        syntaxTree,
     } from "@codemirror/language";
     import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
     import { highlightSelectionMatches, search, searchKeymap } from "@codemirror/search";
-    import { type SyntaxNode, Tree } from "@lezer/common";
     import SearchPanel from "./search.svelte";
     import { mount, unmount } from "svelte";
-    import { mostRelevantNode } from "./ast";
+
+    export interface TooltipProps {
+        view: EditorView;
+        pos: number;
+        side: -1 | 0 | 1;
+    }
 
     export const extensions: Extension = (() => [
         lineNumbers(),
@@ -58,38 +61,6 @@
         highlightActiveLine(),
         highlightSelectionMatches(),
         keymap.of([...defaultKeymap, ...searchKeymap, ...historyKeymap, ...foldKeymap]),
-        hoverTooltip((view, pos) => {
-            const tree = syntaxTree(view.state);
-            if (tree === Tree.empty) {
-                return null;
-            }
-
-            const node = mostRelevantNode(tree, pos);
-            if (!node) {
-                return null;
-            }
-
-            let nodePath = [];
-            let currentNode: SyntaxNode | null = node;
-            while (currentNode) {
-                nodePath.push(currentNode.type.name);
-                currentNode = currentNode.parent;
-            }
-
-            return {
-                pos: node.from,
-                end: node.to,
-                clip: false,
-                arrow: true,
-                create() {
-                    let dom = document.createElement("div");
-                    dom.style.padding = "0.25rem";
-                    dom.style.whiteSpace = "pre";
-                    dom.textContent = `${nodePath.join("\nat ")}\n\n${view.state.doc.sliceString(node.from, node.to)}`;
-                    return { dom };
-                },
-            };
-        }),
     ])();
 
     export const styles: Extension = EditorView.theme({
@@ -122,11 +93,15 @@
             // fix overlapping
             "z-index": "auto",
         },
+        ".cm-tooltip": {
+            // handled by external component
+            "background-color": "transparent",
+        },
     });
 </script>
 
 <script lang="ts">
-    import { onMount } from "svelte";
+    import { type Component, onMount } from "svelte";
     import { mode } from "mode-watcher";
     import type { LanguageSupport } from "@codemirror/language";
     import { EditorView } from "@codemirror/view";
@@ -146,6 +121,8 @@
         wrap?: boolean;
         view?: EditorView | null;
         onchange?: (view: EditorView) => void;
+
+        tooltip?: Component<TooltipProps>;
     }
 
     let {
@@ -156,6 +133,7 @@
         wrap = false,
         view = $bindable(null),
         onchange,
+        tooltip: TooltipComponent,
     }: Props = $props();
 
     $effect(() => view?.dispatch({ effects: readOnlyStore.reconfigure(EditorState.readOnly.of(readonly)) }));
@@ -200,6 +178,25 @@
                             onchange?.(e.view);
                         }
                     }),
+                    !TooltipComponent
+                        ? []
+                        : hoverTooltip((view, pos, side) => ({
+                            pos,
+                            create() {
+                                const target = document.createElement("div");
+                                const component = mount(TooltipComponent, {
+                                    target,
+                                    props: { view, pos, side },
+                                });
+
+                                return {
+                                    dom: target,
+                                    destroy() {
+                                        unmount(component);
+                                    },
+                                };
+                            },
+                        })),
                 ],
             }),
             parent,

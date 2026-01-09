@@ -20,6 +20,7 @@
     import { t } from "$lib/i18n";
     import { onDestroy } from "svelte";
     import type { Cancellable } from "$lib/utils";
+    import Tooltip from "./tooltip.svelte";
 
     let { tab, disasms, handler }: PaneProps = $props();
     const entry = $derived(tab.entry!);
@@ -79,7 +80,14 @@
     {:then [lang, value]}
         <ContextMenu>
             <ContextMenuTrigger>
-                <CodeEditor {value} readonly {lang} bind:size={$textSize} {wrap} />
+                <CodeEditor
+                    {value}
+                    readonly
+                    {lang}
+                    bind:size={$textSize}
+                    {wrap}
+                    tooltip={Tooltip}
+                />
             </ContextMenuTrigger>
             <CodeMenu
                 {tab}
