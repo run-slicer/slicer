@@ -1,16 +1,20 @@
 <script lang="ts">
     import type { TooltipProps } from "$lib/components/editor/editor.svelte";
-    import { syntaxTree } from "@codemirror/language";
-    import { Tree } from "@lezer/common";
+    import type { TypeReferenceResolver } from "@katana-project/laser";
 
-    let { view, pos, side }: TooltipProps = $props();
+    interface Props extends TooltipProps {
+        resolver: TypeReferenceResolver | null;
+    }
 
-    let tree = $derived(syntaxTree(view.state));
-    let node = $derived(tree.resolveInner(pos, side));
+    let { pos, side, resolver }: Props = $props();
+
+    let resolution = $derived(resolver?.resolveAt(pos, side));
 </script>
 
-{#if tree !== Tree.empty}
-    <div class="text-accent-foreground bg-accent animate-in fade-in-0 zoom-in-95 z-50 w-fit rounded-sm px-3 py-1.5 text-xs text-balance">
-        <div>{node.name}</div>
+{#if resolution}
+    <div
+        class="text-accent-foreground bg-accent animate-in fade-in-0 zoom-in-95 z-50 w-fit rounded-sm px-3 py-1.5 text-xs text-balance"
+    >
+        <div>{resolution.qualifiedName ?? resolution.name} ({resolution.kind})</div>
     </div>
 {/if}

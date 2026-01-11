@@ -41,6 +41,9 @@ importers:
       '@katana-project/asm':
         specifier: ^0.24.0
         version: 0.24.0
+      '@katana-project/laser':
+        specifier: ^0.2.1
+        version: 0.2.1
       '@katana-project/zip':
         specifier: ^0.7.1
         version: 0.7.1
@@ -710,6 +713,9 @@ packages:
 
   '@katana-project/asm@0.24.0':
     resolution: {integrity: sha512-9eOk2mnIfJw0yY7TUep0xy7yeyvaHJ24Boj9x1wqEjLJNJhQ54n9ZU7x4T/x2aDW289uJTDI0eHTvStkku3zAQ==}
+
+  '@katana-project/laser@0.2.1':
+    resolution: {integrity: sha512-o960aniuQ3wLW1qgDWM/VN1t1Wd5ctvNqFXNnyT4dVwNeLMvz83qff/KVtgISczcwUG7PJBF3NcVYNkrQtxhuw==}
 
   '@katana-project/zip@0.7.1':
     resolution: {integrity: sha512-yRoiCt7H6o9ayFHLBBbTczmlqcy8UHNjKOpHgB2OYZMNG2gVpCXa7vSwFTo9Tal0R0SSDaudhLn+B6m3BOH+mA==}
@@ -2135,6 +2141,10 @@ snapshots:
       '@jridgewell/sourcemap-codec': 1.5.5
 
   '@katana-project/asm@0.24.0': {}
+
+  '@katana-project/laser@0.2.1':
+    dependencies:
+      '@lezer/common': 1.5.0
 
   '@katana-project/zip@0.7.1': {}
 

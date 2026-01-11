@@ -122,7 +122,8 @@
         view?: EditorView | null;
         onchange?: (view: EditorView) => void;
 
-        tooltip?: Component<TooltipProps>;
+        // TODO: improve typing
+        tooltip?: () => [Component<any>, Record<string, any>];
     }
 
     let {
@@ -133,7 +134,7 @@
         wrap = false,
         view = $bindable(null),
         onchange,
-        tooltip: TooltipComponent,
+        tooltip,
     }: Props = $props();
 
     $effect(() => view?.dispatch({ effects: readOnlyStore.reconfigure(EditorState.readOnly.of(readonly)) }));
@@ -178,25 +179,27 @@
                             onchange?.(e.view);
                         }
                     }),
-                    !TooltipComponent
+                    !tooltip
                         ? []
                         : hoverTooltip((view, pos, side) => ({
-                            pos,
-                            create() {
-                                const target = document.createElement("div");
-                                const component = mount(TooltipComponent, {
-                                    target,
-                                    props: { view, pos, side },
-                                });
+                              pos,
+                              create() {
+                                  const [TooltipComponent, props] = tooltip();
 
-                                return {
-                                    dom: target,
-                                    destroy() {
-                                        unmount(component);
-                                    },
-                                };
-                            },
-                        })),
+                                  const target = document.createElement("div");
+                                  const component = mount(TooltipComponent, {
+                                      target,
+                                      props: { view, pos, side, ...props },
+                                  });
+
+                                  return {
+                                      dom: target,
+                                      destroy() {
+                                          unmount(component);
+                                      },
+                                  };
+                              },
+                          })),
                 ],
             }),
             parent,

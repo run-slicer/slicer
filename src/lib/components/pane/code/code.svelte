@@ -1,26 +1,36 @@
 <script lang="ts">
-    import { EntryType } from "$lib/workspace";
+    import { classRefs, EntryType } from "$lib/workspace";
     import Loading from "$lib/components/loading.svelte";
     import { load as loadLanguage } from "$lib/lang";
-    import { detectLanguage, read, detectInterpretation, canInterpret, Interpretation } from "./";
+    import { canInterpret, detectInterpretation, detectLanguage, Interpretation, read } from "./";
     import CodeEditor from "$lib/components/editor/editor.svelte";
     import { Select, SelectContent, SelectItem, SelectTrigger } from "$lib/components/ui/select";
     import { Button } from "$lib/components/ui/button";
     import { Popover, PopoverContent, PopoverTrigger } from "$lib/components/ui/popover";
     import { SquareCode } from "@lucide/svelte";
     import { jasm, vf } from "$lib/disasm/builtin";
-    import { editorTextSize, editorTextSizeSync, editorWrap, toolsDisasm } from "$lib/state";
+    import {
+        editorTextSize,
+        editorTextSizeSync,
+        editorWrap,
+        interpHexRowBytes,
+        toolsDisasm,
+        toolsDisasmOptions,
+    } from "$lib/state";
     import { get, writable } from "svelte/store";
     import { ContextMenu, ContextMenuTrigger } from "$lib/components/ui/context-menu";
     import CodeMenu from "./menu.svelte";
     import { record } from "$lib/task";
     import type { PaneProps } from "$lib/components/pane";
     import { cn } from "$lib/components/utils";
-    import { interpHexRowBytes, toolsDisasmOptions } from "$lib/state";
     import { t } from "$lib/i18n";
     import { onDestroy } from "svelte";
     import type { Cancellable } from "$lib/utils";
     import Tooltip from "./tooltip.svelte";
+    import { createTypeReferenceResolver, parseUnit } from "@katana-project/laser";
+    import type { EditorView } from "@codemirror/view";
+    import { ensureSyntaxTree } from "@codemirror/language";
+    import { jdkRefs } from "$lib/workspace/jdk";
 
     let { tab, disasms, handler }: PaneProps = $props();
     const entry = $derived(tab.entry!);
@@ -69,6 +79,26 @@
     $effect(() => {
         record(interpType !== Interpretation.TEXT ? "task.disasm" : "task.read", entry.name, () => readPromise);
     });
+
+    let view: EditorView | null = $state(null);
+    let unit = $derived.by(() => {
+        if (
+            (interpType !== Interpretation.CLASS && interpType !== Interpretation.TEXT) ||
+            language !== "java" ||
+            !view
+        ) {
+            return null;
+        }
+
+        const tree = ensureSyntaxTree(view.state, view.state.doc.length, 500);
+        if (!tree) {
+            // too large of a file to parse, contextual info unavailable
+            return null;
+        }
+
+        return parseUnit(tree, view.state.doc.toString());
+    });
+    let resolver = $derived(unit ? createTypeReferenceResolver(unit, [...jdkRefs, ...$classRefs]) : null);
 </script>
 
 <div class="scrollbar-thin relative basis-full overflow-hidden">
@@ -81,12 +111,13 @@
         <ContextMenu>
             <ContextMenuTrigger>
                 <CodeEditor
+                    bind:view
                     {value}
                     readonly
                     {lang}
                     bind:size={$textSize}
                     {wrap}
-                    tooltip={Tooltip}
+                    tooltip={() => [Tooltip, { resolver }]}
                 />
             </ContextMenuTrigger>
             <CodeMenu
