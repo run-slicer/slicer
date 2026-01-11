@@ -157,7 +157,6 @@
                         icon={tab0.icon}
                         closeable={tab0.closeable}
                         pinned={tab0.pinned}
-                        separate={tab0.id === lastPinnedId}
                         onclick={() => updateCurrent(position, tab0)}
                         onclose={(type) => handleClose(type, tab0)}
                         onpin={(value) => handlePin(value, tab0)}

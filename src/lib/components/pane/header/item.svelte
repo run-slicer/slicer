@@ -24,7 +24,6 @@
         active?: boolean;
         closeable?: boolean;
         pinned?: boolean;
-        separate?: boolean;
         onclick?: () => void;
         onclose?: (type: CloseType) => void;
         onpin?: (value: boolean) => void;
@@ -36,7 +35,6 @@
         active = true,
         closeable = false,
         pinned = false,
-        separate = false,
         onclick,
         onclose,
         onpin,
@@ -70,22 +68,25 @@
         <button
             bind:this={elem}
             class={cn(
-                "bg-pane-header inline-flex h-full max-w-96 cursor-pointer items-center px-3",
-                !active || "border-t-primary bg-background border-t",
-                separate && "border-r-primary border-r"
+                "relative overflow-hidden bg-pane-header inline-flex h-full max-w-96 cursor-pointer items-center px-3",
+                !active || "border-t-primary bg-background border-t"
             )}
             aria-label={name}
             {onclick}
         >
-            {#if icon}
-                <Icon size={16} class={cn("mr-1.5 min-w-4", icon.classes)} />
+            {#if pinned}
+                <!-- Pinned background indicator -->
+                <div class="pointer-events-none absolute inset-0 bg-primary opacity-10"></div>
             {/if}
-            <span class="overflow-hidden text-sm break-keep text-ellipsis whitespace-nowrap">{name}</span>
+            {#if icon}
+                <Icon size={16} class={cn("mr-1.5 min-w-4 z-10", icon.classes)} />
+            {/if}
+            <span class="overflow-hidden text-sm break-keep text-ellipsis whitespace-nowrap z-10">{name}</span>
             {#if pinned}
                 <div
                     role="button"
                     tabindex="-1"
-                    class="ml-3 cursor-pointer"
+                    class="ml-3 cursor-pointer z-10"
                     aria-label="Close"
                     onclick={handlePin}
                     onkeydown={handlePin}
@@ -96,7 +97,7 @@
                 <div
                     role="button"
                     tabindex="-1"
-                    class="ml-3 cursor-pointer"
+                    class="ml-3 cursor-pointer z-10"
                     aria-label="Close"
                     onclick={(e) => handleClose(e, "self")}
                     onkeydown={(e) => handleClose(e, "self")}
