@@ -124,11 +124,7 @@
         </ContextMenuItem>
         <ContextMenuSeparator />
         <ContextMenuItem onclick={handlePin}>
-            {#if pinned}
-                {$t("pane.header.menu.unpin")}
-            {:else}
-                {$t("pane.header.menu.pin")}
-            {/if}
+            {$t(pinned ? "pane.header.menu.unpin" : "pane.header.menu.pin")}
         </ContextMenuItem>
     </ContextMenuContent>
 </ContextMenu>
