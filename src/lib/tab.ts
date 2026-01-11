@@ -137,15 +137,8 @@ tabs.subscribe(($tabs) => {
 
     panes.update(($panes) => {
         return Object.values(TabPosition).map((pos) => {
-            const data = $panes.find((p) => p.position === pos) || {
-                position: pos,
-                tabs: [],
-                open: false,
-                pinned: false,
-            };
-            data.tabs = candidates
-                .filter((t) => t.position === pos)
-                .map(({ type, active, pinned }) => ({ type, active, pinned }));
+            const data = $panes.find((p) => p.position === pos) || { position: pos, tabs: [], open: false };
+            data.tabs = candidates.filter((t) => t.position === pos).map(({ type, active }) => ({ type, active }));
 
             if (data.tabs.length > 0 && !data.tabs.some((t) => t.active)) {
                 // no active tab for position, make the last one active
@@ -161,7 +154,7 @@ export const updatePane = (position: TabPosition, open: boolean) => {
     panes.update(($panes) => {
         let pane = $panes.find((p) => p.position === position);
         if (!pane) {
-            pane = { position, tabs: [], open, pinned: false };
+            pane = { position, tabs: [], open };
             $panes.push(pane);
         }
 

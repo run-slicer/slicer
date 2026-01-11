@@ -13,7 +13,6 @@ export interface PaneData {
     position: TabPosition;
     tabs: TabData[];
     open: boolean;
-    pinned: boolean;
 }
 
 export interface TabData {
@@ -47,24 +46,9 @@ export const analysisTransformers = persisted<string[]>(`${root}.analysis.transf
 export const interpHexRowBytes = persisted<number>(`${root}.interp.hex.row-bytes`, 16);
 
 export const panes = persisted<PaneData[]>(`${root}.panes`, [
-    {
-        position: "primary_center" as TabPosition,
-        tabs: [{ type: "welcome" as TabType, active: true }],
-        open: true,
-        pinned: false,
-    },
-    {
-        position: "secondary_left" as TabPosition,
-        tabs: [{ type: "project" as TabType, active: true }],
-        open: true,
-        pinned: false,
-    },
-    {
-        position: "secondary_right" as TabPosition,
-        tabs: [{ type: "structure" as TabType, active: true }],
-        open: true,
-        pinned: false,
-    },
+    { position: "primary_center" as TabPosition, tabs: [{ type: "welcome" as TabType, active: true }], open: true },
+    { position: "secondary_left" as TabPosition, tabs: [{ type: "project" as TabType, active: true }], open: true },
+    { position: "secondary_right" as TabPosition, tabs: [{ type: "structure" as TabType, active: true }], open: true },
 ]);
 
 export const load = (data: string): boolean => {
