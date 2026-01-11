@@ -30,6 +30,11 @@
     let posTabs = $derived(tabs.filter((t) => t.position === position));
     let posCurrent = $derived(posTabs.find((t) => t.active));
 
+    let lastPinnedId = $derived(() => {
+        const pinned = localTabs.filter((t) => t.pinned);
+        return pinned.length > 0 ? pinned[pinned.length - 1].id : null;
+    });
+
     let localTabs = $state.raw(posTabs);
     $effect(() => {
         const localTabs0 = untrack(() => localTabs);
@@ -42,14 +47,34 @@
         localTabs = updatedTabs;
     });
 
-    const finalizeMove = (e: CustomEvent<{ items: Tab[] }>) => {
-        const items = e.detail.items;
-        localTabs = items;
+    const normalizeTabs = (tabs: Tab[]) => {
+        const pinned = tabs.filter((t) => t.pinned);
+        const unpinned = tabs.filter((t) => !t.pinned);
 
-        items.forEach((tab, index) => {
+        const ordered = [...pinned, ...unpinned];
+
+        ordered.forEach((tab, index) => {
             tab.index = index;
             move(tab, position);
         });
+
+        return ordered;
+    };
+
+    const finalizeMove = (e: CustomEvent<{ items: Tab[] }>) => {
+        const items = e.detail.items;
+
+        const pinnedCount = localTabs.filter((t) => t.pinned).length;
+
+        // Clamp pinned tabs to pinned area
+        const pinned = items.filter((t) => t.pinned);
+        const unpinned = items.filter((t) => !t.pinned);
+
+        // If someone tried to drag across the boundary, snap back
+        const fixed =
+            pinned.length !== pinnedCount ? normalizeTabs(localTabs) : normalizeTabs([...pinned, ...unpinned]);
+
+        localTabs = fixed;
     };
 
     let Icon = $derived(paneIcon(position, false));
@@ -91,6 +116,22 @@
 
         toClose.forEach(handler.close);
     };
+
+    const handlePin = (value: boolean, tab: Tab) => {
+        if (tab.pinned === value) return;
+
+        tab.pinned = value;
+
+        const tabsInPane = [...localTabs];
+
+        // Remove tab from current position
+        const withoutTab = tabsInPane.filter((t) => t.id !== tab.id);
+
+        const pinned = withoutTab.filter((t) => t.pinned);
+        const unpinned = withoutTab.filter((t) => !t.pinned);
+
+        localTabs = normalizeTabs([...pinned, tab, ...unpinned]);
+    };
 </script>
 
 {#if handleBefore}<ResizableHandle class={cn(hidden && "hidden")} />{/if}
@@ -114,8 +155,11 @@
                         active={posCurrent?.id === tab0.id}
                         icon={tab0.icon}
                         closeable={tab0.closeable}
+                        pinned={tab0.pinned}
+                        separate={lastPinnedId && tab0.id === lastPinnedId()}
                         onclick={() => updateCurrent(position, tab0)}
                         onclose={(type) => handleClose(type, tab0)}
+                        onpin={(value) => handlePin(value, tab0)}
                     />
                 {/each}
             </div>

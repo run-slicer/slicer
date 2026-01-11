@@ -38,6 +38,7 @@ export interface Tab {
     index: number | null;
     active?: boolean;
     closeable: boolean;
+    pinned: boolean;
     icon?: StyledIcon;
     entry?: Entry;
 
@@ -105,6 +106,7 @@ export const tabs = writable<Map<string, Tab>>(
                     index,
                     active: tab.active,
                     closeable: true,
+                    pinned: false,
                     icon: {
                         icon: def!.icon,
                         classes: ["text-muted-foreground"],
@@ -119,11 +121,18 @@ export const tabs = writable<Map<string, Tab>>(
 tabs.subscribe(($tabs) => {
     const candidates = Array.from($tabs.values())
         .filter((t) => typedDefs.has(t.type))
-        .map((t) => ({ type: t.type, position: t.position, active: Boolean(t.active) }));
+        .map((t) => ({ type: t.type, position: t.position, active: Boolean(t.active), pinned: Boolean(t.pinned) }));
 
-    // re-add Welcome tab, if not present
+    // re-add Welcome tab after pinned section, if not present
     if (!candidates.some((t) => t.type === TabType.WELCOME)) {
-        candidates.unshift({ type: TabType.WELCOME, position: TabPosition.PRIMARY_CENTER, active: false });
+        const pinnedCount = candidates.filter((t) => t.pinned).length;
+
+        candidates.splice(pinnedCount, 0, {
+            type: TabType.WELCOME,
+            position: TabPosition.PRIMARY_CENTER,
+            active: false,
+            pinned: false,
+        });
     }
 
     panes.update(($panes) => {
@@ -363,6 +372,7 @@ export const open = async (entry: Entry, type: TabType = detectType(entry)): Pro
                 position: TabPosition.PRIMARY_CENTER,
                 index: null,
                 closeable: true,
+                pinned: false,
                 entry: await readDeferred(entry),
                 icon: tabIcon(type, entry),
             });
@@ -387,6 +397,7 @@ export const openUnscoped = (def: TabDefinition, position: TabPosition = TabPosi
             position,
             index: null,
             closeable: true,
+            pinned: false,
             icon: { icon: def.icon, classes: ["text-muted-foreground"] },
         });
     }
