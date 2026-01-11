@@ -62,6 +62,8 @@
     "pane.header.menu.close.others": "Close others",
     "pane.header.menu.close.right": "Close to the right",
     "pane.header.menu.close.all": "Close all",
+    "pane.header.menu.pin": "Pin tab",
+    "pane.header.menu.unpin": "Unpin tab",
     "pane.welcome.title": "Welcome",
     "pane.welcome.get-started": "Get started",
     "pane.welcome.get-started.open": "Open JAR/ZIP file",
