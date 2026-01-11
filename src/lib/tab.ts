@@ -108,7 +108,7 @@ export const tabs = writable<Map<string, Tab>>(
                     index,
                     active: tab.active,
                     closeable: true,
-                    pinned: tab.pinned,
+                    pinned: tab.pinned ?? false,
                     icon: {
                         icon: def!.icon,
                         classes: ["text-muted-foreground"],
