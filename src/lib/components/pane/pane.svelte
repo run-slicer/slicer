@@ -30,7 +30,7 @@
     let posTabs = $derived(tabs.filter((t) => t.position === position));
     let posCurrent = $derived(posTabs.find((t) => t.active));
 
-    let lastPinnedId = $derived(() => {
+    let lastPinnedId = $derived.by(() => {
         const pinned = localTabs.filter((t) => t.pinned);
         return pinned.length > 0 ? pinned[pinned.length - 1].id : null;
     });
