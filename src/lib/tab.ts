@@ -204,10 +204,10 @@ export const update = (tab: Tab): Tab => {
         tab.internalId = {}; // fill in missing id
     }
 
-
     tabs.update(($tabs) => {
         if (tab.index == null) {
-            tab.index = Math.max(
+            tab.index =
+                Math.max(
                     -1,
                     ...Array.from($tabs.values())
                         .filter((t) => t.position === tab.position)

@@ -98,7 +98,7 @@
     <div class="flex h-full w-full flex-col">
         <PaneHeader>
             <div
-                class={cn("flex w-full flex-row")}
+                class={cn("flex grow flex-row")}
                 use:dndzone={{
                     items: localTabs,
                     dropTargetStyle: {},
