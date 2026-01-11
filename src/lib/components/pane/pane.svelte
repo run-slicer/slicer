@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { move, type Tab, type TabPosition, updateCurrent } from "$lib/tab";
+    import { move, type Tab, type TabPosition, update, updateCurrent } from "$lib/tab";
     import { cn } from "$lib/components/utils";
     import { ResizablePane } from "$lib/components/ui/resizable";
     import { PaneHeader, PaneHeaderItem } from "./header";
@@ -121,6 +121,7 @@
         if (tab.pinned === value) return;
 
         tab.pinned = value;
+        update(tab);
 
         const tabsInPane = [...localTabs];
 

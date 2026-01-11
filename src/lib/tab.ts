@@ -97,6 +97,8 @@ export const tabs = writable<Map<string, Tab>>(
                 }))
             )
             .filter(({ def }) => def !== undefined)
+            // Sort pinned tabs first
+            .sort((a, b) => (b.tab.pinned ? 1 : 0) - (a.tab.pinned ? 1 : 0))
             .map(({ position, tab, index, def }) => [
                 `${def!.type}:slicer`,
                 {
@@ -106,7 +108,7 @@ export const tabs = writable<Map<string, Tab>>(
                     index,
                     active: tab.active,
                     closeable: true,
-                    pinned: false,
+                    pinned: tab.pinned,
                     icon: {
                         icon: def!.icon,
                         classes: ["text-muted-foreground"],
@@ -138,7 +140,9 @@ tabs.subscribe(($tabs) => {
     panes.update(($panes) => {
         return Object.values(TabPosition).map((pos) => {
             const data = $panes.find((p) => p.position === pos) || { position: pos, tabs: [], open: false };
-            data.tabs = candidates.filter((t) => t.position === pos).map(({ type, active }) => ({ type, active }));
+            data.tabs = candidates
+                .filter((t) => t.position === pos)
+                .map(({ type, active, pinned }) => ({ type, active, pinned }));
 
             if (data.tabs.length > 0 && !data.tabs.some((t) => t.active)) {
                 // no active tab for position, make the last one active
