@@ -1,7 +1,7 @@
 import { warn } from "$lib/log";
 import { analysisBackground, workspaceArchiveDuplicateHandling } from "$lib/state";
 import { record } from "$lib/task";
-import { fetchProgress, groupBy, prettyMethodDesc } from "$lib/utils";
+import { fetchProgress, groupBy, prettyMethodDesc, refFromName } from "$lib/utils";
 import type { Member, Node } from "@katana-project/asm";
 import type { UTF8Entry } from "@katana-project/asm/pool";
 import type { Zip, Entry as ZipEntry } from "@katana-project/zip";
@@ -141,6 +141,8 @@ export const classes = derived(entries, ($entries) => {
             .map((e) => [e.data.name.substring(0, e.data.name.indexOf(".class")), e])
     );
 });
+
+export const classRefs = derived(classes, ($classes) => Array.from($classes.keys()).map(refFromName));
 
 export interface LoadResult {
     entry: Entry;
