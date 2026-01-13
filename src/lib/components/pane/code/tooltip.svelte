@@ -20,6 +20,7 @@
     import { cn } from "$lib/components/utils";
     import { t } from "$lib/i18n";
     import { index } from "$lib/workspace/jdk";
+    import { EditorView } from "@codemirror/view";
 
     interface Props extends TooltipProps {
         resolver: TypeReferenceResolver | null;
@@ -27,7 +28,7 @@
         handler: EventHandler;
     }
 
-    let { pos, side, resolver, classes, handler }: Props = $props();
+    let { view, pos, side, resolver, classes, handler }: Props = $props();
 
     let resolution = $derived(resolver?.resolveAt(pos, side));
 
@@ -58,11 +59,16 @@
     });
 
     const navigateToClass = () => {
-        if (!className) return;
-
-        const entry = classes.get(className);
-        if (entry) {
-            handler.open(entry);
+        if (resolution?.kind === "declared" && resolution.declaration) {
+            view.dispatch({
+                selection: { anchor: resolution.declaration.from },
+                effects: EditorView.scrollIntoView(resolution.declaration.from),
+            });
+        } else if (className) {
+            const entry = classes.get(className);
+            if (entry) {
+                handler.open(entry);
+            }
         }
     };
 </script>
