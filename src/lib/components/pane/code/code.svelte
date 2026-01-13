@@ -31,6 +31,8 @@
     import type { EditorView } from "@codemirror/view";
     import { ensureSyntaxTree } from "@codemirror/language";
     import { jdkRefs } from "$lib/workspace/jdk";
+    import { highlightAst } from "./highlighter";
+    import { Compartment } from "@codemirror/state";
 
     let { tab, disasms, handler }: PaneProps = $props();
     const entry = $derived(tab.entry!);
@@ -99,6 +101,17 @@
         return parseUnit(tree, view.state.doc.toString());
     });
     let resolver = $derived(unit ? createTypeReferenceResolver(unit, [...jdkRefs, ...$classRefs]) : null);
+
+    const resolverStore = new Compartment();
+
+    $effect(() => {
+        if (!view) return;
+
+        view.focus();
+        view.dispatch({
+            effects: resolverStore.reconfigure(highlightAst(resolver)),
+        });
+    });
 </script>
 
 <div class="scrollbar-thin relative basis-full overflow-hidden">
@@ -117,6 +130,7 @@
                     {lang}
                     bind:size={$textSize}
                     {wrap}
+                    extensions={[resolverStore.of(highlightAst(resolver))]}
                     tooltip={() => [Tooltip, { resolver }]}
                 />
             </ContextMenuTrigger>
