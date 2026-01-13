@@ -34,7 +34,7 @@
     import { highlightAst } from "./highlighter";
     import { Compartment } from "@codemirror/state";
 
-    let { tab, disasms, handler }: PaneProps = $props();
+    let { tab, disasms, handler, classes }: PaneProps = $props();
     const entry = $derived(tab.entry!);
 
     let wrap = $state(get(editorWrap));
@@ -131,7 +131,7 @@
                     bind:size={$textSize}
                     {wrap}
                     extensions={[resolverStore.of(highlightAst(resolver))]}
-                    tooltip={() => [Tooltip, { resolver }]}
+                    tooltip={() => [Tooltip, { resolver, classes, handler }]}
                 />
             </ContextMenuTrigger>
             <CodeMenu

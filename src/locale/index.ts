@@ -126,6 +126,9 @@ export interface LocaleData {
     "pane.code.menu.file.export": string;
     "pane.code.menu.file.export.raw": string;
     "pane.code.menu.file.export.disasm": string;
+    "pane.code.tooltip.kind.declared": string;
+    "pane.code.tooltip.kind.builtin": string;
+    "pane.code.tooltip.kind.imported": string;
     "pane.graph.loading": string;
     "pane.graph.method": string;
     "pane.graph.method.none": string;
