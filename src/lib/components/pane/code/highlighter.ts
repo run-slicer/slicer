@@ -116,6 +116,7 @@ export const highlightAst = (resolver: TypeReferenceResolver | null, handler: Ev
             inst.hoverPos = null;
             view.dispatch({});
         },
+        
     });
 
     return [plugin, handlers];
