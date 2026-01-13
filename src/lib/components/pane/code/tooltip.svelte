@@ -19,8 +19,8 @@
     import type { Entry } from "$lib/workspace";
     import { cn } from "$lib/components/utils";
     import { t } from "$lib/i18n";
+    import { resolveClassNavigator } from "$lib/utils";
     import { index } from "$lib/workspace/jdk";
-    import { EditorView } from "@codemirror/view";
 
     interface Props extends TooltipProps {
         resolver: TypeReferenceResolver | null;
@@ -32,45 +32,12 @@
 
     let resolution = $derived(resolver?.resolveAt(pos, side));
 
-    let className = $derived.by(() => {
-        if (!resolution?.qualifiedName) return null;
+    const {
+        packageName,
+        simpleName,
+        navigateToClass
+    } = $derived((resolveClassNavigator(resolution ?? null, handler, view, classes, index)));
 
-        // hack job to resolve inner classes
-        const parts = resolution.qualifiedName.split("."),
-            popped: string[] = [];
-        while (parts.length > 0) {
-            const candidate = parts.join("/") + (popped.length > 0 ? "$" + popped.toReversed().join("$") : "");
-            if (classes.has(candidate) || index.has(candidate)) {
-                return candidate;
-            }
-            popped.push(parts.pop()!);
-        }
-
-        return null;
-    });
-
-    let [packageName, simpleName] = $derived.by(() => {
-        if (!className) return [null, null];
-
-        const lastSlash = className.lastIndexOf("/");
-        return lastSlash > 0
-            ? [className.substring(0, lastSlash), className.substring(lastSlash + 1)]
-            : [null, className];
-    });
-
-    const navigateToClass = () => {
-        if (resolution?.kind === "declared" && resolution.declaration) {
-            view.dispatch({
-                selection: { anchor: resolution.declaration.from },
-                effects: EditorView.scrollIntoView(resolution.declaration.from),
-            });
-        } else if (className) {
-            const entry = classes.get(className);
-            if (entry) {
-                handler.open(entry);
-            }
-        }
-    };
 </script>
 
 {#if resolution && resolution.kind !== "unresolved"}
