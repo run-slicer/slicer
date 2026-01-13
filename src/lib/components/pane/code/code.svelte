@@ -32,7 +32,7 @@
     import { ensureSyntaxTree } from "@codemirror/language";
     import { jdkRefs } from "$lib/workspace/jdk";
 
-    let { tab, disasms, handler }: PaneProps = $props();
+    let { tab, disasms, handler, classes }: PaneProps = $props();
     const entry = $derived(tab.entry!);
 
     let wrap = $state(get(editorWrap));
@@ -117,7 +117,7 @@
                     {lang}
                     bind:size={$textSize}
                     {wrap}
-                    tooltip={() => [Tooltip, { resolver }]}
+                    tooltip={() => [Tooltip, { resolver, classes, handler }]}
                 />
             </ContextMenuTrigger>
             <CodeMenu
