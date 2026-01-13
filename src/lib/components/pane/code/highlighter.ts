@@ -20,9 +20,7 @@ export const highlightAst = (resolver: TypeReferenceResolver | null): Extension 
                 }
 
                 const resolved =
-                    resolver.resolveAt(this.hoverPos, 0) ??
-                    resolver.resolveAt(this.hoverPos, -1) ??
-                    resolver.resolveAt(this.hoverPos, 1);
+                    resolver.resolveAt(this.hoverPos)
 
                 const node = resolved?.ref?.node;
 
