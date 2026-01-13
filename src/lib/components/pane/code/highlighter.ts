@@ -25,7 +25,7 @@ export const highlightAst = (resolver: TypeReferenceResolver | null, handler: Ev
 
                 const node = resolved?.ref?.node;
 
-                if (!node || resolved.kind === "unresolved") {
+                if (!node || resolved.kind === "unresolved" || resolved.kind === "builtin") {
                     this.decorations = Decoration.none;
                     return;
                 }
@@ -64,12 +64,9 @@ export const highlightAst = (resolver: TypeReferenceResolver | null, handler: Ev
             if ((event.ctrlKey || event.metaKey) && event.button === 0 && inst.hoverPos != null) {
                 event.preventDefault(); // prevent selection/context menu
 
-                const resolved =
-                    resolver.resolveAt(inst.hoverPos, 0) ??
-                    resolver.resolveAt(inst.hoverPos, -1) ??
-                    resolver.resolveAt(inst.hoverPos, 1);
+                const resolved = resolver.resolveAt(inst.hoverPos);
 
-                if (resolved) {
+                if (resolved && !(resolved.kind === "unresolved" || resolved.kind === "builtin")) {
                     navigateToClass(view, resolved);
                 }
 
