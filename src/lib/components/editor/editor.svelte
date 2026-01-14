@@ -97,6 +97,12 @@
             // handled by external component
             "background-color": "transparent",
         },
+        ".cm-resolved-type": {
+            "text-decoration": "underline",
+            "text-decoration-thickness": "1px",
+            "text-underline-offset": "2px",
+            cursor: "pointer",
+        },
     });
 </script>
 
@@ -121,6 +127,7 @@
         wrap?: boolean;
         view?: EditorView | null;
         onchange?: (view: EditorView) => void;
+        extensions?: Extension[];
 
         // TODO: improve typing
         tooltip?: () => [Component<any>, Record<string, any>];
@@ -135,6 +142,7 @@
         view = $bindable(null),
         onchange,
         tooltip,
+        extensions: decoupledExtensions = [],
     }: Props = $props();
 
     $effect(() => view?.dispatch({ effects: readOnlyStore.reconfigure(EditorState.readOnly.of(readonly)) }));
@@ -164,6 +172,7 @@
                 doc: value,
                 extensions: [
                     extensions,
+                    ...decoupledExtensions,
                     readOnlyStore.of(EditorState.readOnly.of(readonly)),
                     themeStore.of(mode.current === "dark" ? dark : light),
                     langStore.of(lang || []),
