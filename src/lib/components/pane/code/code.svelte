@@ -31,7 +31,7 @@
     import { EditorView } from "@codemirror/view";
     import { ensureSyntaxTree } from "@codemirror/language";
     import { index, jdkRefs } from "$lib/workspace/jdk";
-    import { typeResolver } from "./resolverExtension";
+    import { typeResolver } from "./resolver_extension";
     import { Compartment } from "@codemirror/state";
 
     let { tab, disasms, handler, classes }: PaneProps = $props();

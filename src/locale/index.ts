@@ -369,4 +369,7 @@ export interface LocaleData {
     "transformer.read.lvt": string;
     "transformer.read.signature": string;
     "transformer.read.debug": string;
+    "modal.usages.title": string;
+    "modal.usages.subtitle": string;
+    "modal.usages.info": string;
 }

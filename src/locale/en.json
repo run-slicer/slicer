@@ -366,5 +366,8 @@
     "transformer.read.monitor": "Strip synchronized blocks",
     "transformer.read.lvt": "Strip local variables",
     "transformer.read.signature": "Strip generic signatures",
-    "transformer.read.debug": "Strip debug information"
+    "transformer.read.debug": "Strip debug information",
+    "modal.usages.title": "Reference usages",
+    "modal.usages.subtitle": "of {0}",
+    "modal.usages.info": "{0} usage(s) found."
 }
