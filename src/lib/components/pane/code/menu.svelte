@@ -23,7 +23,7 @@
 
     interface Props {
         view: EditorView | null;
-        classes: Map<string, Entry>
+        classes: Map<string, Entry>;
         tab: Tab;
         interpType: Interpretation;
         lang: Language;
@@ -46,12 +46,18 @@
     }: Props = $props();
     let entry = $derived(tab.entry!);
 
-    const resolved = $derived(interpType === Interpretation.CLASS ? $resolvedReference : null);
+    const resolved = $derived.by(() =>
+        interpType === Interpretation.CLASS &&
+        $resolvedReference &&
+        $resolvedReference.kind !== "builtin" &&
+        $resolvedReference.kind !== "unresolved"
+            ? $resolvedReference
+            : null
+    );
 
-    const navigator = $derived.by(() => view ? resolveClassNavigator(resolved, handler, view, classes, index) : null);
+    const navigator = $derived.by(() => (view ? resolveClassNavigator(resolved, handler, view, classes, index) : null));
 
-    const navigateToClass = () =>
-        navigator?.navigateToClass();
+    const navigateToClass = () => navigator?.navigateToClass();
 </script>
 
 <ContextMenuContent class="min-w-48">
