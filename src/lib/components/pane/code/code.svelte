@@ -28,10 +28,10 @@
     import type { Cancellable } from "$lib/utils";
     import Tooltip from "./tooltip.svelte";
     import { createTypeReferenceResolver, parseUnit } from "@katana-project/laser";
-    import type { EditorView } from "@codemirror/view";
+    import { EditorView } from "@codemirror/view";
     import { ensureSyntaxTree } from "@codemirror/language";
     import { index, jdkRefs } from "$lib/workspace/jdk";
-    import { highlightAst } from "./highlighter";
+    import { typeResolver } from "./resolverExtension";
     import { Compartment } from "@codemirror/state";
 
     let { tab, disasms, handler, classes }: PaneProps = $props();
@@ -109,7 +109,7 @@
 
         view.focus();
         view.dispatch({
-            effects: resolverStore.reconfigure(highlightAst(resolver, handler, classes, index)),
+            effects: resolverStore.reconfigure(typeResolver(resolver, handler, classes, index)),
         });
     });
 </script>
@@ -130,11 +130,13 @@
                     {lang}
                     bind:size={$textSize}
                     {wrap}
-                    extensions={[resolverStore.of(highlightAst(resolver, handler, classes, index))]}
+                    extensions={[resolverStore.of(typeResolver(resolver, handler, classes, index))]}
                     tooltip={() => [Tooltip, { resolver, classes, handler }]}
                 />
             </ContextMenuTrigger>
             <CodeMenu
+                bind:view
+                {classes}
                 {tab}
                 {interpType}
                 {value}

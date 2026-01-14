@@ -5,7 +5,7 @@ import { RangeSetBuilder, type Extension } from "@codemirror/state";
 import { Decoration, EditorView, ViewPlugin } from "@codemirror/view";
 import type { ResolvedType, TypeReferenceResolver } from "@katana-project/laser";
 
-export const highlightAst = (
+export const typeResolver = (
     resolver: TypeReferenceResolver | null,
     handler: EventHandler,
     classes: Map<string, Entry>,
