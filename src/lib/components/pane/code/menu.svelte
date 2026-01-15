@@ -21,7 +21,7 @@
     import { resolveClassNavigator, type Cancellable } from "$lib/utils";
     import { index } from "$lib/workspace/jdk";
     import { QueryType, search, SearchMode, type SearchResult } from "$lib/workspace/analysis";
-    import { FloatingModal } from "$lib/components/ui/floating-modal";
+    import FloatingModal from "$lib/components/floating-modal.svelte";
     import UsagesContent from "./usages_modal.svelte";
 
     interface Props {
@@ -167,5 +167,5 @@
     initialPosition={position}
     bind:modalElement
 >
-    <UsagesContent bind:open={usagesOpen} data={usages} handler={handler} />
+    <UsagesContent bind:open={usagesOpen} data={usages} handler={handler} {classes} />
 </FloatingModal>

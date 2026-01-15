@@ -4,17 +4,16 @@
     import type { SearchResult } from "$lib/workspace/analysis";
     import { t } from "$lib/i18n";
     import type { EventHandler } from "$lib/event";
-    import { classes } from "$lib/workspace";
-    import { get } from "svelte/store";
+    import { type Entry } from "$lib/workspace";
 
     interface Props {
         open: boolean;
         data: SearchResult[];
         handler: EventHandler;
+        classes: Map<string, Entry>
     }
 
-    let { open = $bindable(), data, handler }: Props = $props();
-    const workspaceClasses = get(classes);
+    let { open = $bindable(), data, handler, classes }: Props = $props();
 
     type GroupedUsages = {
         className: string;
@@ -78,7 +77,7 @@
 
                         open = false;
 
-                        const classEntry = workspaceClasses.values().find((e) => e.name === usage.entry.name);
+                        const classEntry = classes.values().find((e) => e.name === usage.entry.name);
 
                         if (classEntry) handler.open(classEntry);
                     }}
