@@ -1,10 +1,10 @@
 /* array ops */
 
+import type { Entry } from "$lib/workspace";
 import { EditorView } from "@codemirror/view";
 import { Modifier } from "@katana-project/asm/spec";
 import type { ExternalTypeReference, ResolvedType } from "@katana-project/laser";
 import { derived, type Readable, writable, type Writable } from "svelte/store";
-import type { Entry } from "$lib/workspace";
 import type { EventHandler } from "./event";
 
 export const partition = <T>(arr: T[], func: (e: T) => boolean): [T[], T[]] => {
@@ -645,71 +645,68 @@ export const timestampFile = (date: Date = new Date()): string => {
     return `${year}_${month}_${day}-${hours}_${minutes}_${seconds}`;
 };
 
-
 /* editor */
 type ClassNavigator = {
-  className: string | null;
-  packageName: string | null;
-  simpleName: string | null;
-  navigateToClass(): void;
+    className: string | null;
+    packageName: string | null;
+    simpleName: string | null;
+    navigateToClass(): void;
 };
 
 export function resolveClassNavigator(
-  resolution: ResolvedType | null,
-  handler: EventHandler,
-  view: EditorView,
-  classes: Map<string, Entry>,
-  index: Map<string, string>
+    resolution: ResolvedType | null,
+    handler: EventHandler,
+    view: EditorView,
+    classes: Map<string, Entry>,
+    index: Map<string, string>
 ): ClassNavigator {
-  let className: string | null = null;
+    let className: string | null = null;
 
-  if (resolution?.qualifiedName) {
-    const parts = resolution.qualifiedName.split(".");
-    const popped: string[] = [];
+    if (resolution?.qualifiedName) {
+        const parts = resolution.qualifiedName.split(".");
+        const popped: string[] = [];
 
-    while (parts.length > 0) {
-      const candidate =
-        parts.join("/") +
-        (popped.length > 0 ? "$" + popped.toReversed().join("$") : "");
+        while (parts.length > 0) {
+            const candidate = parts.join("/") + (popped.length > 0 ? "$" + popped.toReversed().join("$") : "");
 
-      if (classes.has(candidate) || index.has(candidate)) {
-        className = candidate;
-        break;
-      }
+            if (classes.has(candidate) || index.has(candidate)) {
+                className = candidate;
+                break;
+            }
 
-      popped.push(parts.pop()!);
+            popped.push(parts.pop()!);
+        }
     }
-  }
 
-  let packageName: string | null = null;
-  let simpleName: string | null = null;
+    let packageName: string | null = null;
+    let simpleName: string | null = null;
 
-  if (className) {
-    const lastSlash = className.lastIndexOf("/");
-    if (lastSlash > 0) {
-      packageName = className.substring(0, lastSlash);
-      simpleName = className.substring(lastSlash + 1);
-    } else {
-      simpleName = className;
+    if (className) {
+        const lastSlash = className.lastIndexOf("/");
+        if (lastSlash > 0) {
+            packageName = className.substring(0, lastSlash);
+            simpleName = className.substring(lastSlash + 1);
+        } else {
+            simpleName = className;
+        }
     }
-  }
 
-  const navigateToClass = () => {
-    if (resolution?.kind === "declared" && resolution.declaration) {
-      view.dispatch({
-        selection: { anchor: resolution.declaration.from },
-        effects: EditorView.scrollIntoView(resolution.declaration.from),
-      });
-    } else if (className) {
-      const entry = classes.get(className);
-      if (entry) handler.open(entry);
-    }
-  };
+    const navigateToClass = () => {
+        if (resolution?.kind === "declared" && resolution.declaration) {
+            view.dispatch({
+                selection: { anchor: resolution.declaration.from },
+                effects: EditorView.scrollIntoView(resolution.declaration.from),
+            });
+        } else if (className) {
+            const entry = classes.get(className);
+            if (entry) handler.open(entry);
+        }
+    };
 
-  return {
-    className,
-    packageName,
-    simpleName,
-    navigateToClass,
-  };
+    return {
+        className,
+        packageName,
+        simpleName,
+        navigateToClass,
+    };
 }

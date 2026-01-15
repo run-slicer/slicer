@@ -5,7 +5,12 @@ import { RangeSetBuilder, type Extension } from "@codemirror/state";
 import { Decoration, EditorView, ViewPlugin } from "@codemirror/view";
 import type { ResolvedType, TypeReferenceResolver } from "@katana-project/laser";
 
-export const highlightAst = (resolver: TypeReferenceResolver | null, handler: EventHandler, classes: Map<string, Entry>, index: Map<string, string>): Extension => {
+export const highlightAst = (
+    resolver: TypeReferenceResolver | null,
+    handler: EventHandler,
+    classes: Map<string, Entry>,
+    index: Map<string, string>
+): Extension => {
     const plugin = ViewPlugin.fromClass(
         class {
             decorations = Decoration.none;
@@ -21,11 +26,11 @@ export const highlightAst = (resolver: TypeReferenceResolver | null, handler: Ev
                     return;
                 }
 
-                const resolved = resolver.resolveAt(this.hoverPos)
+                const resolved = resolver.resolveAt(this.hoverPos);
 
                 const node = resolved?.ref?.node;
 
-                if (!node || resolved.kind === "unresolved" || resolved.kind === "builtin") {
+                if (!node || resolved.kind === "builtin") {
                     this.decorations = Decoration.none;
                     return;
                 }
@@ -40,9 +45,8 @@ export const highlightAst = (resolver: TypeReferenceResolver | null, handler: Ev
         }
     );
 
-    
-    const navigateToClass = (view: EditorView, resolution: ResolvedType) => 
-        resolveClassNavigator(resolution, handler, view, classes, index).navigateToClass()
+    const navigateToClass = (view: EditorView, resolution: ResolvedType) =>
+        resolveClassNavigator(resolution, handler, view, classes, index).navigateToClass();
 
     const handlers = EditorView.domEventHandlers({
         mousemove(event, view) {
@@ -65,8 +69,7 @@ export const highlightAst = (resolver: TypeReferenceResolver | null, handler: Ev
                 event.preventDefault(); // prevent selection/context menu
 
                 const resolved = resolver.resolveAt(inst.hoverPos);
-
-                if (resolved && !(resolved.kind === "unresolved" || resolved.kind === "builtin")) {
+                if (resolved && resolved.kind !== "builtin") {
                     navigateToClass(view, resolved);
                 }
 
@@ -113,7 +116,6 @@ export const highlightAst = (resolver: TypeReferenceResolver | null, handler: Ev
             inst.hoverPos = null;
             view.dispatch({});
         },
-        
     });
 
     return [plugin, handlers];

@@ -17,12 +17,9 @@
 
     let resolution = $derived(resolver?.resolveAt(pos, side));
 
-    const {
-        packageName,
-        simpleName,
-        navigateToClass
-    } = $derived((resolveClassNavigator(resolution ?? null, handler, view, classes, index)));
-
+    const { packageName, simpleName, navigateToClass } = $derived(
+        resolveClassNavigator(resolution ?? null, handler, view, classes, index)
+    );
 </script>
 
 {#if resolution}
