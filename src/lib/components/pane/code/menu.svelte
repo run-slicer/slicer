@@ -17,12 +17,12 @@
     import type { EventHandler } from "$lib/event";
     import { t } from "$lib/i18n";
     import type { EditorView } from "@codemirror/view";
-    import { resolvedReference } from "./resolver_extension";
     import { resolveClassNavigator, type Cancellable } from "$lib/utils";
     import { index } from "$lib/workspace/jdk";
     import { QueryType, search, SearchMode, type SearchResult } from "$lib/workspace/analysis";
     import FloatingModal from "$lib/components/floating-modal.svelte";
     import UsagesContent from "./usages_modal.svelte";
+    import type { TypeReferenceResolver } from "@katana-project/laser";
 
     interface Props {
         view: EditorView | null;
@@ -34,6 +34,7 @@
         wrap: boolean;
         sizeSync: boolean;
         handler: EventHandler;
+        resolver: TypeReferenceResolver | null;
     }
 
     let {
@@ -46,17 +47,21 @@
         handler,
         wrap = $bindable(),
         sizeSync = $bindable(),
+        resolver = $bindable(),
     }: Props = $props();
     let entry = $derived(tab.entry!);
 
-    const resolved = $derived.by(() =>
-        interpType === Interpretation.CLASS &&
-        $resolvedReference &&
-        $resolvedReference.kind !== "builtin" &&
-        $resolvedReference.kind !== "unresolved"
-            ? $resolvedReference
-            : null
-    );
+    let resolved = $derived.by(() => {
+        const pos = view?.state.selection.main.head;
+
+        if (!pos || !resolver || interpType !== Interpretation.CLASS) {
+            return null;
+        }
+
+        const resolved = resolver.resolveAt(pos);
+
+        return resolved && resolved.kind !== "builtin" && resolved.kind !== "unresolved" ? resolved : null;
+    });
 
     const navigator = $derived.by(() => (view ? resolveClassNavigator(resolved, handler, view, classes, index) : null));
 
@@ -167,5 +172,5 @@
     initialPosition={position}
     bind:modalElement
 >
-    <UsagesContent bind:open={usagesOpen} data={usages} handler={handler} {classes} />
+    <UsagesContent bind:open={usagesOpen} data={usages} {handler} {classes} />
 </FloatingModal>

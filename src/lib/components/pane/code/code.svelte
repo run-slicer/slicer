@@ -144,6 +144,7 @@
                 {handler}
                 bind:wrap
                 bind:sizeSync={$editorTextSizeSync}
+                bind:resolver
             />
         </ContextMenu>
     {/await}
