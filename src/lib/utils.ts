@@ -651,6 +651,7 @@ type ClassNavigator = {
     packageName: string | null;
     simpleName: string | null;
     navigateToClass(): void;
+    isWorkspaceEntry: boolean;
 };
 
 export function resolveClassNavigator(
@@ -703,10 +704,16 @@ export function resolveClassNavigator(
         }
     };
 
+    const isWorkspaceEntry =
+        resolution?.kind !== "unresolved" &&
+        resolution?.kind !== "builtin" &&
+        ((resolution?.kind === "declared" && !!resolution.declaration) || (!!className && classes.has(className)));
+
     return {
         className,
         packageName,
         simpleName,
         navigateToClass,
+        isWorkspaceEntry,
     };
 }

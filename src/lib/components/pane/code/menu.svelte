@@ -35,6 +35,7 @@
         sizeSync: boolean;
         handler: EventHandler;
         resolver: TypeReferenceResolver | null;
+        mousePosition: { x: number; y: number };
     }
 
     let {
@@ -48,24 +49,23 @@
         wrap = $bindable(),
         sizeSync = $bindable(),
         resolver = $bindable(),
+        mousePosition = $bindable(),
     }: Props = $props();
     let entry = $derived(tab.entry!);
 
-    let resolved = $derived.by(() => {
-        const pos = view?.state.selection.main.head;
+    const resolved = $derived.by(() => {
+        const coords = view?.posAndSideAtCoords(mousePosition);
 
-        if (!pos || !resolver || interpType !== Interpretation.CLASS) {
+        if (!coords || !coords.pos || !resolver || interpType !== Interpretation.CLASS) {
             return null;
         }
 
-        const resolved = resolver.resolveAt(pos);
+        const resolved = resolver.resolveAt(coords.pos, coords.assoc);
 
         return resolved && resolved.kind !== "builtin" && resolved.kind !== "unresolved" ? resolved : null;
     });
 
     const navigator = $derived.by(() => (view ? resolveClassNavigator(resolved, handler, view, classes, index) : null));
-
-    const navigateToClass = () => navigator?.navigateToClass();
 
     let usagesOpen = $state(false);
     let usages = $state([] as SearchResult[]);
@@ -82,7 +82,7 @@
     });
 
     const findUsages = async () => {
-        if (!view || !resolved || !navigator?.className) return;
+        if (!view || !navigator || !navigator.className) return;
 
         const className = navigator.className;
         const target = [...classes.values()];
@@ -122,7 +122,12 @@
     {#if view && resolved}
         <ContextMenuLabel inset>{$t("pane.code.menu.reference")}</ContextMenuLabel>
         <ContextMenuSeparator />
-        <ContextMenuItem inset class="flex justify-between gap-5" onclick={navigateToClass}>
+        <ContextMenuItem
+            inset
+            class="flex justify-between gap-5"
+            disabled={!navigator?.isWorkspaceEntry}
+            onclick={() => navigator?.navigateToClass()}
+        >
             {$t("pane.code.menu.reference.declaration")}
             <CornerDownRight size={16} class="text-foreground" />
         </ContextMenuItem>

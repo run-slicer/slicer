@@ -112,6 +112,8 @@
             effects: resolverStore.reconfigure(typeResolver(resolver, handler, classes, index)),
         });
     });
+
+    let clickPosition = $state({ x: 0, y: 0 });
 </script>
 
 <div class="scrollbar-thin relative basis-full overflow-hidden">
@@ -122,7 +124,7 @@
         />
     {:then [lang, value]}
         <ContextMenu>
-            <ContextMenuTrigger>
+            <ContextMenuTrigger onmousedown={(e) => (clickPosition = { x: e.clientX, y: e.clientY })}>
                 <CodeEditor
                     bind:view
                     {value}
@@ -145,6 +147,7 @@
                 bind:wrap
                 bind:sizeSync={$editorTextSizeSync}
                 bind:resolver
+                bind:mousePosition={clickPosition}
             />
         </ContextMenu>
     {/await}

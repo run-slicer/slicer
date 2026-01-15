@@ -63,7 +63,7 @@
     let selected: SearchResult | null = $state(null);
 </script>
 
-<div class="divide-border divide-y flex h-87.5 flex-col">
+<div class="divide-border flex h-87.5 flex-col divide-y">
     <!-- Toolbar -->
     <div class="bg-muted/30 flex items-center gap-1 px-2 py-1.5">
         <span class="text-muted-foreground mr-2 text-xs">
