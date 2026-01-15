@@ -62,7 +62,7 @@
 
         const resolved = resolver.resolveAt(coords.pos, coords.assoc);
 
-        return resolved && resolved.kind !== "builtin" && resolved.kind !== "unresolved" ? resolved : null;
+        return resolved && resolved.kind !== "builtin" ? resolved : null;
     });
 
     const navigator = $derived.by(() => (view ? resolveClassNavigator(resolved, handler, view, classes, index) : null));
