@@ -106,8 +106,8 @@
             // get the actual size of the modal
             const rect = modalElement.getBoundingClientRect();
             position = {
-                x: window.innerWidth / 2 - rect.width / 2 - 50,
-                y: window.innerHeight / 2 - rect.height / 2 - 120,
+                x: window.innerWidth / 2 - rect.width / 2,
+                y: window.innerHeight / 2 - rect.height / 2,
             };
         }
     });
