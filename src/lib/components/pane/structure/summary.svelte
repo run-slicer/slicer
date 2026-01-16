@@ -69,7 +69,7 @@
 
 <div class="flex h-full w-full flex-col text-sm">
     <div class="border-border/50 border-b px-3 py-2.5">
-        <div class="flex w-full justify-between">
+        <div class="flex w-full items-center justify-between">
             <div class="flex items-center gap-2">
                 <LayoutDashboard class="text-foreground h-4 w-4" />
                 <span class="text-foreground font-medium">{$t("pane.summary.title")}</span>
@@ -106,69 +106,71 @@
             </span>
         </div>
 
-        <div class="pb-2 h-full">
-            <VList data={virtualListData} class="h-full">
-                {#snippet children(item)}
-                    {#if item.type === "header"}
-                        {@const type = item.entryPointType!}
-                        {@const Icon = entryPointIcon(type)}
-                        <button
-                            type="button"
-                            onclick={() => (collapsed[type] = !collapsed[type])}
-                            class="hover:bg-accent/40 group flex w-full items-center gap-2 px-3 py-1 transition-colors"
-                        >
-                            <ChevronRight
-                                class={cn(
-                                    "text-muted-foreground h-3.5 w-3.5 transition-transform",
-                                    !collapsed[type] && "rotate-90"
-                                )}
-                            />
-                            <div class="flex h-5 w-5 items-center justify-center rounded">
-                                <Icon class="text-muted-foreground h-3 w-3" />
-                            </div>
-                            <span class="text-muted-foreground text-xs font-medium">
-                                {$t(`pane.summary.entry-points.${type}`)}
-                            </span>
-                            <span class="bg-muted/50 text-muted-foreground ml-auto rounded px-1.5 py-0.5 text-[10px]">
-                                {groupedEntryPoints[type].length}
-                            </span>
-                        </button>
-                    {:else if item.type === "entry"}
-                        {@const entry = item.entry!}
-                        {@const { icon: Icon, classes } = entryIcon(entry)}
-                        <div
-                            class={cn(
-                                "pl-4.5 transition-colors",
-                                selectedEntry?.name === entry.name ? "bg-accent/60" : "hover:bg-accent/50"
-                            )}
-                        >
-                            <button
-                                type="button"
-                                onclick={() => (selectedEntry = entry)}
-                                ondblclick={() => handleNavigate(entry)}
-                                class={cn(
-                                    "group flex w-full items-center gap-2 border-l py-1 pr-3 pl-4.5 text-left",
-                                    selectedEntry?.name === entry.name ? "border-l-primary" : "border-l"
-                                )}
-                            >
-                                <Icon size={16} class={cn("min-w-4", classes)} />
-                                <span class="text-foreground/90 flex-1 truncate font-mono text-xs">
-                                    {entry.node.thisClass.nameEntry?.string ?? entry.name}
-                                </span>
-                                <ChevronRight
-                                    class="text-muted-foreground/50 h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100"
-                                />
-                            </button>
-                        </div>
-                    {/if}
-                {/snippet}
-            </VList>
-
+        <div class="h-full pb-2">
             {#if activeTypes.length === 0}
                 <div class="text-muted-foreground flex flex-col items-center justify-center py-6 text-center">
                     <Server class="mb-2 h-5 w-5 opacity-50" />
                     <span class="text-xs">{$t("pane.summary.entry-points.none")}</span>
                 </div>
+            {:else}
+                <VList data={virtualListData} class="h-full">
+                    {#snippet children(item)}
+                        {#if item.type === "header"}
+                            {@const type = item.entryPointType!}
+                            {@const Icon = entryPointIcon(type)}
+                            <button
+                                type="button"
+                                onclick={() => (collapsed[type] = !collapsed[type])}
+                                class="hover:bg-accent/40 group flex w-full items-center gap-2 px-3 py-1 transition-colors"
+                            >
+                                <ChevronRight
+                                    class={cn(
+                                        "text-muted-foreground h-3.5 w-3.5 transition-transform",
+                                        !collapsed[type] && "rotate-90"
+                                    )}
+                                />
+                                <div class="flex h-5 w-5 items-center justify-center rounded">
+                                    <Icon class="text-muted-foreground h-3 w-3" />
+                                </div>
+                                <span class="text-muted-foreground text-xs font-medium">
+                                    {$t(`pane.summary.entry-points.${type}`)}
+                                </span>
+                                <span
+                                    class="bg-muted/50 text-muted-foreground ml-auto rounded px-1.5 py-0.5 text-[10px]"
+                                >
+                                    {groupedEntryPoints[type].length}
+                                </span>
+                            </button>
+                        {:else if item.type === "entry"}
+                            {@const entry = item.entry!}
+                            {@const { icon: Icon, classes } = entryIcon(entry)}
+                            <div
+                                class={cn(
+                                    "pl-4.5 transition-colors",
+                                    selectedEntry?.name === entry.name ? "bg-accent/60" : "hover:bg-accent/50"
+                                )}
+                            >
+                                <button
+                                    type="button"
+                                    onclick={() => (selectedEntry = entry)}
+                                    ondblclick={() => handleNavigate(entry)}
+                                    class={cn(
+                                        "group flex w-full items-center gap-2 border-l py-1 pr-3 pl-4.5 text-left",
+                                        selectedEntry?.name === entry.name ? "border-l-primary" : "border-l"
+                                    )}
+                                >
+                                    <Icon size={16} class={cn("min-w-4", classes)} />
+                                    <span class="text-foreground/90 flex-1 truncate font-mono text-xs">
+                                        {entry.node.thisClass.nameEntry?.string ?? entry.name}
+                                    </span>
+                                    <ChevronRight
+                                        class="text-muted-foreground/50 h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100"
+                                    />
+                                </button>
+                            </div>
+                        {/if}
+                    {/snippet}
+                </VList>
             {/if}
         </div>
     </div>
