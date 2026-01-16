@@ -297,7 +297,7 @@ export default {
         clearTabs();
     },
     close(tab: Tab | undefined = get(currentTab) ?? undefined): void {
-        if (tab) {
+        if (tab && !tab.pinned) {
             removeTab(tab);
         }
     },
