@@ -109,7 +109,13 @@
     <ContextMenuContent class="min-w-48">
         <ContextMenuLabel>{name}</ContextMenuLabel>
         <ContextMenuSeparator />
-        <ContextMenuItem onclick={(e) => handleClose(e, "self")} class="justify-between">
+        <ContextMenuItem onclick={(e) => {
+            if (pinned) {
+                handlePin(e)
+            }
+            
+            handleClose(e, "self")
+        }} class="justify-between">
             {$t("pane.header.menu.close.self")}
             {#if active}<Shortcut key="w" modifier={Modifier.CTRL | Modifier.ALT} />{/if}
         </ContextMenuItem>
