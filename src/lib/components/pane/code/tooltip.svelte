@@ -18,10 +18,12 @@
     let { view, pos, side, resolver, classes, handler }: Props = $props();
 
     let resolution = $derived(resolver?.resolveAt(pos, side));
-    let { packageName, simpleName, open } = $derived(resolveType(resolution ?? null, handler, view, classes, index));
+    let { className, packageName, simpleName, open } = $derived(
+        resolveType(resolution ?? null, handler, view, classes, index)
+    );
 </script>
 
-{#if resolution && resolution.kind !== "builtin"}
+{#if className && resolution?.kind !== "builtin"}
     <div
         class="text-card-foreground bg-card animate-in fade-in-0 zoom-in-95 border-border z-50 flex max-w-md cursor-pointer flex-col rounded-sm border shadow-lg"
         onclick={open}
