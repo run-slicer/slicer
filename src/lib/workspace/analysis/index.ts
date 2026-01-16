@@ -3,8 +3,10 @@ import { analysisBackground } from "$lib/state";
 import { recordProgress } from "$lib/task";
 import { cancellable, type Cancellable, rateLimit } from "$lib/utils";
 import { createDefaultWorkerPool } from "$lib/worker";
-import { type ClassEntry, entries, type Entry, EntryType, type MemberEntry } from "$lib/workspace";
-import { FLAG_SKIP_ATTR_PARSE, FLAG_SLICE_BUFFER } from "@katana-project/asm";
+import { type ClassEntry, entries, type Entry, EntryPointType, EntryType, type MemberEntry } from "$lib/workspace";
+import { FLAG_SKIP_ATTR_PARSE, FLAG_SLICE_BUFFER, type Node } from "@katana-project/asm";
+import { type Annotation, type AnnotationsAttribute, readAnnotations } from "@katana-project/asm/attr/annotation";
+import { AttributeType, Modifier } from "@katana-project/asm/spec";
 import { get } from "svelte/store";
 import { QueryType, SearchMode, type SearchQuery, type SearchResult } from "./search";
 import type { AnalysisWorker } from "./worker";
@@ -37,10 +39,99 @@ const analyzeClass = async (entry: Entry, skipAttr: boolean) => {
                 ) || member;
         } else {
             classEntry.type = EntryType.CLASS;
+
+            classEntry.entryPoints = analyzeEntryPoints(classEntry.node);
         }
     } catch (e) {
         error(`failed to read class ${entry.name}`, e);
     }
+};
+
+const analyzeEntryPoints = (node: Node): EntryPointType[] => {
+    const entryPoints: EntryPointType[] = [];
+
+    const mainMethod = node.methods.find(
+        (m) =>
+            m.name.string === "main" && m.type.string === "([Ljava/lang/String;)V" && (m.access & Modifier.STATIC) !== 0
+    );
+
+    if (mainMethod) {
+        entryPoints.push(EntryPointType.MAIN);
+    }
+
+    let annotations: Annotation[] = [];
+
+    try {
+        const attr = node.attrs.find(
+            (a) =>
+                a.name?.string === AttributeType.RUNTIME_VISIBLE_ANNOTATIONS ||
+                a.name?.string === AttributeType.RUNTIME_INVISIBLE_ANNOTATIONS
+        ) as AnnotationsAttribute | undefined;
+
+        if (attr) {
+            annotations = attr.annotations ?? readAnnotations(attr, node.pool).annotations;
+        }
+    } catch {
+        // annotations already defaults to []
+    }
+
+    const premainMethod = node.methods.find(
+        (m) =>
+            m.name.string === "premain" &&
+            (m.type.string === "(Ljava/lang/String;Ljava/lang/instrument/Instrumentation;)V" ||
+                m.type.string === "(Ljava/lang/String;)V") &&
+            (m.access & Modifier.STATIC) !== 0
+    );
+
+    if (premainMethod) {
+        entryPoints.push(EntryPointType.JAVA_AGENT);
+    }
+
+    if (node.superClass?.nameEntry?.string === "org/bukkit/plugin/java/JavaPlugin") {
+        entryPoints.push(EntryPointType.BUKKIT_PLUGIN);
+    }
+
+    if (node.superClass?.nameEntry?.string === "net/md_5/bungee/api/plugin/Plugin") {
+        entryPoints.push(EntryPointType.BUNGEE_PLUGIN);
+    }
+
+    const velocityPlugin = annotations.some(
+        (a) => a.typeEntry && a.typeEntry.string === "Lcom/velocitypowered/api/plugin/Plugin;"
+    );
+
+    if (velocityPlugin) {
+        entryPoints.push(EntryPointType.VELOCITY_PLUGIN);
+    }
+
+    const forgeMod = annotations.some(
+        (a) => a.typeEntry && a.typeEntry.string === "Lnet/minecraftforge/fml/common/Mod;"
+    );
+
+    if (forgeMod) {
+        entryPoints.push(EntryPointType.FORGE_MOD);
+    }
+
+    const fabricInitializers = new Set([
+        "net/fabricmc/api/ModInitializer",
+        "net/fabricmc/api/ClientModInitializer",
+        "net/fabricmc/api/DedicatedServerModInitializer",
+    ]);
+
+    const fabricMod = node.interfaces?.some((i) => i.nameEntry && fabricInitializers.has(i.nameEntry.string));
+
+    if (fabricMod) {
+        entryPoints.push(EntryPointType.FABRIC_MOD);
+    }
+
+    const spongeMixin = annotations.some(
+        (a) => a.typeEntry && a.typeEntry.string === "Lorg/spongepowered/asm/mixin/Mixin;"
+    );
+
+    if (spongeMixin) {
+        entryPoints.push(EntryPointType.SPONGE_MIXIN);
+    }
+
+    return entryPoints;
 };
 
 export const analyze = async (entry: Entry, state: AnalysisState = AnalysisState.PARTIAL) => {
