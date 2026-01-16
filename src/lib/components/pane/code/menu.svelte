@@ -105,20 +105,6 @@
             });
         }
     };
-
-    let modalElement: HTMLDivElement | undefined = $state();
-    let position = $state({ x: 0, y: 0 });
-
-    $effect(() => {
-        if (usagesOpen && usages && modalElement) {
-            // get the actual size of the modal
-            const rect = modalElement.getBoundingClientRect();
-            position = {
-                x: window.innerWidth / 2 - rect.width / 2,
-                y: window.innerHeight / 2 - rect.height / 2,
-            };
-        }
-    });
 </script>
 
 <ContextMenuContent class="min-w-48">
@@ -175,8 +161,7 @@
     bind:open={usagesOpen}
     title={$t("modal.usages.title")}
     subtitle={$t("modal.usages.subtitle", prettyInternalName(referenceName || ""))}
-    initialPosition={position}
-    bind:modalElement
+    initialPosition={mousePosition}
 >
     <UsagesContent bind:open={usagesOpen} data={usages} {handler} />
 </FloatingModal>
