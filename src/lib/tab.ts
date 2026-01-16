@@ -38,7 +38,7 @@ export interface Tab {
     index: number | null;
     active?: boolean;
     closeable: boolean;
-    pinned: boolean;
+    pinned?: boolean;
     icon?: StyledIcon;
     entry?: Entry;
 
@@ -108,7 +108,7 @@ export const tabs = writable<Map<string, Tab>>(
                     index,
                     active: tab.active,
                     closeable: true,
-                    pinned: tab.pinned ?? false,
+                    pinned: tab.pinned,
                     icon: {
                         icon: def!.icon,
                         classes: ["text-muted-foreground"],
@@ -376,7 +376,6 @@ export const open = async (entry: Entry, type: TabType = detectType(entry)): Pro
                 position: TabPosition.PRIMARY_CENTER,
                 index: null,
                 closeable: true,
-                pinned: false,
                 entry: await readDeferred(entry),
                 icon: tabIcon(type, entry),
             });
@@ -401,7 +400,6 @@ export const openUnscoped = (def: TabDefinition, position: TabPosition = TabPosi
             position,
             index: null,
             closeable: true,
-            pinned: false,
             icon: { icon: def.icon, classes: ["text-muted-foreground"] },
         });
     }

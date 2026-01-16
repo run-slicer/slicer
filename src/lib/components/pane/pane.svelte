@@ -1,12 +1,11 @@
 <script lang="ts">
     import { move, type Tab, type TabPosition, update, updateCurrent } from "$lib/tab";
     import { cn } from "$lib/components/utils";
-    import { ResizablePane } from "$lib/components/ui/resizable";
+    import { ResizableHandle, ResizablePane } from "$lib/components/ui/resizable";
     import { PaneHeader, PaneHeaderItem } from "./header";
     import { dndzone } from "svelte-dnd-action";
     import type { EventHandler } from "$lib/event";
     import { type Snippet, untrack } from "svelte";
-    import { ResizableHandle } from "$lib/components/ui/resizable";
     import PaneMenu from "./menu.svelte";
     import { Plus } from "@lucide/svelte";
     import { paneIcon } from "$lib/components/icons";
@@ -29,11 +28,6 @@
     let { tabs, size, hidden, position, handler, children, handleBefore, handleAfter }: Props = $props();
     let posTabs = $derived(tabs.filter((t) => t.position === position));
     let posCurrent = $derived(posTabs.find((t) => t.active));
-
-    let lastPinnedId = $derived.by(() => {
-        const pinned = localTabs.filter((t) => t.pinned);
-        return pinned.length > 0 ? pinned[pinned.length - 1].id : null;
-    });
 
     let localTabs = $state.raw(posTabs);
     $effect(() => {
@@ -71,10 +65,7 @@
         const unpinned = items.filter((t) => !t.pinned);
 
         // If someone tried to drag across the boundary, snap back
-        const fixed =
-            pinned.length !== pinnedCount ? normalizeTabs(localTabs) : normalizeTabs([...pinned, ...unpinned]);
-
-        localTabs = fixed;
+        localTabs = pinned.length !== pinnedCount ? normalizeTabs(localTabs) : normalizeTabs([...pinned, ...unpinned]);
     };
 
     let Icon = $derived(paneIcon(position, false));
@@ -123,10 +114,8 @@
         tab.pinned = value;
         update(tab);
 
-        const tabsInPane = [...localTabs];
-
         // Remove tab from current position
-        const withoutTab = tabsInPane.filter((t) => t.id !== tab.id);
+        const withoutTab = localTabs.filter((t) => t.id !== tab.id);
 
         const pinned = withoutTab.filter((t) => t.pinned);
         const unpinned = withoutTab.filter((t) => !t.pinned);

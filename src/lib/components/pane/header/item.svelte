@@ -75,7 +75,6 @@
             {onclick}
         >
             {#if pinned}
-                <!-- Pinned background indicator -->
                 <div class="bg-primary pointer-events-none absolute inset-0 opacity-10"></div>
             {/if}
             {#if icon}
