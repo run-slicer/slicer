@@ -126,6 +126,9 @@ export interface LocaleData {
     "pane.code.menu.file.export": string;
     "pane.code.menu.file.export.raw": string;
     "pane.code.menu.file.export.disasm": string;
+    "pane.code.menu.reference": string;
+    "pane.code.menu.reference.declaration": string;
+    "pane.code.menu.reference.usages": string;
     "pane.graph.loading": string;
     "pane.graph.method": string;
     "pane.graph.method.none": string;
@@ -366,4 +369,10 @@ export interface LocaleData {
     "transformer.read.lvt": string;
     "transformer.read.signature": string;
     "transformer.read.debug": string;
+    "modal.pin": string;
+    "modal.unpin": string;
+    "modal.close": string;
+    "modal.usages.title": string;
+    "modal.usages.subtitle": string;
+    "modal.usages.info": string;
 }
