@@ -17,7 +17,7 @@
     let grouped = $derived(groupBy(data, (usage) => usage.entry.name));
 </script>
 
-<div class="divide-border flex h-87.5 flex-col divide-y">
+<div class="divide-border flex h-full flex-col divide-y">
     <div class="bg-muted/30 flex items-center gap-1 px-2 py-1.5">
         <span class="text-muted-foreground mr-2 text-xs">
             {$t("modal.usages.info", data.length)}
@@ -25,7 +25,7 @@
     </div>
 
     <div class="min-h-0 flex-1">
-        <VList data={Array.from(grouped.entries())} class="h-full overflow-x-hidden">
+        <VList data={Array.from(grouped.entries())} class="h-full overflow-x-hidden pb-2">
             {#snippet children([name, usages])}
                 {@const { icon: Icon, classes: iconClasses } = entryIcon(usages[0].entry)}
 
@@ -41,7 +41,7 @@
                             open = false;
                             handler.open(usage.entry);
                         }}
-                        class="hover:bg-accent/50 focus:bg-accent ml-6 flex w-[calc(100%-1.5rem)] flex-col gap-1 rounded-sm px-3 py-1.5 text-left transition-colors"
+                        class="hover:bg-accent/50 focus:bg-accent ml-6 flex w-[calc(100%-2rem)] flex-col gap-1 rounded-sm px-3 py-1.5 text-left transition-colors"
                     >
                         <code class="text-foreground truncate font-mono text-xs">
                             {usage.value}

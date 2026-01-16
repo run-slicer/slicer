@@ -24,8 +24,10 @@
     }: Props = $props();
 
     let position = $state({ ...initialPosition });
+    let size = $state({ width: 520, height: 300 });
     let pinned = $state(false);
     let isDragging = $state(false);
+    let isResizing = $state(false);
     let dragOffset = $state({ x: 0, y: 0 });
 
     $effect(() => {
@@ -64,6 +66,19 @@
 
     const handleMouseUp = () => {
         isDragging = false;
+        isResizing = false;
+    };
+
+    const handleResizeMouseDown = (e: MouseEvent) => {
+        e.stopPropagation();
+        isResizing = true;
+    };
+
+    const handleResizeMove = (e: MouseEvent) => {
+        if (!isResizing) return;
+        const newWidth = Math.max(300, e.clientX - position.x);
+        const newHeight = Math.max(200, e.clientY - position.y);
+        size = { width: newWidth, height: newHeight };
     };
 
     const handleClickOutside = (e: MouseEvent) => {
@@ -74,13 +89,19 @@
     };
 
     $effect(() => {
-        if (isDragging) {
+        if (isDragging || isResizing) {
             document.body.style.userSelect = "none";
-            document.addEventListener("mousemove", handleMouseMove);
+            if (isDragging) {
+                document.addEventListener("mousemove", handleMouseMove);
+            }
+            if (isResizing) {
+                document.addEventListener("mousemove", handleResizeMove);
+            }
             document.addEventListener("mouseup", handleMouseUp);
             return () => {
                 document.body.style.userSelect = "";
                 document.removeEventListener("mousemove", handleMouseMove);
+                document.removeEventListener("mousemove", handleResizeMove);
                 document.removeEventListener("mouseup", handleMouseUp);
             };
         }
@@ -102,8 +123,8 @@
 {#if open}
     <div
         bind:this={modalElement}
-        class="bg-popover border-border fixed z-50 max-w-150 min-w-130 rounded-md border shadow-xl"
-        style="left: {position.x}px; top: {position.y}px;"
+        class="bg-popover border-border fixed z-50 flex flex-col rounded-md border shadow-xl"
+        style="left: {position.x}px; top: {position.y}px; width: {size.width}px; height: {size.height}px;"
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
@@ -150,8 +171,25 @@
             </div>
         </header>
 
-        <div class="max-h-100 overflow-auto">
+        <div class="flex h-full w-full flex-col overflow-auto">
             {@render children()}
+        </div>
+
+        <div
+            class="absolute right-0 bottom-0 h-4 w-4 cursor-se-resize"
+            onmousedown={handleResizeMouseDown}
+            role="presentation"
+            style="touch-action: none;"
+        >
+            <svg class="text-muted-foreground h-full w-full opacity-50 hover:opacity-100" viewBox="0 0 16 16">
+                <path
+                    d="M 14 2 L 2 14 M 14 6 L 6 14 M 14 10 L 10 14"
+                    stroke="currentColor"
+                    stroke-width="1"
+                    fill="none"
+                    stroke-linecap="round"
+                />
+            </svg>
         </div>
     </div>
 {/if}
