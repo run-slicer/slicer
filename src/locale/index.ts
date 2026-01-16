@@ -64,6 +64,8 @@ export interface LocaleData {
     "pane.header.menu.close.others": string;
     "pane.header.menu.close.right": string;
     "pane.header.menu.close.all": string;
+    "pane.header.menu.pin": string;
+    "pane.header.menu.unpin": string;
     "pane.welcome.title": string;
     "pane.welcome.get-started": string;
     "pane.welcome.get-started.open": string;

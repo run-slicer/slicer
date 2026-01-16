@@ -18,6 +18,7 @@ export interface PaneData {
 export interface TabData {
     type: TabType;
     active: boolean;
+    pinned?: boolean;
 }
 
 export type ProjectMode = "file" | "package";
