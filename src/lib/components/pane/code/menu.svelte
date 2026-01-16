@@ -17,7 +17,7 @@
     import type { EventHandler } from "$lib/event";
     import { t } from "$lib/i18n";
     import type { EditorView } from "@codemirror/view";
-    import { resolveClassNavigator, type Cancellable } from "$lib/utils";
+    import { type Cancellable, prettyInternalName } from "$lib/utils";
     import { index } from "$lib/workspace/jdk";
     import { QueryType, search, SearchMode, type SearchResult } from "$lib/workspace/analysis";
     import FloatingModal from "$lib/components/floating_modal.svelte";
@@ -25,6 +25,7 @@
     import type { TypeReferenceResolver } from "@katana-project/laser";
     import { error } from "$lib/log";
     import { toast } from "svelte-sonner";
+    import { resolveType } from "./resolver";
 
     interface Props {
         view: EditorView | null;
@@ -65,7 +66,7 @@
         return resolved && resolved.kind !== "builtin" ? resolved : null;
     });
 
-    let navigator = $derived(view ? resolveClassNavigator(resolved, handler, view, classes, index) : null);
+    let detail = $derived(view ? resolveType(resolved, handler, view, classes, index) : null);
 
     let usagesOpen = $state(false);
     let usages: SearchResult[] = $state.raw([]);
@@ -82,9 +83,9 @@
     });
 
     const findUsages = async () => {
-        if (!view || !navigator || !navigator.className) return;
+        if (!view || !detail || !detail.className) return;
 
-        const className = navigator.className;
+        const className = detail.className;
 
         referenceName = className;
         try {
@@ -105,7 +106,7 @@
         }
     };
 
-    let modalElement: HTMLDivElement | undefined = $state(undefined);
+    let modalElement: HTMLDivElement | undefined = $state();
     let position = $state({ x: 0, y: 0 });
 
     $effect(() => {
@@ -127,8 +128,8 @@
     <ContextMenuItem
         inset
         class="flex justify-between gap-5"
-        disabled={!hasReference || !navigator?.isWorkspaceEntry}
-        onclick={() => navigator?.navigateToClass()}
+        disabled={!hasReference || !detail?.canOpen}
+        onclick={() => detail?.open()}
     >
         {$t("pane.code.menu.reference.declaration")}
         <CornerDownRight size={16} class="text-foreground" />
@@ -173,7 +174,7 @@
 <FloatingModal
     bind:open={usagesOpen}
     title={$t("modal.usages.title")}
-    subtitle={$t("modal.usages.subtitle", referenceName)}
+    subtitle={$t("modal.usages.subtitle", prettyInternalName(referenceName || ""))}
     initialPosition={position}
     bind:modalElement
 >

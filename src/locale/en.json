@@ -117,6 +117,7 @@
     "pane.code.interp.text": "Text",
     "pane.code.interp.binary-xml": "Binary XML",
     "pane.code.interp.detected": "(detected)",
+    "pane.code.tooltip.default-package": "default package",
     "pane.code.menu.editor": "Editor",
     "pane.code.menu.editor.wrap": "Wrap lines",
     "pane.code.menu.editor.lock-zoom": "Lock zoom",
@@ -370,7 +371,7 @@
     "modal.pin": "Pin",
     "modal.unpin": "Unpin",
     "modal.close": "Close",
-    "modal.usages.title": "Reference usages",
+    "modal.usages.title": "Type usages",
     "modal.usages.subtitle": "of {0}",
     "modal.usages.info": "{0} usage(s) found."
 }

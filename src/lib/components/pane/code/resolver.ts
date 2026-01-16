@@ -1,9 +1,74 @@
 import type { EventHandler } from "$lib/event";
-import { resolveClassNavigator } from "$lib/utils";
 import type { Entry } from "$lib/workspace";
-import { RangeSetBuilder, type Extension } from "@codemirror/state";
+import { type Extension, RangeSetBuilder } from "@codemirror/state";
 import { Decoration, EditorView, ViewPlugin } from "@codemirror/view";
 import type { ResolvedType, TypeReferenceResolver } from "@katana-project/laser";
+
+interface ResolutionDetail {
+    className: string | null;
+    packageName: string | null;
+    simpleName: string | null;
+
+    open(): void;
+    canOpen: boolean;
+}
+
+export const resolveType = (
+    resolution: ResolvedType | null,
+    handler: EventHandler,
+    view: EditorView,
+    classes: Map<string, Entry>,
+    index: Map<string, string>
+): ResolutionDetail => {
+    let className: string | null = null;
+    if (resolution?.qualifiedName) {
+        const parts = resolution.qualifiedName.split(".");
+        const popped: string[] = [];
+
+        while (parts.length > 0) {
+            const candidate = parts.join("/") + (popped.length > 0 ? "$" + popped.toReversed().join("$") : "");
+
+            if (classes.has(candidate) || index.has(candidate)) {
+                className = candidate;
+                break;
+            }
+
+            popped.push(parts.pop()!);
+        }
+    }
+
+    let packageName: string | null = null,
+        simpleName: string | null = null;
+    if (className) {
+        const lastSlash = className.lastIndexOf("/");
+        if (lastSlash > 0) {
+            packageName = className.substring(0, lastSlash);
+            simpleName = className.substring(lastSlash + 1);
+        } else {
+            simpleName = className;
+        }
+    }
+
+    return {
+        className,
+        packageName,
+        simpleName,
+        open() {
+            if (resolution?.kind === "declared" && resolution.declaration) {
+                view.dispatch({
+                    selection: { anchor: resolution.declaration.from },
+                    effects: EditorView.scrollIntoView(resolution.declaration.from),
+                });
+            } else if (className) {
+                const entry = classes.get(className);
+                if (entry) handler.open(entry);
+            }
+        },
+        canOpen:
+            resolution?.kind !== "builtin" &&
+            ((resolution?.kind === "declared" && !!resolution.declaration) || (!!className && classes.has(className))),
+    };
+};
 
 export const typeResolver = (
     resolver: TypeReferenceResolver | null,
@@ -46,7 +111,7 @@ export const typeResolver = (
     );
 
     const navigateToClass = (view: EditorView, resolution: ResolvedType) =>
-        resolveClassNavigator(resolution, handler, view, classes, index).navigateToClass();
+        resolveType(resolution, handler, view, classes, index).open();
 
     const handlers = EditorView.domEventHandlers({
         mousemove(event, view) {

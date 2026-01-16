@@ -119,6 +119,7 @@ export interface LocaleData {
     "pane.code.interp.text": string;
     "pane.code.interp.binary-xml": string;
     "pane.code.interp.detected": string;
+    "pane.code.tooltip.default-package": string;
     "pane.code.menu.editor": string;
     "pane.code.menu.editor.wrap": string;
     "pane.code.menu.editor.lock-zoom": string;
