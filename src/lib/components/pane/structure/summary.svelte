@@ -121,7 +121,7 @@
                 <div
                     class={cn(
                         "overflow-hidden transition-[max-height,opacity] duration-200 ease-in-out",
-                        collapsed[type] ? "max-h-0 opacity-0" : "max-h-250 opacity-100"
+                        collapsed[type] ? "max-h-0 opacity-0" : "opacity-100"
                     )}
                 >
                     {#each entries as entry}
