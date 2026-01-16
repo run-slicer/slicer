@@ -97,12 +97,6 @@
             // handled by external component
             "background-color": "transparent",
         },
-        ".cm-resolved-type": {
-            "text-decoration": "underline",
-            "text-decoration-thickness": "1px",
-            "text-underline-offset": "2px",
-            cursor: "pointer",
-        },
     });
 </script>
 
