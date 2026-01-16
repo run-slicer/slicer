@@ -68,7 +68,7 @@
         <button
             bind:this={elem}
             class={cn(
-                "relative overflow-hidden bg-pane-header inline-flex h-full max-w-96 cursor-pointer items-center px-3",
+                "bg-pane-header relative inline-flex h-full max-w-96 cursor-pointer items-center overflow-hidden px-3",
                 !active || "border-t-primary bg-background border-t"
             )}
             aria-label={name}
@@ -76,17 +76,17 @@
         >
             {#if pinned}
                 <!-- Pinned background indicator -->
-                <div class="pointer-events-none absolute inset-0 bg-primary opacity-10"></div>
+                <div class="bg-primary pointer-events-none absolute inset-0 opacity-10"></div>
             {/if}
             {#if icon}
-                <Icon size={16} class={cn("mr-1.5 min-w-4 z-10", icon.classes)} />
+                <Icon size={16} class={cn("z-10 mr-1.5 min-w-4", icon.classes)} />
             {/if}
-            <span class="overflow-hidden text-sm break-keep text-ellipsis whitespace-nowrap z-10">{name}</span>
+            <span class="z-10 overflow-hidden text-sm break-keep text-ellipsis whitespace-nowrap">{name}</span>
             {#if pinned}
                 <div
                     role="button"
                     tabindex="-1"
-                    class="ml-3 cursor-pointer z-10"
+                    class="z-10 ml-3 cursor-pointer"
                     aria-label="Close"
                     onclick={handlePin}
                     onkeydown={handlePin}
@@ -97,7 +97,7 @@
                 <div
                     role="button"
                     tabindex="-1"
-                    class="ml-3 cursor-pointer z-10"
+                    class="z-10 ml-3 cursor-pointer"
                     aria-label="Close"
                     onclick={(e) => handleClose(e, "self")}
                     onkeydown={(e) => handleClose(e, "self")}

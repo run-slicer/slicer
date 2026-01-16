@@ -100,7 +100,7 @@
     --xy-controls-button-background-color-hover: oklch(from var(--muted) l c h / 0.6);
 
     /* slicer */
-    --pane-header: oklch(0.9794 0.0013 286.38);
+    --pane-header: color-mix(in oklab, var(--background) 40%, var(--muted) 60%);
 }
 
 .dark {
@@ -135,7 +135,6 @@
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.552 0.016 285.938);
-    --pane-header: oklch(0.2273 0.0038 286.09);
 }
 
 @theme inline {
