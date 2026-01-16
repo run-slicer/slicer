@@ -1,6 +1,7 @@
 <script lang="ts">
     import { X, Pin, PinOff } from "@lucide/svelte";
     import type { Snippet } from "svelte";
+    import { t } from "$lib/i18n";
 
     interface Props {
         open: boolean;
@@ -34,12 +35,12 @@
         }
     });
 
-    function handleClose() {
+    const handleClose = () => {
         open = false;
         onclose?.();
-    }
+    };
 
-    function handleMouseDown(e: MouseEvent) {
+    const handleMouseDown = (e: MouseEvent) => {
         if ((e.target as HTMLElement).closest("button")) return;
         isDragging = true;
         const rect = modalElement?.getBoundingClientRect();
@@ -49,9 +50,9 @@
                 y: e.clientY - rect.top,
             };
         }
-    }
+    };
 
-    function handleMouseMove(e: MouseEvent) {
+    const handleMouseMove = (e: MouseEvent) => {
         if (!isDragging) return;
         const newX = e.clientX - dragOffset.x;
         const newY = e.clientY - dragOffset.y;
@@ -59,18 +60,18 @@
             x: Math.max(0, Math.min(newX, window.innerWidth - 400)),
             y: Math.max(0, Math.min(newY, window.innerHeight - 100)),
         };
-    }
+    };
 
-    function handleMouseUp() {
+    const handleMouseUp = () => {
         isDragging = false;
-    }
+    };
 
-    function handleClickOutside(e: MouseEvent) {
+    const handleClickOutside = (e: MouseEvent) => {
         if (pinned) return;
         if (modalElement && !modalElement.contains(e.target as Node)) {
             handleClose();
         }
-    }
+    };
 
     $effect(() => {
         if (isDragging) {
@@ -101,7 +102,7 @@
 {#if open}
     <div
         bind:this={modalElement}
-        class="bg-popover border-border fixed z-50 max-w-150 min-w-130 rounded-lg border shadow-xl"
+        class="bg-popover border-border fixed z-50 max-w-150 min-w-130 rounded-md border shadow-xl"
         style="left: {position.x}px; top: {position.y}px;"
         role="dialog"
         aria-modal="true"
@@ -131,7 +132,7 @@
                 <button
                     onclick={() => (pinned = !pinned)}
                     class="hover:bg-accent text-muted-foreground hover:text-foreground rounded p-1 transition-colors"
-                    title={pinned ? "Unpin" : "Pin"}
+                    title={$t(pinned ? "modal.unpin" : "modal.pin")}
                 >
                     {#if pinned}
                         <Pin class="h-4 w-4" />
@@ -142,7 +143,7 @@
                 <button
                     onclick={handleClose}
                     class="hover:bg-accent text-muted-foreground hover:text-foreground rounded p-1 transition-colors"
-                    title="Close"
+                    title={$t("modal.close")}
                 >
                     <X class="h-4 w-4" />
                 </button>

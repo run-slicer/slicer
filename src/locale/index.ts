@@ -369,6 +369,9 @@ export interface LocaleData {
     "transformer.read.lvt": string;
     "transformer.read.signature": string;
     "transformer.read.debug": string;
+    "modal.pin": string;
+    "modal.unpin": string;
+    "modal.close": string;
     "modal.usages.title": string;
     "modal.usages.subtitle": string;
     "modal.usages.info": string;

@@ -20,9 +20,11 @@
     import { resolveClassNavigator, type Cancellable } from "$lib/utils";
     import { index } from "$lib/workspace/jdk";
     import { QueryType, search, SearchMode, type SearchResult } from "$lib/workspace/analysis";
-    import FloatingModal from "$lib/components/floating-modal.svelte";
-    import UsagesContent from "./usages_modal.svelte";
+    import FloatingModal from "$lib/components/floating_modal.svelte";
+    import UsagesContent from "./usages.svelte";
     import type { TypeReferenceResolver } from "@katana-project/laser";
+    import { error } from "$lib/log";
+    import { toast } from "svelte-sonner";
 
     interface Props {
         view: EditorView | null;
@@ -55,29 +57,27 @@
 
     const resolved = $derived.by(() => {
         const coords = view?.posAndSideAtCoords(mousePosition);
-
-        if (!coords || !coords.pos || !resolver || interpType !== Interpretation.CLASS) {
+        if (!coords || !resolver || interpType !== Interpretation.CLASS) {
             return null;
         }
 
         const resolved = resolver.resolveAt(coords.pos, coords.assoc);
-
         return resolved && resolved.kind !== "builtin" ? resolved : null;
     });
 
-    const navigator = $derived.by(() => (view ? resolveClassNavigator(resolved, handler, view, classes, index) : null));
+    let navigator = $derived(view ? resolveClassNavigator(resolved, handler, view, classes, index) : null);
 
     let usagesOpen = $state(false);
-    let usages = $state([] as SearchResult[]);
-    let referenceName = $state(undefined as string | undefined);
-    let task = $state<Cancellable<void> | undefined>(undefined);
+    let usages: SearchResult[] = $state.raw([]);
+    let referenceName: string | null = $state(null);
+    let task: Cancellable<void> | null = $state(null);
 
     $effect(() => {
         if (!usagesOpen) {
             usages = [];
-            referenceName = undefined;
+            referenceName = null;
             task?.cancel();
-            task = undefined;
+            task = null;
         }
     });
 
@@ -85,21 +85,23 @@
         if (!view || !navigator || !navigator.className) return;
 
         const className = navigator.className;
-        const target = [...classes.values()];
 
         referenceName = className;
         try {
             usages = [];
             usagesOpen = true;
             task = search(
-                target,
+                Array.from(classes.values()),
                 { type: QueryType.PSEUDOCODE, value: className, mode: SearchMode.PARTIAL_MATCH, ref: true },
                 (res) => {
-                    usages.push(res);
+                    usages = [...usages, res];
                 }
             );
         } catch (e) {
-            console.error("Failed to find usages for", className, e);
+            error("failed to search", e);
+            toast.error($t("toast.error.title.generic"), {
+                description: $t("toast.error.search"),
+            });
         }
     };
 
@@ -119,25 +121,23 @@
 </script>
 
 <ContextMenuContent class="min-w-48">
-    {#if view && resolved}
-        <ContextMenuLabel inset>{$t("pane.code.menu.reference")}</ContextMenuLabel>
-        <ContextMenuSeparator />
-        <ContextMenuItem
-            inset
-            class="flex justify-between gap-5"
-            disabled={!navigator?.isWorkspaceEntry}
-            onclick={() => navigator?.navigateToClass()}
-        >
-            {$t("pane.code.menu.reference.declaration")}
-            <CornerDownRight size={16} class="text-foreground" />
-        </ContextMenuItem>
-
-        <ContextMenuItem inset class="flex justify-between" onclick={findUsages}>
-            {$t("pane.code.menu.reference.usages")}
-            <TextSearch size={16} />
-        </ContextMenuItem>
-        <ContextMenuSeparator />
-    {/if}
+    {@const hasReference = view && resolved}
+    <ContextMenuLabel inset>{$t("pane.code.menu.reference")}</ContextMenuLabel>
+    <ContextMenuSeparator />
+    <ContextMenuItem
+        inset
+        class="flex justify-between gap-5"
+        disabled={!hasReference || !navigator?.isWorkspaceEntry}
+        onclick={() => navigator?.navigateToClass()}
+    >
+        {$t("pane.code.menu.reference.declaration")}
+        <CornerDownRight size={16} class="text-foreground" />
+    </ContextMenuItem>
+    <ContextMenuItem inset class="flex justify-between" disabled={!hasReference} onclick={findUsages}>
+        {$t("pane.code.menu.reference.usages")}
+        <TextSearch size={16} />
+    </ContextMenuItem>
+    <ContextMenuSeparator />
     <ContextMenuLabel inset>{$t("pane.code.menu.editor")}</ContextMenuLabel>
     <ContextMenuSeparator />
     <ContextMenuCheckboxItem class="justify-between" bind:checked={wrap}>
@@ -173,9 +173,9 @@
 <FloatingModal
     bind:open={usagesOpen}
     title={$t("modal.usages.title")}
-    subtitle={$t("modal.usages.subtitle", [referenceName])}
+    subtitle={$t("modal.usages.subtitle", referenceName)}
     initialPosition={position}
     bind:modalElement
 >
-    <UsagesContent bind:open={usagesOpen} data={usages} {handler} {classes} />
+    <UsagesContent bind:open={usagesOpen} data={usages} {handler} />
 </FloatingModal>
