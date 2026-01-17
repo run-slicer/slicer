@@ -334,7 +334,7 @@
     "toast.error.load": "No se pudo leer el ZIP {0}, compruebe la consola.",
     "toast.error.read": "No se pudo leer el archivo {0}, compruebe la consola.",
     "toast.error.clipboard.unsupported": "No se pudo copiar desde el portapapeles, la función no está disponible.",
-    "toast.error.clipboard.denied": "Could not copy from clipboard, access.",
+    "toast.error.clipboard.denied": "Could not copy from clipboard, access denied.",
     "toast.error.script.read": "No se pudo leer el script {0}, comprueba la consola.",
     "toast.error.script.load": "No se pudo cargar el script {0}, comprueba la consola.",
     "toast.error.script.unload": "No se pudo desactivar el script {0}, comprueba la consola.",
