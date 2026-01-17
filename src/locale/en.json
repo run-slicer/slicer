@@ -334,7 +334,7 @@
     "toast.error.load": "Could not read ZIP {0}, check the console.",
     "toast.error.read": "Could not read entry {0}, check the console.",
     "toast.error.clipboard.unsupported": "Could not copy from clipboard, feature not available.",
-    "toast.error.clipboard.denied": "Could not copy from clipboard, access.",
+    "toast.error.clipboard.denied": "Could not copy from clipboard, access denied.",
     "toast.error.script.read": "Failed to read script {0}, check the console.",
     "toast.error.script.load": "Failed to load script {0}, check the console.",
     "toast.error.script.unload": "Failed to unload script {0}, check the console.",
