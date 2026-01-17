@@ -334,7 +334,7 @@
     "toast.error.load": "Nepodařilo se přečíst ZIP {0}, zkontrolujte konzoli.",
     "toast.error.read": "Nepodařilo se přečíst položku {0}, zkontrolujte konzoli.",
     "toast.error.clipboard.unsupported": "Nepodařilo se zkopírovat ze schránky, funkce není dostupná.",
-    "toast.error.clipboard.denied": "Could not copy from clipboard, access denied.",
+    "toast.error.clipboard.denied": "Nepodařilo se zkopírovat ze schránky, přístup odepřen.",
     "toast.error.script.read": "Nepodařilo se přečíst skript {0}, zkontrolujte konzoli.",
     "toast.error.script.load": "Nepodařilo se načíst skript {0}, zkontrolujte konzoli.",
     "toast.error.script.unload": "Nepodařilo se odebrat skript {0}, zkontrolujte konzoli.",
