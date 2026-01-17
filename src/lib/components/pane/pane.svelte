@@ -105,7 +105,7 @@
 
         const toClose = targets[type] ?? [];
 
-        toClose.forEach(handler.close);
+        toClose.filter(t => type === "self" || !t.pinned).forEach(handler.close);
     };
 
     const handlePin = (value: boolean, tab: Tab) => {
