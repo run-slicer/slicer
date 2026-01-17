@@ -119,6 +119,7 @@
     "pane.code.interp.text": "Texto",
     "pane.code.interp.binary-xml": "Binario XML",
     "pane.code.interp.detected": "(detectado)",
+    "pane.code.tooltip.default-package": "default package",
     "pane.code.menu.editor": "Editor",
     "pane.code.menu.editor.wrap": "Ajustar líneas",
     "pane.code.menu.editor.lock-zoom": "Bloquear zoom",
@@ -126,6 +127,9 @@
     "pane.code.menu.file.export": "Exportar",
     "pane.code.menu.file.export.raw": "En crudo",
     "pane.code.menu.file.export.disasm": "Desensamblado",
+    "pane.code.menu.reference": "Reference",
+    "pane.code.menu.reference.declaration": "Go to declaration",
+    "pane.code.menu.reference.usages": "Find usages",
     "pane.graph.loading": "Calculando gráfica...",
     "pane.graph.method": "Método:",
     "pane.graph.method.none": "<ninguno>",
@@ -365,5 +369,11 @@
     "transformer.read.monitor": "Quitar bloques sincronizados",
     "transformer.read.lvt": "Quitar variables locales",
     "transformer.read.signature": "Quitar firmas genéricas",
-    "transformer.read.debug": "Quitar información de depuración"
+    "transformer.read.debug": "Quitar información de depuración",
+    "modal.pin": "Pin",
+    "modal.unpin": "Unpin",
+    "modal.close": "Close",
+    "modal.usages.title": "Type usages",
+    "modal.usages.subtitle": "of {0}",
+    "modal.usages.info": "{0} usage(s) found."
 }
