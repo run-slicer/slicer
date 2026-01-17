@@ -1,6 +1,7 @@
 /* array ops */
 
 import { Modifier } from "@katana-project/asm/spec";
+import type { ExternalTypeReference } from "@katana-project/laser";
 import { derived, type Readable, writable, type Writable } from "svelte/store";
 
 export const partition = <T>(arr: T[], func: (e: T) => boolean): [T[], T[]] => {
@@ -428,6 +429,10 @@ const primTypes: Record<string, string> = {
     V: "void",
 };
 
+export const prettyInternalName = (name: string): string => {
+    return name.replaceAll("$", ".").replaceAll("/", ".");
+};
+
 export const prettyJavaType = (desc: string, short: boolean = false): string => {
     if (!desc) {
         return desc;
@@ -529,6 +534,16 @@ export const prettyErrorStack = (e: any): string | null => {
     }
 
     return null;
+};
+
+export const refFromName = (klass: string): ExternalTypeReference => {
+    const parts = klass.split("/");
+    const name = parts.pop()!.replaceAll("$", ".");
+    return {
+        name,
+        qualifiedName: klass.replaceAll("/", ".").replaceAll("$", "."),
+        packageName: parts.join(".") || null,
+    };
 };
 
 export const prettyError = (e: any): string => {

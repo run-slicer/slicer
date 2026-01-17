@@ -21,14 +21,16 @@
     import { entryIcon } from "$lib/components/icons";
     import type { Task } from "$lib/task";
     import Tasks from "./tasks.svelte";
+    import type { EventHandler } from "$lib/event";
 
     interface Props {
         tab: Tab | null;
         tasks: Task[];
         encoding: Encoding | null;
+        handler: EventHandler;
     }
 
-    let { tab, tasks, encoding }: Props = $props();
+    let { tab, tasks, encoding, handler }: Props = $props();
 </script>
 
 <Separator />
@@ -42,10 +44,13 @@
                     {@const lastEntry = x === entries.length - 1}
                     {#each parts as part, y}
                         {@const lastPart = y === parts.length - 1}
-                        <BreadcrumbItem class="whitespace-nowrap">
+                        <BreadcrumbItem
+                            class={cn("whitespace-nowrap", lastPart && "cursor-pointer")}
+                            onclick={lastPart ? () => handler.open(entry) : undefined}
+                        >
                             {#if lastPart}
                                 {@const { icon: FileIcon, classes } = entryIcon(entry)}
-                                <FileIcon size={14} class={cn("min-w-[14px]", classes)} />
+                                <FileIcon size={14} class={cn("min-w-3.5", classes)} />
                             {/if}
                             {part}
                         </BreadcrumbItem>

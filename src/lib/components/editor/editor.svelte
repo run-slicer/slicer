@@ -6,6 +6,7 @@
         highlightActiveLine,
         highlightActiveLineGutter,
         highlightSpecialChars,
+        hoverTooltip,
         keymap,
         lineNumbers,
         rectangularSelection,
@@ -24,7 +25,13 @@
     import SearchPanel from "./search.svelte";
     import { mount, unmount } from "svelte";
 
-    export const basicSetup: Extension = (() => [
+    export interface TooltipProps {
+        view: EditorView;
+        pos: number;
+        side: -1 | 0 | 1;
+    }
+
+    export const extensions: Extension = (() => [
         lineNumbers(),
         highlightActiveLineGutter(),
         highlightSpecialChars(),
@@ -86,11 +93,15 @@
             // fix overlapping
             "z-index": "auto",
         },
+        ".cm-tooltip": {
+            // handled by external component
+            "background-color": "transparent",
+        },
     });
 </script>
 
 <script lang="ts">
-    import { onMount } from "svelte";
+    import { type Component, onMount } from "svelte";
     import { mode } from "mode-watcher";
     import type { LanguageSupport } from "@codemirror/language";
     import { EditorView } from "@codemirror/view";
@@ -110,6 +121,10 @@
         wrap?: boolean;
         view?: EditorView | null;
         onchange?: (view: EditorView) => void;
+        extensions?: Extension[];
+
+        // TODO: improve typing
+        tooltip?: () => [Component<any>, Record<string, any>];
     }
 
     let {
@@ -120,6 +135,8 @@
         wrap = false,
         view = $bindable(null),
         onchange,
+        tooltip,
+        extensions: decoupledExtensions = [],
     }: Props = $props();
 
     $effect(() => view?.dispatch({ effects: readOnlyStore.reconfigure(EditorState.readOnly.of(readonly)) }));
@@ -148,7 +165,8 @@
             state: EditorState.create({
                 doc: value,
                 extensions: [
-                    basicSetup,
+                    extensions,
+                    ...decoupledExtensions,
                     readOnlyStore.of(EditorState.readOnly.of(readonly)),
                     themeStore.of(mode.current === "dark" ? dark : light),
                     langStore.of(lang || []),
@@ -164,6 +182,27 @@
                             onchange?.(e.view);
                         }
                     }),
+                    !tooltip
+                        ? []
+                        : hoverTooltip((view, pos, side) => ({
+                              pos,
+                              create() {
+                                  const [TooltipComponent, props] = tooltip();
+
+                                  const target = document.createElement("div");
+                                  const component = mount(TooltipComponent, {
+                                      target,
+                                      props: { view, pos, side, ...props },
+                                  });
+
+                                  return {
+                                      dom: target,
+                                      destroy() {
+                                          unmount(component);
+                                      },
+                                  };
+                              },
+                          })),
                 ],
             }),
             parent,

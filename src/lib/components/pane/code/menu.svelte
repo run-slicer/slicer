@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { Tab } from "$lib/tab";
-    import { transformEntry } from "$lib/workspace";
+    import { transformEntry, type Entry } from "$lib/workspace";
     import {
         ContextMenuContent,
         ContextMenuItem,
@@ -11,13 +11,25 @@
         ContextMenuSeparator,
     } from "$lib/components/ui/context-menu";
     import ContextMenuLabel from "$lib/components/menu_label.svelte";
-    import { Binary, CaseSensitive, Code, TextWrap } from "@lucide/svelte";
+    import { Binary, CaseSensitive, Code, CornerDownRight, TextSearch, TextWrap } from "@lucide/svelte";
     import { type Language, toExtension } from "$lib/lang";
     import { Interpretation } from "./";
     import type { EventHandler } from "$lib/event";
     import { t } from "$lib/i18n";
+    import type { EditorView } from "@codemirror/view";
+    import { type Cancellable, prettyInternalName } from "$lib/utils";
+    import { index } from "$lib/workspace/jdk";
+    import { QueryType, search, SearchMode, type SearchResult } from "$lib/workspace/analysis";
+    import FloatingModal from "$lib/components/floating_modal.svelte";
+    import UsagesContent from "./usages.svelte";
+    import type { TypeReferenceResolver } from "@katana-project/laser";
+    import { error } from "$lib/log";
+    import { toast } from "svelte-sonner";
+    import { resolveType } from "./resolver";
 
     interface Props {
+        view: EditorView | null;
+        classes: Map<string, Entry>;
         tab: Tab;
         interpType: Interpretation;
         lang: Language;
@@ -25,13 +37,94 @@
         wrap: boolean;
         sizeSync: boolean;
         handler: EventHandler;
+        resolver: TypeReferenceResolver | null;
+        mousePosition: { x: number; y: number };
     }
 
-    let { tab, interpType, lang, value, handler, wrap = $bindable(), sizeSync = $bindable() }: Props = $props();
+    let {
+        view = $bindable(),
+        classes,
+        tab,
+        interpType,
+        lang,
+        value,
+        handler,
+        wrap = $bindable(),
+        sizeSync = $bindable(),
+        resolver = $bindable(),
+        mousePosition = $bindable(),
+    }: Props = $props();
     let entry = $derived(tab.entry!);
+
+    const resolved = $derived.by(() => {
+        const coords = view?.posAndSideAtCoords(mousePosition);
+        if (!coords || !resolver || interpType !== Interpretation.CLASS) {
+            return null;
+        }
+
+        const resolved = resolver.resolveAt(coords.pos, coords.assoc);
+        return resolved && resolved.kind !== "builtin" ? resolved : null;
+    });
+
+    let detail = $derived(view ? resolveType(resolved, handler, view, classes, index) : null);
+
+    let usagesOpen = $state(false);
+    let usages: SearchResult[] = $state.raw([]);
+    let referenceName: string | null = $state(null);
+    let task: Cancellable<void> | null = $state(null);
+
+    $effect(() => {
+        if (!usagesOpen) {
+            usages = [];
+            referenceName = null;
+            task?.cancel();
+            task = null;
+        }
+    });
+
+    const findUsages = async () => {
+        if (!view || !detail || !detail.className) return;
+
+        const className = detail.className;
+
+        referenceName = className;
+        try {
+            usages = [];
+            usagesOpen = true;
+            task = search(
+                Array.from(classes.values()),
+                { type: QueryType.PSEUDOCODE, value: className, mode: SearchMode.PARTIAL_MATCH, ref: true },
+                (res) => {
+                    usages = [...usages, res];
+                }
+            );
+        } catch (e) {
+            error("failed to search", e);
+            toast.error($t("toast.error.title.generic"), {
+                description: $t("toast.error.search"),
+            });
+        }
+    };
 </script>
 
 <ContextMenuContent class="min-w-48">
+    {@const hasReference = view && resolved}
+    <ContextMenuLabel inset>{$t("pane.code.menu.reference")}</ContextMenuLabel>
+    <ContextMenuSeparator />
+    <ContextMenuItem
+        inset
+        class="flex justify-between gap-5"
+        disabled={!hasReference || !detail?.canOpen}
+        onclick={() => detail?.open()}
+    >
+        {$t("pane.code.menu.reference.declaration")}
+        <CornerDownRight size={16} class="text-foreground" />
+    </ContextMenuItem>
+    <ContextMenuItem inset class="flex justify-between" disabled={!hasReference} onclick={findUsages}>
+        {$t("pane.code.menu.reference.usages")}
+        <TextSearch size={16} />
+    </ContextMenuItem>
+    <ContextMenuSeparator />
     <ContextMenuLabel inset>{$t("pane.code.menu.editor")}</ContextMenuLabel>
     <ContextMenuSeparator />
     <ContextMenuCheckboxItem class="justify-between" bind:checked={wrap}>
@@ -63,3 +156,12 @@
         </ContextMenuSubContent>
     </ContextMenuSub>
 </ContextMenuContent>
+
+<FloatingModal
+    bind:open={usagesOpen}
+    title={$t("modal.usages.title")}
+    subtitle={$t("modal.usages.subtitle", prettyInternalName(referenceName || ""))}
+    initialPosition={mousePosition}
+>
+    <UsagesContent bind:open={usagesOpen} data={usages} {handler} />
+</FloatingModal>

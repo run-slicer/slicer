@@ -119,6 +119,7 @@
     "pane.code.interp.text": "Text",
     "pane.code.interp.binary-xml": "Binary XML",
     "pane.code.interp.detected": "(detected)",
+    "pane.code.tooltip.default-package": "default package",
     "pane.code.menu.editor": "Editor",
     "pane.code.menu.editor.wrap": "Wrap lines",
     "pane.code.menu.editor.lock-zoom": "Lock zoom",
@@ -126,6 +127,9 @@
     "pane.code.menu.file.export": "Export",
     "pane.code.menu.file.export.raw": "Raw",
     "pane.code.menu.file.export.disasm": "Disassembled",
+    "pane.code.menu.reference": "Reference",
+    "pane.code.menu.reference.declaration": "Go to declaration",
+    "pane.code.menu.reference.usages": "Find usages",
     "pane.graph.loading": "Computing graph...",
     "pane.graph.method": "Method:",
     "pane.graph.method.none": "<none>",
@@ -365,5 +369,11 @@
     "transformer.read.monitor": "Strip synchronized blocks",
     "transformer.read.lvt": "Strip local variables",
     "transformer.read.signature": "Strip generic signatures",
-    "transformer.read.debug": "Strip debug information"
+    "transformer.read.debug": "Strip debug information",
+    "modal.pin": "Pin",
+    "modal.unpin": "Unpin",
+    "modal.close": "Close",
+    "modal.usages.title": "Type usages",
+    "modal.usages.subtitle": "of {0}",
+    "modal.usages.info": "{0} usage(s) found."
 }

@@ -329,7 +329,10 @@ export const clear = () => {
 // utilities below
 
 export const isEncodingDependent = (tab: Tab): boolean => {
-    return tab.type === TabType.CODE && tab.entry?.type !== EntryType.CLASS /* not disassembled */;
+    return (
+        tab.type === TabType.CODE &&
+        !(tab.entry?.type === EntryType.CLASS || tab.entry?.type === EntryType.MEMBER) /* not disassembled */
+    );
 };
 
 // soft-refresh code tabs on encoding change
