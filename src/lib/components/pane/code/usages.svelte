@@ -6,6 +6,7 @@
     import { t } from "$lib/i18n";
     import type { EventHandler } from "$lib/event";
     import { groupBy } from "$lib/utils";
+    import { memberEntry } from "$lib/workspace";
 
     interface Props {
         open: boolean;
@@ -36,10 +37,14 @@
                 </div>
 
                 {#each usages as usage}
+                    {@const entry =
+                        usage.member?.type?.string?.charAt(0) === "("
+                            ? memberEntry(usage.entry, usage.member)
+                            : usage.entry}
                     <button
                         ondblclick={() => {
                             open = false;
-                            handler.open(usage.entry);
+                            handler.open(entry);
                         }}
                         class="hover:bg-accent/50 focus:bg-accent ml-6 flex w-[calc(100%-2rem)] flex-col gap-1 rounded-sm px-3 py-1.5 text-left transition-colors"
                     >

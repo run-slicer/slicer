@@ -88,6 +88,6 @@
     disasms={disasms0}
     handler={$handler}
 />
-<Crumb tab={$currentTab} tasks={tasks0} encoding={$currentEncoding} />
+<Crumb tab={$currentTab} tasks={tasks0} encoding={$currentEncoding} handler={$handler} />
 <Command entries={entries0} handler={$handler} />
 <Modals />

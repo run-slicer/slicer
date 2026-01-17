@@ -1,5 +1,6 @@
 import type { EventHandler } from "$lib/event";
 import type { Entry } from "$lib/workspace";
+import { index } from "$lib/workspace/jdk";
 import { type Extension, RangeSetBuilder } from "@codemirror/state";
 import { Decoration, EditorView, ViewPlugin } from "@codemirror/view";
 import type { ResolvedType, TypeReferenceResolver } from "@katana-project/laser";
@@ -17,8 +18,7 @@ export const resolveType = (
     resolution: ResolvedType | null,
     handler: EventHandler,
     view: EditorView,
-    classes: Map<string, Entry>,
-    index: Map<string, string>
+    classes: Map<string, Entry>
 ): ResolutionDetail => {
     let className: string | null = null;
     if (resolution?.qualifiedName) {
@@ -73,8 +73,7 @@ export const resolveType = (
 export const typeResolver = (
     resolver: TypeReferenceResolver | null,
     handler: EventHandler,
-    classes: Map<string, Entry>,
-    index: Map<string, string>
+    classes: Map<string, Entry>
 ): Extension => {
     const plugin = ViewPlugin.fromClass(
         class {
@@ -111,7 +110,7 @@ export const typeResolver = (
     );
 
     const navigateToClass = (view: EditorView, resolution: ResolvedType) =>
-        resolveType(resolution, handler, view, classes, index).open();
+        resolveType(resolution, handler, view, classes).open();
 
     const handlers = EditorView.domEventHandlers({
         mousemove(event, view) {

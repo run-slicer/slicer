@@ -4,7 +4,6 @@
     import type { EventHandler } from "$lib/event";
     import type { Entry } from "$lib/workspace";
     import { cn } from "$lib/components/utils";
-    import { index } from "$lib/workspace/jdk";
     import { resolveType } from "$lib/components/pane/code/resolver";
     import { prettyInternalName } from "$lib/utils";
     import { t } from "$lib/i18n";
@@ -19,7 +18,7 @@
 
     let resolution = $derived(resolver?.resolveAt(pos, side));
     let { className, packageName, simpleName, open } = $derived(
-        resolveType(resolution ?? null, handler, view, classes, index)
+        resolveType(resolution ?? null, handler, view, classes)
     );
 </script>
 
