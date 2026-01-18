@@ -108,8 +108,6 @@
     "pane.structure.menu.graph": "Zobrazit graf",
     "pane.structure.search.placeholder": "Hledat členy...",
     "pane.structure.search.no-results": "Žádní členové nebyli nalezeni.",
-    "pane.structure.empty.title": "Nic k zobrazení",
-    "pane.structure.empty.subtitle": "Otevřete soubor Java třídy pro zobrazení jeho struktury.",
     "pane.code.loading.disasm": "Překládám...",
     "pane.code.loading.read": "Čtu...",
     "pane.code.disasm": "Disassembler:",

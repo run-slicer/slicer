@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Input } from "$lib/components/ui/input";
-    import { Search, FileX2, LayoutDashboard } from "@lucide/svelte";
+    import { Search, LayoutDashboard } from "@lucide/svelte";
     import { Field, Constructor, Method, AbstractMethod, accessIcon, classIcon } from "$lib/components/icons";
     import type { PaneProps } from "../";
     import { EntryType, type ClassEntry } from "$lib/workspace";
@@ -19,7 +19,6 @@
     let { handler, classes, entries }: PaneProps = $props();
 
     let showSummary = $state(false);
-
     let query = $state("");
 
     let currentEntry = $derived.by(() => {
@@ -75,12 +74,7 @@
         {@const { icon: EntryIcon, classes } = entryIcon(currentEntry)}
         {@const hasSuperData = absData && (absData.superClass || absData.implementations.length > 0)}
         <div class="bg-muted/20 border-b p-3">
-            <div
-                class={cn(
-                    "mb-2 flex w-full items-center justify-between",
-                    hasSuperData && "border-b-border border-b pb-2"
-                )}
-            >
+            <div class="mb-2 flex w-full justify-between">
                 <div class="min-w-0 flex-1">
                     {#if packageName}
                         <div class="text-muted-foreground mb-2 truncate text-xs" title={packageName}>

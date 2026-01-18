@@ -108,8 +108,6 @@
     "pane.structure.menu.graph": "Ver gráfica",
     "pane.structure.search.placeholder": "Buscar miembros...",
     "pane.structure.search.no-results": "No se han encontrado miembros.",
-    "pane.structure.empty.title": "Nada que ver",
-    "pane.structure.empty.subtitle": "Abre un una clase de Java para ver su estructura.",
     "pane.code.loading.disasm": "Desensamblando...",
     "pane.code.loading.read": "Leyendo...",
     "pane.code.disasm": "Desensamblador:",

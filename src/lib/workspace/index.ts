@@ -53,21 +53,18 @@ export interface ArchiveEntry extends Entry {
 
 export enum EntryPointType {
     MAIN = "main",
-    JAVA_AGENT = "java-agent",
-    BUKKIT_PLUGIN = "bukkit-plugin",
-    BUNGEE_PLUGIN = "bungee-plugin",
-    VELOCITY_PLUGIN = "velocity-plugin",
-    FORGE_MOD = "forge-mod",
-    FABRIC_MOD = "fabric-mod",
-    SPONGE_MIXIN = "sponge-mixin",
+    AGENT = "agent",
+    MINECRAFT_BUKKIT = "minecraft.bukkit",
+    MINECRAFT_BUNGEE = "minecraft.bungee",
+    MINECRAFT_VELOCITY = "minecraft.velocity",
+    MINECRAFT_FORGE = "minecraft.forge",
+    MINECRAFT_FABRIC = "minecraft.fabric",
 }
-
-export const ENTRY_POINT_TYPES = Object.values(EntryPointType) as EntryPointType[];
 
 export interface ClassEntry extends Entry {
     type: EntryType.CLASS | EntryType.MEMBER;
     node: Node;
-    entryPoints?: EntryPointType[];
+    entryPoints: EntryPointType[];
 }
 
 export interface MemberEntry extends ClassEntry {

@@ -108,8 +108,6 @@
     "pane.structure.menu.graph": "Graph anzeigen",
     "pane.structure.search.placeholder": "Mitglieder suchen...",
     "pane.structure.search.no-results": "Keine Mitglieder gefunden.",
-    "pane.structure.empty.title": "Nichts zum Anzeigen",
-    "pane.structure.empty.subtitle": "Öffnen Sie eine Java-Klassendatei, um ihre Struktur anzuzeigen.",
     "pane.code.loading.disasm": "Wird disassembliert...",
     "pane.code.loading.read": "Wird gelesen...",
     "pane.code.disasm": "Disassembler:",

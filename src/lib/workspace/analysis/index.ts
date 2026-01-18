@@ -39,13 +39,18 @@ const analyzeClass = async (entry: Entry, skipAttr: boolean) => {
                 ) || member;
         } else {
             classEntry.type = EntryType.CLASS;
-
             classEntry.entryPoints = analyzeEntryPoints(classEntry.node);
         }
     } catch (e) {
         error(`failed to read class ${entry.name}`, e);
     }
 };
+
+const FABRIC_INITIALIZERS = new Set([
+    "net/fabricmc/api/ModInitializer",
+    "net/fabricmc/api/ClientModInitializer",
+    "net/fabricmc/api/DedicatedServerModInitializer",
+]);
 
 const analyzeEntryPoints = (node: Node): EntryPointType[] => {
     const entryPoints: EntryPointType[] = [];
@@ -60,7 +65,6 @@ const analyzeEntryPoints = (node: Node): EntryPointType[] => {
     }
 
     let annotations: Annotation[] = [];
-
     try {
         const attr = node.attrs.find(
             (a) =>
@@ -84,51 +88,31 @@ const analyzeEntryPoints = (node: Node): EntryPointType[] => {
     );
 
     if (premainMethod) {
-        entryPoints.push(EntryPointType.JAVA_AGENT);
+        entryPoints.push(EntryPointType.AGENT);
     }
 
-    if (node.superClass?.nameEntry?.string === "org/bukkit/plugin/java/JavaPlugin") {
-        entryPoints.push(EntryPointType.BUKKIT_PLUGIN);
+    switch (node.superClass?.nameEntry?.string) {
+        case "org/bukkit/plugin/java/JavaPlugin":
+            entryPoints.push(EntryPointType.MINECRAFT_BUKKIT);
+            break;
+        case "net/md_5/bungee/api/plugin/Plugin":
+            entryPoints.push(EntryPointType.MINECRAFT_BUNGEE);
+            break;
     }
 
-    if (node.superClass?.nameEntry?.string === "net/md_5/bungee/api/plugin/Plugin") {
-        entryPoints.push(EntryPointType.BUNGEE_PLUGIN);
-    }
-
-    const velocityPlugin = annotations.some(
-        (a) => a.typeEntry && a.typeEntry.string === "Lcom/velocitypowered/api/plugin/Plugin;"
-    );
-
+    const velocityPlugin = annotations.some((a) => a.typeEntry?.string === "Lcom/velocitypowered/api/plugin/Plugin;");
     if (velocityPlugin) {
-        entryPoints.push(EntryPointType.VELOCITY_PLUGIN);
+        entryPoints.push(EntryPointType.MINECRAFT_VELOCITY);
     }
 
-    const forgeMod = annotations.some(
-        (a) => a.typeEntry && a.typeEntry.string === "Lnet/minecraftforge/fml/common/Mod;"
-    );
-
+    const forgeMod = annotations.some((a) => a.typeEntry?.string === "Lnet/minecraftforge/fml/common/Mod;");
     if (forgeMod) {
-        entryPoints.push(EntryPointType.FORGE_MOD);
+        entryPoints.push(EntryPointType.MINECRAFT_FORGE);
     }
 
-    const fabricInitializers = new Set([
-        "net/fabricmc/api/ModInitializer",
-        "net/fabricmc/api/ClientModInitializer",
-        "net/fabricmc/api/DedicatedServerModInitializer",
-    ]);
-
-    const fabricMod = node.interfaces?.some((i) => i.nameEntry && fabricInitializers.has(i.nameEntry.string));
-
+    const fabricMod = node.interfaces?.some((i) => i.nameEntry && FABRIC_INITIALIZERS.has(i.nameEntry.string));
     if (fabricMod) {
-        entryPoints.push(EntryPointType.FABRIC_MOD);
-    }
-
-    const spongeMixin = annotations.some(
-        (a) => a.typeEntry && a.typeEntry.string === "Lorg/spongepowered/asm/mixin/Mixin;"
-    );
-
-    if (spongeMixin) {
-        entryPoints.push(EntryPointType.SPONGE_MIXIN);
+        entryPoints.push(EntryPointType.MINECRAFT_FABRIC);
     }
 
     return entryPoints;
