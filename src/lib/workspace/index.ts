@@ -51,9 +51,20 @@ export interface ArchiveEntry extends Entry {
     archive: Zip;
 }
 
+export enum EntryPointType {
+    MAIN = "main",
+    AGENT = "agent",
+    MINECRAFT_BUKKIT = "minecraft.bukkit",
+    MINECRAFT_BUNGEE = "minecraft.bungee",
+    MINECRAFT_VELOCITY = "minecraft.velocity",
+    MINECRAFT_FORGE = "minecraft.forge",
+    MINECRAFT_FABRIC = "minecraft.fabric",
+}
+
 export interface ClassEntry extends Entry {
     type: EntryType.CLASS | EntryType.MEMBER;
     node: Node;
+    entryPoints: EntryPointType[];
 }
 
 export interface MemberEntry extends ClassEntry {

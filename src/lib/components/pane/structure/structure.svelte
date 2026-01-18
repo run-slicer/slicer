@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Input } from "$lib/components/ui/input";
-    import { Search, FileX2 } from "@lucide/svelte";
+    import { Search, LayoutDashboard } from "@lucide/svelte";
     import { Field, Constructor, Method, AbstractMethod, accessIcon, classIcon } from "$lib/components/icons";
     import type { PaneProps } from "../";
     import { EntryType, type ClassEntry } from "$lib/workspace";
@@ -13,8 +13,12 @@
     import { current as currentTab } from "$lib/tab";
     import type { UTF8Entry } from "@katana-project/asm/pool";
     import { t } from "$lib/i18n";
+    import Summary from "./summary.svelte";
+    import { Button } from "$lib/components/ui/button";
 
-    let { handler, classes }: PaneProps = $props();
+    let { handler, classes, entries }: PaneProps = $props();
+
+    let showSummary = $state(false);
     let query = $state("");
 
     let currentEntry = $derived.by(() => {
@@ -66,18 +70,30 @@
 </script>
 
 <div class="flex h-full w-full flex-col">
-    {#if currentEntry}
+    {#if currentEntry && !showSummary}
         {@const { icon: EntryIcon, classes } = entryIcon(currentEntry)}
         {@const hasSuperData = absData && (absData.superClass || absData.implementations.length > 0)}
         <div class="bg-muted/20 border-b p-3">
-            {#if packageName}
-                <div class="text-muted-foreground mb-2 truncate text-xs" title={packageName}>
-                    {packageName}
+            <div class="mb-2 flex w-full justify-between">
+                <div class="min-w-0 flex-1">
+                    {#if packageName}
+                        <div class="text-muted-foreground mb-2 truncate text-xs" title={packageName}>
+                            {packageName}
+                        </div>
+                    {/if}
+                    <div class={cn("flex items-center gap-2")}>
+                        <EntryIcon class={cn(classes, "h-4 w-4 shrink-0")} />
+                        <span class="truncate text-sm font-medium">{simpleName}</span>
+                    </div>
                 </div>
-            {/if}
-            <div class={cn("mb-2 flex items-center gap-2", hasSuperData && "border-b-border border-b pb-2")}>
-                <EntryIcon class={cn(classes, "h-4 w-4")} />
-                <span class="text-sm font-medium">{simpleName}</span>
+                <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    class="text-muted-foreground ml-2 shrink-0"
+                    onclick={() => (showSummary = true)}
+                >
+                    <LayoutDashboard />
+                </Button>
             </div>
             {#if hasSuperData}
                 <div class="text-muted-foreground text-xs">
@@ -312,19 +328,6 @@
             </div>
         </div>
     {:else}
-        <div class="flex flex-1 items-center justify-center p-6">
-            <div class="flex flex-col items-center justify-center p-8 text-center">
-                <div class="bg-muted/30 mb-4 flex h-16 w-16 items-center justify-center rounded-full">
-                    <FileX2 class="text-muted-foreground h-8 w-8" />
-                </div>
-
-                <h3 class="mb-2 text-lg font-semibold">
-                    {$t("pane.structure.empty.title")}
-                </h3>
-                <p class="text-muted-foreground text-sm">
-                    {$t("pane.structure.empty.subtitle")}
-                </p>
-            </div>
-        </div>
+        <Summary {classes} {entries} bind:currentEntry bind:showSummary />
     {/if}
 </div>

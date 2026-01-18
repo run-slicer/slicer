@@ -1,9 +1,11 @@
 import { TabPosition, TabType } from "$lib/tab";
 import { type Modifiers, parseModifiers } from "$lib/utils";
-import { type ClassEntry, type Entry, EntryType } from "$lib/workspace";
+import { type ClassEntry, type Entry, EntryPointType, EntryType } from "$lib/workspace";
 import type { UTF8Entry } from "@katana-project/asm/pool";
 import {
+    Box,
     Braces,
+    Bug,
     CodeXml,
     Coffee,
     File,
@@ -15,6 +17,7 @@ import {
     type IconProps,
     Image,
     InspectionPanel,
+    Network,
     PanelBottom,
     PanelBottomDashed,
     PanelLeft,
@@ -22,9 +25,13 @@ import {
     PanelRight,
     PanelRightDashed,
     Parentheses,
+    PlayIcon,
+    Puzzle,
+    Server,
     Sparkles,
     Text,
     TextQuote,
+    Zap,
 } from "@lucide/svelte";
 import type { Component } from "svelte";
 import Android from "./android.svelte";
@@ -187,6 +194,25 @@ export const paneIcon = (pos: TabPosition, open: boolean): Icon => {
             return open ? PanelLeft : PanelLeftDashed;
         case TabPosition.SECONDARY_RIGHT:
             return open ? PanelRight : PanelRightDashed;
+    }
+};
+
+export const entryPointIcon = (type: EntryPointType): Icon => {
+    switch (type) {
+        case EntryPointType.MAIN:
+            return PlayIcon;
+        case EntryPointType.AGENT:
+            return Bug;
+        case EntryPointType.MINECRAFT_BUKKIT:
+            return Server;
+        case EntryPointType.MINECRAFT_BUNGEE:
+            return Network;
+        case EntryPointType.MINECRAFT_VELOCITY:
+            return Zap;
+        case EntryPointType.MINECRAFT_FORGE:
+            return Box;
+        case EntryPointType.MINECRAFT_FABRIC:
+            return Puzzle;
     }
 };
 
