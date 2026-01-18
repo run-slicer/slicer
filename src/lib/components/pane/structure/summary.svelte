@@ -45,17 +45,17 @@
         <div class="flex flex-col">
             <div class="flex items-center gap-2">
                 <LayoutDashboard class="text-foreground h-4 w-4" />
-                <span class="text-foreground font-medium">{$t("pane.summary.title")}</span>
+                <span class="text-foreground font-medium">{$t("pane.structure.summary.title")}</span>
             </div>
 
             <div class="text-muted-foreground mt-1.5 flex items-center gap-3 text-xs">
                 <span class="flex items-center gap-1">
                     <Layers class="h-3 w-3" />
-                    {$t("pane.summary.total-classes", classes.size)}
+                    {$t("pane.structure.summary.total-classes", classes.size)}
                 </span>
                 <span class="flex items-center gap-1">
                     <FileCodeCorner class="h-3 w-3" />
-                    {$t("pane.summary.total-files", entries.length)}
+                    {$t("pane.structure.summary.total-files", entries.length)}
                 </span>
             </div>
         </div>
@@ -75,7 +75,7 @@
     <div class="flex-1">
         <div class="px-3 py-2">
             <span class="text-muted-foreground/70 text-[11px] font-medium tracking-wider uppercase">
-                {$t("pane.summary.entry-points")}
+                {$t("pane.structure.summary.entry-points")}
             </span>
         </div>
 
@@ -83,7 +83,7 @@
             {#if groupedEntryPoints.size === 0}
                 <div class="text-muted-foreground flex flex-col items-center justify-center py-6 text-center">
                     <Server class="mb-2 h-5 w-5 opacity-50" />
-                    <span class="text-xs">{$t("pane.summary.entry-points.none")}</span>
+                    <span class="text-xs">{$t("pane.structure.summary.entry-points.none")}</span>
                 </div>
             {:else}
                 {#each groupedEntryPoints.entries() as [type, entries]}
@@ -103,7 +103,7 @@
                             <Icon class="text-muted-foreground h-3 w-3" />
                         </span>
                         <span class="text-muted-foreground text-xs font-medium">
-                            {$t(`pane.summary.entry-points.${type}`)}
+                            {$t(`pane.structure.summary.entry-points.${type}`)}
                         </span>
                         <span class="bg-muted/50 text-muted-foreground ml-auto rounded px-1.5 py-0.5 text-[10px]">
                             {entries.length}
