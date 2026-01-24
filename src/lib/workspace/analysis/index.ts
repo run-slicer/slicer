@@ -3,10 +3,19 @@ import { analysisBackground } from "$lib/state";
 import { recordProgress } from "$lib/task";
 import { cancellable, type Cancellable, rateLimit } from "$lib/utils";
 import { createDefaultWorkerPool } from "$lib/worker";
-import { type ClassEntry, entries, type Entry, EntryPointType, EntryType, type MemberEntry } from "$lib/workspace";
+import {
+    CharacteristicType,
+    type ClassEntry,
+    entries,
+    type Entry,
+    EntryPointType,
+    EntryType,
+    type MemberEntry,
+} from "$lib/workspace";
 import { FLAG_SKIP_ATTR_PARSE, FLAG_SLICE_BUFFER, type Node } from "@katana-project/asm";
 import { type Annotation, type AnnotationsAttribute, readAnnotations } from "@katana-project/asm/attr/annotation";
-import { AttributeType, Modifier } from "@katana-project/asm/spec";
+import type { ClassEntry as ClassPoolEntry } from "@katana-project/asm/pool";
+import { AttributeType, ConstantType, Modifier } from "@katana-project/asm/spec";
 import { get } from "svelte/store";
 import { QueryType, SearchMode, type SearchQuery, type SearchResult } from "./search";
 import type { AnalysisWorker } from "./worker";
@@ -40,6 +49,7 @@ const analyzeClass = async (entry: Entry, skipAttr: boolean) => {
         } else {
             classEntry.type = EntryType.CLASS;
             classEntry.entryPoints = analyzeEntryPoints(classEntry.node);
+            classEntry.characteristics = analyzeCharacteristics(classEntry.node);
         }
     } catch (e) {
         error(`failed to read class ${entry.name}`, e);
@@ -116,6 +126,73 @@ const analyzeEntryPoints = (node: Node): EntryPointType[] => {
     }
 
     return entryPoints;
+};
+
+const analyzeCharacteristics = (node: Node): CharacteristicType[] => {
+    const chars = new Set<CharacteristicType>();
+    for (const entry of node.pool) {
+        switch (entry?.type) {
+            case ConstantType.CLASS: {
+                const className = (entry as ClassPoolEntry).nameEntry?.string;
+                if (!className) break;
+
+                switch (className) {
+                    case "java/lang/ClassLoader":
+                    case "java/net/URLClassLoader":
+                        chars.add(CharacteristicType.CLASS_LOADING);
+                        break;
+                    case "javax/crypto/Cipher":
+                        chars.add(CharacteristicType.ENCRYPTION);
+                        break;
+                    case "java/lang/reflect/Method":
+                    case "java/lang/reflect/Constructor":
+                    case "java/lang/reflect/Field":
+                    case "java/lang/invoke/MethodHandle":
+                    case "java/lang/invoke/MethodHandles":
+                    case "java/lang/invoke/MethodHandles$Lookup":
+                    case "java/lang/invoke/MethodType":
+                    case "java/lang/invoke/VarHandle":
+                        chars.add(CharacteristicType.REFLECTION);
+                        break;
+                    case "java/io/File":
+                    case "java/nio/file/Files":
+                    case "java/nio/file/Path":
+                    case "java/nio/file/Paths":
+                    case "java/nio/file/FileSystem":
+                    case "java/nio/file/FileSystems":
+                        chars.add(CharacteristicType.FILE_IO);
+                        break;
+                    case "java/net/Socket":
+                    case "java/net/ServerSocket":
+                    case "java/net/DatagramSocket":
+                    case "java/net/HttpURLConnection":
+                    case "java/net/URL":
+                    case "java/net/URLConnection":
+                    case "java/net/http/HttpClient":
+                        chars.add(CharacteristicType.NETWORK_IO);
+                        break;
+                    case "java/io/ObjectInputStream":
+                    case "java/io/ObjectOutputStream":
+                        chars.add(CharacteristicType.OBJECT_SERDES);
+                        break;
+                    case "java/lang/foreign/MemorySegment":
+                    case "java/lang/foreign/Arena":
+                    case "java/lang/foreign/Linker":
+                        chars.add(CharacteristicType.NATIVE_CODE);
+                        break;
+                }
+                break;
+            }
+        }
+    }
+
+    for (const method of node.methods) {
+        if ((method.access & Modifier.NATIVE) !== 0) {
+            chars.add(CharacteristicType.NATIVE_CODE);
+        }
+    }
+
+    return Array.from(chars.values());
 };
 
 export const analyze = async (entry: Entry, state: AnalysisState = AnalysisState.PARTIAL) => {

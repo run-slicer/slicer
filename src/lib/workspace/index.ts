@@ -60,10 +60,21 @@ export enum EntryPointType {
     MINECRAFT_FABRIC = "minecraft.fabric",
 }
 
+export enum CharacteristicType {
+    CLASS_LOADING = "class-loading",
+    ENCRYPTION = "encryption",
+    FILE_IO = "file-io",
+    NETWORK_IO = "network-io",
+    OBJECT_SERDES = "object-serdes",
+    REFLECTION = "reflection",
+    NATIVE_CODE = "native-code",
+}
+
 export interface ClassEntry extends Entry {
     type: EntryType.CLASS | EntryType.MEMBER;
     node: Node;
     entryPoints: EntryPointType[];
+    characteristics: CharacteristicType[];
 }
 
 export interface MemberEntry extends ClassEntry {

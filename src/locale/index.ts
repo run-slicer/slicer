@@ -122,6 +122,15 @@ export interface LocaleData {
     "pane.structure.summary.entry-points.minecraft.velocity": string;
     "pane.structure.summary.entry-points.minecraft.forge": string;
     "pane.structure.summary.entry-points.minecraft.fabric": string;
+    "pane.structure.summary.characteristics": string;
+    "pane.structure.summary.characteristics.none": string;
+    "pane.structure.summary.characteristics.class-loading": string;
+    "pane.structure.summary.characteristics.encryption": string;
+    "pane.structure.summary.characteristics.file-io": string;
+    "pane.structure.summary.characteristics.network-io": string;
+    "pane.structure.summary.characteristics.object-serdes": string;
+    "pane.structure.summary.characteristics.reflection": string;
+    "pane.structure.summary.characteristics.native-code": string;
     "pane.code.loading.disasm": string;
     "pane.code.loading.read": string;
     "pane.code.disasm": string;
