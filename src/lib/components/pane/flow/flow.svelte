@@ -30,8 +30,6 @@
     const entry = tab.entry!;
 
     const node = "node" in entry ? (entry as ClassEntry).node : null;
-
-    const pool = node ? node.pool : [];
     const methods = node ? node.methods : [];
 
     let member = $state(entry.type === EntryType.MEMBER ? (entry as MemberEntry).member : null);
@@ -135,11 +133,15 @@
                     </div>
                 </SelectTrigger>
                 <SelectContent class="max-h-[240px] w-full overflow-scroll" side="top" align="start">
-                    <SelectItem value="-1" label="<none>" class="font-mono text-xs tracking-tight">
-                        {$t("pane.graph.method")}
+                    <SelectItem
+                        value="-1"
+                        label={$t("pane.graph.method.none")}
+                        class="font-mono text-xs tracking-tight"
+                    >
+                        {$t("pane.graph.method.none")}
                     </SelectItem>
                     {#each methods as mth, i}
-                        {@const label = !mth ? $t("pane.graph.method.none") : `${mth.name.string}${mth.type.string}`}
+                        {@const label = `${mth.name.string}${mth.type.string}`}
                         <SelectItem value={i.toString()} {label} class="font-mono text-xs tracking-tight break-all">
                             {label}
                         </SelectItem>
