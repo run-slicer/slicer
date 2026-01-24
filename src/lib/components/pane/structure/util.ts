@@ -109,9 +109,7 @@ interface AbstractionInfo {
 
 export const abstractionInfo = (node: Node): AbstractionInfo => {
     return {
-        superClass: node.superClass
-            ? (node.pool[node.superClass.name] as UTF8Entry).string.replaceAll("/", ".")
-            : undefined,
-        implementations: node.interfaces.map((itf) => (node.pool[itf.name] as UTF8Entry).string.replaceAll("/", ".")),
+        superClass: node.superClass ? (node.pool[node.superClass.name] as UTF8Entry).string : undefined,
+        implementations: node.interfaces.map((itf) => (node.pool[itf.name] as UTF8Entry).string),
     };
 };

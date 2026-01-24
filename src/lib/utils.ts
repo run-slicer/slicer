@@ -429,7 +429,14 @@ const primTypes: Record<string, string> = {
     V: "void",
 };
 
-export const prettyInternalName = (name: string): string => {
+export const prettyInternalName = (name: string, short: boolean = false): string => {
+    if (short) {
+        const index = name.lastIndexOf("/");
+        if (index !== -1) {
+            return name.substring(index + 1).replaceAll("$", ".");
+        }
+    }
+
     return name.replaceAll("$", ".").replaceAll("/", ".");
 };
 

@@ -9,7 +9,7 @@
     import { fields, methods, innerClasses, abstractionInfo } from "./util";
     import StructureMenu from "./menu.svelte";
     import { ContextMenu, ContextMenuTrigger } from "$lib/components/ui/context-menu";
-    import { partition } from "$lib/utils";
+    import { partition, prettyInternalName } from "$lib/utils";
     import { current as currentTab } from "$lib/tab";
     import type { UTF8Entry } from "@katana-project/asm/pool";
     import { t } from "$lib/i18n";
@@ -71,7 +71,7 @@
 
 <div class="flex h-full w-full flex-col">
     {#if currentEntry && !showSummary}
-        {@const { icon: EntryIcon, classes } = entryIcon(currentEntry)}
+        {@const { icon: EntryIcon, classes: iconClasses } = entryIcon(currentEntry)}
         {@const hasSuperData = absData && (absData.superClass || absData.implementations.length > 0)}
         <div class="bg-muted/20 border-b p-3">
             <div class="mb-2 flex w-full justify-between">
@@ -82,8 +82,8 @@
                         </div>
                     {/if}
                     <div class={cn("flex items-center gap-2")}>
-                        <EntryIcon class={cn(classes, "h-4 w-4 shrink-0")} />
-                        <span class="truncate text-sm font-medium">{simpleName}</span>
+                        <EntryIcon class={cn(iconClasses, "h-4 w-4 shrink-0")} />
+                        <span class="truncate text-sm font-medium">{prettyInternalName(simpleName || "")}</span>
                     </div>
                 </div>
                 <Button
@@ -98,16 +98,42 @@
             {#if hasSuperData}
                 <div class="text-muted-foreground text-xs">
                     {#if absData.superClass}
-                        <div class="truncate" title={absData.superClass}>
+                        {@const superEntry = classes.get(absData.superClass)}
+                        <div>
                             {$t("pane.structure.extends")}
-                            <span class="text-secondary-foreground">{absData.superClass}</span>
+                            <button
+                                title={prettyInternalName(absData.superClass)}
+                                class={cn("text-secondary-foreground", superEntry ? "cursor-pointer underline" : "")}
+                                onclick={() => {
+                                    if (superEntry) {
+                                        handler.open(superEntry);
+                                    }
+                                }}
+                            >
+                                {prettyInternalName(absData.superClass, !!superEntry)}
+                            </button>
                         </div>
                     {/if}
                     {#if absData.implementations.length > 0}
-                        <div class="truncate" title={absData.implementations.join(", ")}>
+                        <div>
                             {$t("pane.structure.implements")}
                             <span class="text-secondary-foreground">
-                                {absData.implementations.join(", ")}
+                                {#each absData.implementations as impl, i}
+                                    {@const implEntry = classes.get(impl)}
+                                    {#if i > 0},
+                                    {/if}
+                                    <button
+                                        title={prettyInternalName(impl)}
+                                        class={cn(implEntry && "cursor-pointer underline")}
+                                        onclick={() => {
+                                            if (implEntry) {
+                                                handler.open(implEntry);
+                                            }
+                                        }}
+                                    >
+                                        {prettyInternalName(impl, !!implEntry)}
+                                    </button>
+                                {/each}
                             </span>
                         </div>
                     {/if}
@@ -124,10 +150,13 @@
         <div class="flex-1 overflow-y-auto">
             <div class="p-2">
                 {#if filteredFieldData.length > 0}
-                    <div class="mb-4">
-                        <div class="mb-2 flex items-center gap-2 px-2">
-                            <span class="text-muted-foreground text-sm font-medium">
-                                {$t("pane.structure.fields", fieldData.length)}
+                    <div class="mb-3">
+                        <div class="mb-1 flex items-center gap-2 px-2">
+                            <span class="text-muted-foreground text-xs font-medium">
+                                {$t("pane.structure.fields")}
+                            </span>
+                            <span class="bg-muted/50 text-muted-foreground ml-auto rounded px-1.5 py-0.5 text-[10px]">
+                                {fieldData.length}
                             </span>
                         </div>
                         {#each filteredFieldData as field}
@@ -158,10 +187,13 @@
                 {/if}
 
                 {#if filteredInitializerData.length > 0}
-                    <div class="mb-4">
-                        <div class="mb-2 flex items-center gap-2 px-2">
-                            <span class="text-muted-foreground text-sm font-medium">
-                                {$t("pane.structure.initializers", initializerData.length)}
+                    <div class="mb-3">
+                        <div class="mb-1 flex items-center gap-2 px-2">
+                            <span class="text-muted-foreground text-xs font-medium">
+                                {$t("pane.structure.initializers")}
+                            </span>
+                            <span class="bg-muted/50 text-muted-foreground ml-auto rounded px-1.5 py-0.5 text-[10px]">
+                                {initializerData.length}
                             </span>
                         </div>
                         {#each filteredInitializerData as initializer}
@@ -193,10 +225,13 @@
                 {/if}
 
                 {#if filteredConstructorData.length > 0}
-                    <div class="mb-4">
-                        <div class="mb-2 flex items-center gap-2 px-2">
-                            <span class="text-muted-foreground text-sm font-medium">
-                                {$t("pane.structure.constructors", constructorData.length)}
+                    <div class="mb-3">
+                        <div class="mb-1 flex items-center gap-2 px-2">
+                            <span class="text-muted-foreground text-xs font-medium">
+                                {$t("pane.structure.constructors")}
+                            </span>
+                            <span class="bg-muted/50 text-muted-foreground ml-auto rounded px-1.5 py-0.5 text-[10px]">
+                                {constructorData.length}
                             </span>
                         </div>
                         {#each filteredConstructorData as constructor}
@@ -228,10 +263,13 @@
                 {/if}
 
                 {#if methodData.length > 0}
-                    <div class="mb-4">
-                        <div class="mb-2 flex items-center gap-2 px-2">
-                            <span class="text-muted-foreground text-sm font-medium">
-                                {$t("pane.structure.methods", methodData.length)}
+                    <div class="mb-3">
+                        <div class="mb-1 flex items-center gap-2 px-2">
+                            <span class="text-muted-foreground text-xs font-medium">
+                                {$t("pane.structure.methods")}
+                            </span>
+                            <span class="bg-muted/50 text-muted-foreground ml-auto rounded px-1.5 py-0.5 text-[10px]">
+                                {methodData.length}
                             </span>
                         </div>
                         {#each methodData as method}
@@ -268,10 +306,13 @@
                 {/if}
 
                 {#if filteredInnerClassData.length > 0}
-                    <div class="mb-4">
-                        <div class="mb-2 flex items-center gap-2 px-2">
-                            <span class="text-muted-foreground text-sm font-medium">
-                                {$t("pane.structure.inner-classes", innerClassData.length)}
+                    <div class="mb-3">
+                        <div class="mb-1 flex items-center gap-2 px-2">
+                            <span class="text-muted-foreground text-xs font-medium">
+                                {$t("pane.structure.inner-classes")}
+                            </span>
+                            <span class="bg-muted/50 text-muted-foreground ml-auto rounded px-1.5 py-0.5 text-[10px]">
+                                {innerClassData.length}
                             </span>
                         </div>
                         {#each filteredInnerClassData as innerClass}
