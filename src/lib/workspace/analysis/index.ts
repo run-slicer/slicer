@@ -14,7 +14,7 @@ import {
 } from "$lib/workspace";
 import { FLAG_SKIP_ATTR_PARSE, FLAG_SLICE_BUFFER, type Node } from "@katana-project/asm";
 import { type Annotation, type AnnotationsAttribute, readAnnotations } from "@katana-project/asm/attr/annotation";
-import type { ClassEntry as ClassPoolEntry } from "@katana-project/asm/pool";
+import type { ClassEntry as ClassPoolEntry, RefEntry } from "@katana-project/asm/pool";
 import { AttributeType, ConstantType, Modifier } from "@katana-project/asm/spec";
 import { get } from "svelte/store";
 import { QueryType, SearchMode, type SearchQuery, type SearchResult } from "./search";
@@ -152,6 +152,9 @@ const analyzeCharacteristics = (node: Node): CharacteristicType[] => {
                     case "java/lang/invoke/MethodHandles$Lookup":
                     case "java/lang/invoke/MethodType":
                     case "java/lang/invoke/VarHandle":
+                    case "java/util/concurrent/atomic/AtomicReferenceFieldUpdater":
+                    case "java/util/concurrent/atomic/AtomicIntegerFieldUpdater":
+                    case "java/util/concurrent/atomic/AtomicLongFieldUpdater":
                         chars.add(CharacteristicType.REFLECTION);
                         break;
                     case "java/io/File":
@@ -178,9 +181,36 @@ const analyzeCharacteristics = (node: Node): CharacteristicType[] => {
                     case "java/lang/foreign/MemorySegment":
                     case "java/lang/foreign/Arena":
                     case "java/lang/foreign/Linker":
+                    case "java/lang/foreign/SymbolLookup":
+                    case "sun/misc/Unsafe":
                         chars.add(CharacteristicType.NATIVE_CODE);
                         break;
+                    case "java/lang/ProcessBuilder":
+                    case "java/lang/ProcessHandle":
+                    case "java/lang/Process":
+                        chars.add(CharacteristicType.PROCESS_MANIPULATION);
+                        break;
                 }
+                break;
+            }
+            case ConstantType.METHODREF:
+            case ConstantType.INTERFACE_METHODREF: {
+                const refEntry = entry as RefEntry;
+                const className = refEntry.refEntry?.nameEntry?.string;
+                const nameType = refEntry.nameTypeEntry;
+                const methodName = nameType?.nameEntry?.string;
+
+                if (!className || !methodName) break;
+
+                if (className === "java/lang/Runtime" || className === "java/lang/System") {
+                    if (methodName === "exec") {
+                        chars.add(CharacteristicType.PROCESS_MANIPULATION);
+                    }
+                    if (methodName === "load" || methodName === "loadLibrary") {
+                        chars.add(CharacteristicType.NATIVE_CODE);
+                    }
+                }
+
                 break;
             }
         }

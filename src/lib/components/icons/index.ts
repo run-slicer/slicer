@@ -9,6 +9,7 @@ import {
     CloudUpload,
     CodeXml,
     Coffee,
+    Cpu,
     EarthLock,
     File,
     FileArchive,
@@ -238,6 +239,8 @@ export const characteristicIcon = (type: CharacteristicType): Icon => {
             return FlipVertical2;
         case CharacteristicType.NATIVE_CODE:
             return Binary;
+        case CharacteristicType.PROCESS_MANIPULATION:
+            return Cpu;
     }
 };
 

@@ -68,6 +68,7 @@ export enum CharacteristicType {
     OBJECT_SERDES = "object-serdes",
     REFLECTION = "reflection",
     NATIVE_CODE = "native-code",
+    PROCESS_MANIPULATION = "process-manipulation",
 }
 
 export interface ClassEntry extends Entry {
