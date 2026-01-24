@@ -129,6 +129,7 @@
     "pane.structure.summary.characteristics.object-serdes": "Object serialization",
     "pane.structure.summary.characteristics.reflection": "Reflection",
     "pane.structure.summary.characteristics.native-code": "FFM/native methods",
+    "pane.structure.summary.characteristics.process-manipulation": "Process manipulation",
     "pane.code.loading.disasm": "Desensamblando...",
     "pane.code.loading.read": "Leyendo...",
     "pane.code.disasm": "Desensamblador:",
