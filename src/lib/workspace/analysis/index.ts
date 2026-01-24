@@ -163,6 +163,8 @@ const analyzeCharacteristics = (node: Node): CharacteristicType[] => {
                     case "java/nio/file/Paths":
                     case "java/nio/file/FileSystem":
                     case "java/nio/file/FileSystems":
+                    case "java/nio/channels/FileChannel":
+                    case "java/nio/channels/AsynchronousFileChannel":
                         chars.add(CharacteristicType.FILE_IO);
                         break;
                     case "java/net/Socket":
@@ -172,6 +174,12 @@ const analyzeCharacteristics = (node: Node): CharacteristicType[] => {
                     case "java/net/URL":
                     case "java/net/URLConnection":
                     case "java/net/http/HttpClient":
+                    case "java/nio/channels/NetworkChannel":
+                    case "java/nio/channels/SocketChannel":
+                    case "java/nio/channels/ServerSocketChannel":
+                    case "java/nio/channels/DatagramChannel":
+                    case "java/nio/channels/AsynchronousSocketChannel":
+                    case "java/nio/channels/AsynchronousServerSocketChannel":
                         chars.add(CharacteristicType.NETWORK_IO);
                         break;
                     case "java/io/ObjectInputStream":
