@@ -18,7 +18,6 @@
     import { t } from "$lib/i18n";
     import type { EditorView } from "@codemirror/view";
     import { type Cancellable, prettyInternalName } from "$lib/utils";
-    import { index } from "$lib/workspace/jdk";
     import { QueryType, search, SearchMode, type SearchResult } from "$lib/workspace/analysis";
     import FloatingModal from "$lib/components/floating_modal.svelte";
     import UsagesContent from "./usages.svelte";
@@ -66,7 +65,7 @@
         return resolved && resolved.kind !== "builtin" ? resolved : null;
     });
 
-    let detail = $derived(view ? resolveType(resolved, handler, view, classes, index) : null);
+    let detail = $derived(view ? resolveType(resolved, handler, view, classes) : null);
 
     let usagesOpen = $state(false);
     let usages: SearchResult[] = $state.raw([]);

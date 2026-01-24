@@ -8,12 +8,13 @@
     import type { Component } from "svelte";
     import type { Icon } from "$lib/components/icons";
     import { t } from "$lib/i18n";
+    import type { PaneProps } from "$lib/components/pane";
 
     type SectionID = "general" | "editor" | "workspace" | "analysis" | "interp";
     interface Section {
         id: SectionID;
         icon: Icon;
-        component: Component;
+        component: Component<PaneProps>;
     }
 
     const sections: Section[] = [
@@ -29,7 +30,6 @@
     import { Button } from "$lib/components/ui/button";
     import { Upload, Download, Eraser } from "@lucide/svelte";
     import { load, save } from "$lib/state";
-    import type { PaneProps } from "$lib/components/pane";
     import { downloadBlob, readFiles, timestampFile } from "$lib/utils";
     import { toast } from "svelte-sonner";
     import { modals } from "svelte-modals";

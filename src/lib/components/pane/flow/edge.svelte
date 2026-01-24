@@ -5,7 +5,7 @@
 
     let { id, interactionWidth, label, labelStyle, style, markerEnd, markerStart, data }: EdgeProps = $props();
 
-    const elkEdge = data as ElkExtendedEdge;
+    const elkEdge = data as unknown as ElkExtendedEdge;
     let [path, labelX, labelY] = $derived(getSmoothStepPathFromElk(elkEdge));
 </script>
 

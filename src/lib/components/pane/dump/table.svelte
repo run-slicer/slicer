@@ -95,7 +95,7 @@
                 }),
             cell: ({ row }) =>
                 renderComponent(TableCellComponent, {
-                    text: row.getValue("name"),
+                    text: row.getValue("name") as string,
                     mono: true,
                 }),
             filterFn: "includesString",

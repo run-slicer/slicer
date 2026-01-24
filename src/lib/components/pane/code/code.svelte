@@ -30,7 +30,7 @@
     import { createTypeReferenceResolver, parseUnit } from "@katana-project/laser";
     import { EditorView } from "@codemirror/view";
     import { ensureSyntaxTree } from "@codemirror/language";
-    import { index, jdkRefs } from "$lib/workspace/jdk";
+    import { jdkRefs } from "$lib/workspace/jdk";
     import { typeResolver } from "./resolver";
     import { Compartment } from "@codemirror/state";
 
@@ -109,7 +109,7 @@
 
         view.focus();
         view.dispatch({
-            effects: resolverStore.reconfigure(typeResolver(resolver, handler, classes, index)),
+            effects: resolverStore.reconfigure(typeResolver(resolver, handler, classes)),
         });
     });
 
@@ -132,7 +132,7 @@
                     {lang}
                     bind:size={$textSize}
                     {wrap}
-                    extensions={[resolverStore.of(typeResolver(resolver, handler, classes, index))]}
+                    extensions={[resolverStore.of(typeResolver(resolver, handler, classes))]}
                     tooltip={() => [Tooltip, { resolver, classes, handler }]}
                 />
             </ContextMenuTrigger>
