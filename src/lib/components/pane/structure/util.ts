@@ -2,7 +2,6 @@ import { type Modifiers, parseModifiers, prettyJavaType, prettyMethodDesc } from
 import { type ClassEntry, type Entry, EntryType, memberEntry } from "$lib/workspace";
 import type { Node } from "@katana-project/asm";
 import type { InnerClassesAttribute } from "@katana-project/asm/attr";
-import type { UTF8Entry } from "@katana-project/asm/pool";
 import { AttributeType } from "@katana-project/asm/spec";
 
 interface Method {
@@ -64,7 +63,7 @@ export const innerClasses = (node: Node, classes: Map<string, Entry>): InnerClas
         return [];
     }
 
-    const thisClass = (node.pool[node.thisClass.name] as UTF8Entry).string;
+    const thisClass = node.thisClass.nameEntry!.string;
     return (attr as InnerClassesAttribute).classes
         .map((klass) => {
             const poolEntry = klass.innerEntry;
@@ -74,21 +73,21 @@ export const innerClasses = (node: Node, classes: Map<string, Entry>): InnerClas
 
             const outerEntry = klass.outerEntry;
             if (outerEntry) {
-                const outerName = (node.pool[outerEntry.name] as UTF8Entry).string;
+                const outerName = outerEntry.nameEntry!.string;
                 if (outerName !== thisClass) {
                     // not an inner class of this class
                     return null;
                 }
             }
 
-            let entry = classes.get((node.pool[poolEntry.name] as UTF8Entry).string) as ClassEntry | undefined;
+            let entry = classes.get(poolEntry.nameEntry!.string) as ClassEntry | undefined;
             if (entry?.type !== EntryType.CLASS) {
                 entry = undefined;
             }
 
             let record = false;
             if (entry?.node?.superClass) {
-                const superName = (entry!.node.pool[entry!.node.superClass.name] as UTF8Entry).string;
+                const superName = entry!.node.superClass.nameEntry!.string;
                 record = superName === "java/lang/Record";
             }
 
@@ -109,7 +108,7 @@ interface AbstractionInfo {
 
 export const abstractionInfo = (node: Node): AbstractionInfo => {
     return {
-        superClass: node.superClass ? (node.pool[node.superClass.name] as UTF8Entry).string : undefined,
-        implementations: node.interfaces.map((itf) => (node.pool[itf.name] as UTF8Entry).string),
+        superClass: node.superClass ? node.superClass.nameEntry!.string : undefined,
+        implementations: node.interfaces.map((itf) => itf.nameEntry!.string),
     };
 };

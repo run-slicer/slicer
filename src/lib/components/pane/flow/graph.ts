@@ -4,7 +4,6 @@ import type { Node as ClassNode, Member } from "@katana-project/asm";
 import { escapeLiteral, formatEntry, formatInsn } from "@katana-project/asm/analysis/disasm";
 import { computeGraph, EdgeType, type Node as GraphNode } from "@katana-project/asm/analysis/graph";
 import type { BootstrapMethodsAttribute, CodeAttribute } from "@katana-project/asm/attr";
-import type { UTF8Entry } from "@katana-project/asm/pool";
 import { AttributeType } from "@katana-project/asm/spec";
 import type { Edge, MarkerType, Node } from "@xyflow/svelte";
 import ELK, { type ElkNode } from "elkjs/lib/elk-api";
@@ -218,7 +217,7 @@ export const computeHierarchyGraph = async (
     inheritanceGraph: InheritanceGraph,
     withSubtypes: boolean
 ): Promise<[Node[], Edge[]]> => {
-    const currentName = (node.pool[node.thisClass.name] as UTF8Entry).string;
+    const currentName = node.thisClass.nameEntry!.string;
     const currentNode = inheritanceGraph[currentName];
     if (!currentNode) {
         return [[], []]; // class not found in graph

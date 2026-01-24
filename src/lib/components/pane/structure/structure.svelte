@@ -11,7 +11,6 @@
     import { ContextMenu, ContextMenuTrigger } from "$lib/components/ui/context-menu";
     import { partition, prettyInternalName } from "$lib/utils";
     import { current as currentTab } from "$lib/tab";
-    import type { UTF8Entry } from "@katana-project/asm/pool";
     import { t } from "$lib/i18n";
     import Summary from "./summary.svelte";
     import { Button } from "$lib/components/ui/button";
@@ -35,12 +34,12 @@
     let currentNode = $derived(currentEntry ? currentEntry.node! : null);
 
     let [packageName, simpleName] = $derived.by(() => {
-        const nameEntry = currentNode?.thisClass;
+        const nameEntry = currentNode?.thisClass?.nameEntry;
         if (!nameEntry) {
             return [null, null];
         }
 
-        const parts = (currentNode.pool[nameEntry.name] as UTF8Entry).string.split("/");
+        const parts = nameEntry.string.split("/");
         return [parts.slice(0, parts.length - 1).join("."), parts.pop()];
     });
 

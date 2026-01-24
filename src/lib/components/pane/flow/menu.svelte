@@ -12,7 +12,6 @@
     import { toJpeg, toPng, toSvg } from "html-to-image";
     import { downloadUrl, prettyMethodDesc } from "$lib/utils";
     import type { Member, Node } from "@katana-project/asm";
-    import type { UTF8Entry } from "@katana-project/asm/pool";
     import { CodeXml, Image } from "@lucide/svelte";
     import { checkDims } from "./canvas";
     import { t } from "$lib/i18n";
@@ -28,7 +27,7 @@
     let name = $derived.by(() => {
         if (!node) return "Unknown";
 
-        const nodeName = (node.pool[node.thisClass.name] as UTF8Entry).string;
+        const nodeName = node.thisClass.nameEntry!.string;
 
         const slashIndex = nodeName.lastIndexOf("/");
         const shortName = slashIndex !== -1 ? nodeName.substring(slashIndex + 1) : nodeName;

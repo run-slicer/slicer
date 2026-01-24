@@ -3,7 +3,7 @@ import { escapeLiteral, formatEntry, formatInsn } from "@katana-project/asm/anal
 import type { BootstrapMethodsAttribute, CodeAttribute } from "@katana-project/asm/attr";
 import { readBootstrapMethods } from "@katana-project/asm/attr/bsm";
 import { readCode } from "@katana-project/asm/attr/code";
-import type { Entry, NameTypeEntry, Pool, UTF8Entry } from "@katana-project/asm/pool";
+import type { Entry, NameTypeEntry } from "@katana-project/asm/pool";
 import { AttributeType, ConstantType } from "@katana-project/asm/spec";
 import { expose } from "comlink";
 import { QueryType, type SearchData, SearchMode, type SearchResultData } from "./search";
@@ -49,11 +49,8 @@ const searchPoolEntries = (
         .filter((e) => comparator(e.value));
 };
 
-const isMethodNameType = (entry: Entry, pool: Pool): boolean => {
-    return (
-        entry.type === ConstantType.NAME_AND_TYPE &&
-        (pool[(entry as NameTypeEntry).type_] as UTF8Entry).string.charAt(0) === "("
-    );
+const isMethodNameType = (entry: Entry): boolean => {
+    return entry.type === ConstantType.NAME_AND_TYPE && (entry as NameTypeEntry).typeEntry!.string.charAt(0) === "(";
 };
 
 const searchMembers = (members: Member[], comparator: Comparator): SearchResultData[] => {
@@ -110,12 +107,12 @@ expose({
                     ? searchPoolEntries(
                           node,
                           comparator,
-                          (e) => e.type === ConstantType.NAME_AND_TYPE && !isMethodNameType(e, node.pool)
+                          (e) => e.type === ConstantType.NAME_AND_TYPE && !isMethodNameType(e)
                       )
                     : searchMembers(node.fields, comparator);
             case QueryType.METHOD:
                 return ref
-                    ? searchPoolEntries(node, comparator, (e) => isMethodNameType(e, node.pool))
+                    ? searchPoolEntries(node, comparator, (e) => isMethodNameType(e))
                     : searchMembers(node.methods, comparator);
         }
     },

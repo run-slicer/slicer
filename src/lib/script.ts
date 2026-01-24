@@ -33,7 +33,6 @@ import {
 } from "$lib/workspace";
 import { AnalysisState, analyze } from "$lib/workspace/analysis";
 import { DataType, memoryData, type MemoryData } from "$lib/workspace/data";
-import type { UTF8Entry } from "@katana-project/asm/pool";
 import type {
     DisassemblerContext,
     EditorContext,
@@ -213,7 +212,7 @@ const unwrapDisasm = (disasm: ScriptDisassembler): Disassembler => {
                 const { node, data } = entry;
 
                 const buf = await data.bytes();
-                const name = (node.pool[node.thisClass.name] as UTF8Entry).string;
+                const name = node.thisClass.nameEntry!.string;
 
                 const needJdk = get(analysisJdkClasses);
                 return disasm.class(name, createClassSource(name, buf, needJdk), createResources(needJdk));
@@ -225,7 +224,7 @@ const unwrapDisasm = (disasm: ScriptDisassembler): Disassembler => {
                       const { node, data } = entry;
 
                       const buf = await data.bytes();
-                      const name = (node.pool[node.thisClass.name] as UTF8Entry).string;
+                      const name = node.thisClass.nameEntry!.string;
                       const signature = method.name.string + method.type.string;
 
                       const needJdk = get(analysisJdkClasses);

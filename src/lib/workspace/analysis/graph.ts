@@ -1,5 +1,4 @@
 import { type ClassEntry, classes, EntryType } from "$lib/workspace";
-import type { UTF8Entry } from "@katana-project/asm/pool";
 import { derived } from "svelte/store";
 
 export interface IGraphNode {
@@ -82,20 +81,20 @@ const createGraph = (classes: ClassEntry[]): InheritanceGraph => {
     for (const klass of classes) {
         const { node: klassNode } = klass;
 
-        const classNode = node((klassNode.pool[klassNode.thisClass.name] as UTF8Entry).string);
+        const classNode = node(klassNode.thisClass.nameEntry!.string);
         classNode.entry = klass;
 
         if (klassNode.superClass) {
             classNode.superClass = {
                 from: classNode,
-                to: node((klassNode.pool[klassNode.superClass.name] as UTF8Entry).string),
+                to: node(klassNode.superClass.nameEntry!.string),
                 itf: false,
             };
         }
         for (const itf of klassNode.interfaces) {
             classNode.interfaces.push({
                 from: classNode,
-                to: node((klassNode.pool[itf.name] as UTF8Entry).string),
+                to: node(itf.nameEntry!.string),
                 itf: true,
             });
         }

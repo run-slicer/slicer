@@ -9,7 +9,6 @@
 
 <script lang="ts">
     import type { Node } from "@katana-project/asm";
-    import type { UTF8Entry } from "@katana-project/asm/pool";
     import { Table, TableCell, TableHead, TableRow } from "$lib/components/ui/table";
     import { ElementType, formatMod } from "@katana-project/asm/analysis/disasm";
     import { AttributeType, Modifier } from "@katana-project/asm/spec";
@@ -30,17 +29,17 @@
     const signatureAttr = node.attrs.find((a) => a.type === AttributeType.SIGNATURE);
     const sourceFileAttr = node.attrs.find((a) => a.type === AttributeType.SOURCE_FILE);
 
-    const name = (node.pool[node.thisClass.name] as UTF8Entry).string;
+    const name = node.thisClass.nameEntry!.string;
     const mods = formatMod(
         node.access,
         (node.access & Modifier.INTERFACE) !== 0 ? ElementType.INTERFACE : ElementType.CLASS
     );
-    const superName = node.superClass ? (node.pool[node.superClass.name] as UTF8Entry).string : null;
-    const interfaces = node.interfaces.map(({ name }) => (node.pool[name] as UTF8Entry).string);
+    const superName = node.superClass ? node.superClass.nameEntry!.string : null;
+    const interfaces = node.interfaces.map(({ nameEntry }) => nameEntry!.string);
 
     const permittedSubclasses =
         (permittedSubclassesAttr as PermittedSubclassesAttribute)?.classes?.map(
-            ({ entry }) => (node.pool[entry?.name ?? 0] as UTF8Entry).string
+            ({ entry }) => entry?.nameEntry?.string
         ) || [];
     const signature = (signatureAttr as SignatureAttribute)?.signatureEntry?.string;
     const sourceFile = (sourceFileAttr as SourceFileAttribute)?.sourceFileEntry?.string;

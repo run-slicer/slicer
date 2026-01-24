@@ -11,7 +11,6 @@
     import { type ClassEntry, type Entry, entryRef, EntryType } from "$lib/workspace";
     import { t } from "$lib/i18n";
     import { groupBy } from "$lib/utils";
-    import type { UTF8Entry } from "@katana-project/asm/pool";
 
     let { entries, handler }: PaneProps = $props();
 
@@ -45,7 +44,7 @@
         if (e.extension === "class") {
             if (e.type === EntryType.CLASS) {
                 const { node } = e as ClassEntry;
-                return (node.pool[node.thisClass.name] as UTF8Entry).string;
+                return node.thisClass.nameEntry!.string;
             }
 
             return e.data.name.replace(/\.class$/, "");

@@ -1,7 +1,6 @@
 import { TabPosition, TabType } from "$lib/tab";
 import { type Modifiers, parseModifiers } from "$lib/utils";
 import { type ClassEntry, type Entry, EntryPointType, EntryType } from "$lib/workspace";
-import type { UTF8Entry } from "@katana-project/asm/pool";
 import {
     Box,
     Braces,
@@ -115,7 +114,7 @@ export const entryIcon = (entry: Entry): StyledIcon => {
 
                 let record = false;
                 if (node.superClass) {
-                    const superName = (node.pool[node.superClass.name] as UTF8Entry).string;
+                    const superName = node.superClass.nameEntry!.string;
                     record = superName === "java/lang/Record";
                 }
 

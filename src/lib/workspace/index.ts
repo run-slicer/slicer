@@ -3,7 +3,6 @@ import { analysisBackground, workspaceArchiveDuplicateHandling } from "$lib/stat
 import { record } from "$lib/task";
 import { fetchProgress, groupBy, prettyMethodDesc, refFromName } from "$lib/utils";
 import type { Member, Node } from "@katana-project/asm";
-import type { UTF8Entry } from "@katana-project/asm/pool";
 import type { Zip, Entry as ZipEntry } from "@katana-project/zip";
 import { derived, get, writable } from "svelte/store";
 import { AnalysisState, analyze, analyzeBackground, analyzeSchedule } from "./analysis";
@@ -108,8 +107,7 @@ export const transformEntry = (entry: Entry, ext: string, value: string): Entry 
 };
 
 export const memberEntry = (entry: ClassEntry, member: Member): MemberEntry => {
-    const nodeName = (entry.node.pool[entry.node.thisClass.name] as UTF8Entry).string;
-
+    const nodeName = entry.node.thisClass.nameEntry!.string;
     const signature = member.name.string + prettyMethodDesc(member.type.string);
 
     const slashIndex = nodeName.lastIndexOf("/");
