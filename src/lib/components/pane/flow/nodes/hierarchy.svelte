@@ -2,17 +2,25 @@
     import { Handle, type NodeProps, Position } from "@xyflow/svelte";
     import type { HierarchyNodeData } from "../graph";
     import { Separator } from "$lib/components/ui/separator";
+    import { cn } from "$lib/components/utils";
+    import { prettyInternalName } from "$lib/utils";
 
     interface Props extends NodeProps {
         data: HierarchyNodeData;
     }
 
     let { data }: Props = $props();
-    let { fields, methods } = $derived(data.node);
+    let { fields, methods, open } = $derived(data.node);
 </script>
 
 <Handle type="target" position={Position.Top} />
-<p class="px-[10px] font-mono tracking-tight whitespace-nowrap">{data.node.name}</p>
+<button
+    title={prettyInternalName(data.node.name)}
+    class={cn("px-[10px] font-mono tracking-tight whitespace-nowrap", open && "cursor-pointer underline decoration-1")}
+    onclick={open}
+>
+    {data.node.displayName}
+</button>
 <div class="font-mono text-[10px]">
     {#if fields.length > 0}
         <Separator class="my-[10px]" />

@@ -26,7 +26,7 @@
     import { t } from "$lib/i18n";
     import { graph, type InheritanceGraph } from "$lib/workspace/analysis/graph";
 
-    let { tab }: PaneProps = $props();
+    let { tab, handler }: PaneProps = $props();
     const entry = tab.entry!;
 
     const node = "node" in entry ? (entry as ClassEntry).node : null;
@@ -62,7 +62,7 @@
 
         return member
             ? computeControlFlowGraph(node, member, showHandlerEdges)
-            : computeHierarchyGraph(node, inheritanceGraph, showSubtypes);
+            : computeHierarchyGraph(node, inheritanceGraph, showSubtypes, handler);
     };
 </script>
 

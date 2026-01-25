@@ -1,4 +1,5 @@
-import { prettyJavaType, prettyMethodDesc } from "$lib/utils";
+import type { EventHandler } from "$lib/event";
+import { prettyInternalName, prettyJavaType, prettyMethodDesc } from "$lib/utils";
 import type { InheritanceGraph } from "$lib/workspace/analysis/graph";
 import type { Node as ClassNode, Member } from "@katana-project/asm";
 import { escapeLiteral, formatEntry, formatInsn } from "@katana-project/asm/analysis/disasm";
@@ -201,8 +202,11 @@ interface MemberData {
 
 interface HierarchyNode {
     name: string;
+    displayName: string;
     fields: MemberData[];
     methods: MemberData[];
+
+    open?: () => void;
 }
 
 const IMPLICIT_SUPER = new Set([
@@ -215,7 +219,8 @@ const IMPLICIT_SUPER = new Set([
 export const computeHierarchyGraph = async (
     node: ClassNode,
     inheritanceGraph: InheritanceGraph,
-    withSubtypes: boolean
+    withSubtypes: boolean,
+    handler?: EventHandler
 ): Promise<[Node[], Edge[]]> => {
     const currentName = node.thisClass.nameEntry!.string;
     const currentNode = inheritanceGraph[currentName];
@@ -235,6 +240,7 @@ export const computeHierarchyGraph = async (
 
     const nodes = graphNodes.map<HierarchyNode>((node) => ({
         name: node.name,
+        displayName: prettyInternalName(node.name, !!(handler && node.entry)),
         fields:
             node.entry?.node?.fields?.map((f) => ({
                 type: prettyJavaType(f.type.string, true),
@@ -245,10 +251,11 @@ export const computeHierarchyGraph = async (
                 type: prettyJavaType(m.type.string.substring(m.type.string.lastIndexOf(")") + 1), true),
                 descriptor: escapeLiteral(m.name.string) + prettyMethodDesc(m.type.string),
             })) || [],
+        open: handler && node.entry ? () => handler?.open(node.entry!) : undefined,
     }));
 
     const data: HierarchyNodeData[] = nodes.map((node) => {
-        const metrics = computeTextSize(node.name, `400 12px / 18px ${monoFF}`);
+        const metrics = computeTextSize(node.displayName, `400 12px / 18px ${monoFF}`);
 
         const lines = [...node.fields, ...node.methods].map((f) => `${f.type} ${f.descriptor}`);
         const smallMetrics = computeTextSize(
@@ -260,6 +267,8 @@ export const computeHierarchyGraph = async (
         let height = 18 + 15 * lines.length /* line height */ + 20 /* padding */ + 2; /* border */
         if (node.fields.length > 0) height += 1 /* separator */ + 20 /* separator padding */;
         if (node.methods.length > 0) height += 1 /* separator */ + 20 /* separator padding */;
+
+        if (node.name !== node.displayName) height += 1; // underline
 
         return { node, width, height };
     });
