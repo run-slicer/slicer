@@ -2,8 +2,10 @@
     import { ChevronRight, ChevronDown } from "@lucide/svelte";
     import { VList } from "virtua/svelte";
     import { entryIcon } from "$lib/components/icons";
-    import { EntryType, type ClassEntry, type Entry, type ImplementationTreeNode } from "$lib/workspace";
+    import { EntryType, type ClassEntry, type Entry } from "$lib/workspace";
     import type { EventHandler } from "$lib/event";
+    import type { ImplementationTreeNode } from "./inheritance";
+    import { cn } from "$lib/components/utils";
 
     interface Props {
         data: ImplementationTreeNode | null;
@@ -14,7 +16,7 @@
 
     let { data, open = $bindable(), handler, classes }: Props = $props();
 
-    let selectedEntry = $state<ClassEntry | undefined>(undefined);
+    let selectedEntry = $state.raw<ClassEntry | undefined>(undefined);
 
     let expandedNodes = $state<Set<string>>(new Set());
 
@@ -95,18 +97,12 @@
         }}
         ondblclick={() => {
             open = false;
-
-            const entry = [...classes.values()].find(
-                e =>
-                    e.type === EntryType.CLASS &&
-                    (e as ClassEntry).node.thisClass.nameEntry?.string ===
-                        node.entry.node.thisClass.nameEntry?.string
-            ) as ClassEntry | undefined;
-
-            if (entry) handler.open(entry);
+            handler.open(node.entry);
         }}
-        class="hover:bg-accent/50 flex w-full items-center gap-1 rounded-sm px-1 py-0.5 text-left text-sm transition-colors
-            {isSelected ? 'bg-accent' : ''}"
+        class={cn(
+            "hover:bg-accent/50 flex w-full items-center gap-1 rounded-sm px-1 py-0.5 text-left text-sm transition-colors",
+            isSelected && "bg-accent"
+        )}
         style="padding-left: {depth * 16 + 4}px;"
     >
         <span class="flex h-4 w-4 shrink-0 items-center justify-center">
@@ -120,7 +116,7 @@
         </span>
 
         <span class="flex h-4 w-4 shrink-0 items-center justify-center">
-            <Icon class="h-4 w-4 {iconInfo.classes}" fill="currentColor" />
+            <Icon class={cn("h-4 w-4", iconInfo.classes)} fill="currentColor" />
         </span>
 
         <span class="text-foreground truncate font-medium shrink-0">

@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { Tab } from "$lib/tab";
-    import { transformEntry, type ClassEntry, type Entry, type ImplementationTreeNode } from "$lib/workspace";
+    import { transformEntry, type Entry } from "$lib/workspace";
     import {
         ContextMenuContent,
         ContextMenuItem,
@@ -26,8 +26,7 @@
     import { toast } from "svelte-sonner";
     import { resolveType } from "./resolver";
     import ImplementationsTree from "./implementations.svelte";
-    import { get } from "svelte/store";
-    import { computeImplementationTree } from "./inheritance";
+    import { computeImplementationTree, type ImplementationTreeNode } from "./inheritance";
     import { graph } from "$lib/workspace/analysis/graph";
 
     interface Props {
@@ -73,7 +72,7 @@
 
     let usagesOpen = $state(false);
     let implementationsOpen = $state(false);
-    let implementations: ImplementationTreeNode | null = $state(null);
+    let implementations: ImplementationTreeNode | null = $state.raw(null);
     let usages: SearchResult[] = $state.raw([]);
     let referenceName: string | null = $state(null);
     let task: Cancellable<void> | null = $state(null);
@@ -122,8 +121,7 @@
         implementationsOpen = true;
         implementations = null;
 
-        const g = get(graph);
-        implementations = computeImplementationTree(detail.className, g);
+        implementations = computeImplementationTree(detail.className, $graph);
     };
 </script>
 
