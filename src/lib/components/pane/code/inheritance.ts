@@ -19,12 +19,10 @@ const buildNode = (
     const entry = graphNode.entry;
     const children: ImplementationTreeNode[] = [];
 
-    const nodesToScan = universe ?? new Set(
-        graphNode.relations(graph, n => !IMPLICIT_SUPER.has(n.name))
-    );
+    const nodesToScan = universe ?? new Set(graphNode.relations(graph, (n) => !IMPLICIT_SUPER.has(n.name)));
 
     for (const other of nodesToScan) {
-        if (!(other.superClass?.to === graphNode || other.interfaces.some(itf => itf.to === graphNode))) continue;
+        if (!(other.superClass?.to === graphNode || other.interfaces.some((itf) => itf.to === graphNode))) continue;
 
         const child = buildNode(other, graph, entry, nodesToScan);
         if (child) children.push(child);

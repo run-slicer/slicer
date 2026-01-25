@@ -41,24 +41,21 @@
         const next = new Set(expandedNodes);
         next.has(id) ? next.delete(id) : next.add(id);
         expandedNodes = next;
-    }
+    };
 
     const getSimpleName = (entry: ClassEntry): string => {
         const full = entry.node.thisClass.nameEntry?.string ?? "";
         const parts = full.split(/[./$]/);
         return parts.at(-1) || full;
-    }
+    };
 
     const getFullName = (entry: ClassEntry): string => {
         return entry.node.thisClass.nameEntry?.string ?? "";
-    }
+    };
 
     const countDescendants = (node: ImplementationTreeNode): number => {
-        return node.children.reduce(
-            (acc, child) => acc + 1 + countDescendants(child),
-            0
-        );
-    }
+        return node.children.reduce((acc, child) => acc + 1 + countDescendants(child), 0);
+    };
 
     let rows = $derived.by(() => {
         if (!data) return [];
@@ -73,7 +70,7 @@
             for (const child of node.children) {
                 walk(child, depth + 1);
             }
-        }
+        };
 
         walk(data, 0);
         return out;
@@ -119,7 +116,7 @@
             <Icon class={cn("h-4 w-4", iconInfo.classes)} fill="currentColor" />
         </span>
 
-        <span class="text-foreground truncate font-medium shrink-0">
+        <span class="text-foreground shrink-0 truncate font-medium">
             {simpleName}
         </span>
         <span class="text-muted-foreground ml-1 truncate text-xs">
