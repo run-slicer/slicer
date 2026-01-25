@@ -290,7 +290,7 @@ export const analyzeBackground = async () => {
                     completed++;
                     task.desc.set(`${completed}/${$queue.length}`);
                     task.progress?.set((completed / $queue.length) * 100);
-                }, workers.size)
+                }, workers.size * 2)
             )
         );
 
@@ -327,7 +327,7 @@ export const search = (
                         completed++;
                         task.desc.set(`${completed}/${entries.length}`);
                         task.progress?.set((completed / entries.length) * 100);
-                    }, workers.size)
+                    }, workers.size * 2)
                 )
             );
 

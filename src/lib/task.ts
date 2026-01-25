@@ -1,6 +1,6 @@
 import type { TranslationKey } from "$lib/i18n";
 import { log } from "$lib/log";
-import { cyrb53 } from "$lib/utils";
+import { cyrb53, throttled } from "$lib/utils";
 import { get, type Writable, writable } from "svelte/store";
 
 export interface Task {
@@ -36,7 +36,7 @@ export const create = (name: TranslationKey, desc: string | null, indeterminate:
         id: (cyrb53(name + desc) + Math.floor(Math.random() * 65536)).toString(16),
         name: writable(name),
         desc: writable(desc),
-        progress: indeterminate ? undefined : writable(0),
+        progress: indeterminate ? undefined : throttled(writable(0), 50),
     };
 };
 

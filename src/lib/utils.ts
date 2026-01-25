@@ -257,6 +257,28 @@ export const debounced = <T>(store: Readable<T>, delay: number): Readable<T> => 
     });
 };
 
+export const throttled = <T>(store: Writable<T>, interval: number): Writable<T> => {
+    let lastTime = 0;
+
+    return {
+        subscribe: store.subscribe,
+        set(value: T) {
+            const now = Date.now();
+            if (now - lastTime >= interval) {
+                lastTime = now;
+                store.set(value);
+            }
+        },
+        update(updater: (value: T) => T) {
+            const now = Date.now();
+            if (now - lastTime >= interval) {
+                lastTime = now;
+                store.update(updater);
+            }
+        },
+    };
+};
+
 /* file operations */
 
 export const readFiles = (pattern: string, multiple: boolean): Promise<File[]> => {
