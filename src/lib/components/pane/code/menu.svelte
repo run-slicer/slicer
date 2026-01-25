@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { Tab } from "$lib/tab";
-    import { transformEntry, type Entry } from "$lib/workspace";
+    import { transformEntry, type ClassEntry, type Entry, type ImplementationTreeNode } from "$lib/workspace";
     import {
         ContextMenuContent,
         ContextMenuItem,
@@ -11,7 +11,7 @@
         ContextMenuSeparator,
     } from "$lib/components/ui/context-menu";
     import ContextMenuLabel from "$lib/components/menu_label.svelte";
-    import { Binary, CaseSensitive, Code, CornerDownRight, TextSearch, TextWrap } from "@lucide/svelte";
+    import { Binary, CaseSensitive, Code, CornerDownRight, TextSearch, TextWrap, Workflow } from "@lucide/svelte";
     import { type Language, toExtension } from "$lib/lang";
     import { Interpretation } from "./";
     import type { EventHandler } from "$lib/event";
@@ -25,6 +25,10 @@
     import { error } from "$lib/log";
     import { toast } from "svelte-sonner";
     import { resolveType } from "./resolver";
+    import ImplementationsTree from "./implementations.svelte";
+    import { get } from "svelte/store";
+    import { computeImplementationTree } from "./inheritance";
+    import { graph } from "$lib/workspace/analysis/graph";
 
     interface Props {
         view: EditorView | null;
@@ -68,6 +72,8 @@
     let detail = $derived(view ? resolveType(resolved, handler, view, classes) : null);
 
     let usagesOpen = $state(false);
+    let implementationsOpen = $state(false);
+    let implementations: ImplementationTreeNode | null = $state(null);
     let usages: SearchResult[] = $state.raw([]);
     let referenceName: string | null = $state(null);
     let task: Cancellable<void> | null = $state(null);
@@ -78,6 +84,10 @@
             referenceName = null;
             task?.cancel();
             task = null;
+        }
+
+        if (!implementationsOpen) {
+            referenceName = null;
         }
     });
 
@@ -104,9 +114,20 @@
             });
         }
     };
+
+    const findImplementations = async () => {
+        if (!view || !detail?.className) return;
+
+        referenceName = detail.className;
+        implementationsOpen = true;
+        implementations = null;
+
+        const g = get(graph);
+        implementations = computeImplementationTree(detail.className, g);
+    };
 </script>
 
-<ContextMenuContent class="min-w-48">
+<ContextMenuContent class="min-w-54">
     {@const hasReference = view && resolved}
     <ContextMenuLabel inset>{$t("pane.code.menu.reference")}</ContextMenuLabel>
     <ContextMenuSeparator />
@@ -122,6 +143,10 @@
     <ContextMenuItem inset class="flex justify-between" disabled={!hasReference} onclick={findUsages}>
         {$t("pane.code.menu.reference.usages")}
         <TextSearch size={16} />
+    </ContextMenuItem>
+    <ContextMenuItem inset class="flex justify-between" disabled={!hasReference} onclick={findImplementations}>
+        {$t("pane.code.menu.reference.implementations")}
+        <Workflow size={16} class="text-foreground" />
     </ContextMenuItem>
     <ContextMenuSeparator />
     <ContextMenuLabel inset>{$t("pane.code.menu.editor")}</ContextMenuLabel>
@@ -163,4 +188,13 @@
     initialPosition={mousePosition}
 >
     <UsagesContent bind:open={usagesOpen} data={usages} {handler} />
+</FloatingModal>
+
+<FloatingModal
+    bind:open={implementationsOpen}
+    title={$t("modal.implementations.title")}
+    subtitle={$t("modal.implementations.subtitle", prettyInternalName(referenceName || ""))}
+    initialPosition={mousePosition}
+>
+    <ImplementationsTree {classes} data={implementations} {handler} bind:open={implementationsOpen} />
 </FloatingModal>

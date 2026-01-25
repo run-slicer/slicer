@@ -150,6 +150,7 @@
     "pane.code.menu.reference": "Reference",
     "pane.code.menu.reference.declaration": "Go to declaration",
     "pane.code.menu.reference.usages": "Find usages",
+    "pane.code.menu.reference.implementations": "Find implementations",
     "pane.graph.loading": "Computing graph...",
     "pane.graph.method": "Method:",
     "pane.graph.method.none": "<none>",
@@ -395,5 +396,7 @@
     "modal.close": "Close",
     "modal.usages.title": "Type usages",
     "modal.usages.subtitle": "of {0}",
-    "modal.usages.info": "{0} usage(s) found."
+    "modal.usages.info": "{0} usage(s) found.",
+    "modal.implementations.title": "Type implementations",
+    "modal.implementations.subtitle": "of {0}"
 }

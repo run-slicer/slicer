@@ -78,6 +78,12 @@ export interface ClassEntry extends Entry {
     characteristics: CharacteristicType[];
 }
 
+export interface ImplementationTreeNode {
+    entry: ClassEntry;
+    parent?: ClassEntry;
+    children: ImplementationTreeNode[];
+}
+
 export interface MemberEntry extends ClassEntry {
     type: EntryType.MEMBER;
     member: Member;
