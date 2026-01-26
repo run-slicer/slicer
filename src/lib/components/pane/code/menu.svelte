@@ -17,15 +17,12 @@
     import type { EventHandler } from "$lib/event";
     import { t } from "$lib/i18n";
     import type { EditorView } from "@codemirror/view";
-    import { type Cancellable, prettyInternalName } from "$lib/utils";
-    import { QueryType, search, SearchMode, type SearchResult } from "$lib/workspace/analysis";
+    import { prettyInternalName } from "$lib/utils";
     import FloatingModal from "$lib/components/floating_modal.svelte";
     import UsagesContent from "./usages.svelte";
     import type { TypeReferenceResolver } from "@katana-project/laser";
-    import { error } from "$lib/log";
-    import { toast } from "svelte-sonner";
     import { resolveType } from "./resolver";
-    import HierarchyTree from "./hierarchy.svelte";
+    import HierarchyContent from "./hierarchy.svelte";
     import { graph } from "$lib/workspace/analysis/graph";
 
     interface Props {
@@ -70,50 +67,9 @@
     let detail = $derived(view ? resolveType(resolved, handler, view, classes) : null);
 
     let usagesOpen = $state(false);
-    let implementationsOpen = $state(false);
-    let usages: SearchResult[] = $state.raw([]);
-    let referenceName: string | null = $state(null);
-    let task: Cancellable<void> | null = $state(null);
 
-    $effect(() => {
-        if (!usagesOpen) {
-            usages = [];
-            task?.cancel();
-            task = null;
-        }
-    });
-
-    const findUsages = async () => {
-        if (!view || !detail || !detail.className) return;
-
-        const className = detail.className;
-
-        referenceName = className;
-        try {
-            usages = [];
-            usagesOpen = true;
-            task = search(
-                Array.from(classes.values()),
-                { type: QueryType.PSEUDOCODE, value: className, mode: SearchMode.PARTIAL_MATCH, ref: true },
-                (res) => {
-                    usages = [...usages, res];
-                }
-            );
-        } catch (e) {
-            error("failed to search", e);
-            toast.error($t("toast.error.title.generic"), {
-                description: $t("toast.error.search"),
-            });
-        }
-    };
-
+    let hierarchyOpen = $state(false);
     let hasGraphNode = $derived($graph[detail?.className ?? ""] !== undefined);
-    const findImplementations = async () => {
-        if (!view || !detail?.className) return;
-
-        referenceName = detail.className;
-        implementationsOpen = true;
-    };
 </script>
 
 <ContextMenuContent class="min-w-54">
@@ -129,7 +85,7 @@
         {$t("pane.code.menu.reference.declaration")}
         <CornerDownRight size={16} class="text-foreground" />
     </ContextMenuItem>
-    <ContextMenuItem inset class="flex justify-between" disabled={!hasReference} onclick={findUsages}>
+    <ContextMenuItem inset class="flex justify-between" disabled={!hasReference} onclick={() => (usagesOpen = true)}>
         {$t("pane.code.menu.reference.usages")}
         <TextSearch size={16} />
     </ContextMenuItem>
@@ -137,7 +93,7 @@
         inset
         class="flex justify-between gap-5"
         disabled={!hasReference || !hasGraphNode}
-        onclick={findImplementations}
+        onclick={() => (hierarchyOpen = true)}
     >
         {$t("pane.code.menu.reference.implementations")}
         <Workflow size={16} class="text-foreground" />
@@ -178,22 +134,17 @@
 <FloatingModal
     bind:open={usagesOpen}
     title={$t("modal.usages.title")}
-    subtitle={$t("modal.usages.subtitle", prettyInternalName(referenceName || ""))}
+    subtitle={$t("modal.usages.subtitle", prettyInternalName(detail?.className || ""))}
     initialPosition={mousePosition}
 >
-    <UsagesContent bind:open={usagesOpen} data={usages} {handler} />
+    <UsagesContent bind:open={usagesOpen} name={detail?.className ?? null} {classes} {handler} />
 </FloatingModal>
 
 <FloatingModal
-    bind:open={implementationsOpen}
+    bind:open={hierarchyOpen}
     title={$t("modal.hierarchy.title")}
-    subtitle={$t("modal.hierarchy.subtitle", prettyInternalName(referenceName || ""))}
+    subtitle={$t("modal.hierarchy.subtitle", prettyInternalName(detail?.className || ""))}
     initialPosition={mousePosition}
 >
-    <HierarchyTree
-        graph={$graph}
-        data={referenceName ? ($graph[referenceName] ?? null) : null}
-        {handler}
-        bind:open={implementationsOpen}
-    />
+    <HierarchyContent bind:open={hierarchyOpen} name={detail?.className ?? null} {handler} />
 </FloatingModal>

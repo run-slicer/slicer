@@ -2,26 +2,61 @@
     import { VList } from "virtua/svelte";
     import { entryIcon } from "$lib/components/icons";
     import { cn } from "$lib/components/utils";
-    import type { SearchResult } from "$lib/workspace/analysis";
+    import { QueryType, search, SearchMode, type SearchResult } from "$lib/workspace/analysis";
     import { t } from "$lib/i18n";
     import type { EventHandler } from "$lib/event";
-    import { groupBy } from "$lib/utils";
-    import { memberEntry } from "$lib/workspace";
+    import { type Cancellable, groupBy } from "$lib/utils";
+    import { type Entry, memberEntry } from "$lib/workspace";
+    import { error } from "$lib/log";
+    import { toast } from "svelte-sonner";
 
     interface Props {
         open: boolean;
-        data: SearchResult[];
+        name: string | null;
+        classes: Map<string, Entry>;
         handler: EventHandler;
     }
 
-    let { open = $bindable(), data, handler }: Props = $props();
-    let grouped = $derived(groupBy(data, (usage) => usage.entry.name));
+    let { open = $bindable(), name, classes, handler }: Props = $props();
+
+    let usages: SearchResult[] = $state.raw([]);
+    let task: Cancellable<void> | null = $state(null);
+
+    $effect(() => {
+        if (!open || !name) return;
+
+        try {
+            usages = [];
+            task = search(
+                Array.from(classes.values()),
+                { type: QueryType.PSEUDOCODE, value: name, mode: SearchMode.PARTIAL_MATCH, ref: true },
+                (res) => {
+                    usages = [...usages, res];
+                }
+            );
+        } catch (e) {
+            error("failed to search", e);
+            toast.error($t("toast.error.title.generic"), {
+                description: $t("toast.error.search"),
+            });
+        }
+    })
+
+    $effect(() => {
+        if (!open) {
+            usages = [];
+            task?.cancel();
+            task = null;
+        }
+    });
+
+    let grouped = $derived(groupBy(usages, (usage) => usage.entry.name));
 </script>
 
 <div class="divide-border flex h-full flex-col divide-y">
     <div class="bg-muted/30 flex items-center gap-1 px-2 py-1.5">
         <span class="text-muted-foreground mr-2 text-xs">
-            {$t("modal.usages.info", data.length)}
+            {$t("modal.usages.info", usages.length)}
         </span>
     </div>
 
@@ -40,7 +75,8 @@
                     {@const entry =
                         usage.member?.type?.string?.charAt(0) === "("
                             ? memberEntry(usage.entry, usage.member)
-                            : usage.entry}
+                            : usage.entry
+                    }
                     <button
                         ondblclick={() => {
                             open = false;

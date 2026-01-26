@@ -4,22 +4,17 @@
     import { Class, entryIcon, Interface } from "$lib/components/icons";
     import type { EventHandler } from "$lib/event";
     import { cn } from "$lib/components/utils";
-    import {
-        type IGraphNode,
-        IGraphNodeType,
-        IMPLICIT_SUPER,
-        type InheritanceGraph,
-    } from "$lib/workspace/analysis/graph";
+    import { type IGraphNode, IGraphNodeType, IMPLICIT_SUPER, graph } from "$lib/workspace/analysis/graph";
     import { prettyInternalName } from "$lib/utils";
 
     interface Props {
-        graph: InheritanceGraph;
-        data: IGraphNode | null;
         open: boolean;
+        name: string | null;
         handler: EventHandler;
     }
 
-    let { graph, data, open = $bindable(), handler }: Props = $props();
+    let { open = $bindable(), name, handler }: Props = $props();
+    let data = $derived(open && name ? ($graph[name] ?? null) : null);
 
     type TreeRow = {
         node: IGraphNode;
@@ -29,7 +24,7 @@
     // if we're viewing an implicit super class, don't hide any implicit supers
     // this likely will be pretty ugly, but it's better than showing an empty tree
     let implicitSuper = $derived(data && IMPLICIT_SUPER.has(data.name) ? new Set() : IMPLICIT_SUPER);
-    let relations = $derived(data?.relations(graph, (n) => !implicitSuper.has(n.name)) ?? []);
+    let relations = $derived(data?.relations($graph, (n) => !implicitSuper.has(n.name)) ?? []);
     let expandedNodes = $derived(relations.map((n) => n.name));
 
     const getChildren = (node: IGraphNode): IGraphNode[] => {
