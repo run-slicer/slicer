@@ -1,7 +1,20 @@
 import { type ClassEntry, classes, EntryType } from "$lib/workspace";
 import { derived } from "svelte/store";
 
+export const IMPLICIT_SUPER = new Set([
+    "java/lang/Object",
+    "java/lang/Enum",
+    "java/lang/Record",
+    "java/lang/annotation/Annotation",
+]);
+
+export enum IGraphNodeType {
+    CLASS = "class",
+    INTERFACE = "interface",
+}
+
 export interface IGraphNode {
+    type: IGraphNodeType;
     name: string;
     superClass: IGraphEdge | null;
     interfaces: IGraphEdge[];
@@ -22,6 +35,7 @@ export interface InheritanceGraph {
 }
 
 const createNode = (className: string): IGraphNode => ({
+    type: IGraphNodeType.CLASS,
     name: className,
     superClass: null,
     interfaces: [],
@@ -92,9 +106,12 @@ const createGraph = (classes: ClassEntry[]): InheritanceGraph => {
             };
         }
         for (const itf of klassNode.interfaces) {
+            const toNode = node(itf.nameEntry!.string);
+            toNode.type = IGraphNodeType.INTERFACE;
+
             classNode.interfaces.push({
                 from: classNode,
-                to: node(itf.nameEntry!.string),
+                to: toNode,
                 itf: true,
             });
         }

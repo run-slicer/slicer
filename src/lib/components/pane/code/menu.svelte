@@ -25,8 +25,7 @@
     import { error } from "$lib/log";
     import { toast } from "svelte-sonner";
     import { resolveType } from "./resolver";
-    import ImplementationsTree from "./implementations.svelte";
-    import { computeImplementationTree, type ImplementationTreeNode } from "./inheritance";
+    import HierarchyTree from "./hierarchy.svelte";
     import { graph } from "$lib/workspace/analysis/graph";
 
     interface Props {
@@ -72,7 +71,6 @@
 
     let usagesOpen = $state(false);
     let implementationsOpen = $state(false);
-    let implementations: ImplementationTreeNode | null = $state.raw(null);
     let usages: SearchResult[] = $state.raw([]);
     let referenceName: string | null = $state(null);
     let task: Cancellable<void> | null = $state(null);
@@ -80,13 +78,8 @@
     $effect(() => {
         if (!usagesOpen) {
             usages = [];
-            referenceName = null;
             task?.cancel();
             task = null;
-        }
-
-        if (!implementationsOpen) {
-            referenceName = null;
         }
     });
 
@@ -114,14 +107,12 @@
         }
     };
 
+    let hasGraphNode = $derived($graph[detail?.className ?? ""] !== undefined);
     const findImplementations = async () => {
         if (!view || !detail?.className) return;
 
         referenceName = detail.className;
         implementationsOpen = true;
-        implementations = null;
-
-        implementations = computeImplementationTree(detail.className, $graph);
     };
 </script>
 
@@ -142,7 +133,12 @@
         {$t("pane.code.menu.reference.usages")}
         <TextSearch size={16} />
     </ContextMenuItem>
-    <ContextMenuItem inset class="flex justify-between" disabled={!hasReference} onclick={findImplementations}>
+    <ContextMenuItem
+        inset
+        class="flex justify-between gap-5"
+        disabled={!hasReference || !hasGraphNode}
+        onclick={findImplementations}
+    >
         {$t("pane.code.menu.reference.implementations")}
         <Workflow size={16} class="text-foreground" />
     </ContextMenuItem>
@@ -190,9 +186,14 @@
 
 <FloatingModal
     bind:open={implementationsOpen}
-    title={$t("modal.implementations.title")}
-    subtitle={$t("modal.implementations.subtitle", prettyInternalName(referenceName || ""))}
+    title={$t("modal.hierarchy.title")}
+    subtitle={$t("modal.hierarchy.subtitle", prettyInternalName(referenceName || ""))}
     initialPosition={mousePosition}
 >
-    <ImplementationsTree {classes} data={implementations} {handler} bind:open={implementationsOpen} />
+    <HierarchyTree
+        graph={$graph}
+        data={referenceName ? ($graph[referenceName] ?? null) : null}
+        {handler}
+        bind:open={implementationsOpen}
+    />
 </FloatingModal>

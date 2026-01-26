@@ -96,8 +96,8 @@ importers:
         specifier: ^3.4.0
         version: 3.4.0
       virtua:
-        specifier: ^0.48.2
-        version: 0.48.2(svelte@5.45.6)
+        specifier: ^0.48.3
+        version: 0.48.3(svelte@5.45.6)
     devDependencies:
       '@internationalized/date':
         specifier: ^3.10.0
@@ -1643,8 +1643,8 @@ packages:
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
-  virtua@0.48.2:
-    resolution: {integrity: sha512-z8zko7BRnSruf3pYMjhfKIdz138quGVRxSNSZJ7rcrhnxd03mRhGIWNZULE1Dz0VMdRVVaBeT6Ow8ynayHW3Jg==}
+  virtua@0.48.3:
+    resolution: {integrity: sha512-WTGPqMshLNtTQaIhvNo6EnjMvBP0GAYN8ZJsTY6HZqQCJlspW0L9IrIDi4vYV2J7uBlnuSqemnw40IKTg/aeGA==}
     peerDependencies:
       react: '>=16.14.0'
       react-dom: '>=16.14.0'
@@ -2988,7 +2988,7 @@ snapshots:
 
   util-deprecate@1.0.2: {}
 
-  virtua@0.48.2(svelte@5.45.6):
+  virtua@0.48.3(svelte@5.45.6):
     optionalDependencies:
       svelte: 5.45.6
 

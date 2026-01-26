@@ -1,5 +1,5 @@
 import { prettyJavaType, prettyMethodDesc } from "$lib/utils";
-import type { InheritanceGraph } from "$lib/workspace/analysis/graph";
+import { IMPLICIT_SUPER, type InheritanceGraph } from "$lib/workspace/analysis/graph";
 import type { Node as ClassNode, Member } from "@katana-project/asm";
 import { escapeLiteral, formatEntry, formatInsn } from "@katana-project/asm/analysis/disasm";
 import { computeGraph, EdgeType, type Node as GraphNode } from "@katana-project/asm/analysis/graph";
@@ -204,13 +204,6 @@ interface HierarchyNode {
     fields: MemberData[];
     methods: MemberData[];
 }
-
-const IMPLICIT_SUPER = new Set([
-    "java/lang/Object",
-    "java/lang/Enum",
-    "java/lang/Record",
-    "java/lang/annotation/Annotation",
-]);
 
 export const computeHierarchyGraph = async (
     node: ClassNode,

@@ -43,7 +43,7 @@
         "queueable": "^5.3.2",
         "svelte-modals": "^2.0.1",
         "tailwind-merge": "^3.4.0",
-        "virtua": "^0.48.2"
+        "virtua": "^0.48.3"
     },
     "devDependencies": {
         "@internationalized/date": "^3.10.0",

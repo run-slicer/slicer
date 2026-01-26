@@ -397,6 +397,6 @@
     "modal.usages.title": "Type usages",
     "modal.usages.subtitle": "of {0}",
     "modal.usages.info": "{0} usage(s) found.",
-    "modal.implementations.title": "Type implementations",
-    "modal.implementations.subtitle": "of {0}"
+    "modal.hierarchy.title": "Type hierarchy",
+    "modal.hierarchy.subtitle": "of {0}"
 }
