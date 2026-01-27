@@ -131,6 +131,7 @@ export interface LocaleData {
     "pane.structure.summary.characteristics.object-serdes": string;
     "pane.structure.summary.characteristics.reflection": string;
     "pane.structure.summary.characteristics.native-code": string;
+    "pane.structure.summary.characteristics.process-manipulation": string;
     "pane.code.loading.disasm": string;
     "pane.code.loading.read": string;
     "pane.code.disasm": string;
@@ -151,6 +152,7 @@ export interface LocaleData {
     "pane.code.menu.reference": string;
     "pane.code.menu.reference.declaration": string;
     "pane.code.menu.reference.usages": string;
+    "pane.code.menu.reference.implementations": string;
     "pane.graph.loading": string;
     "pane.graph.method": string;
     "pane.graph.method.none": string;
@@ -396,5 +398,9 @@ export interface LocaleData {
     "modal.close": string;
     "modal.usages.title": string;
     "modal.usages.subtitle": string;
+    "modal.usages.subtitle.none": string;
     "modal.usages.info": string;
+    "modal.hierarchy.title": string;
+    "modal.hierarchy.subtitle": string;
+    "modal.hierarchy.subtitle.none": string;
 }

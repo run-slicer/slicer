@@ -11,20 +11,19 @@
         ContextMenuSeparator,
     } from "$lib/components/ui/context-menu";
     import ContextMenuLabel from "$lib/components/menu_label.svelte";
-    import { Binary, CaseSensitive, Code, CornerDownRight, TextSearch, TextWrap } from "@lucide/svelte";
+    import { Binary, CaseSensitive, Code, CornerDownRight, TextSearch, TextWrap, Workflow } from "@lucide/svelte";
     import { type Language, toExtension } from "$lib/lang";
     import { Interpretation } from "./";
     import type { EventHandler } from "$lib/event";
     import { t } from "$lib/i18n";
     import type { EditorView } from "@codemirror/view";
-    import { type Cancellable, prettyInternalName } from "$lib/utils";
-    import { QueryType, search, SearchMode, type SearchResult } from "$lib/workspace/analysis";
+    import { prettyInternalName } from "$lib/utils";
     import FloatingModal from "$lib/components/floating_modal.svelte";
     import UsagesContent from "./usages.svelte";
     import type { TypeReferenceResolver } from "@katana-project/laser";
-    import { error } from "$lib/log";
-    import { toast } from "svelte-sonner";
     import { resolveType } from "./resolver";
+    import HierarchyContent from "./hierarchy.svelte";
+    import { graph } from "$lib/workspace/analysis/graph";
 
     interface Props {
         view: EditorView | null;
@@ -68,45 +67,12 @@
     let detail = $derived(view ? resolveType(resolved, handler, view, classes) : null);
 
     let usagesOpen = $state(false);
-    let usages: SearchResult[] = $state.raw([]);
-    let referenceName: string | null = $state(null);
-    let task: Cancellable<void> | null = $state(null);
 
-    $effect(() => {
-        if (!usagesOpen) {
-            usages = [];
-            referenceName = null;
-            task?.cancel();
-            task = null;
-        }
-    });
-
-    const findUsages = async () => {
-        if (!view || !detail || !detail.className) return;
-
-        const className = detail.className;
-
-        referenceName = className;
-        try {
-            usages = [];
-            usagesOpen = true;
-            task = search(
-                Array.from(classes.values()),
-                { type: QueryType.PSEUDOCODE, value: className, mode: SearchMode.PARTIAL_MATCH, ref: true },
-                (res) => {
-                    usages = [...usages, res];
-                }
-            );
-        } catch (e) {
-            error("failed to search", e);
-            toast.error($t("toast.error.title.generic"), {
-                description: $t("toast.error.search"),
-            });
-        }
-    };
+    let hierarchyOpen = $state(false);
+    let hasGraphNode = $derived($graph[detail?.className ?? ""] !== undefined);
 </script>
 
-<ContextMenuContent class="min-w-48">
+<ContextMenuContent class="min-w-54">
     {@const hasReference = view && resolved}
     <ContextMenuLabel inset>{$t("pane.code.menu.reference")}</ContextMenuLabel>
     <ContextMenuSeparator />
@@ -119,9 +85,18 @@
         {$t("pane.code.menu.reference.declaration")}
         <CornerDownRight size={16} class="text-foreground" />
     </ContextMenuItem>
-    <ContextMenuItem inset class="flex justify-between" disabled={!hasReference} onclick={findUsages}>
+    <ContextMenuItem inset class="flex justify-between" disabled={!hasReference} onclick={() => (usagesOpen = true)}>
         {$t("pane.code.menu.reference.usages")}
         <TextSearch size={16} />
+    </ContextMenuItem>
+    <ContextMenuItem
+        inset
+        class="flex justify-between gap-5"
+        disabled={!hasReference || !hasGraphNode}
+        onclick={() => (hierarchyOpen = true)}
+    >
+        {$t("pane.code.menu.reference.implementations")}
+        <Workflow size={16} class="text-foreground" />
     </ContextMenuItem>
     <ContextMenuSeparator />
     <ContextMenuLabel inset>{$t("pane.code.menu.editor")}</ContextMenuLabel>
@@ -159,8 +134,23 @@
 <FloatingModal
     bind:open={usagesOpen}
     title={$t("modal.usages.title")}
-    subtitle={$t("modal.usages.subtitle", prettyInternalName(referenceName || ""))}
+    subtitle={$t(
+        detail?.className ? "modal.usages.subtitle" : "modal.usages.subtitle.none",
+        prettyInternalName(detail?.className || "")
+    )}
     initialPosition={mousePosition}
 >
-    <UsagesContent bind:open={usagesOpen} data={usages} {handler} />
+    <UsagesContent bind:open={usagesOpen} name={detail?.className ?? null} {classes} {handler} />
+</FloatingModal>
+
+<FloatingModal
+    bind:open={hierarchyOpen}
+    title={$t("modal.hierarchy.title")}
+    subtitle={$t(
+        detail?.className ? "modal.hierarchy.subtitle" : "modal.hierarchy.subtitle.none",
+        prettyInternalName(detail?.className || "")
+    )}
+    initialPosition={mousePosition}
+>
+    <HierarchyContent bind:open={hierarchyOpen} name={detail?.className ?? null} {handler} />
 </FloatingModal>
