@@ -150,7 +150,7 @@
     "pane.code.menu.reference": "Reference",
     "pane.code.menu.reference.declaration": "Jít na deklaraci",
     "pane.code.menu.reference.usages": "Najít použití",
-    "pane.code.menu.reference.implementations": "Find implementations",
+    "pane.code.menu.reference.implementations": "Najít implementace",
     "pane.graph.loading": "Počítám graf...",
     "pane.graph.method": "Metoda:",
     "pane.graph.method.none": "<žádná>",
@@ -395,10 +395,10 @@
     "modal.unpin": "Odepnout",
     "modal.close": "Zavřít",
     "modal.usages.title": "Použití typu",
-    "modal.usages.subtitle": "z {0}",
-    "modal.usages.subtitle.none": "No type at this location.",
+    "modal.usages.subtitle": "{0}",
+    "modal.usages.subtitle.none": "Na tomto místě není žádný typ.",
     "modal.usages.info": "Nalezeno {0} použití.",
-    "modal.hierarchy.title": "Type descendants",
-    "modal.hierarchy.subtitle": "of {0}",
-    "modal.hierarchy.subtitle.none": "No type at this location."
+    "modal.hierarchy.title": "Potomci typu",
+    "modal.hierarchy.subtitle": "{0}",
+    "modal.hierarchy.subtitle.none": "Na tomto místě není žádný typ."
 }
