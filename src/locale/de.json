@@ -150,7 +150,7 @@
     "pane.code.menu.reference": "Referenz",
     "pane.code.menu.reference.declaration": "Zur Deklaration gehen",
     "pane.code.menu.reference.usages": "Nutzungen finden",
-    "pane.code.menu.reference.implementations": "Find implementations",
+    "pane.code.menu.reference.implementations": "Implementationen finden",
     "pane.graph.loading": "Graph wird berechnet...",
     "pane.graph.method": "Methode:",
     "pane.graph.method.none": "<none>",
@@ -396,9 +396,9 @@
     "modal.close": "Schließen",
     "modal.usages.title": "Typnutzung",
     "modal.usages.subtitle": "von {0}",
-    "modal.usages.subtitle.none": "No type at this location.",
+    "modal.usages.subtitle.none": "Kein Typ an diesem Ort.",
     "modal.usages.info": "{0} Nutzung(en) gefunden.",
-    "modal.hierarchy.title": "Type descendants",
-    "modal.hierarchy.subtitle": "of {0}",
-    "modal.hierarchy.subtitle.none": "No type at this location."
+    "modal.hierarchy.title": "Typnachkommen",
+    "modal.hierarchy.subtitle": "von {0}",
+    "modal.hierarchy.subtitle.none": "Kein Typ an diesem Ort."
 }
