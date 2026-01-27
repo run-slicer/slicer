@@ -150,6 +150,7 @@
     "pane.code.menu.reference": "Referencia",
     "pane.code.menu.reference.declaration": "Ir a la declaración",
     "pane.code.menu.reference.usages": "Buscar usos",
+    "pane.code.menu.reference.implementations": "Find implementations",
     "pane.graph.loading": "Calculando gráfica...",
     "pane.graph.method": "Método:",
     "pane.graph.method.none": "<ninguno>",
@@ -395,5 +396,9 @@
     "modal.close": "Cerrar",
     "modal.usages.title": "Usos del tipo",
     "modal.usages.subtitle": "de {0}",
-    "modal.usages.info": "{0} uso(s) encontrado(s)"
+    "modal.usages.subtitle.none": "No type at this location.",
+    "modal.usages.info": "{0} uso(s) encontrado(s)",
+    "modal.hierarchy.title": "Type descendants",
+    "modal.hierarchy.subtitle": "of {0}",
+    "modal.hierarchy.subtitle.none": "No type at this location."
 }
