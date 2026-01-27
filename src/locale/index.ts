@@ -398,7 +398,9 @@ export interface LocaleData {
     "modal.close": string;
     "modal.usages.title": string;
     "modal.usages.subtitle": string;
+    "modal.usages.subtitle.none": string;
     "modal.usages.info": string;
     "modal.hierarchy.title": string;
     "modal.hierarchy.subtitle": string;
+    "modal.hierarchy.subtitle.none": string;
 }

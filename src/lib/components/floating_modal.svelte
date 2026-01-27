@@ -1,11 +1,10 @@
 <script lang="ts">
     import { X, Pin, PinOff } from "@lucide/svelte";
-    import type { Snippet } from "svelte";
+    import { type Snippet, untrack } from "svelte";
     import { t } from "$lib/i18n";
 
     interface Props {
         open: boolean;
-        onclose?: () => void;
         title: string;
         subtitle?: string;
         initialPosition?: { x: number; y: number };
@@ -15,7 +14,6 @@
 
     let {
         open = $bindable(false),
-        onclose,
         title,
         subtitle,
         initialPosition = { x: 200, y: 150 },
@@ -32,14 +30,13 @@
 
     $effect(() => {
         if (open) {
-            position = { ...initialPosition };
+            position = { ...untrack(() => initialPosition) };
             pinned = false;
         }
     });
 
     const handleClose = () => {
         open = false;
-        onclose?.();
     };
 
     const handleMouseDown = (e: MouseEvent) => {

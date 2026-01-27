@@ -5,7 +5,7 @@
     import { QueryType, search, SearchMode, type SearchResult } from "$lib/workspace/analysis";
     import { t } from "$lib/i18n";
     import type { EventHandler } from "$lib/event";
-    import { type Cancellable, groupBy } from "$lib/utils";
+    import { groupBy } from "$lib/utils";
     import { type Entry, memberEntry } from "$lib/workspace";
     import { error } from "$lib/log";
     import { toast } from "svelte-sonner";
@@ -20,34 +20,30 @@
     let { open = $bindable(), name, classes, handler }: Props = $props();
 
     let usages: SearchResult[] = $state.raw([]);
-    let task: Cancellable<void> | null = $state(null);
-
     $effect(() => {
-        if (!open || !name) return;
+        usages = [];
+        if (!open || !name) {
+            return;
+        }
 
-        try {
-            usages = [];
-            task = search(
-                Array.from(classes.values()),
-                { type: QueryType.PSEUDOCODE, value: name, mode: SearchMode.PARTIAL_MATCH, ref: true },
-                (res) => {
-                    usages = [...usages, res];
-                }
-            );
-        } catch (e) {
+        const task = search(
+            Array.from(classes.values()),
+            { type: QueryType.PSEUDOCODE, value: name, mode: SearchMode.PARTIAL_MATCH, ref: true },
+            (res) => {
+                usages = [...usages, res];
+            }
+        );
+
+        task.then(null, (e) => {
             error("failed to search", e);
             toast.error($t("toast.error.title.generic"), {
                 description: $t("toast.error.search"),
             });
-        }
-    })
+        });
 
-    $effect(() => {
-        if (!open) {
-            usages = [];
-            task?.cancel();
-            task = null;
-        }
+        return () => {
+            task.cancel();
+        };
     });
 
     let grouped = $derived(groupBy(usages, (usage) => usage.entry.name));
@@ -61,35 +57,36 @@
     </div>
 
     <div class="min-h-0 flex-1">
-        <VList data={Array.from(grouped.entries())} getKey={([name]) => name} class="h-full overflow-x-hidden p-1">
-            {#snippet children([name, usages])}
-                {@const { icon: Icon, classes: iconClasses } = entryIcon(usages[0].entry)}
+        {#if usages.length > 0}
+            <VList data={Array.from(grouped.entries())} getKey={(_, i) => i} class="h-full overflow-x-hidden p-1">
+                {#snippet children([name, usages])}
+                    {@const { icon: Icon, classes: iconClasses } = entryIcon(usages[0].entry)}
 
-                <div class="flex items-center gap-2 px-2 py-1 text-sm font-medium">
-                    <Icon class={cn(iconClasses, "h-4 w-4 shrink-0")} />
-                    <span class="text-foreground">{name}</span>
-                    <span class="text-muted-foreground text-xs">({usages.length})</span>
-                </div>
+                    <div class="flex items-center gap-2 px-2 py-1 text-sm font-medium">
+                        <Icon class={cn(iconClasses, "h-4 w-4 shrink-0")} />
+                        <span class="text-foreground">{name}</span>
+                        <span class="text-muted-foreground text-xs">({usages.length})</span>
+                    </div>
 
-                {#each usages as usage}
-                    {@const entry =
-                        usage.member?.type?.string?.charAt(0) === "("
-                            ? memberEntry(usage.entry, usage.member)
-                            : usage.entry
-                    }
-                    <button
-                        ondblclick={() => {
-                            open = false;
-                            handler.open(entry);
-                        }}
-                        class="hover:bg-accent/50 focus:bg-accent ml-6 flex w-[calc(100%-2rem)] flex-col gap-1 rounded-sm px-2 py-1 text-left transition-colors"
-                    >
-                        <code class="text-foreground truncate font-mono text-xs">
-                            {usage.value}
-                        </code>
-                    </button>
-                {/each}
-            {/snippet}
-        </VList>
+                    {#each usages as usage}
+                        {@const entry =
+                            usage.member?.type?.string?.charAt(0) === "("
+                                ? memberEntry(usage.entry, usage.member)
+                                : usage.entry}
+                        <button
+                            ondblclick={() => {
+                                open = false;
+                                handler.open(entry);
+                            }}
+                            class="hover:bg-accent/50 focus:bg-accent ml-6 flex w-[calc(100%-2rem)] flex-col gap-1 rounded-sm px-2 py-1 text-left transition-colors"
+                        >
+                            <code class="text-foreground truncate font-mono text-xs">
+                                {usage.value}
+                            </code>
+                        </button>
+                    {/each}
+                {/snippet}
+            </VList>
+        {/if}
     </div>
 </div>

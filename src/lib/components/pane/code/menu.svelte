@@ -134,7 +134,10 @@
 <FloatingModal
     bind:open={usagesOpen}
     title={$t("modal.usages.title")}
-    subtitle={$t("modal.usages.subtitle", prettyInternalName(detail?.className || ""))}
+    subtitle={$t(
+        detail?.className ? "modal.usages.subtitle" : "modal.usages.subtitle.none",
+        prettyInternalName(detail?.className || "")
+    )}
     initialPosition={mousePosition}
 >
     <UsagesContent bind:open={usagesOpen} name={detail?.className ?? null} {classes} {handler} />
@@ -143,7 +146,10 @@
 <FloatingModal
     bind:open={hierarchyOpen}
     title={$t("modal.hierarchy.title")}
-    subtitle={$t("modal.hierarchy.subtitle", prettyInternalName(detail?.className || ""))}
+    subtitle={$t(
+        detail?.className ? "modal.hierarchy.subtitle" : "modal.hierarchy.subtitle.none",
+        prettyInternalName(detail?.className || "")
+    )}
     initialPosition={mousePosition}
 >
     <HierarchyContent bind:open={hierarchyOpen} name={detail?.className ?? null} {handler} />
