@@ -4,8 +4,9 @@
     import { Class, entryIcon, Interface } from "$lib/components/icons";
     import type { EventHandler } from "$lib/event";
     import { cn } from "$lib/components/utils";
-    import { graph, IGraphNodeType, WalkDirection } from "$lib/workspace/analysis/graph";
+    import { graph, type IGraphNode, IGraphNodeType, WalkDirection } from "$lib/workspace/analysis/graph";
     import { prettyInternalName } from "$lib/utils";
+    import { SvelteSet } from "svelte/reactivity";
 
     interface Props {
         open: boolean;
@@ -16,25 +17,53 @@
     let { open = $bindable(), name, handler }: Props = $props();
     let data = $derived(open && name ? ($graph[name] ?? null) : null);
 
-    let relations = $derived(data?.walk(WalkDirection.DOWN, (node, level) => ({ node, level })) ?? []);
+    let rows = $derived(data?.walk(WalkDirection.DOWN, (node, level) => ({ node, level })) ?? []);
 
-    let expandedNodes = $derived(relations.map(({ node }) => node.name));
-    const toggleExpanded = (id: string) => {
-        if (expandedNodes.includes(id)) {
-            expandedNodes = expandedNodes.filter((n) => n !== id);
+    let collapsed = $state(new SvelteSet<number>());
+    $effect(() => {
+        // reset collapsed nodes when data changes
+        data;
+        collapsed = new SvelteSet();
+    });
+
+    let visibleRows = $derived.by(() => {
+        const result: Array<{ node: IGraphNode; level: number; index: number }> = [];
+
+        const stack: number[] = []; // stack of parent indices that are visible
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+
+            // remove parents from stack that are at same or deeper level
+            while (stack.length > 0 && rows[stack[stack.length - 1]].level >= row.level) {
+                stack.pop();
+            }
+
+            // show if: root (no parents) OR parent is visible and not collapsed
+            if (stack.length === 0 || !collapsed.has(stack[stack.length - 1])) {
+                result.push({ ...row, index: i });
+                stack.push(i);
+            }
+        }
+
+        return result;
+    });
+
+    const toggleExpanded = (index: number) => {
+        if (collapsed.has(index)) {
+            collapsed.delete(index);
         } else {
-            expandedNodes = [...expandedNodes, id];
+            collapsed.add(index);
         }
     };
 </script>
 
 {#if data}
     <div class="flex h-full min-h-0 flex-1 flex-col">
-        <VList data={relations} itemSize={28} class="h-full overflow-x-hidden p-2">
-            {#snippet children({ node, level })}
+        <VList data={visibleRows} class="h-full overflow-x-hidden p-2">
+            {#snippet children({ node, level, index })}
                 {@const hasChildren = node.subClasses.length > 0 || node.implementations.length > 0}
 
-                {@const Chevron = expandedNodes.includes(node.name) ? ChevronDown : ChevronRight}
+                {@const Chevron = collapsed.has(index) ? ChevronRight : ChevronDown}
                 {@const { icon: Icon, classes: iconClasses } = node.entry
                     ? entryIcon(node.entry)
                     : node.type === IGraphNodeType.INTERFACE
@@ -45,9 +74,10 @@
                     role="button"
                     tabindex="-1"
                     ondblclick={() => {
-                        if (node.entry) {
+                        const entry = node.entry;
+                        if (entry) {
                             open = false;
-                            handler.open(node.entry);
+                            handler.open(entry);
                         }
                     }}
                     class={cn(
@@ -57,9 +87,10 @@
                     style="padding-left: {level * 16 + 4}px;"
                 >
                     <button
-                        onclick={() => {
+                        onclick={(e) => {
+                            e.stopPropagation();
                             if (hasChildren) {
-                                toggleExpanded(node.name);
+                                toggleExpanded(index);
                             }
                         }}
                         class="flex h-4 w-4 shrink-0 cursor-pointer items-center justify-center"
