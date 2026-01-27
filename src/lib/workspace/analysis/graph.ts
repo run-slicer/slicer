@@ -1,16 +1,15 @@
 import { type ClassEntry, classes, EntryType } from "$lib/workspace";
 import { derived } from "svelte/store";
 
-export const IMPLICIT_SUPER = new Set([
-    "java/lang/Object",
-    "java/lang/Enum",
-    "java/lang/Record",
-    "java/lang/annotation/Annotation",
-]);
-
 export enum IGraphNodeType {
     CLASS = "class",
     INTERFACE = "interface",
+}
+
+export enum WalkDirection {
+    UP = "up",
+    DOWN = "down",
+    BOTH = "both",
 }
 
 export interface IGraphNode {
@@ -19,9 +18,11 @@ export interface IGraphNode {
     superClass: IGraphEdge | null;
     interfaces: IGraphEdge[];
     entry?: ClassEntry;
-
     get edges(): IGraphEdge[];
-    relations(graph: InheritanceGraph | null, filter: (node: IGraphNode) => boolean): IGraphNode[];
+
+    subClasses: IGraphEdge[];
+    implementations: IGraphEdge[];
+    walk<T>(direction: WalkDirection, func: (node: IGraphNode, level: number) => T | null): T[];
 }
 
 export interface IGraphEdge {
@@ -42,44 +43,50 @@ const createNode = (className: string): IGraphNode => ({
     get edges() {
         return this.superClass ? [this.superClass, ...this.interfaces] : this.interfaces;
     },
-    relations(graph: InheritanceGraph | null, filter?: (node: IGraphNode) => boolean): IGraphNode[] {
-        const relations = new Set<IGraphNode>();
+    subClasses: [],
+    implementations: [],
+    walk<T>(direction: WalkDirection, func: (node: IGraphNode, level: number) => T | null): T[] {
+        const results: T[] = [];
+
         // walk up and down the inheritance tree to find all related classes
-        const visit = (node: IGraphNode) => {
-            if (relations.has(node) || (filter && !filter(node))) {
+        const visit = (node: IGraphNode, level: number = 0, visited: IGraphNode[] = []) => {
+            if (visited.includes(node)) {
                 return;
             }
-            relations.add(node);
 
-            // visit superclass
-            if (node.superClass) {
-                visit(node.superClass.to);
+            const result = func(node, level);
+            if (result === null) {
+                return; // stop walking
+            }
+            results.push(result);
+
+            if (direction === WalkDirection.UP || direction === WalkDirection.BOTH) {
+                // visit superclass
+                if (node.superClass) {
+                    visit(node.superClass.to, level - 1, [...visited, node]);
+                }
+
+                // visit interfaces
+                for (const itfEdge of node.interfaces) {
+                    visit(itfEdge.to, level - 1, [...visited, node]);
+                }
             }
 
-            // visit interfaces
-            for (const itfEdge of node.interfaces) {
-                visit(itfEdge.to);
-            }
+            if (direction === WalkDirection.DOWN || direction === WalkDirection.BOTH) {
+                // visit subclasses
+                for (const subEdge of node.subClasses) {
+                    visit(subEdge.to, level + 1, [...visited, node]);
+                }
 
-            // visit subclasses
-            if (graph) {
-                for (const otherNode of Object.values(graph)) {
-                    if (otherNode.superClass?.to === node) {
-                        visit(otherNode);
-                        continue;
-                    }
-                    for (const itfEdge of otherNode.interfaces) {
-                        if (itfEdge.to === node) {
-                            visit(otherNode);
-                            break;
-                        }
-                    }
+                // visit implementations
+                for (const implEdge of node.implementations) {
+                    visit(implEdge.to, level + 1, [...visited, node]);
                 }
             }
         };
 
         visit(this);
-        return Array.from(relations);
+        return results;
     },
 });
 
@@ -106,14 +113,37 @@ const createGraph = (classes: ClassEntry[]): InheritanceGraph => {
             };
         }
         for (const itf of klassNode.interfaces) {
-            const toNode = node(itf.nameEntry!.string);
-            toNode.type = IGraphNodeType.INTERFACE;
+            const itfNode = node(itf.nameEntry!.string);
+            itfNode.type = IGraphNodeType.INTERFACE;
 
             classNode.interfaces.push({
                 from: classNode,
-                to: toNode,
+                to: itfNode,
                 itf: true,
             });
+        }
+    }
+
+    for (const classNode of Object.values(graph)) {
+        if (classNode.superClass) {
+            const superNode = classNode.superClass.to;
+            if (!superNode.subClasses.some((e) => e.from === superNode && e.to === classNode)) {
+                superNode.subClasses.push({
+                    from: superNode,
+                    to: classNode,
+                    itf: false,
+                });
+            }
+        }
+        for (const itfEdge of classNode.interfaces) {
+            const itfNode = itfEdge.to;
+            if (!itfNode.implementations.some((e) => e.from === itfNode && e.to === classNode)) {
+                itfNode.implementations.push({
+                    from: itfNode,
+                    to: classNode,
+                    itf: true,
+                });
+            }
         }
     }
 

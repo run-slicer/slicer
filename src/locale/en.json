@@ -398,7 +398,7 @@
     "modal.usages.subtitle": "of {0}",
     "modal.usages.subtitle.none": "No type at this location.",
     "modal.usages.info": "{0} usage(s) found.",
-    "modal.hierarchy.title": "Type hierarchy",
+    "modal.hierarchy.title": "Type descendants",
     "modal.hierarchy.subtitle": "of {0}",
     "modal.hierarchy.subtitle.none": "No type at this location."
 }

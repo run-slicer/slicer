@@ -1,5 +1,5 @@
 import { prettyJavaType, prettyMethodDesc } from "$lib/utils";
-import { IMPLICIT_SUPER, type InheritanceGraph } from "$lib/workspace/analysis/graph";
+import { type InheritanceGraph, WalkDirection } from "$lib/workspace/analysis/graph";
 import type { Node as ClassNode, Member } from "@katana-project/asm";
 import { escapeLiteral, formatEntry, formatInsn } from "@katana-project/asm/analysis/disasm";
 import { computeGraph, EdgeType, type Node as GraphNode } from "@katana-project/asm/analysis/graph";
@@ -205,6 +205,13 @@ interface HierarchyNode {
     methods: MemberData[];
 }
 
+const IMPLICIT_SUPER = new Set([
+    "java/lang/Object",
+    "java/lang/Enum",
+    "java/lang/Record",
+    "java/lang/annotation/Annotation",
+]);
+
 export const computeHierarchyGraph = async (
     node: ClassNode,
     inheritanceGraph: InheritanceGraph,
@@ -216,17 +223,18 @@ export const computeHierarchyGraph = async (
         return [[], []]; // class not found in graph
     }
 
-    const graphNodes = currentNode.relations(
-        withSubtypes ? inheritanceGraph : null,
-        (n) => !IMPLICIT_SUPER.has(n.name)
+    const graphNodes = new Set(
+        currentNode.walk(withSubtypes ? WalkDirection.BOTH : WalkDirection.UP, (n) =>
+            IMPLICIT_SUPER.has(n.name) ? null : n
+        )
     );
 
     // make sure we have both sides of the edge
-    const edges = graphNodes
+    const edges = Array.from(graphNodes.values())
         .flatMap((n) => n.edges)
-        .filter((e) => graphNodes.includes(e.from) && graphNodes.includes(e.to));
+        .filter((e) => graphNodes.has(e.from) && graphNodes.has(e.to));
 
-    const nodes = graphNodes.map<HierarchyNode>((node) => ({
+    const nodes = Array.from(graphNodes.values()).map<HierarchyNode>((node) => ({
         name: node.name,
         fields:
             node.entry?.node?.fields?.map((f) => ({
