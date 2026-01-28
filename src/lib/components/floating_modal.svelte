@@ -137,11 +137,11 @@
             role="presentation"
         >
             <div class="min-w-0 flex-1 pr-2">
-                <p id="modal-title" class="text-foreground text-sm leading-tight font-semibold">
+                <p class="text-foreground truncate text-sm leading-tight font-semibold">
                     {title}
                 </p>
                 {#if subtitle}
-                    <p id="modal-description" class="text-muted-foreground mt-0.5 text-xs leading-tight">
+                    <p class="text-muted-foreground mt-0.5 truncate text-xs leading-tight">
                         {subtitle}
                     </p>
                 {/if}
