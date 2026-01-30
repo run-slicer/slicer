@@ -11,13 +11,14 @@ A modern Java reverse engineering tool for the web.
 - graph visualization
     - inheritance, interface implementation within a workspace
     - bytecode control flow via a [CFG](https://en.wikipedia.org/wiki/Control-flow_graph)
-    - exportable to a PNG/SVG!
-- low-level tabular view of a class file
-- heap dump reading and summarization
-- simple hexadecimal viewer for binary files
-- a simple JS scripting API for doing various things
+- bytecode-level search
+    - constant pool entries, instructions, member declarations or usages
 - multi-pane workspace for viewing multiple files at once
+- contextual actions (right-click) in code and all over the UI
+    - go-to declaration, find usages/implementations, ...
+- a simple JS scripting API for adding decompilers/disassemblers, manipulating workspace entries, ...
 - [shadcn/ui](https://ui.shadcn.com/) design and theming support
+- and many more... check [the documentation](https://docs.slicer.run) or see for yourself
 
 ## Installation
 
