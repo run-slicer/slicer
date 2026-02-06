@@ -1,5 +1,7 @@
-import { type ClassEntry, classes, EntryType } from "$lib/workspace";
+import { type ClassEntry, classes, EntryType, type MemberEntry } from "$lib/workspace";
+import type { Member } from "@katana-project/asm";
 import { derived } from "svelte/store";
+import { workers } from "./";
 
 export enum IGraphNodeType {
     CLASS = "class",
@@ -26,8 +28,8 @@ export interface IGraphNode {
 }
 
 export interface IGraphEdge {
-    from: IGraphNode;
-    to: IGraphNode;
+    sub: IGraphNode;
+    super: IGraphNode;
     itf: boolean;
 }
 
@@ -35,7 +37,7 @@ export interface InheritanceGraph {
     [className: string]: IGraphNode;
 }
 
-const createNode = (className: string): IGraphNode => ({
+const createINode = (className: string): IGraphNode => ({
     type: IGraphNodeType.CLASS,
     name: className,
     superClass: null,
@@ -63,24 +65,24 @@ const createNode = (className: string): IGraphNode => ({
             if (direction === WalkDirection.UP || direction === WalkDirection.BOTH) {
                 // visit superclass
                 if (node.superClass) {
-                    visit(node.superClass.to, level - 1, [...visited, node]);
+                    visit(node.superClass.super, level - 1, [...visited, node]);
                 }
 
                 // visit interfaces
                 for (const itfEdge of node.interfaces) {
-                    visit(itfEdge.to, level - 1, [...visited, node]);
+                    visit(itfEdge.super, level - 1, [...visited, node]);
                 }
             }
 
             if (direction === WalkDirection.DOWN || direction === WalkDirection.BOTH) {
                 // visit subclasses
                 for (const subEdge of node.subClasses) {
-                    visit(subEdge.to, level + 1, [...visited, node]);
+                    visit(subEdge.super, level + 1, [...visited, node]);
                 }
 
                 // visit implementations
                 for (const implEdge of node.implementations) {
-                    visit(implEdge.to, level + 1, [...visited, node]);
+                    visit(implEdge.super, level + 1, [...visited, node]);
                 }
             }
         };
@@ -90,11 +92,11 @@ const createNode = (className: string): IGraphNode => ({
     },
 });
 
-const createGraph = (classes: ClassEntry[]): InheritanceGraph => {
+const createIGraph = (classes: ClassEntry[]): InheritanceGraph => {
     const graph: InheritanceGraph = {};
     const node = (className: string): IGraphNode => {
         if (!graph[className]) {
-            graph[className] = createNode(className);
+            graph[className] = createINode(className);
         }
         return graph[className];
     };
@@ -107,8 +109,8 @@ const createGraph = (classes: ClassEntry[]): InheritanceGraph => {
 
         if (klassNode.superClass) {
             classNode.superClass = {
-                from: classNode,
-                to: node(klassNode.superClass.nameEntry!.string),
+                sub: classNode,
+                super: node(klassNode.superClass.nameEntry!.string),
                 itf: false,
             };
         }
@@ -117,8 +119,8 @@ const createGraph = (classes: ClassEntry[]): InheritanceGraph => {
             itfNode.type = IGraphNodeType.INTERFACE;
 
             classNode.interfaces.push({
-                from: classNode,
-                to: itfNode,
+                sub: classNode,
+                super: itfNode,
                 itf: true,
             });
         }
@@ -126,21 +128,21 @@ const createGraph = (classes: ClassEntry[]): InheritanceGraph => {
 
     for (const classNode of Object.values(graph)) {
         if (classNode.superClass) {
-            const superNode = classNode.superClass.to;
-            if (!superNode.subClasses.some((e) => e.from === superNode && e.to === classNode)) {
+            const superNode = classNode.superClass.super;
+            if (!superNode.subClasses.some((e) => e.sub === superNode && e.super === classNode)) {
                 superNode.subClasses.push({
-                    from: superNode,
-                    to: classNode,
+                    sub: superNode,
+                    super: classNode,
                     itf: false,
                 });
             }
         }
         for (const itfEdge of classNode.interfaces) {
-            const itfNode = itfEdge.to;
-            if (!itfNode.implementations.some((e) => e.from === itfNode && e.to === classNode)) {
+            const itfNode = itfEdge.super;
+            if (!itfNode.implementations.some((e) => e.sub === itfNode && e.super === classNode)) {
                 itfNode.implementations.push({
-                    from: itfNode,
-                    to: classNode,
+                    sub: itfNode,
+                    super: classNode,
                     itf: true,
                 });
             }
@@ -151,5 +153,91 @@ const createGraph = (classes: ClassEntry[]): InheritanceGraph => {
 };
 
 export const graph = derived(classes, ($classes) =>
-    createGraph(Array.from($classes.values()).filter((e) => e.type === EntryType.CLASS) as ClassEntry[])
+    createIGraph(Array.from($classes.values()).filter((e) => e.type === EntryType.CLASS) as ClassEntry[])
 );
+
+export interface CGraphEdge {
+    caller: CGraphNode;
+    callee: CGraphNode;
+}
+
+export interface Callable {
+    id: string;
+    name: string;
+    type: string;
+    owner: string;
+}
+
+export interface CGraphNode extends Callable {
+    callers: CGraphEdge[];
+    callees: CGraphEdge[];
+    get edges(): CGraphEdge[];
+
+    member?: Member;
+    ownerEntry?: ClassEntry;
+}
+
+export interface CallGraph {
+    [id: string]: CGraphNode;
+}
+
+// TODO: explore making a global call graph for resolving callers
+export const createCallGraph = async (root: MemberEntry, classes: ClassEntry[]): Promise<CallGraph> => {
+    const graph: CallGraph = {};
+    const node = (call: Callable): CGraphNode => {
+        if (!graph[call.id]) {
+            const ownerEntry = classes.find((c) => c.node.thisClass?.nameEntry?.string === call.owner);
+            const member = ownerEntry?.node.methods.find(
+                (m) => m.name?.string === call.name && m.type?.string === call.type
+            );
+
+            graph[call.id] = {
+                ...call,
+                callers: [],
+                callees: [],
+                member,
+                ownerEntry,
+                get edges() {
+                    return this.callees;
+                },
+            };
+        }
+        return graph[call.id];
+    };
+
+    const visited = new Set<string>();
+    const stack: CGraphNode[] = [
+        node({
+            id: `${root.node.thisClass.nameEntry!.string}#${root.member.name.string}${root.member.type.string}`,
+            name: root.member.name.string,
+            type: root.member.type.string,
+            owner: root.node.thisClass.nameEntry!.string,
+        }),
+    ];
+
+    while (stack.length > 0) {
+        const current = stack.pop()!;
+        if (visited.has(current.id)) {
+            continue;
+        }
+        visited.add(current.id);
+
+        if (!current.member || !current.ownerEntry) {
+            continue;
+        }
+
+        const callees = await workers.instance().task((w) => w.findCallees(current.member!, current.ownerEntry!.node));
+
+        for (const callee of callees) {
+            const calleeNode = node(callee);
+            current.callees.push({ caller: current, callee: calleeNode });
+            calleeNode.callers.push({ caller: current, callee: calleeNode });
+
+            if (!visited.has(calleeNode.id)) {
+                stack.push(calleeNode);
+            }
+        }
+    }
+
+    return graph;
+};

@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { type ClassEntry, EntryType, type MemberEntry } from "$lib/workspace";
+    import { type ClassEntry, EntryType, memberEntry, type MemberEntry } from "$lib/workspace";
     import type { Member } from "@katana-project/asm";
-    import { Circle, CircleX, Zap, ZapOff } from "@lucide/svelte";
+    import { Circle, CircleX, GitPullRequestArrow, Workflow, Zap, ZapOff } from "@lucide/svelte";
     import { mode } from "mode-watcher";
     import {
         Background,
@@ -18,15 +18,18 @@
     import Loading from "$lib/components/loading.svelte";
     import ControlFlowNode from "./nodes/control_flow.svelte";
     import HierarchyNode from "./nodes/hierarchy.svelte";
+    import CallNode from "./nodes/call.svelte";
     import FlowEdge from "./edge.svelte";
     import FlowMenu from "./menu.svelte";
-    import { computeControlFlowGraph, computeHierarchyGraph } from "./graph";
+    import { computeCallGraph, computeControlFlowGraph, computeHierarchyGraph, GraphType } from "./graph";
     import type { PaneProps } from "$lib/components/pane";
     import { cyrb53 } from "$lib/utils";
     import { t } from "$lib/i18n";
-    import { graph, type InheritanceGraph } from "$lib/workspace/analysis/graph";
+    import { createCallGraph, graph, type InheritanceGraph } from "$lib/workspace/analysis/graph";
+    import { cn } from "$lib/components/utils";
+    import { Button } from "$lib/components/ui/button";
 
-    let { tab, handler }: PaneProps = $props();
+    let { tab, handler, classes }: PaneProps = $props();
     const entry = tab.entry!;
 
     const node = "node" in entry ? (entry as ClassEntry).node : null;
@@ -48,9 +51,11 @@
 
     let parentElem: HTMLElement | undefined = $state();
 
+    let graphType = $derived(member ? GraphType.CONTROL_FLOW : GraphType.HIERARCHY);
     let showHandlerEdges = $state(false);
     let showSubtypes = $state(false);
     const computeGraph = async (
+        type: GraphType,
         member: Member | null,
         inheritanceGraph: InheritanceGraph,
         showHandlerEdges: boolean,
@@ -60,9 +65,19 @@
             return [[], []]; // not a class
         }
 
-        return member
-            ? computeControlFlowGraph(node, member, showHandlerEdges)
-            : computeHierarchyGraph(node, inheritanceGraph, showSubtypes, handler);
+        if (type === GraphType.HIERARCHY) {
+            return computeHierarchyGraph(node, inheritanceGraph, showSubtypes, handler);
+        }
+        if (!member) {
+            return [[], []]; // no member selected
+        }
+
+        const methodEntry =
+            entry.type === EntryType.MEMBER ? (entry as MemberEntry) : memberEntry(entry as ClassEntry, member);
+        const actualClasses = Array.from(classes.values()).filter((e) => e.type === EntryType.CLASS) as ClassEntry[];
+        return type === GraphType.CALL
+            ? computeCallGraph(await createCallGraph(methodEntry, actualClasses))
+            : computeControlFlowGraph(node, member, showHandlerEdges);
     };
 </script>
 
@@ -70,7 +85,7 @@
     <SvelteFlowProvider>
         <ContextMenu>
             <ContextMenuTrigger class="h-full w-full">
-                {#await computeGraph(member, $graph, showHandlerEdges, showSubtypes)}
+                {#await computeGraph(graphType, member, $graph, showHandlerEdges, showSubtypes)}
                     <Loading value={$t("pane.graph.loading")} timed />
                 {:then [nodes, edges]}
                     <SvelteFlow
@@ -84,12 +99,12 @@
                         nodesConnectable={false}
                         elementsSelectable={false}
                         proOptions={{ hideAttribution: true }}
-                        nodeTypes={{ "cf-node": ControlFlowNode, "hier-node": HierarchyNode }}
+                        nodeTypes={{ "cf-node": ControlFlowNode, "hier-node": HierarchyNode, "call-node": CallNode }}
                         edgeTypes={{ "auto-edge": FlowEdge }}
                     >
                         <Background variant={BackgroundVariant.Dots} />
                         <Controls showLock={false} position="bottom-right">
-                            {#if member}
+                            {#if graphType === GraphType.CONTROL_FLOW}
                                 <ControlButton
                                     class="svelte-flow__controls-interactive"
                                     onclick={() => (showHandlerEdges = !showHandlerEdges)}
@@ -99,7 +114,7 @@
                                     {@const Icon = showHandlerEdges ? Zap : ZapOff}
                                     <Icon size={12} class="fill-none!" />
                                 </ControlButton>
-                            {:else}
+                            {:else if graphType === GraphType.HIERARCHY}
                                 <ControlButton
                                     class="svelte-flow__controls-interactive"
                                     onclick={() => (showSubtypes = !showSubtypes)}
@@ -117,11 +132,14 @@
             <FlowMenu {parentElem} {node} {member} />
         </ContextMenu>
     </SvelteFlowProvider>
-    {#if entry.type !== EntryType.MEMBER}
-        <div class="absolute bottom-0 m-[15px]">
+    <div class="absolute bottom-0 z-20 m-[15px] flex flex-row">
+        {#if entry.type !== EntryType.MEMBER}
             <Select type="single" bind:value={methodIndex}>
                 <SelectTrigger
-                    class="!bg-card h-7 max-w-[425px] text-xs whitespace-nowrap [&_svg]:ml-2 [&_svg]:h-4 [&_svg]:w-4"
+                    class={cn(
+                        "!bg-card h-7 max-w-[425px] text-xs whitespace-nowrap [&_svg]:ml-2 [&_svg]:h-4 [&_svg]:w-4",
+                        graphType !== GraphType.HIERARCHY && "rounded-r-none border-r-0"
+                    )}
                 >
                     <div class="overflow-hidden text-ellipsis">
                         <span class="text-muted-foreground mr-2">
@@ -148,8 +166,21 @@
                     {/each}
                 </SelectContent>
             </Select>
-        </div>
-    {/if}
+        {/if}
+        {#if graphType !== GraphType.HIERARCHY}
+            <Button
+                variant="outline"
+                size="icon"
+                class={cn("!bg-card", entry.type !== EntryType.MEMBER && "rounded-l-none")}
+                onclick={() => (graphType = graphType === GraphType.CALL ? GraphType.CONTROL_FLOW : GraphType.CALL)}
+                title={$t(graphType === GraphType.CALL ? "pane.graph.calls.hide" : "pane.graph.calls.show")}
+                aria-label={$t(graphType === GraphType.CALL ? "pane.graph.calls.hide" : "pane.graph.calls.show")}
+            >
+                {@const Icon = graphType === GraphType.CALL ? Workflow : GitPullRequestArrow}
+                <Icon />
+            </Button>
+        {/if}
+    </div>
 </div>
 
 <style>

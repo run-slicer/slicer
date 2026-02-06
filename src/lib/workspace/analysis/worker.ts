@@ -1,16 +1,20 @@
+import type { Callable } from "$lib/workspace/analysis/graph";
 import { type Member, type Node, read } from "@katana-project/asm";
 import { escapeLiteral, formatEntry, formatInsn } from "@katana-project/asm/analysis/disasm";
 import type { BootstrapMethodsAttribute, CodeAttribute } from "@katana-project/asm/attr";
 import { readBootstrapMethods } from "@katana-project/asm/attr/bsm";
 import { readCode } from "@katana-project/asm/attr/code";
-import type { Entry, NameTypeEntry } from "@katana-project/asm/pool";
-import { AttributeType, ConstantType } from "@katana-project/asm/spec";
+import type { InvokeInstruction } from "@katana-project/asm/insn";
+import type { Entry, NameTypeEntry, RefEntry } from "@katana-project/asm/pool";
+import { AttributeType, ConstantType, Opcode } from "@katana-project/asm/spec";
 import { expose } from "comlink";
 import { QueryType, type SearchData, SearchMode, type SearchResultData } from "./search";
 
 export interface AnalysisWorker {
     read(data: Uint8Array, flags: number): Promise<Node>;
     search(data: SearchData): Promise<SearchResultData[]>;
+
+    findCallees(member: Member, owner: Node): Promise<Callable[]>;
 }
 
 type Comparator = (v: string) => boolean;
@@ -115,5 +119,41 @@ expose({
                     ? searchPoolEntries(node, comparator, (e) => isMethodNameType(e))
                     : searchMembers(node.methods, comparator);
         }
+    },
+    async findCallees(member: Member, owner: Node): Promise<Callable[]> {
+        const callees: Callable[] = [];
+
+        const code = member.attrs.find((a) => a.type === AttributeType.CODE) as CodeAttribute;
+        if (!code) {
+            return callees;
+        }
+
+        const visited = new Set<string>();
+        for (const insn of code.insns) {
+            switch (insn.opcode) {
+                case Opcode.INVOKEVIRTUAL:
+                case Opcode.INVOKESPECIAL:
+                case Opcode.INVOKESTATIC:
+                case Opcode.INVOKEINTERFACE: {
+                    const ref = owner.pool[(insn as InvokeInstruction).ref] as RefEntry;
+                    const calleeClass = ref.refEntry!;
+                    const callee = ref.nameTypeEntry!;
+
+                    const id = `${calleeClass.nameEntry!.string}#${callee.nameEntry!.string}${callee.typeEntry!.string}`;
+                    if (!visited.has(id)) {
+                        visited.add(id);
+                        callees.push({
+                            id,
+                            name: callee.nameEntry!.string,
+                            type: callee.typeEntry!.string,
+                            owner: calleeClass.nameEntry!.string,
+                        });
+                    }
+                    break;
+                }
+            }
+        }
+
+        return callees;
     },
 } satisfies AnalysisWorker);

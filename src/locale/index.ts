@@ -156,6 +156,8 @@ export interface LocaleData {
     "pane.graph.loading": string;
     "pane.graph.method": string;
     "pane.graph.method.none": string;
+    "pane.graph.calls.hide": string;
+    "pane.graph.calls.show": string;
     "pane.graph.controls.exceptions": string;
     "pane.graph.controls.subtypes": string;
     "pane.graph.menu.title": string;

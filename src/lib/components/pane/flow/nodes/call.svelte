@@ -1,26 +1,20 @@
 <script lang="ts">
     import { Handle, type NodeProps, Position } from "@xyflow/svelte";
-    import type { ControlFlowNodeData } from "../graph";
+    import type { CallGraphNodeData } from "../graph";
 
     interface Props extends NodeProps {
-        data: ControlFlowNodeData;
+        data: CallGraphNodeData;
     }
 
     let { data }: Props = $props();
 </script>
 
 <Handle type="target" position={Position.Top} />
-{#each data.lines as line}
-    {@const parts = line.split(" ")}
-    <p class="font-mono whitespace-nowrap">
-        <span class="text-muted-foreground">{parts[0]}</span>
-        {parts.slice(1).join(" ")}
-    </p>
-{/each}
+<p class="font-mono whitespace-nowrap">{data.node.id}</p>
 <Handle type="source" position={Position.Bottom} />
 
 <style>
-    :global(.svelte-flow__node-cf-node) {
+    :global(.svelte-flow__node-call-node) {
         padding: 10px;
         border-radius: var(--xy-node-border-radius, var(--xy-node-border-radius-default));
         font-size: 12px;
