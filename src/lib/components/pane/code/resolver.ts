@@ -35,6 +35,12 @@ export const resolveType = (
 
             popped.push(parts.pop()!);
         }
+
+        if (!className) {
+            // fallback to full qualified name if we couldn't find any match
+            // this might be wrong if we're dealing with inner classes, but it's better than nothing
+            className = resolution.qualifiedName.replaceAll(".", "/");
+        }
     }
 
     let packageName: string | null = null,
