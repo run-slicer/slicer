@@ -274,7 +274,9 @@ const nextTab = (tab: Tab): Tab | null => {
 };
 
 export const remove = (tab: Tab) => {
-    updateCurrent(tab.position, nextTab(tab));
+    if (tab.active) {
+        updateCurrent(tab.position, nextTab(tab));
+    }
 
     tabs.update(($tabs) => {
         $tabs.delete(tab.id);
