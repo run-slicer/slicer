@@ -30,9 +30,28 @@ const createComparator = (value: string, mode: SearchMode): Comparator => {
     }
 };
 
+const readCode0 = (node: Node, member: Member): CodeAttribute | null => {
+    const attr = member.attrs.find((a) => a.name?.string === AttributeType.CODE);
+    if (attr) {
+        if (attr.type === AttributeType.CODE) {
+            return attr as CodeAttribute;
+        }
+
+        try {
+            return readCode(attr, node.pool);
+        } catch (e) {}
+    }
+
+    return null;
+};
+
 const readBsm = (node: Node): BootstrapMethodsAttribute | null => {
     const attr = node.attrs.find((a) => a.name?.string === AttributeType.BOOTSTRAP_METHODS);
     if (attr) {
+        if (attr.type === AttributeType.BOOTSTRAP_METHODS) {
+            return attr as BootstrapMethodsAttribute;
+        }
+
         try {
             return readBootstrapMethods(attr, node.pool);
         } catch (e) {}
@@ -77,25 +96,13 @@ expose({
             case QueryType.PSEUDOCODE:
                 const bsmAttr = readBsm(node);
                 const code = [
-                    ...node.methods.flatMap((member) =>
-                        member.attrs
-                            .filter((a) => a.name?.string === AttributeType.CODE)
-                            .map((attr) => {
-                                try {
-                                    return attr.type === AttributeType.CODE
-                                        ? (attr as CodeAttribute)
-                                        : readCode(attr, node.pool);
-                                } catch (e) {}
-                                return null;
-                            })
-                            .filter((i) => i !== null)
-                            .flatMap((code) =>
-                                code.insns.map((i) => ({
-                                    member,
-                                    value: formatInsn(code, bsmAttr, i, node.pool, true),
-                                }))
-                            )
-                    ),
+                    ...node.methods.flatMap((member) => {
+                        const codeAttr = readCode0(node, member);
+                        return (codeAttr?.insns ?? []).map((i) => ({
+                            member,
+                            value: formatInsn(codeAttr!, bsmAttr, i, node.pool, true),
+                        }));
+                    }),
                     ...node.pool
                         .filter((e) => e !== null)
                         .map((e) => ({
@@ -123,7 +130,7 @@ expose({
     async findCallees(member: Member, owner: Node): Promise<Callable[]> {
         const callees: Callable[] = [];
 
-        const code = member.attrs.find((a) => a.type === AttributeType.CODE) as CodeAttribute;
+        const code = readCode0(owner, member);
         if (!code) {
             return callees;
         }
