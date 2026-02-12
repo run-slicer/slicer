@@ -1,16 +1,27 @@
 <script lang="ts">
     import { Handle, type NodeProps, Position } from "@xyflow/svelte";
     import type { CallGraphNodeData } from "../graph";
+    import { cn } from "$lib/components/utils";
 
     interface Props extends NodeProps {
         data: CallGraphNodeData;
     }
 
     let { data }: Props = $props();
+    let { owner, ownerDisplayName, name, type, open, openMember } = $derived(data.node);
 </script>
 
 <Handle type="target" position={Position.Top} />
-<p class="font-mono whitespace-nowrap">{data.node.id}</p>
+<p class="flex font-mono whitespace-nowrap">
+    <button title={owner} class={cn(open && "cursor-pointer underline decoration-1")} onclick={open}>
+        {ownerDisplayName}
+    </button>
+    #
+    <button title={`${name}${type}`} class={cn(open && "cursor-pointer underline decoration-1")} onclick={openMember}>
+        {name}
+    </button>
+    {type}
+</p>
 <Handle type="source" position={Position.Bottom} />
 
 <style>

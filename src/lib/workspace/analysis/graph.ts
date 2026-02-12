@@ -152,7 +152,7 @@ const createIGraph = (classes: ClassEntry[]): InheritanceGraph => {
     return graph;
 };
 
-export const graph = derived(classes, ($classes) =>
+export const inheritanceGraph = derived(classes, ($classes) =>
     createIGraph(Array.from($classes.values()).filter((e) => e.type === EntryType.CLASS) as ClassEntry[])
 );
 

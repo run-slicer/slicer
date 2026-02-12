@@ -1,6 +1,7 @@
 import type { EventHandler } from "$lib/event";
 import { prettyInternalName, prettyJavaType, prettyMethodDesc } from "$lib/utils";
-import { type CallGraph, type CGraphNode, type InheritanceGraph, WalkDirection } from "$lib/workspace/analysis/graph";
+import { memberEntry } from "$lib/workspace";
+import { type CallGraph, type InheritanceGraph, WalkDirection } from "$lib/workspace/analysis/graph";
 import type { Node as ClassNode, Member } from "@katana-project/asm";
 import { escapeLiteral, formatEntry, formatInsn } from "@katana-project/asm/analysis/disasm";
 import { computeGraph, EdgeType, type Node as GraphNode } from "@katana-project/asm/analysis/graph";
@@ -297,8 +298,8 @@ export const computeHierarchyGraph = async (
         })),
         edges: edges.map((e) => ({
             id: `${e.sub.name}-${e.super.name}`,
-            targets: [`${e.sub.name}`],
-            sources: [`${e.super.name}`],
+            targets: [`${e.super.name}`],
+            sources: [`${e.sub.name}`],
         })),
     };
 
@@ -322,8 +323,8 @@ export const computeHierarchyGraph = async (
         edges.map((edge) => ({
             id: `${edge.sub.name}-${edge.super.name}`,
             type: "auto-edge",
-            source: edge.super.name,
-            target: edge.sub.name,
+            source: edge.sub.name,
+            target: edge.super.name,
             animated: edge.itf,
             markerEnd: {
                 type: "arrowclosed" as MarkerType /* skip non-type import */,
@@ -336,25 +337,49 @@ export const computeHierarchyGraph = async (
     ];
 };
 
+interface CallGraphNode {
+    id: string;
+    owner: string;
+    ownerDisplayName: string;
+    name: string;
+    type: string;
+
+    open?: () => void;
+    openMember?: () => void;
+}
+
 export type CallGraphNodeData = {
-    node: CGraphNode;
+    node: CallGraphNode;
     width: number;
     height: number;
 };
 
-export const computeCallGraph = async (callGraph: CallGraph): Promise<[Node[], Edge[]]> => {
+export const computeCallGraph = async (callGraph: CallGraph, handler?: EventHandler): Promise<[Node[], Edge[]]> => {
     const nodes = Object.values(callGraph);
     const edges = nodes.flatMap((n) => n.edges);
 
     const data: CallGraphNodeData[] = nodes.map((node) => {
-        const lines = [node.id];
+        const cgNode: CallGraphNode = {
+            id: node.id,
+            owner: node.owner,
+            ownerDisplayName: prettyInternalName(node.owner, !!(handler && node.ownerEntry)),
+            name: node.name,
+            type: prettyMethodDesc(node.type, true),
+            open: handler && node.ownerEntry ? () => handler.open(node.ownerEntry!) : undefined,
+            openMember:
+                handler && node.ownerEntry && node.member
+                    ? () => handler.open(memberEntry(node.ownerEntry!, node.member!))
+                    : undefined,
+        };
+
+        const lines = [`${cgNode.ownerDisplayName}#${cgNode.name}${cgNode.type}`];
         const metrics = computeTextSize(
             lines.reduce((a, b) => (a.length > b.length ? a : b)),
             `400 12px / 18px ${monoFF}`
         );
 
         return {
-            node,
+            node: cgNode,
             lines,
             width: metrics.width + 20 /* padding */ + 2 /* border */,
             height: 18 /* line height */ * lines.length + 20 /* padding */ + 2 /* border */,

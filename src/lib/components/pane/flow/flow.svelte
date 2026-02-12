@@ -23,9 +23,9 @@
     import FlowMenu from "./menu.svelte";
     import { computeCallGraph, computeControlFlowGraph, computeHierarchyGraph, GraphType } from "./graph";
     import type { PaneProps } from "$lib/components/pane";
-    import { cyrb53 } from "$lib/utils";
+    import { cyrb53, prettyMethodDesc } from "$lib/utils";
     import { t } from "$lib/i18n";
-    import { createCallGraph, graph, type InheritanceGraph } from "$lib/workspace/analysis/graph";
+    import { createCallGraph, inheritanceGraph, type InheritanceGraph } from "$lib/workspace/analysis/graph";
     import { cn } from "$lib/components/utils";
     import { Button } from "$lib/components/ui/button";
 
@@ -76,7 +76,7 @@
             entry.type === EntryType.MEMBER ? (entry as MemberEntry) : memberEntry(entry as ClassEntry, member);
         const actualClasses = Array.from(classes.values()).filter((e) => e.type === EntryType.CLASS) as ClassEntry[];
         return type === GraphType.CALL
-            ? computeCallGraph(await createCallGraph(methodEntry, actualClasses))
+            ? computeCallGraph(await createCallGraph(methodEntry, actualClasses), handler)
             : computeControlFlowGraph(node, member, showHandlerEdges);
     };
 </script>
@@ -85,7 +85,7 @@
     <SvelteFlowProvider>
         <ContextMenu>
             <ContextMenuTrigger class="h-full w-full">
-                {#await computeGraph(graphType, member, $graph, showHandlerEdges, showSubtypes)}
+                {#await computeGraph(graphType, member, $inheritanceGraph, showHandlerEdges, showSubtypes)}
                     <Loading value={$t("pane.graph.loading")} timed />
                 {:then [nodes, edges]}
                     <SvelteFlow
@@ -146,7 +146,9 @@
                             {$t("pane.graph.method")}
                         </span>
                         <span class="font-mono tracking-tight">
-                            {!member ? $t("pane.graph.method.none") : `${member.name.string}${member.type.string}`}
+                            {!member
+                                ? $t("pane.graph.method.none")
+                                : `${member.name.string}${prettyMethodDesc(member.type.string, true)}`}
                         </span>
                     </div>
                 </SelectTrigger>
@@ -159,7 +161,7 @@
                         {$t("pane.graph.method.none")}
                     </SelectItem>
                     {#each methods as mth, i}
-                        {@const label = `${mth.name.string}${mth.type.string}`}
+                        {@const label = `${mth.name.string}${prettyMethodDesc(mth.type.string, true)}`}
                         <SelectItem value={i.toString()} {label} class="font-mono text-xs tracking-tight break-all">
                             {label}
                         </SelectItem>
