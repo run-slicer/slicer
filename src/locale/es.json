@@ -158,7 +158,7 @@
     "pane.graph.calls.show": "Show callees",
     "pane.graph.controls.exceptions": "toggle exception handler edges",
     "pane.graph.controls.subtypes": "alternar subtipos",
-    "pane.graph.menu.title": "Graph",
+    "pane.graph.menu.title": "Gráfica",
     "pane.graph.menu.export": "Exportar",
     "pane.image.loading": "Leyendo...",
     "pane.image.zoom.reset": "Restablecer zoom",
