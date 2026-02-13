@@ -23,7 +23,7 @@
     import type { TypeReferenceResolver } from "@katana-project/laser";
     import { resolveType } from "./resolver";
     import HierarchyContent from "./hierarchy.svelte";
-    import { graph } from "$lib/workspace/analysis/graph";
+    import { inheritanceGraph } from "$lib/workspace/analysis/graph";
 
     interface Props {
         view: EditorView | null;
@@ -69,7 +69,7 @@
     let usagesOpen = $state(false);
 
     let hierarchyOpen = $state(false);
-    let hasGraphNode = $derived($graph[detail?.className ?? ""] !== undefined);
+    let hasGraphNode = $derived($inheritanceGraph[detail?.className ?? ""] !== undefined);
 </script>
 
 <ContextMenuContent class="min-w-54">

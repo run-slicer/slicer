@@ -1,6 +1,7 @@
 import type { EventHandler } from "$lib/event";
 import { prettyInternalName, prettyJavaType, prettyMethodDesc } from "$lib/utils";
-import { type InheritanceGraph, WalkDirection } from "$lib/workspace/analysis/graph";
+import { memberEntry } from "$lib/workspace";
+import { type CallGraph, type InheritanceGraph, WalkDirection } from "$lib/workspace/analysis/graph";
 import type { Node as ClassNode, Member } from "@katana-project/asm";
 import { escapeLiteral, formatEntry, formatInsn } from "@katana-project/asm/analysis/disasm";
 import { computeGraph, EdgeType, type Node as GraphNode } from "@katana-project/asm/analysis/graph";
@@ -8,6 +9,12 @@ import type { BootstrapMethodsAttribute, CodeAttribute } from "@katana-project/a
 import { AttributeType } from "@katana-project/asm/spec";
 import type { Edge, MarkerType, Node } from "@xyflow/svelte";
 import ELK, { type ElkNode } from "elkjs/lib/elk-api";
+
+export enum GraphType {
+    CONTROL_FLOW = "control-flow",
+    CALL = "call",
+    HIERARCHY = "hierarchy",
+}
 
 export type ControlFlowNodeData = {
     node: GraphNode;
@@ -51,6 +58,14 @@ const controlFlowLayoutOptions = {
     "elk.layered.layering.strategy": "LONGEST_PATH_SOURCE",
     "elk.layered.considerModelOrder.strategy": "PREFER_NODES",
     "elk.layered.cycleBreaking.strategy": "MODEL_ORDER",
+};
+
+const callLayoutOptions = {
+    ...commonOptions,
+    "elk.direction": "RIGHT",
+    "elk.layered.mergeEdges": "true",
+    "elk.spacing.portPort": "2",
+    "elk.layered.spacing.nodeNodeBetweenLayers": "40",
 };
 
 const hierarchyLayoutOptions = {
@@ -237,7 +252,7 @@ export const computeHierarchyGraph = async (
     // make sure we have both sides of the edge
     const edges = Array.from(graphNodes.values())
         .flatMap((n) => n.edges)
-        .filter((e) => graphNodes.has(e.from) && graphNodes.has(e.to));
+        .filter((e) => graphNodes.has(e.sub) && graphNodes.has(e.super));
 
     const nodes = Array.from(graphNodes.values()).map<HierarchyNode>((node) => ({
         name: node.name,
@@ -282,9 +297,9 @@ export const computeHierarchyGraph = async (
             height: d.height,
         })),
         edges: edges.map((e) => ({
-            id: `${e.from.name}-${e.to.name}`,
-            targets: [`${e.from.name}`],
-            sources: [`${e.to.name}`],
+            id: `${e.sub.name}-${e.super.name}`,
+            targets: [`${e.super.name}`],
+            sources: [`${e.sub.name}`],
         })),
     };
 
@@ -306,15 +321,111 @@ export const computeHierarchyGraph = async (
             };
         }),
         edges.map((edge) => ({
-            id: `${edge.from.name}-${edge.to.name}`,
+            id: `${edge.sub.name}-${edge.super.name}`,
             type: "auto-edge",
-            source: edge.to.name,
-            target: edge.from.name,
+            source: edge.sub.name,
+            target: edge.super.name,
             animated: edge.itf,
             markerEnd: {
                 type: "arrowclosed" as MarkerType /* skip non-type import */,
             },
-            data: layout.edges?.find((e) => e.id === `${edge.from.name}-${edge.to.name}`)! as unknown as Record<
+            data: layout.edges?.find((e) => e.id === `${edge.sub.name}-${edge.super.name}`)! as unknown as Record<
+                string,
+                unknown
+            >,
+        })),
+    ];
+};
+
+interface CallGraphNode {
+    id: string;
+    owner: string;
+    ownerDisplayName: string;
+    name: string;
+    type: string;
+
+    open?: () => void;
+    openMember?: () => void;
+}
+
+export type CallGraphNodeData = {
+    node: CallGraphNode;
+    width: number;
+    height: number;
+};
+
+export const computeCallGraph = async (callGraph: CallGraph, handler?: EventHandler): Promise<[Node[], Edge[]]> => {
+    const nodes = Object.values(callGraph);
+    const edges = nodes.flatMap((n) => n.edges);
+
+    const data: CallGraphNodeData[] = nodes.map((node) => {
+        const cgNode: CallGraphNode = {
+            id: node.id,
+            owner: node.owner,
+            ownerDisplayName: prettyInternalName(node.owner, !!(handler && node.ownerEntry)),
+            name: node.name,
+            type: prettyMethodDesc(node.type, true),
+            open: handler && node.ownerEntry ? () => handler.open(node.ownerEntry!) : undefined,
+            openMember:
+                handler && node.ownerEntry && node.member
+                    ? () => handler.open(memberEntry(node.ownerEntry!, node.member!))
+                    : undefined,
+        };
+
+        const lines = [`${cgNode.ownerDisplayName}#${cgNode.name}${cgNode.type}`];
+        const metrics = computeTextSize(
+            lines.reduce((a, b) => (a.length > b.length ? a : b)),
+            `400 12px / 18px ${monoFF}`
+        );
+
+        return {
+            node: cgNode,
+            lines,
+            width: metrics.width + 20 /* padding */ + 2 /* border */,
+            height: 18 /* line height */ * lines.length + 20 /* padding */ + 2 /* border */,
+        };
+    });
+
+    const graph: ElkNode = {
+        id: "root",
+        children: data.map((d) => ({
+            id: d.node.id,
+            width: d.width,
+            height: d.height,
+        })),
+        edges: edges.map((e) => ({
+            id: `${e.caller.id}-${e.callee.id}`,
+            targets: [`${e.callee.id}`],
+            sources: [`${e.caller.id}`],
+        })),
+    };
+
+    const layout = await elk.layout(graph, { layoutOptions: callLayoutOptions });
+    return [
+        data.map((d) => {
+            const elkNode = layout.children?.find((n) => n.id === d.node.id);
+
+            return {
+                id: d.node.id,
+                type: "call-node",
+                data: d,
+                position: {
+                    x: elkNode?.x ?? 0,
+                    y: elkNode?.y ?? 0,
+                },
+                // highlight current node
+                style: d.node.id === nodes[0].id ? "border: 1px solid var(--primary);" : undefined,
+            };
+        }),
+        edges.map((edge) => ({
+            id: `${edge.caller.id}-${edge.callee.id}`,
+            type: "auto-edge",
+            source: edge.caller.id,
+            target: edge.callee.id,
+            markerEnd: {
+                type: "arrowclosed" as MarkerType /* skip non-type import */,
+            },
+            data: layout.edges?.find((e) => e.id === `${edge.caller.id}-${edge.callee.id}`)! as unknown as Record<
                 string,
                 unknown
             >,

@@ -1,26 +1,31 @@
 <script lang="ts">
     import { Handle, type NodeProps, Position } from "@xyflow/svelte";
-    import type { ControlFlowNodeData } from "../graph";
+    import type { CallGraphNodeData } from "../graph";
+    import { cn } from "$lib/components/utils";
 
     interface Props extends NodeProps {
-        data: ControlFlowNodeData;
+        data: CallGraphNodeData;
     }
 
     let { data }: Props = $props();
+    let { owner, ownerDisplayName, name, type, open, openMember } = $derived(data.node);
 </script>
 
 <Handle type="target" position={Position.Top} />
-{#each data.lines as line}
-    {@const parts = line.split(" ")}
-    <p class="font-mono whitespace-nowrap">
-        <span class="text-muted-foreground">{parts[0]}</span>
-        {parts.slice(1).join(" ")}
-    </p>
-{/each}
+<p class="flex font-mono whitespace-nowrap">
+    <button title={owner} class={cn(open && "cursor-pointer underline decoration-1")} onclick={open}>
+        {ownerDisplayName}
+    </button>
+    #
+    <button title={`${name}${type}`} class={cn(open && "cursor-pointer underline decoration-1")} onclick={openMember}>
+        {name}
+    </button>
+    {type}
+</p>
 <Handle type="source" position={Position.Bottom} />
 
 <style>
-    :global(.svelte-flow__node-cf-node) {
+    :global(.svelte-flow__node-call-node) {
         padding: 10px;
         border-radius: var(--xy-node-border-radius, var(--xy-node-border-radius-default));
         font-size: 12px;

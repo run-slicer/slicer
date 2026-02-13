@@ -16,7 +16,7 @@
 <Handle type="target" position={Position.Top} />
 <button
     title={prettyInternalName(data.node.name)}
-    class={cn("px-[10px] font-mono tracking-tight whitespace-nowrap", open && "cursor-pointer underline decoration-1")}
+    class={cn("px-[10px] font-mono whitespace-nowrap", open && "cursor-pointer underline decoration-1")}
     onclick={open}
 >
     {data.node.displayName}

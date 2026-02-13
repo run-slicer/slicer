@@ -4,7 +4,7 @@
     import { Class, entryIcon, Interface } from "$lib/components/icons";
     import type { EventHandler } from "$lib/event";
     import { cn } from "$lib/components/utils";
-    import { graph, type IGraphNode, IGraphNodeType, WalkDirection } from "$lib/workspace/analysis/graph";
+    import { inheritanceGraph, type IGraphNode, IGraphNodeType, WalkDirection } from "$lib/workspace/analysis/graph";
     import { prettyInternalName } from "$lib/utils";
     import { SvelteSet } from "svelte/reactivity";
 
@@ -15,7 +15,7 @@
     }
 
     let { open = $bindable(), name, handler }: Props = $props();
-    let data = $derived(open && name ? ($graph[name] ?? null) : null);
+    let data = $derived(open && name ? ($inheritanceGraph[name] ?? null) : null);
 
     let rows = $derived(data?.walk(WalkDirection.DOWN, (node, level) => ({ node, level })) ?? []);
 

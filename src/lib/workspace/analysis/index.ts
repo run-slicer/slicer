@@ -27,7 +27,7 @@ export const enum AnalysisState {
     FULL,
 }
 
-const workers = createDefaultWorkerPool<AnalysisWorker>(() => new Worker());
+export const workers = createDefaultWorkerPool<AnalysisWorker>(() => new Worker());
 const analyzeClass = async (entry: Entry, skipAttr: boolean) => {
     const buffer = await entry.data.bytes();
 
